@@ -1,0 +1,20 @@
+{
+  "name": "fala-pt",
+  "private": true,
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "type-check": "turbo type-check",
+    "db:generate": "pnpm --filter @fala-pt/db db:generate",
+    "db:push": "pnpm --filter @fala-pt/db db:push",
+    "db:migrate": "pnpm --filter @fala-pt/db db:migrate",
+    "db:studio": "pnpm --filter @fala-pt/db db:studio",
+    "clean": "turbo clean && rm -rf node_modules"
+  }
+}

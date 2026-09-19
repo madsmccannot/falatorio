@@ -1,0 +1,28 @@
+{
+  "name": "@fala-pt/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./constants": "./src/constants.ts",
+    "./fsrs": "./src/fsrs/index.ts",
+    "./scoring": "./src/scoring/index.ts",
+    "./lesson": "./src/lesson/index.ts",
+    "./gamification": "./src/gamification/index.ts",
+    "./economy": "./src/economy/index.ts",
+    "./entitlements": "./src/entitlements/index.ts",
+    "./ads": "./src/ads/index.ts",
+    "./l1-profiles": "./src/l1-profiles/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

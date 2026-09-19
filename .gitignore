@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.next/
+.expo/
+.turbo/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage/
+
+# Mobile builds
+apps/mobile/ios/
+apps/mobile/android/
+*.apk
+*.ipa
+*.aab
+
+# Design docs (local only)
+01-stack-comparativo.html
+02-mapa-tecnico-plataforma.html
+03-directory-tree.html
+*.html:Zone.Identifier
