@@ -10,6 +10,7 @@ import { Vocabulary } from "./collections/Vocabulary";
 import { AudioClips } from "./collections/AudioClips";
 import { L1CulturalContent } from "./collections/L1CulturalContent";
 import { ReviewQueue } from "./collections/ReviewQueue";
+import { Users } from "./collections/Users";
 
 export default buildConfig({
   serverURL: process.env["PAYLOAD_PUBLIC_SERVER_URL"] ?? "http://localhost:3002",
@@ -28,6 +29,7 @@ export default buildConfig({
     migrationDir: "./src/migrations",
   }),
   collections: [
+    Users,
     Courses,
     Units,
     Lessons,
