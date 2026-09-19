@@ -1,0 +1,27 @@
+{
+  "name": "@fala-pt/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./schema": "./src/schema/index.ts"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:migrate": "tsx src/migrate.ts",
+    "db:studio": "drizzle-kit studio",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.0",
+    "drizzle-orm": "^0.35.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.27.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
