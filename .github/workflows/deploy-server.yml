@@ -1,0 +1,69 @@
+name: Deploy Server
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "server/**"
+      - "packages/**"
+      - "pnpm-lock.yaml"
+
+concurrency:
+  group: deploy-server
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/server
+
+jobs:
+  deploy:
+    name: Build & Deploy Server
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./server/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to Railway
+        if: ${{ vars.RAILWAY_SERVICE_ID != '' }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          curl -X POST "https://backboard.railway.com/graphql/v2" \
+            -H "Authorization: Bearer $RAILWAY_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "query": "mutation { serviceInstanceRedeploy(serviceId: \"'${{ vars.RAILWAY_SERVICE_ID }}'\") }"
+            }'
+
+      - name: Run DB migrations
+        if: ${{ vars.RAILWAY_SERVICE_ID != '' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          npx pnpm install --frozen-lockfile --filter @fala-pt/db
+          npx pnpm db:migrate

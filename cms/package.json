@@ -1,0 +1,26 @@
+{
+  "name": "@fala-pt/cms",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "payload dev",
+    "build": "payload build",
+    "generate:types": "payload generate:types",
+    "generate:graphQLSchema": "payload generate:graphQLSchema",
+    "serve": "payload serve",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "^3.0.0",
+    "@payloadcms/richtext-lexical": "^3.0.0",
+    "@payloadcms/storage-s3": "^3.0.0",
+    "payload": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "cross-env": "^7.0.3"
+  },
+  "devDependencies": {
+    "@fala-pt/tsconfig": "workspace:*",
+    "typescript": "^5.6.0"
+  }
+}
