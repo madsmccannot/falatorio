@@ -202,8 +202,8 @@ importers:
         specifier: ^0.10.0
         version: 0.10.4
       drizzle-orm:
-        specifier: ^0.35.0
-        version: 0.35.3(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.3.0)(pg@8.20.0)(react@19.3.0)
+        specifier: ^0.36.0
+        version: 0.36.4(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.3.0)(pg@8.20.0)(react@19.3.0)
     devDependencies:
       drizzle-kit:
         specifier: ^0.27.0
@@ -251,8 +251,8 @@ importers:
         specifier: ^5.25.0
         version: 5.81.5
       drizzle-orm:
-        specifier: ^0.35.0
-        version: 0.35.3(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.3.0)(pg@8.20.0)(react@19.3.0)
+        specifier: ^0.36.0
+        version: 0.36.4(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.3.0)(pg@8.20.0)(react@19.3.0)
       fastify:
         specifier: ^5.1.0
         version: 5.12.5
@@ -5162,15 +5162,15 @@ packages:
     resolution: {integrity: sha512-hOzRGSdyKIU4FcTSFYGKdXEjFsncVwHZ43gY3WU5Bz9j5Iadp6Rh6hxLSQ1IWXpKLBKt/d5y1cpSPcV+FcoQ1A==}
     hasBin: true
 
-  drizzle-orm@0.35.3:
-    resolution: {integrity: sha512-Uv6N+b36x4BaZlxc96e+ag7RnMapBLGhc4SSi2F7RDwqYJipWjaU/P68RUp1FbW9r+mxoDp8nMz2Eece8PJxfA==}
+  drizzle-orm@0.36.4:
+    resolution: {integrity: sha512-1OZY3PXD7BR00Gl61UUOFihslDldfH4NFRH2MbP54Yxi0G/PKn4HfO65JYZ7c16DeP3SpM3Aw+VXVG9j6CRSXA==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=3'
-      '@electric-sql/pglite': '>=0.1.1'
+      '@electric-sql/pglite': '>=0.2.0'
       '@libsql/client': '>=0.10.0'
       '@libsql/client-wasm': '>=0.10.0'
-      '@neondatabase/serverless': '>=0.1'
+      '@neondatabase/serverless': '>=0.10.0'
       '@op-engineering/op-sqlite': '>=2'
       '@opentelemetry/api': ^1.4.1
       '@planetscale/database': '>=1'
@@ -5184,7 +5184,7 @@ packages:
       '@xata.io/client': '*'
       better-sqlite3: '>=7'
       bun-types: '*'
-      expo-sqlite: '>=13.2.0'
+      expo-sqlite: '>=14.0.0'
       knex: '*'
       kysely: '*'
       mysql2: '>=2'
@@ -5202,6 +5202,8 @@ packages:
       '@electric-sql/pglite':
         optional: true
       '@libsql/client':
+        optional: true
+      '@libsql/client-wasm':
         optional: true
       '@neondatabase/serverless':
         optional: true
@@ -11901,10 +11903,12 @@ snapshots:
     dependencies:
       '@libsql/core': 0.18.0
       js-base64: 3.9.4
+    optional: true
 
   '@libsql/core@0.18.0':
     dependencies:
       js-base64: 3.9.4
+    optional: true
 
   '@monaco-editor/loader@1.7.0':
     dependencies:
@@ -14899,10 +14903,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.35.3(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.3.0)(pg@8.20.0)(react@19.3.0):
-    dependencies:
-      '@libsql/client-wasm': 0.18.0
+  drizzle-orm@0.36.4(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.3.0)(pg@8.20.0)(react@19.3.0):
     optionalDependencies:
+      '@libsql/client-wasm': 0.18.0
       '@neondatabase/serverless': 0.10.4
       '@types/pg': 8.20.0
       '@types/react': 19.3.0
@@ -16550,7 +16553,8 @@ snapshots:
 
   joycon@3.1.1: {}
 
-  js-base64@3.9.4: {}
+  js-base64@3.9.4:
+    optional: true
 
   js-cookie@3.0.7: {}
 
