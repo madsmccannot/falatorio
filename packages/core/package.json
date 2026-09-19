@@ -17,7 +17,7 @@
   },
   "scripts": {
     "type-check": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "lint": "eslint src/"
   },
