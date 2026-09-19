@@ -4,11 +4,10 @@ export async function transcribeAudio(audioBase64: string): Promise<string> {
   const audioBuffer = Buffer.from(audioBase64, "base64");
 
   const formData = new FormData();
-  formData.append(
-    "file",
-    new Blob([audioBuffer], { type: "audio/webm" }),
-    "audio.webm",
-  );
+  // Node 20+ supports Blob + FormData natively; typed as `any` because
+  // mobile tsconfig resolves this file under ES2022 (no DOM lib).
+  const blob = new (globalThis as any).Blob([audioBuffer], { type: "audio/webm" });
+  (formData as any).append("file", blob, "audio.webm");
   formData.append("model", "whisper-1");
   formData.append("language", "pt");
   formData.append("response_format", "json");

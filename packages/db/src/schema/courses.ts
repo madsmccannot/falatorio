@@ -5,7 +5,7 @@ import {
   jsonb,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { l1CodeEnum, cefrEnum } from "./users.js";
+import { l1CodeEnum, cefrEnum } from "./users";
 
 export const courses = pgTable("courses", {
   id: uuid("id").primaryKey().defaultRandom(),

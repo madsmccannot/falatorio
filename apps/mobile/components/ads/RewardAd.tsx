@@ -9,7 +9,7 @@ import { useEntitlements } from "@/hooks/useEntitlements";
 
 const AD_UNIT_ID = __DEV__
   ? TestIds.REWARDED
-  : process.env.EXPO_PUBLIC_ADMOB_REWARD_ID ?? TestIds.REWARDED;
+  : process.env["EXPO_PUBLIC_ADMOB_REWARD_ID"] ?? TestIds.REWARDED;
 
 export function useRewardAd() {
   const { initialized, gdprConsent } = useAds();

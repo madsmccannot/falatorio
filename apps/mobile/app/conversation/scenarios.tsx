@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -6,7 +5,6 @@ import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { Card } from "@/components/ui/Card";
-import { Loading } from "@/components/ui/Loading";
 import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
 
 const SCENARIOS = [

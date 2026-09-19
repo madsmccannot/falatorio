@@ -9,7 +9,7 @@ import { useEntitlements } from "@/hooks/useEntitlements";
 
 const AD_UNIT_ID = __DEV__
   ? TestIds.INTERSTITIAL
-  : process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_ID ?? TestIds.INTERSTITIAL;
+  : process.env["EXPO_PUBLIC_ADMOB_INTERSTITIAL_ID"] ?? TestIds.INTERSTITIAL;
 
 export function useInterstitialAd() {
   const { initialized, gdprConsent } = useAds();

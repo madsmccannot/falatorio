@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import { purchasePackage, getOfferings } from "@/lib/revenuecat";
+import { purchasePackage, getOfferings, type PurchasesPackage } from "@/lib/revenuecat";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -30,22 +30,22 @@ export default function SuperDetailScreen() {
     try {
       setPurchasing(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      const offerings = await getOfferings();
+      const packages = await getOfferings();
       const packageId = period === "monthly" ? "super_monthly" : "super_yearly";
-      const pkg = offerings?.current?.availablePackages.find(
-        (p) => p.identifier === packageId
+      const pkg = packages.find(
+        (p: PurchasesPackage) => p.identifier === packageId
       );
       if (!pkg) {
-        showToast("Plan not available", "error");
+        showToast({ message: "Plan not available", type: "error" });
         return;
       }
       await purchasePackage(pkg);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      showToast("Welcome to Super!", "success");
+      showToast({ message: "Welcome to Super!", type: "success" });
       router.replace("/tabs/learn");
-    } catch (err: any) {
-      if (!err?.userCancelled) {
-        showToast("Purchase failed", "error");
+    } catch (err: unknown) {
+      if (!(err as Record<string, boolean>)?.["userCancelled"]) {
+        showToast({ message: "Purchase failed", type: "error" });
       }
     } finally {
       setPurchasing(false);
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   planCardBest: {
     borderColor: colors.primary[500],
-    backgroundColor: colors.neutral[850] ?? colors.neutral[800],
+    backgroundColor: colors.neutral[800],
   },
   bestBadge: {
     position: "absolute",

@@ -1,5 +1,4 @@
-import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
 

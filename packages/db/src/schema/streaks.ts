@@ -6,7 +6,7 @@ import {
   date,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { users } from "./users.js";
+import { users } from "./users";
 
 export const streaks = pgTable("streaks", {
   id: uuid("id").primaryKey().defaultRandom(),

@@ -1,6 +1,6 @@
 import { MMKV } from "react-native-mmkv";
 
-const storage = new MMKV({ id: "fala-pt" });
+export const storage = new MMKV({ id: "fala-pt" });
 
 export function getString(key: string): string | undefined {
   return storage.getString(key);

@@ -1,11 +1,12 @@
-import React from "react";
+import type React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useEntitlements } from "@/hooks/useEntitlements";
+import type { Feature } from "@fala-pt/core/entitlements";
 import { SuperUpsell } from "./SuperUpsell";
 import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
 
 type Props = {
-  feature: string;
+  feature: Feature;
   children: React.ReactNode;
   fallback?: React.ReactNode;
 };

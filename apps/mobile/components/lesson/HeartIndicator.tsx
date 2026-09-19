@@ -1,7 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { Text, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSequence, withTiming } from "react-native-reanimated";
-import { colors, spacing, typography } from "@fala-pt/ui/tokens";
+import { colors, typography } from "@fala-pt/ui/tokens";
 
 type Props = {
   hearts: number;

@@ -1,14 +1,52 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Fala PT — Learn European Portuguese",
-  description: "Master European Portuguese with adaptive lessons, spaced repetition, and AI-powered conversation practice.",
+  title: {
+    default: "Fala PT — Aprende Português Europeu",
+    template: "%s | Fala PT",
+  },
+  description:
+    "A plataforma para aprender português europeu de verdade. Lições adaptativas, repetição espaçada e conversação com IA — tudo adaptado à tua língua materna.",
+  keywords: [
+    "português europeu",
+    "aprender português",
+    "PT-EU",
+    "portugal",
+    "língua portuguesa",
+    "european portuguese",
+  ],
+  openGraph: {
+    title: "Fala PT — Aprende Português Europeu",
+    description:
+      "Lições adaptativas, repetição espaçada e conversação com IA — tudo adaptado à tua língua materna.",
+    locale: "pt_PT",
+    type: "website",
+  },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="pt">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body
+        style={{
+          margin: 0,
+          fontFamily: "'Inter', system-ui, sans-serif",
+          backgroundColor: "#FAFAF9",
+          color: "#1C1917",
+        }}
+      >
+        {children}
+      </body>
     </html>
   );
 }

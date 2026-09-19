@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";

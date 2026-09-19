@@ -14,7 +14,7 @@ export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
       const indices = words.map((_, i) => i);
       for (let i = indices.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [indices[i], indices[j]] = [indices[j], indices[i]];
+        [indices[i], indices[j]] = [indices[j]!, indices[i]!];
       }
       return indices;
     }
@@ -30,7 +30,7 @@ export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
   const removeWord = (pos: number) => {
     if (disabled) return;
     Haptics.selectionAsync();
-    const idx = selected[pos];
+    const idx = selected[pos]!;
     setSelected(selected.filter((_, i) => i !== pos));
     setAvailable([...available, idx]);
   };

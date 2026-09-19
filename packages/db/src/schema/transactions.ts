@@ -7,7 +7,7 @@ import {
   pgEnum,
   index,
 } from "drizzle-orm/pg-core";
-import { users } from "./users.js";
+import { users } from "./users";
 
 export const transactionTypeEnum = pgEnum("transaction_type", [
   "earn", "spend", "iap", "refund",

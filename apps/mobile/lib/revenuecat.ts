@@ -3,6 +3,8 @@ import Purchases, {
   type PurchasesPackage,
   LOG_LEVEL,
 } from "react-native-purchases";
+
+export type { PurchasesPackage };
 import { Platform } from "react-native";
 
 const API_KEYS = {

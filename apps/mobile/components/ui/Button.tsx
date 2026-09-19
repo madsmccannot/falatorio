@@ -1,10 +1,9 @@
-import React from "react";
+import type React from "react";
 import {
   Pressable,
   Text,
   StyleSheet,
   type ViewStyle,
-  type TextStyle,
   ActivityIndicator,
 } from "react-native";
 import * as Haptics from "expo-haptics";

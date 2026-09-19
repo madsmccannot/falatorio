@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography, shadows } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
 import { SUPER_PRICING } from "@fala-pt/core";
 import { setOnboardingComplete } from "@/lib/storage";
 

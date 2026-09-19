@@ -13,7 +13,7 @@ import * as SecureStore from "expo-secure-store";
 
 SplashScreen.preventAutoHideAsync();
 
-const CLERK_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
+const CLERK_KEY = process.env["EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY"] ?? "";
 
 const tokenCache = {
   async getToken(key: string) {

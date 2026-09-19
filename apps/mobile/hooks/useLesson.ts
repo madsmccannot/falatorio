@@ -1,30 +1,49 @@
 import { useState, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 
+interface Exercise {
+  id: string;
+  type: string;
+  prompt: string;
+  options?: string[];
+  audioUrl: string | null;
+  audioNativeUrl: string | null;
+  difficulty: number;
+}
+
+interface FeedbackState {
+  correct: boolean;
+  correctAnswer?: string;
+  l1Tip?: string;
+}
+
+type LessonPhase = "loading" | "answering" | "complete";
+
 interface LessonState {
   sessionId: string | null;
-  exercises: Array<{
-    id: string;
-    type: string;
-    prompt: unknown;
-    audioUrl: string | null;
-    audioNativeUrl: string | null;
-    difficulty: number;
-  }>;
+  exercises: Exercise[];
   currentIndex: number;
   results: Array<{
     correct: boolean;
     score: number;
     feedback: string | null;
   }>;
+  phase: LessonPhase;
+  selectedAnswer: string | null;
+  feedback: FeedbackState | null;
+  error: string | null;
 }
 
-export function useLesson() {
+export function useLesson(lessonId?: string) {
   const [state, setState] = useState<LessonState>({
     sessionId: null,
     exercises: [],
     currentIndex: 0,
     results: [],
+    phase: "loading",
+    selectedAnswer: null,
+    feedback: null,
+    error: null,
   });
 
   const startMutation = trpc.lesson.startLesson.useMutation();
@@ -32,30 +51,51 @@ export function useLesson() {
   const completeMutation = trpc.lesson.completeLesson.useMutation();
   const utils = trpc.useUtils();
 
-  const startLesson = useCallback(async (lessonId: string) => {
-    const result = await startMutation.mutateAsync({ lessonId });
-    setState({
-      sessionId: result.sessionId,
-      exercises: result.exercises,
-      currentIndex: 0,
-      results: [],
-    });
-    return result;
-  }, [startMutation]);
+  const startLesson = useCallback(async (id?: string) => {
+    const targetId = id ?? lessonId;
+    if (!targetId) return null;
+    try {
+      const result = await startMutation.mutateAsync({ lessonId: targetId });
+      setState((prev) => ({
+        ...prev,
+        sessionId: result.sessionId,
+        exercises: result.exercises as Exercise[],
+        currentIndex: 0,
+        results: [],
+        phase: "answering" as const,
+        error: null,
+      }));
+      return result;
+    } catch (err) {
+      setState((prev) => ({
+        ...prev,
+        error: err instanceof Error ? err.message : "Failed to start lesson",
+      }));
+      return null;
+    }
+  }, [lessonId, startMutation]);
 
-  const submitAnswer = useCallback(async (answer: string) => {
-    if (!state.sessionId || !state.exercises[state.currentIndex]) return null;
+  const setSelectedAnswer = useCallback((answer: string) => {
+    setState((prev) => ({ ...prev, selectedAnswer: answer }));
+  }, []);
+
+  const submitCurrentAnswer = useCallback(async () => {
+    if (!state.sessionId || !state.exercises[state.currentIndex] || !state.selectedAnswer) return null;
 
     const exercise = state.exercises[state.currentIndex]!;
     const result = await submitMutation.mutateAsync({
       sessionId: state.sessionId,
       exerciseId: exercise.id,
-      answer,
+      answer: state.selectedAnswer,
     });
 
     setState((prev) => ({
       ...prev,
-      currentIndex: prev.currentIndex + 1,
+      feedback: {
+        correct: result.correct,
+        correctAnswer: (result as Record<string, unknown>)["correctAnswer"] as string | undefined,
+        l1Tip: (result as Record<string, unknown>)["l1Tip"] as string | undefined,
+      },
       results: [...prev.results, {
         correct: result.correct,
         score: result.score,
@@ -64,7 +104,21 @@ export function useLesson() {
     }));
 
     return result;
-  }, [state.sessionId, state.exercises, state.currentIndex, submitMutation]);
+  }, [state.sessionId, state.exercises, state.currentIndex, state.selectedAnswer, submitMutation]);
+
+  const nextExercise = useCallback(() => {
+    setState((prev) => {
+      const nextIndex = prev.currentIndex + 1;
+      const isComplete = nextIndex >= prev.exercises.length;
+      return {
+        ...prev,
+        currentIndex: nextIndex,
+        selectedAnswer: null,
+        feedback: null,
+        phase: isComplete ? "complete" as const : "answering" as const,
+      };
+    });
+  }, []);
 
   const completeLesson = useCallback(async () => {
     if (!state.sessionId) return null;
@@ -84,21 +138,28 @@ export function useLesson() {
   const progress = state.exercises.length > 0
     ? state.currentIndex / state.exercises.length
     : 0;
-  const isComplete = state.currentIndex >= state.exercises.length && state.exercises.length > 0;
 
   return {
     sessionId: state.sessionId,
+    state: state.phase,
     exercises: state.exercises,
     currentExercise,
     currentIndex: state.currentIndex,
     results: state.results,
     progress,
-    isComplete,
+    totalExercises: state.exercises.length,
+    selectedAnswer: state.selectedAnswer,
+    setSelectedAnswer,
+    submitCurrentAnswer,
+    submitAnswer: submitCurrentAnswer,
+    isSubmitting: submitMutation.isPending,
+    feedback: state.feedback,
+    nextExercise,
+    isComplete: state.phase === "complete",
     startLesson,
-    submitAnswer,
     completeLesson,
     isStarting: startMutation.isPending,
-    isSubmitting: submitMutation.isPending,
     isCompleting: completeMutation.isPending,
+    error: state.error,
   };
 }

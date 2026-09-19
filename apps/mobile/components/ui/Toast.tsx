@@ -20,9 +20,11 @@ interface ToastData {
 
 interface ToastContextValue {
   show: (data: ToastData) => void;
+  showToast: (data: ToastData) => void;
 }
 
-const ToastContext = createContext<ToastContextValue>({ show: () => {} });
+const noop = () => {};
+const ToastContext = createContext<ToastContextValue>({ show: noop, showToast: noop });
 
 export function useToast() {
   return useContext(ToastContext);
@@ -64,7 +66,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const style = toast ? TYPE_COLORS[toast.type] : TYPE_COLORS.info;
 
   return (
-    <ToastContext.Provider value={{ show }}>
+    <ToastContext.Provider value={{ show, showToast: show }}>
       {children}
       {toast && (
         <Animated.View

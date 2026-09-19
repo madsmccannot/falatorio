@@ -5,7 +5,7 @@ import {
   timestamp,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { exercises } from "./exercises.js";
+import { exercises } from "./exercises";
 
 export const audioRegionEnum = pgEnum("audio_region", [
   "lisboa", "porto", "algarve", "acores", "madeira",

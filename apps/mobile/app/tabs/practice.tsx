@@ -1,9 +1,7 @@
-import React from "react";
 import {
   View,
   Text,
   FlatList,
-  Pressable,
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -17,7 +15,7 @@ import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
 export default function PracticeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { dueItems, dueCount, isLoading, refreshReviews } = useFSRS();
+  const { dueItems, dueCount, isLoading } = useFSRS();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>

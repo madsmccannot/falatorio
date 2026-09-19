@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
   withDelay,
 } from "react-native-reanimated";
-import { colors, spacing, radii } from "@fala-pt/ui/tokens";
+import { colors } from "@fala-pt/ui/tokens";
 
 type Props = {
   active: boolean;

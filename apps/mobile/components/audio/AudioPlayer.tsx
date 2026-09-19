@@ -13,8 +13,8 @@ type Props = {
 
 export function AudioPlayer({ uri, label, compact }: Props) {
   const [isPlaying, setIsPlaying] = React.useState(false);
-  const [duration, setDuration] = React.useState(0);
-  const [position, setPosition] = React.useState(0);
+  const [, setDuration] = React.useState(0);
+  const [, setPosition] = React.useState(0);
   const soundRef = React.useRef<Audio.Sound | null>(null);
   const progress = useSharedValue(0);
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback } from "react";
+import React, { createContext, useContext } from "react";
 import mobileAds, { MaxAdContentRating } from "react-native-google-mobile-ads";
 import { storage, KEYS } from "@/lib/storage";
 

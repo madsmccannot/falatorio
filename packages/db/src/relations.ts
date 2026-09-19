@@ -15,7 +15,7 @@ import {
   transactions,
   iapReceipts,
   adEvents,
-} from "./schema/index.js";
+} from "./schema/index";
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   streak: one(streaks, {

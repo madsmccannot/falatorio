@@ -2,16 +2,16 @@ import { Platform } from "react-native";
 
 export const AD_UNITS = {
   banner: Platform.select({
-    ios: process.env.EXPO_PUBLIC_ADMOB_BANNER_IOS ?? "",
-    android: process.env.EXPO_PUBLIC_ADMOB_BANNER_ANDROID ?? "",
+    ios: process.env["EXPO_PUBLIC_ADMOB_BANNER_IOS"] ?? "",
+    android: process.env["EXPO_PUBLIC_ADMOB_BANNER_ANDROID"] ?? "",
   }) ?? "",
   interstitial: Platform.select({
-    ios: process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_IOS ?? "",
-    android: process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_ANDROID ?? "",
+    ios: process.env["EXPO_PUBLIC_ADMOB_INTERSTITIAL_IOS"] ?? "",
+    android: process.env["EXPO_PUBLIC_ADMOB_INTERSTITIAL_ANDROID"] ?? "",
   }) ?? "",
   reward: Platform.select({
-    ios: process.env.EXPO_PUBLIC_ADMOB_REWARD_IOS ?? "",
-    android: process.env.EXPO_PUBLIC_ADMOB_REWARD_ANDROID ?? "",
+    ios: process.env["EXPO_PUBLIC_ADMOB_REWARD_IOS"] ?? "",
+    android: process.env["EXPO_PUBLIC_ADMOB_REWARD_ANDROID"] ?? "",
   }) ?? "",
 };
 

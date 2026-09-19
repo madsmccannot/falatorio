@@ -22,7 +22,7 @@ type Message = {
   id: string;
   role: "user" | "tutor";
   text: string;
-  errors?: Array<{ fragment: string; correction: string; explanation: string }>;
+  errors?: Array<{ type: string; userSaid: string; correct: string; explanation: string }>;
 };
 
 export default function ConversationScreen() {
@@ -39,7 +39,6 @@ export default function ConversationScreen() {
   const startMutation = trpc.conversation.startSession.useMutation();
   const sendMutation = trpc.conversation.sendMessage.useMutation();
   const completeMutation = trpc.conversation.completeSession.useMutation();
-  const explainMutation = trpc.conversation.explainError.useMutation();
 
   React.useEffect(() => {
     (async () => {
@@ -49,7 +48,7 @@ export default function ConversationScreen() {
         {
           id: "tutor-0",
           role: "tutor",
-          text: result.greeting,
+          text: "Olá! Vamos praticar português. Diz-me alguma coisa!",
         },
       ]);
     })();
@@ -175,8 +174,8 @@ export default function ConversationScreen() {
         <Text style={styles.modalTitle}>Errors in your message</Text>
         {selectedError?.map((err, i) => (
           <View key={i} style={styles.errorCard}>
-            <Text style={styles.errorFragment}>"{err.fragment}"</Text>
-            <Text style={styles.errorCorrection}>{err.correction}</Text>
+            <Text style={styles.errorFragment}>"{err.userSaid}"</Text>
+            <Text style={styles.errorCorrection}>{err.correct}</Text>
             <Text style={styles.errorExplanation}>{err.explanation}</Text>
           </View>
         ))}

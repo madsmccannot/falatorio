@@ -6,7 +6,7 @@ import {
   varchar,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { courses } from "./courses.js";
+import { courses } from "./courses";
 
 export const units = pgTable("units", {
   id: uuid("id").primaryKey().defaultRandom(),

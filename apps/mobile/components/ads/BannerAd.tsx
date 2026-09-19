@@ -1,11 +1,10 @@
-import React from "react";
 import { View, StyleSheet } from "react-native";
 import { BannerAd as GBannerAd, BannerAdSize, TestIds } from "react-native-google-mobile-ads";
 import { useAds } from "./AdProvider";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { spacing } from "@fala-pt/ui/tokens";
 
-const AD_UNIT_ID = __DEV__ ? TestIds.BANNER : process.env.EXPO_PUBLIC_ADMOB_BANNER_ID ?? TestIds.BANNER;
+const AD_UNIT_ID = __DEV__ ? TestIds.BANNER : process.env["EXPO_PUBLIC_ADMOB_BANNER_ID"] ?? TestIds.BANNER;
 
 export function BannerAdComponent() {
   const { initialized, gdprConsent } = useAds();

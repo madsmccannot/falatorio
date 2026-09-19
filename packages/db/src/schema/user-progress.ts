@@ -6,8 +6,8 @@ import {
   timestamp,
   primaryKey,
 } from "drizzle-orm/pg-core";
-import { users } from "./users.js";
-import { exercises } from "./exercises.js";
+import { users } from "./users";
+import { exercises } from "./exercises";
 
 export const userProgress = pgTable("user_progress", {
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),

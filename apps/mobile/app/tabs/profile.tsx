@@ -1,6 +1,4 @@
-import React from "react";
-import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
-import { useRouter } from "expo-router";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@clerk/clerk-expo";
 import { trpc } from "@/lib/trpc";
@@ -13,12 +11,11 @@ import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { signOut } = useAuth();
   const profile = trpc.user.getProfile.useQuery();
   const achievements = trpc.gamification.getAchievements.useQuery();
   const { currentDays, longestDays } = useStreak();
-  const { isSuper, tier } = useEntitlements();
+  const { isSuper } = useEntitlements();
   const user = profile.data;
 
   if (profile.isLoading) {

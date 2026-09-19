@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import Animated, { FadeIn, SlideInDown } from "react-native-reanimated";
+import { Text, StyleSheet } from "react-native";
+import Animated, { SlideInDown } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";

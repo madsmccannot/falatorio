@@ -1,4 +1,3 @@
-import React from "react";
 import {
   View,
   Text,
@@ -15,7 +14,7 @@ import { useEntitlements } from "@/hooks/useEntitlements";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
-import { colors, spacing, radii, typography, shadows } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
 
 export default function ShopScreen() {
   const insets = useSafeAreaInsets();

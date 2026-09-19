@@ -1,7 +1,6 @@
-import React from "react";
+import type React from "react";
 import {
   Modal as RNModal,
-  View,
   Pressable,
   StyleSheet,
 } from "react-native";
@@ -13,9 +12,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { colors, spacing, radii } from "@fala-pt/ui/tokens";
 
-interface ModalProps {
+export interface ModalProps {
   visible: boolean;
-  onClose: () => void;
+  onClose?: () => void;
+  onDismiss?: () => void;
   children: React.ReactNode;
   dismissable?: boolean;
 }
@@ -23,16 +23,18 @@ interface ModalProps {
 export function Modal({
   visible,
   onClose,
+  onDismiss,
   children,
   dismissable = true,
 }: ModalProps) {
+  const handleClose = onClose ?? onDismiss ?? (() => {});
   return (
     <RNModal
       visible={visible}
       transparent
       animationType="none"
       statusBarTranslucent
-      onRequestClose={dismissable ? onClose : undefined}
+      onRequestClose={dismissable ? handleClose : undefined}
     >
       <Animated.View
         entering={FadeIn.duration(200)}
@@ -41,7 +43,7 @@ export function Modal({
       >
         <Pressable
           style={styles.backdrop}
-          onPress={dismissable ? onClose : undefined}
+          onPress={dismissable ? handleClose : undefined}
         />
         <Animated.View
           entering={SlideInDown.springify().damping(18).stiffness(300)}

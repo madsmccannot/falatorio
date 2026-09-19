@@ -1,10 +1,9 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { FadeIn, useSharedValue, useAnimatedStyle, withRepeat, withTiming } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
-import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, typography } from "@fala-pt/ui/tokens";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function SpeakAndScore({ exercise, onAnswer, disabled }: ExerciseProps) {

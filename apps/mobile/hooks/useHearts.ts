@@ -23,6 +23,9 @@ export function useHearts() {
     hearts: state.data?.hearts ?? 0,
     unlimited: state.data?.unlimited ?? false,
     nextRefillAt: state.data?.nextRefillAt ?? null,
+    nextRefillIn: state.data?.nextRefillAt
+      ? Math.max(0, new Date(state.data.nextRefillAt).getTime() - Date.now())
+      : null,
     isLoading: state.isLoading,
     refillWithCrystals,
     continueWithCrystals,

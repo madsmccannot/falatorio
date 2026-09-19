@@ -6,7 +6,7 @@ import {
   timestamp,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { users } from "./users.js";
+import { users } from "./users";
 
 export const leagueTierEnum = pgEnum("league_tier", [
   "bronze", "silver", "gold", "diamond", "obsidian",

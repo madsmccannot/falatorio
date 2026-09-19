@@ -6,7 +6,7 @@ import {
   real,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { units } from "./units.js";
+import { units } from "./units";
 
 export const lessons = pgTable("lessons", {
   id: uuid("id").primaryKey().defaultRandom(),

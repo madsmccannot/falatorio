@@ -6,7 +6,7 @@ import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, typography } from "@fala-pt/ui/tokens";
 
 export default function LessonResultScreen() {
   const router = useRouter();
@@ -20,7 +20,6 @@ export default function LessonResultScreen() {
     passed: string;
   }>();
 
-  const score = Number(params.score ?? 0);
   const xpEarned = Number(params.xpEarned ?? 0);
   const crystalsEarned = Number(params.crystalsEarned ?? 0);
   const totalExercises = Number(params.totalExercises ?? 0);

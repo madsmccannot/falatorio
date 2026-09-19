@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -11,11 +10,12 @@ import { HEARTS } from "@fala-pt/core";
 
 type Props = {
   visible: boolean;
+  sessionId?: string;
   onContinue: () => void;
   onQuit: () => void;
 };
 
-export function MidLessonPaywall({ visible, onContinue, onQuit }: Props) {
+export function MidLessonPaywall({ visible, sessionId, onContinue, onQuit }: Props) {
   const router = useRouter();
   const { continueWithCrystals } = useHearts();
   const { balance } = useCrystals();
@@ -24,7 +24,7 @@ export function MidLessonPaywall({ visible, onContinue, onQuit }: Props) {
 
   const handleContinue = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    await continueWithCrystals();
+    await continueWithCrystals(sessionId ?? "");
     onContinue();
   };
 

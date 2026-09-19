@@ -3,11 +3,10 @@ import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
-import { purchasePackage, getOfferings } from "@/lib/revenuecat";
+import { purchasePackage, getOfferings, type PurchasesPackage } from "@/lib/revenuecat";
 import { useCrystals } from "@/hooks/useCrystals";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Loading } from "@/components/ui/Loading";
 import { useToast } from "@/components/ui/Toast";
 import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
 
@@ -38,20 +37,20 @@ export default function CrystalPacksScreen() {
     try {
       setPurchasing(pack.id);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      const offerings = await getOfferings();
-      const pkg = offerings?.current?.availablePackages.find(
-        (p) => p.identifier === pack.packageId
+      const packages = await getOfferings();
+      const pkg = packages.find(
+        (p: PurchasesPackage) => p.identifier === pack.packageId
       );
       if (!pkg) {
-        showToast("Pack not available", "error");
+        showToast({ message: "Pack not available", type: "error" });
         return;
       }
       await purchasePackage(pkg);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      showToast(`${pack.amount} ouro added!`, "success");
+      showToast({ message: `${pack.amount} ouro added!`, type: "success" });
     } catch (err: any) {
       if (!err?.userCancelled) {
-        showToast("Purchase failed", "error");
+        showToast({ message: "Purchase failed", type: "error" });
       }
     } finally {
       setPurchasing(null);

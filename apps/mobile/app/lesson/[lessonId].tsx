@@ -10,14 +10,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import Animated, {
   FadeIn,
-  FadeOut,
   SlideInRight,
   SlideOutLeft,
 } from "react-native-reanimated";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLesson } from "@/hooks/useLesson";
 import { useHearts } from "@/hooks/useHearts";
-import { useEntitlements } from "@/hooks/useEntitlements";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { Modal } from "@/components/ui/Modal";
@@ -27,7 +25,6 @@ export default function LessonScreen() {
   const { lessonId } = useLocalSearchParams<{ lessonId: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { isSuper } = useEntitlements();
   const { hearts, unlimited, continueWithCrystals } = useHearts();
 
   const {
@@ -41,9 +38,6 @@ export default function LessonScreen() {
     isSubmitting,
     feedback,
     nextExercise,
-    completeLesson,
-    isCompleting,
-    startLesson,
     isStarting,
     error,
   } = useLesson(lessonId!);
@@ -75,7 +69,7 @@ export default function LessonScreen() {
     return (
       <View style={[styles.container, styles.centered, { paddingTop: insets.top }]}>
         <Text style={styles.errorTitle}>Something went wrong</Text>
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.errorText}>{String(error)}</Text>
         <Button
           title="Go back"
           onPress={() => router.back()}
@@ -250,7 +244,7 @@ export default function LessonScreen() {
         <Button
           title="Continue (50 ouro)"
           onPress={async () => {
-            await continueWithCrystals();
+            await continueWithCrystals(lessonId!);
             setShowOutOfHearts(false);
           }}
           style={styles.modalButton}

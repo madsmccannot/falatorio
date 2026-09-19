@@ -18,7 +18,7 @@ export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
     const indices = pairs.map((_, i) => i);
     for (let i = indices.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]];
+      [indices[i], indices[j]] = [indices[j]!, indices[i]!];
     }
     return indices;
   }, [pairs.length]);
@@ -104,7 +104,7 @@ export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
                 style={[styles.card, stateStyle(getRightState(origIdx))]}
               >
                 <Text style={[styles.cardText, matched.has(origIdx) && styles.matchedText]}>
-                  {pairs[origIdx].right}
+                  {pairs[origIdx]?.right}
                 </Text>
               </Animated.View>
             </Pressable>

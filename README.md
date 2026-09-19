@@ -26,7 +26,7 @@ falapt/
 |-------|-----------|
 | Mobile | React Native 0.76, Expo 52, expo-router, Reanimated, Gesture Handler |
 | Server | Fastify 5, tRPC 11, superjson |
-| Database | PostgreSQL (Neon), Drizzle ORM, 18 schema tables |
+| Database | PostgreSQL (Neon), Drizzle ORM, 17 schema tables |
 | Cache/Queue | Redis (ioredis), BullMQ (6 queues) |
 | Auth | Clerk (JWT, cached in Redis) |
 | CMS | Payload CMS v3, PostgreSQL adapter, R2 storage |
@@ -39,7 +39,9 @@ falapt/
 
 ### L1 Profiles
 
-Every source language is a separate product. Each L1 profile contains phonetic transfer maps, grammar interference patterns, false friends, and cultural bridges. Currently 15 profiles: en, es, fr, de, it, nl, pl, ro, uk, ru, ar, hi, bn, ur, zh.
+Every source language is a separate product. Each L1 profile contains phonetic transfer maps, grammar interference patterns, false friends, and cultural bridges. 15 profiles: en, es, fr, de, hi, ur, ar, bn, zh, ru, uk, tr, pl, ko, ja.
+
+Phase 1 languages (en, es, fr, hi, ur, ar, bn) have full production profiles: 15-40 false friends, 12-15 phonetic difficulties, 12-15 grammar gaps, 15-30 cognates, and 15-25 cultural references per language. Phase 2 languages (de, zh, ru, uk, tr, pl, ko, ja) have functional stubs.
 
 ### FSRS (Free Spaced Repetition Scheduler)
 
@@ -68,7 +70,7 @@ Text scoring uses Levenshtein distance with PT-EU phonetic normalization. Speech
 
 ## Package Breakdown
 
-### `packages/core` — 63 files
+### `packages/core` — 64 files
 
 Pure business logic, zero dependencies on I/O or frameworks:
 
@@ -79,11 +81,11 @@ Pure business logic, zero dependencies on I/O or frameworks:
 - **Entitlements** — feature gates, heart system, access checks
 - **Gamification** — XP calculator, streak logic, league promotion, achievements
 - **Ads** — ad policy (GDPR, tier, cooldowns)
-- **L1 Profiles** — 15 language transfer profiles with cultural content
+- **L1 Profiles** — 15 language transfer profiles with cultural content (7 fully expanded)
 
-### `packages/db` — 18 schema tables
+### `packages/db` — 17 schema tables
 
-Users, courses, units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content.
+Users, courses, units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content. Initial Drizzle migration generated.
 
 ### `server` — 12 routers, 7 services, 6 jobs
 
@@ -93,7 +95,7 @@ Users, courses, units, lessons, exercises, audio clips, user progress, streaks, 
 
 **Jobs (BullMQ):** exercise generation, league reset, streak reminders, quality flagging, heart refill, subscription checks.
 
-### `apps/mobile` — 19 screens, 39 components, 8 hooks
+### `apps/mobile` — 19 screens, 38 components, 8 hooks
 
 **Onboarding:** language select, GDPR consent, goal, level, placement test, plan.
 

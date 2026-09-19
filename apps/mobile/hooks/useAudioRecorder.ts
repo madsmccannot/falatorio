@@ -29,7 +29,7 @@ export function useAudioRecorder() {
 
     const recording = new Audio.Recording();
     await recording.prepareToRecordAsync(
-      Audio.RecordingOptionsPresets.HIGH_QUALITY,
+      Audio.RecordingOptionsPresets["HIGH_QUALITY"],
     );
     await recording.startAsync();
 
