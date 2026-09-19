@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { eq, and, sum, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { transactions, wallets } from "@fala-pt/db/schema";
+import { transactions } from "@fala-pt/db/schema";
 import { computeBalance, type Transaction } from "@fala-pt/core/economy";
 
 export const economyRouter = t.router({
@@ -13,7 +13,7 @@ export const economyRouter = t.router({
       .from(transactions)
       .where(eq(transactions.userId, ctx.user.userId));
 
-    const txs: Transaction[] = rows.map((r) => ({
+    const txs = rows.map((r) => ({
       type: r.type as Transaction["type"],
       amount: r.amount,
     }));
@@ -84,7 +84,7 @@ export const economyRouter = t.router({
         .from(transactions)
         .where(eq(transactions.userId, ctx.user.userId));
 
-      const txs: Transaction[] = rows.map((r) => ({
+      const txs = rows.map((r) => ({
         type: r.type as Transaction["type"],
         amount: r.amount,
       }));

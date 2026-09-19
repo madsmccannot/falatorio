@@ -1,6 +1,5 @@
 import { TRPCError } from "@trpc/server";
 import { t } from "./router.js";
-import type { Context } from "./context.js";
 
 export const authGuard = t.middleware(async ({ ctx, next }) => {
   if (!ctx.user) {

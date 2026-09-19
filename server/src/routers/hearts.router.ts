@@ -5,8 +5,9 @@ import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
 import { users, transactions } from "@fala-pt/db/schema";
 import { HEARTS, CRYSTALS } from "@fala-pt/core";
-import { getHearts, refillAllHearts, type HeartState } from "@fala-pt/core/entitlements";
+import { getHearts } from "@fala-pt/core/entitlements";
 import { computeBalance, type Transaction } from "@fala-pt/core/economy";
+import type { Tier } from "@fala-pt/core";
 
 export const heartsRouter = t.router({
   getState: protectedProcedure.query(async ({ ctx }) => {
@@ -26,16 +27,15 @@ export const heartsRouter = t.router({
       return { hearts: HEARTS.MAX, unlimited: true, nextRefillAt: null };
     }
 
-    const state = getHearts({
-      hearts: user.hearts ?? HEARTS.MAX,
-      heartsRefillAt: user.heartsRefillAt,
-      tier: user.tier as "free" | "super",
-    });
+    const current = getHearts(
+      { hearts: user.hearts, heartsRefillAt: user.heartsRefillAt },
+      user.tier as Tier,
+    );
 
     return {
-      hearts: state.current,
+      hearts: current ?? HEARTS.MAX,
       unlimited: false,
-      nextRefillAt: state.nextRefillAt,
+      nextRefillAt: user.heartsRefillAt,
     };
   }),
 
@@ -60,7 +60,7 @@ export const heartsRouter = t.router({
       .from(transactions)
       .where(eq(transactions.userId, ctx.user.userId));
 
-    const txs: Transaction[] = rows.map((r) => ({
+    const txs = rows.map((r) => ({
       type: r.type as Transaction["type"],
       amount: r.amount,
     }));
@@ -102,7 +102,7 @@ export const heartsRouter = t.router({
         .from(transactions)
         .where(eq(transactions.userId, ctx.user.userId));
 
-      const txs: Transaction[] = rows.map((r) => ({
+      const txs = rows.map((r) => ({
         type: r.type as Transaction["type"],
         amount: r.amount,
       }));

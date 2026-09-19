@@ -1,5 +1,4 @@
-import { z } from "zod";
-import { eq, and, sql, desc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
@@ -11,8 +10,7 @@ import {
   transactions,
 } from "@fala-pt/db/schema";
 import { LEAGUE, CRYSTALS } from "@fala-pt/core";
-import { checkStreak, recordActivity, canRecoverStreak } from "@fala-pt/core/gamification";
-import { checkAchievements } from "@fala-pt/core/gamification";
+import { checkStreak, recordActivity } from "@fala-pt/core/gamification";
 import { computeBalance, type Transaction } from "@fala-pt/core/economy";
 
 export const gamificationRouter = t.router({
@@ -32,25 +30,28 @@ export const gamificationRouter = t.router({
       };
     }
 
-    const today = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const timezone = "Europe/Lisbon";
     const result = checkStreak({
       currentDays: streak.currentDays,
       longestDays: streak.longestDays,
       lastActivityDate: streak.lastActivityDate,
       freezeAvailable: streak.freezeAvailable,
       freezeUsedToday: streak.freezeUsedToday,
-    }, today);
+    }, now, timezone);
 
     return {
-      currentDays: result.currentDays,
+      currentDays: result.streakDays,
       longestDays: result.longestDays,
       freezeAvailable: streak.freezeAvailable,
-      isActive: result.isActive,
+      isActive: !result.streakBroken,
     };
   }),
 
   recordDailyActivity: protectedProcedure.mutation(async ({ ctx }) => {
-    const today = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const timezone = "Europe/Lisbon";
+    const today = now.toLocaleDateString("en-CA", { timeZone: timezone });
     const [streak] = await ctx.db
       .select()
       .from(streaks)
@@ -67,7 +68,7 @@ export const gamificationRouter = t.router({
 
       await ctx.db
         .update(users)
-        .set({ streakDays: 1, lastActivityAt: new Date(), updatedAt: new Date() })
+        .set({ streakDays: 1, lastActivityAt: now, updatedAt: now })
         .where(eq(users.id, ctx.user.userId));
 
       return { currentDays: 1, isNew: true };
@@ -81,7 +82,8 @@ export const gamificationRouter = t.router({
         freezeAvailable: streak.freezeAvailable,
         freezeUsedToday: streak.freezeUsedToday,
       },
-      today,
+      now,
+      timezone,
     );
 
     await ctx.db
@@ -91,7 +93,7 @@ export const gamificationRouter = t.router({
         longestDays: updated.longestDays,
         lastActivityDate: today,
         freezeUsedToday: false,
-        updatedAt: new Date(),
+        updatedAt: now,
       })
       .where(eq(streaks.userId, ctx.user.userId));
 
@@ -100,8 +102,8 @@ export const gamificationRouter = t.router({
       .set({
         streakDays: updated.currentDays,
         longestStreak: updated.longestDays,
-        lastActivityAt: new Date(),
-        updatedAt: new Date(),
+        lastActivityAt: now,
+        updatedAt: now,
       })
       .where(eq(users.id, ctx.user.userId));
 
@@ -114,7 +116,7 @@ export const gamificationRouter = t.router({
       .from(transactions)
       .where(eq(transactions.userId, ctx.user.userId));
 
-    const txs: Transaction[] = rows.map((r) => ({
+    const txs = rows.map((r) => ({
       type: r.type as Transaction["type"],
       amount: r.amount,
     }));

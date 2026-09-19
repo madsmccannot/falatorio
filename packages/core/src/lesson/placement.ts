@@ -1,5 +1,5 @@
 import type { CEFRLevel, L1Code } from "../constants.js";
-import { CEFR_LEVELS, PLACEMENT_TEST } from "../constants.js";
+import { PLACEMENT_TEST } from "../constants.js";
 
 export interface PlacementQuestion {
   id: string;

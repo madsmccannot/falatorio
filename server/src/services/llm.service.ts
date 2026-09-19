@@ -9,7 +9,7 @@ interface ConversationMessage {
   timestamp: string;
 }
 
-interface GrammarError {
+export interface GrammarError {
   type: string;
   userSaid: string;
   correct: string;

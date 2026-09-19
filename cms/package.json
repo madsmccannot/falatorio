@@ -2,6 +2,7 @@
   "name": "@fala-pt/cms",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "payload dev",
     "build": "payload build",

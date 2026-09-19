@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
@@ -11,14 +11,14 @@ import {
   audioClips,
   l1CulturalContent,
 } from "@fala-pt/db/schema";
-import type { L1Code, CEFRLevel } from "@fala-pt/core";
+import type { L1Code } from "@fala-pt/core";
 
 export const contentRouter = t.router({
   getCourses: protectedProcedure.query(async ({ ctx }) => {
     const rows = await ctx.db
       .select()
       .from(courses)
-      .where(eq(courses.l1Source, ctx.user.l1))
+      .where(eq(courses.l1Source, ctx.user.l1 as L1Code))
       .orderBy(courses.sortOrder);
 
     return rows.map((c) => ({
@@ -101,7 +101,7 @@ export const contentRouter = t.router({
       const rows = await ctx.db
         .select()
         .from(l1CulturalContent)
-        .where(eq(l1CulturalContent.l1Code, ctx.user.l1))
+        .where(eq(l1CulturalContent.l1Code, ctx.user.l1 as L1Code))
         .orderBy(sql`RANDOM()`)
         .limit(input.limit);
 

@@ -1,5 +1,5 @@
 import type { ExerciseType, Tier } from "../constants.js";
-import { HEARTS, LESSON } from "../constants.js";
+import { LESSON } from "../constants.js";
 
 export interface ExerciseItem {
   id: string;

@@ -2,9 +2,9 @@ import type { Job } from "bullmq";
 import type { createDb } from "@fala-pt/db";
 import { eq } from "drizzle-orm";
 import { lessons, exercises } from "@fala-pt/db/schema";
-import { EXERCISE_TYPES, EXERCISE_STATUS, type ExerciseType } from "@fala-pt/core";
+import { EXERCISE_TYPES, type ExerciseType } from "@fala-pt/core";
 
-interface GenerateExercisesData {
+export interface GenerateExercisesData {
   lessonId: string;
   count: number;
   cefrLevel: string;

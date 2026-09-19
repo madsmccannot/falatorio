@@ -10,7 +10,7 @@ export interface Transaction {
   createdAt: Date;
 }
 
-export function computeBalance(transactions: readonly Transaction[]): number {
+export function computeBalance(transactions: readonly Pick<Transaction, "type" | "amount">[]): number {
   let balance = 0;
   for (const tx of transactions) {
     switch (tx.type) {

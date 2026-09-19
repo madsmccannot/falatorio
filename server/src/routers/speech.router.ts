@@ -56,7 +56,7 @@ export const speechRouter = t.router({
         speed: z.enum(["slow", "normal"]).default("normal"),
       }),
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       const { synthesizeSpeech } = await import("../services/tts.service.js");
       const audioUrl = await synthesizeSpeech(input.text, input.speed);
       return { audioUrl };

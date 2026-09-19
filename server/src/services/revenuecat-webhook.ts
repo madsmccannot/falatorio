@@ -51,7 +51,7 @@ export function registerRevenueCatWebhook(
             .update(users)
             .set({
               tier: "super",
-              tierExpiresAt: new Date(event.expiration_at_ms),
+              tierExpiresAt: new Date(event.expiration_at_ms!),
               updatedAt: new Date(),
             })
             .where(eq(users.id, user.id));

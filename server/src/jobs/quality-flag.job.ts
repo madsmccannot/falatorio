@@ -1,9 +1,9 @@
 import type { Job } from "bullmq";
 import type { createDb } from "@fala-pt/db";
-import { eq, and, lt, sql, count, avg } from "drizzle-orm";
+import { eq, and, sql, count, avg } from "drizzle-orm";
 import { exercises, userProgress } from "@fala-pt/db/schema";
 
-interface QualityFlagData {
+export interface QualityFlagData {
   minResponses: number;
   lowScoreThreshold: number;
 }

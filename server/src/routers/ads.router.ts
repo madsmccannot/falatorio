@@ -1,16 +1,18 @@
 import { z } from "zod";
-import { eq, gte, and, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
 import { users, adEvents, transactions } from "@fala-pt/db/schema";
-import { ADS, HEARTS, CRYSTALS } from "@fala-pt/core";
+import { HEARTS, CRYSTALS } from "@fala-pt/core";
 import {
   shouldShowBannerAd,
   shouldShowInterstitialAd,
   canShowRewardAd,
   getRewardAdOptions,
+  type AdState,
 } from "@fala-pt/core/ads";
+import type { Tier } from "@fala-pt/core";
 
 export const adsRouter = t.router({
   getAdDecision: protectedProcedure
@@ -37,21 +39,24 @@ export const adsRouter = t.router({
         return { show: false, reason: user.tier === "super" ? "super_user" : "no_consent" };
       }
 
-      const adState = {
-        tier: user.tier as "free" | "super",
-        adConsent: user.adConsent,
-        lastAdShownAt: user.lastAdShownAt,
+      const tier = user.tier as Tier;
+      const adState: AdState = {
+        lastBannerShownAt: null,
+        lastInterstitialShownAt: user.lastAdShownAt,
+        lastRewardAdShownAt: user.lastAdShownAt,
         lessonsCompletedSinceLastInterstitial: input.lessonCount ?? 0,
+        sessionStartedAt: new Date(),
+        hasGDPRConsent: user.adConsent,
       };
 
       switch (input.placement) {
         case "banner":
-          return { show: shouldShowBannerAd(adState), reason: null };
+          return { show: shouldShowBannerAd(tier, adState).show, reason: null };
         case "interstitial":
-          return { show: shouldShowInterstitialAd(adState), reason: null };
+          return { show: shouldShowInterstitialAd(tier, adState).show, reason: null };
         case "reward": {
-          const canShow = canShowRewardAd(adState);
-          if (!canShow) return { show: false, reason: "cooldown" };
+          const decision = canShowRewardAd(tier, adState);
+          if (!decision.show) return { show: false, reason: "cooldown" };
           return { show: true, options: getRewardAdOptions(), reason: null };
         }
       }

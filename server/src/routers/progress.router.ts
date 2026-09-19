@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { eq, and, lte, sql, count } from "drizzle-orm";
-import { TRPCError } from "@trpc/server";
+import { eq, and, lte, count } from "drizzle-orm";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
 import {
@@ -8,7 +7,6 @@ import {
   exercises,
   lessons,
   units,
-  courses,
 } from "@fala-pt/db/schema";
 
 export const progressRouter = t.router({

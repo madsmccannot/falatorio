@@ -12,8 +12,8 @@ import { L1CulturalContent } from "./collections/L1CulturalContent";
 import { ReviewQueue } from "./collections/ReviewQueue";
 
 export default buildConfig({
-  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? "http://localhost:3002",
-  secret: process.env.PAYLOAD_SECRET ?? "",
+  serverURL: process.env["PAYLOAD_PUBLIC_SERVER_URL"] ?? "http://localhost:3002",
+  secret: process.env["PAYLOAD_SECRET"] ?? "",
   admin: {
     user: "users",
     meta: {
@@ -23,7 +23,7 @@ export default buildConfig({
   editor: lexicalEditor({}),
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL ?? "",
+      connectionString: process.env["DATABASE_URL"] ?? "",
     },
     migrationDir: "./src/migrations",
   }),
@@ -44,24 +44,24 @@ export default buildConfig({
           prefix: "audio",
         },
       },
-      bucket: process.env.R2_BUCKET ?? "falapt-media",
+      bucket: process.env["R2_BUCKET"] ?? "falapt-media",
       config: {
-        endpoint: process.env.R2_ENDPOINT ?? "",
+        endpoint: process.env["R2_ENDPOINT"] ?? "",
         region: "auto",
         credentials: {
-          accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
-          secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
+          accessKeyId: process.env["R2_ACCESS_KEY_ID"] ?? "",
+          secretAccessKey: process.env["R2_SECRET_ACCESS_KEY"] ?? "",
         },
         forcePathStyle: true,
       },
     }),
   ],
   cors: [
-    process.env.PAYLOAD_PUBLIC_SERVER_URL ?? "http://localhost:3002",
-    process.env.APP_URL ?? "http://localhost:3001",
+    process.env["PAYLOAD_PUBLIC_SERVER_URL"] ?? "http://localhost:3002",
+    process.env["APP_URL"] ?? "http://localhost:3001",
   ],
   csrf: [
-    process.env.PAYLOAD_PUBLIC_SERVER_URL ?? "http://localhost:3002",
+    process.env["PAYLOAD_PUBLIC_SERVER_URL"] ?? "http://localhost:3002",
   ],
   typescript: {
     outputFile: "./src/payload-types.ts",

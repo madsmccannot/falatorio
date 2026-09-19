@@ -5,7 +5,7 @@ import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
 import { conversationSessions } from "@fala-pt/db/schema";
 import { EXPLAINS } from "@fala-pt/core";
-import { isSuperActive } from "@fala-pt/core/entitlements";
+import { chatWithTutor, explainGrammarError } from "../services/llm.service.js";
 
 export const conversationRouter = t.router({
   startSession: protectedProcedure
@@ -46,8 +46,6 @@ export const conversationRouter = t.router({
       if (session.userId !== ctx.user.userId) {
         throw new TRPCError({ code: "FORBIDDEN" });
       }
-
-      const { chatWithTutor } = await import("../services/llm.service.js");
 
       const messages = session.messages as Array<{
         role: string;
@@ -139,7 +137,6 @@ export const conversationRouter = t.router({
         });
       }
 
-      const { explainGrammarError } = await import("../services/llm.service.js");
       const explanation = await explainGrammarError(
         input.errorText,
         ctx.user.l1,

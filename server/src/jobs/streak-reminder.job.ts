@@ -1,11 +1,11 @@
 import type { Job } from "bullmq";
 import type { createDb } from "@fala-pt/db";
 import type Redis from "ioredis";
-import { eq, and, lt, isNotNull, sql } from "drizzle-orm";
-import { users, streaks } from "@fala-pt/db/schema";
+import { and, isNotNull, sql } from "drizzle-orm";
+import { streaks } from "@fala-pt/db/schema";
 import { sendPushNotification } from "../services/push.service.js";
 
-interface StreakReminderData {
+export interface StreakReminderData {
   batchSize: number;
 }
 

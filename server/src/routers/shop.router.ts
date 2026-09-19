@@ -52,7 +52,7 @@ export const shopRouter = t.router({
         .from(transactions)
         .where(eq(transactions.userId, ctx.user.userId));
 
-      const txs: Transaction[] = rows.map((r) => ({
+      const txs = rows.map((r) => ({
         type: r.type as Transaction["type"],
         amount: r.amount,
       }));

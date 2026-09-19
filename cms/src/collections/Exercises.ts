@@ -1,6 +1,5 @@
 import type { CollectionConfig } from "payload";
 import { onPublish } from "../hooks/on-publish";
-import { onReject } from "../hooks/on-reject";
 
 const EXERCISE_TYPES = [
   { label: "Translate L1 → PT", value: "translate_l1_to_pt" },

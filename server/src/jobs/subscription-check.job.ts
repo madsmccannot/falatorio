@@ -1,10 +1,10 @@
 import type { Job } from "bullmq";
 import type { createDb } from "@fala-pt/db";
-import { eq, and, lt, isNotNull, sql } from "drizzle-orm";
+import { eq, and, isNotNull, sql } from "drizzle-orm";
 import { users } from "@fala-pt/db/schema";
 import { HEARTS } from "@fala-pt/core";
 
-interface SubscriptionCheckData {
+export interface SubscriptionCheckData {
   batchSize: number;
 }
 

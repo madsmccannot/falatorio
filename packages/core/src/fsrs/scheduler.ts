@@ -34,7 +34,6 @@ function nextRecallStability(
   r: number,
   rating: FSRSRating,
 ): number {
-  const g = ratingToIndex(rating);
   const hardPenalty = rating === "hard" ? params.w[15]! : 1;
   const easyBonus = rating === "easy" ? params.w[16]! : 1;
   return (

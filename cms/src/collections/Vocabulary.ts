@@ -70,7 +70,7 @@ export const Vocabulary: CollectionConfig = {
         { label: "Feminine", value: "f" },
         { label: "N/A", value: "na" },
       ],
-      admin: { condition: (data) => data?.category === "noun" || data?.category === "adjective" },
+      admin: { condition: (data) => data?.["category"] === "noun" || data?.["category"] === "adjective" },
     },
     {
       name: "exampleSentence",

@@ -1,4 +1,4 @@
-import type { Tier, AdType } from "../constants.js";
+import type { Tier } from "../constants.js";
 import { ADS, HEARTS, CRYSTALS } from "../constants.js";
 
 export interface AdState {

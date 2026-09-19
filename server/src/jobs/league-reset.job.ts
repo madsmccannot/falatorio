@@ -1,11 +1,11 @@
 import type { Job } from "bullmq";
 import type { createDb } from "@fala-pt/db";
-import { eq, and, sql } from "drizzle-orm";
-import { leagueEntries, users } from "@fala-pt/db/schema";
-import { LEAGUE, LEAGUE_TIERS, type LeagueTier } from "@fala-pt/core";
+import { eq, and } from "drizzle-orm";
+import { leagueEntries } from "@fala-pt/db/schema";
+import { LEAGUE_TIERS, type LeagueTier } from "@fala-pt/core";
 import { calculatePromotions, type LeagueEntry } from "@fala-pt/core/gamification";
 
-interface LeagueResetData {
+export interface LeagueResetData {
   seasonWeek: string;
 }
 
@@ -35,7 +35,8 @@ export async function processLeagueReset(
 
     const leagueEntryList: LeagueEntry[] = entries.map((e) => ({
       userId: e.userId,
-      weeklyXp: e.weeklyXp,
+      weeklyXP: e.weeklyXp,
+      tier,
     }));
 
     const results = calculatePromotions(leagueEntryList);
