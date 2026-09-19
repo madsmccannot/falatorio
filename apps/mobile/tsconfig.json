@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "strict": true,
+    "paths": {
+      "@/*": ["./*"],
+      "@fala-pt/core": ["../../packages/core/src"],
+      "@fala-pt/core/*": ["../../packages/core/src/*"],
+      "@fala-pt/ui": ["../../packages/ui/src"],
+      "@fala-pt/api": ["../../packages/api/src"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "expo-env.d.ts"],
+  "exclude": ["node_modules"]
+}
