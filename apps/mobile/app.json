@@ -7,12 +7,6 @@
     "icon": "./assets/icon.png",
     "scheme": "falatorio",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#059669"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.falatorio.app",
@@ -27,7 +21,9 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#059669"
       },
-      "permissions": ["RECORD_AUDIO"]
+      "permissions": [
+        "RECORD_AUDIO"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -38,7 +34,18 @@
           "androidAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX",
           "iosAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"
         }
-      ]
+      ],
+      "expo-asset",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#059669"
+        }
+      ],
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {

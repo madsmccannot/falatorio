@@ -3,11 +3,18 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { trpc } from "@falatorio/api/client";
 import superjson from "superjson";
-import { useAuth } from "@clerk/clerk-expo";
 import { getApiUrl } from "./storage";
 
+const HAS_CLERK = !!process.env["EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY"];
+
 export function useTRPCClient() {
-  const { getToken } = useAuth();
+  let getToken: () => Promise<string | null> = () => Promise.resolve(null);
+
+  if (HAS_CLERK) {
+    const { useAuth } = require("@clerk/clerk-expo");
+    const auth = useAuth();
+    getToken = auth.getToken;
+  }
 
   const [queryClient] = useState(
     () =>

@@ -1,6 +1,43 @@
-import { MMKV } from "react-native-mmkv";
+let storage: {
+  getString(key: string): string | undefined;
+  getBoolean(key: string): boolean | undefined;
+  getNumber(key: string): number | undefined;
+  set(key: string, value: string | boolean | number): void;
+  delete(key: string): void;
+  clearAll(): void;
+};
 
-export const storage = new MMKV({ id: "falatorio" });
+try {
+  const { MMKV } = require("react-native-mmkv");
+  storage = new MMKV({ id: "falatorio" });
+} catch {
+  const map = new Map<string, string | boolean | number>();
+  storage = {
+    getString(key: string) {
+      const v = map.get(key);
+      return typeof v === "string" ? v : undefined;
+    },
+    getBoolean(key: string) {
+      const v = map.get(key);
+      return typeof v === "boolean" ? v : undefined;
+    },
+    getNumber(key: string) {
+      const v = map.get(key);
+      return typeof v === "number" ? v : undefined;
+    },
+    set(key: string, value: string | boolean | number) {
+      map.set(key, value);
+    },
+    delete(key: string) {
+      map.delete(key);
+    },
+    clearAll() {
+      map.clear();
+    },
+  };
+}
+
+export { storage };
 
 export function getString(key: string): string | undefined {
   return storage.getString(key);

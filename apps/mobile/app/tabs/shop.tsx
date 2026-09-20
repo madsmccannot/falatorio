@@ -1,25 +1,40 @@
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  StyleSheet,
-} from "react-native";
+import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
 import { useCrystals } from "@/hooks/useCrystals";
 import { useEntitlements } from "@/hooks/useEntitlements";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
-import { GoldPrisms, AppIcon } from "@/components/icons";
+import { GoldPrisms, CrownIcon, HeartIcon, FlameIcon, ShieldIcon, TimerIcon } from "@/components/icons";
+import { useTheme } from "@/lib/theme";
+import { useTranslation } from "@/lib/i18n";
+import type { TKey } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+
+const PREVIEW_ITEMS: { id: string; nameKey: TKey; price: number; icon: string; color: string }[] = [
+  { id: "hearts_refill", nameKey: "shop.hearts_refill", price: 350, icon: "heart", color: colors.heart },
+  { id: "streak_freeze", nameKey: "shop.streak_freeze", price: 200, icon: "shield", color: colors.info },
+  { id: "double_xp", nameKey: "shop.double_xp", price: 500, icon: "flame", color: colors.xp },
+  { id: "timer_boost", nameKey: "shop.timer_boost", price: 150, icon: "timer", color: colors.streak },
+];
+
+function ItemIcon({ type, size, color }: { type: string; size: number; color: string }) {
+  switch (type) {
+    case "heart": return <HeartIcon size={size} color={color} />;
+    case "shield": return <ShieldIcon size={size} color={color} />;
+    case "flame": return <FlameIcon size={size} color={color} />;
+    case "timer": return <TimerIcon size={size} color={color} />;
+    default: return <GoldPrisms size={size} color={color} />;
+  }
+}
 
 export default function ShopScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const theme = useTheme();
+  const { t } = useTranslation();
   const { balance } = useCrystals();
   const { isSuper } = useEntitlements();
   const items = trpc.shop.listItems.useQuery();
@@ -34,50 +49,56 @@ export default function ShopScreen() {
     await utils.shop.listItems.invalidate();
   };
 
+  const shopItems = (items.data && items.data.length > 0) ? items.data : null;
+
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Shop</Text>
-        <View style={styles.balanceChip}>
+        <Text style={[styles.title, { color: theme.text }]}>{t("shop.title")}</Text>
+        <View style={[styles.balanceChip, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
           <GoldPrisms size={16} />
-          <Text style={styles.balanceValue}>{balance}</Text>
+          <Text style={[styles.balanceValue, { color: colors.crystal }]}>{balance}</Text>
         </View>
       </View>
 
       {!isSuper && (
         <Pressable
           onPress={() => router.push("/shop/super-detail")}
-          style={styles.superBanner}
+          style={[styles.superBanner, { backgroundColor: theme.superBanner }]}
         >
-          <Text style={styles.superTitle}>Upgrade to Super</Text>
-          <Text style={styles.superSubtitle}>
-            Unlimited hearts, no ads, AI error review
-          </Text>
-          <Text style={styles.superCta}>Start free trial →</Text>
+          <View style={styles.superRow}>
+            <View style={styles.superLeft}>
+              <Text style={[styles.superTitle, { color: theme.superBannerText }]}>
+                {t("shop.upgrade_title")}
+              </Text>
+              <Text style={[styles.superSubtitle, { color: theme.textMuted }]}>
+                {t("shop.upgrade_desc")}
+              </Text>
+              <Text style={styles.superCta}>{t("shop.trial_cta")}</Text>
+            </View>
+            <CrownIcon size={40} color={colors.crystal} />
+          </View>
         </Pressable>
       )}
 
       {items.isLoading ? (
-        <Loading message="Loading shop..." />
-      ) : (
+        <Loading message={t("shop.loading")} />
+      ) : shopItems ? (
         <FlatList
-          data={items.data ?? []}
+          data={shopItems}
           keyExtractor={(item) => item.id}
           numColumns={2}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => {
-            const name = (item.name as Record<string, string>)["en"] ?? item.id;
+            const name = (item.name as Record<string, string>)["pt"] ?? (item.name as Record<string, string>)["en"] ?? item.id;
             const canAfford = item.priceCrystals !== null && balance >= item.priceCrystals;
 
             return (
-              <Card style={styles.itemCard}>
-                {item.icon && (
-                  <View style={styles.itemIconContainer}>
-                    <AppIcon name={item.icon} size={28} />
-                  </View>
-                )}
-                <Text style={styles.itemName} numberOfLines={2}>{name}</Text>
+              <View style={[styles.itemCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                <Text style={[styles.itemName, { color: theme.text }]} numberOfLines={2}>
+                  {name}
+                </Text>
                 {item.priceCrystals !== null && (
                   <Button
                     title={`${item.priceCrystals} ouro`}
@@ -89,19 +110,39 @@ export default function ShopScreen() {
                     style={styles.buyButton}
                   />
                 )}
-                {item.priceEur !== null && item.priceCrystals === null && (
-                  <Button
-                    title={`€${item.priceEur}`}
-                    onPress={() => router.push("/shop/crystal-packs")}
-                    variant="outline"
-                    size="sm"
-                    style={styles.buyButton}
-                  />
-                )}
-              </Card>
+              </View>
             );
           }}
         />
+      ) : (
+        <View style={styles.previewList}>
+          <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>{t("shop.available")}</Text>
+          {PREVIEW_ITEMS.map(item => (
+            <View
+              key={item.id}
+              style={[styles.previewCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
+            >
+              <View style={[styles.previewIconBg, { backgroundColor: item.color + "20" }]}>
+                <ItemIcon type={item.icon} size={24} color={item.color} />
+              </View>
+              <View style={styles.previewInfo}>
+                <Text style={[styles.previewName, { color: theme.text }]}>{t(item.nameKey)}</Text>
+                <View style={styles.previewPrice}>
+                  <GoldPrisms size={14} />
+                  <Text style={[styles.previewPriceText, { color: colors.crystal }]}>{item.price}</Text>
+                </View>
+              </View>
+              <Button
+                title={t("shop.buy")}
+                variant={balance >= item.price ? "primary" : "secondary"}
+                size="sm"
+                disabled={balance < item.price}
+                onPress={() => handlePurchase(item.id)}
+                style={styles.previewButton}
+              />
+            </View>
+          ))}
+        </View>
       )}
     </View>
   );
@@ -110,7 +151,6 @@ export default function ShopScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
   },
   header: {
     flexDirection: "row",
@@ -123,37 +163,41 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.sizes["2xl"],
     fontWeight: "700",
-    color: colors.neutral[900],
   },
   balanceChip: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.neutral[100],
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     borderRadius: radii.full,
     gap: spacing.xs,
+    borderWidth: 1,
   },
   balanceValue: {
-    fontSize: typography.sizes.sm,
+    fontSize: typography.sizes.md,
     fontWeight: "700",
-    color: colors.neutral[900],
   },
   superBanner: {
     marginHorizontal: spacing.lg,
     marginBottom: spacing.lg,
     padding: spacing.xl,
     borderRadius: radii.lg,
-    backgroundColor: colors.neutral[900],
+  },
+  superRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  superLeft: {
+    flex: 1,
+    marginRight: spacing.md,
   },
   superTitle: {
     fontSize: typography.sizes.lg,
     fontWeight: "700",
-    color: "#FFFFFF",
   },
   superSubtitle: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[400],
     marginTop: spacing.xs,
     lineHeight: 20,
   },
@@ -174,19 +218,64 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     marginBottom: spacing.sm,
-    padding: spacing.md,
-  },
-  itemIconContainer: {
-    marginBottom: spacing.sm,
+    padding: spacing.lg,
+    borderRadius: radii.lg,
+    borderWidth: 1,
   },
   itemName: {
     fontSize: typography.sizes.sm,
     fontWeight: "600",
-    color: colors.neutral[900],
     textAlign: "center",
     marginBottom: spacing.sm,
   },
   buyButton: {
     width: "100%",
+  },
+  previewList: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing["5xl"],
+  },
+  sectionTitle: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    marginBottom: spacing.sm,
+    marginLeft: spacing.xs,
+  },
+  previewCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: spacing.lg,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    marginBottom: spacing.sm,
+    gap: spacing.md,
+  },
+  previewIconBg: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  previewInfo: {
+    flex: 1,
+  },
+  previewName: {
+    fontSize: typography.sizes.md,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  previewPrice: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  previewPriceText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "700",
+  },
+  previewButton: {
+    minWidth: 80,
   },
 });

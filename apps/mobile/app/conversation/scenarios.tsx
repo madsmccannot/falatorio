@@ -5,6 +5,7 @@ import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { Card } from "@/components/ui/Card";
+import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 const SCENARIOS = [
@@ -21,6 +22,7 @@ const SCENARIOS = [
 export default function ScenariosScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useTranslation();
   const { isSuper } = useEntitlements();
   const session = trpc.auth.getSession.useQuery();
   const userLevel = session.data?.cefrLevel ?? "A1";
@@ -28,13 +30,13 @@ export default function ScenariosScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Conversations</Text>
+        <Text style={styles.title}>{t("scenarios.title")}</Text>
         <Text style={styles.subtitle}>
-          Practice real-life scenarios with an AI tutor that speaks European Portuguese.
+          {t("scenarios.subtitle")}
         </Text>
         {!isSuper && (
           <View style={styles.limitBadge}>
-            <Text style={styles.limitText}>3 free error reviews / day</Text>
+            <Text style={styles.limitText}>{t("scenarios.limit")}</Text>
           </View>
         )}
       </View>
@@ -68,7 +70,7 @@ export default function ScenariosScreen() {
                 <Text style={styles.scenarioDesc}>{item.description}</Text>
                 {locked && (
                   <Text style={styles.lockedText}>
-                    Reach {item.cefrMin} to unlock
+                    {t("scenarios.unlock").replace("{{level}}", item.cefrMin)}
                   </Text>
                 )}
               </Card>

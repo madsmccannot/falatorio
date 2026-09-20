@@ -8,20 +8,23 @@ import { purchasePackage, getOfferings, type PurchasesPackage } from "@/lib/reve
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
+import { useTranslation } from "@/lib/i18n";
+import type { TKey } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { SUPER_PRICING } from "@falatorio/core";
 
-const FEATURES = [
-  { title: "Unlimited hearts", desc: "Never wait for hearts to refill" },
-  { title: "No ads", desc: "Zero interruptions while learning" },
-  { title: "AI error review", desc: "Unlimited grammar explanations from Claude" },
-  { title: "Streak repair", desc: "Free streak freeze each month" },
-  { title: "Priority support", desc: "Faster response from the team" },
-] as const;
+const FEATURES: { titleKey: TKey; descKey: TKey }[] = [
+  { titleKey: "super.feat_hearts", descKey: "super.feat_hearts_desc" },
+  { titleKey: "super.feat_ads", descKey: "super.feat_ads_desc" },
+  { titleKey: "super.feat_ai", descKey: "super.feat_ai_desc" },
+  { titleKey: "super.feat_streak", descKey: "super.feat_streak_desc" },
+  { titleKey: "super.feat_support", descKey: "super.feat_support_desc" },
+];
 
 export default function SuperDetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useTranslation();
   const { isSuper } = useEntitlements();
   const { showToast } = useToast();
   const [purchasing, setPurchasing] = React.useState(false);
@@ -55,12 +58,12 @@ export default function SuperDetailScreen() {
   if (isSuper) {
     return (
       <View style={[styles.container, styles.centered, { paddingTop: insets.top }]}>
-        <Text style={styles.activeTitle}>You're Super</Text>
+        <Text style={styles.activeTitle}>{t("super.active_title")}</Text>
         <Text style={styles.activeSubtitle}>
-          All premium features are already unlocked.
+          {t("super.active_text")}
         </Text>
         <Button
-          title="Go back"
+          title={t("super.back")}
           onPress={() => router.back()}
           variant="outline"
           style={{ marginTop: spacing.lg }}
@@ -75,7 +78,7 @@ export default function SuperDetailScreen() {
       contentContainerStyle={styles.scroll}
     >
       <Button
-        title="Back"
+        title={t("super.back")}
         onPress={() => router.back()}
         variant="ghost"
         size="sm"
@@ -83,9 +86,9 @@ export default function SuperDetailScreen() {
       />
 
       <Animated.View entering={FadeInDown.delay(100).duration(300)} style={styles.hero}>
-        <Text style={styles.heroTitle}>Falatório Super</Text>
+        <Text style={styles.heroTitle}>{t("super.title")}</Text>
         <Text style={styles.heroSubtitle}>
-          Learn faster, without limits.
+          {t("super.subtitle")}
         </Text>
       </Animated.View>
 
@@ -96,8 +99,8 @@ export default function SuperDetailScreen() {
               <Text style={styles.checkMark}>✓</Text>
             </View>
             <View style={styles.featureText}>
-              <Text style={styles.featureTitle}>{f.title}</Text>
-              <Text style={styles.featureDesc}>{f.desc}</Text>
+              <Text style={styles.featureTitle}>{t(f.titleKey)}</Text>
+              <Text style={styles.featureDesc}>{t(f.descKey)}</Text>
             </View>
           </View>
         ))}
@@ -105,12 +108,12 @@ export default function SuperDetailScreen() {
 
       <Animated.View entering={FadeInDown.delay(500).duration(300)} style={styles.plans}>
         <View style={styles.planCard}>
-          <Text style={styles.planPeriod}>Monthly</Text>
+          <Text style={styles.planPeriod}>{t("super.monthly")}</Text>
           <Text style={styles.planPrice}>
             €{SUPER_PRICING.MONTHLY_EUR.toFixed(2)}/mo
           </Text>
           <Button
-            title="Subscribe"
+            title={t("super.subscribe")}
             onPress={() => handleSubscribe("monthly")}
             variant="outline"
             loading={purchasing}
@@ -120,9 +123,9 @@ export default function SuperDetailScreen() {
 
         <View style={[styles.planCard, styles.planCardBest]}>
           <View style={styles.bestBadge}>
-            <Text style={styles.bestText}>Best value</Text>
+            <Text style={styles.bestText}>{t("super.best_value")}</Text>
           </View>
-          <Text style={[styles.planPeriod, styles.planPeriodBest]}>Yearly</Text>
+          <Text style={[styles.planPeriod, styles.planPeriodBest]}>{t("super.yearly")}</Text>
           <Text style={[styles.planPrice, styles.planPriceBest]}>
             €{SUPER_PRICING.YEARLY_EUR.toFixed(2)}/yr
           </Text>
@@ -130,7 +133,7 @@ export default function SuperDetailScreen() {
             Save {Math.round((1 - SUPER_PRICING.YEARLY_EUR / (SUPER_PRICING.MONTHLY_EUR * 12)) * 100)}%
           </Text>
           <Button
-            title="Start 7-day free trial"
+            title={t("super.trial")}
             onPress={() => handleSubscribe("yearly")}
             loading={purchasing}
             style={styles.planButton}
@@ -139,9 +142,7 @@ export default function SuperDetailScreen() {
       </Animated.View>
 
       <Text style={styles.legalText}>
-        Payment will be charged to your App Store or Google Play account.
-        Subscriptions automatically renew unless cancelled at least 24h before
-        the end of the current period.
+        {t("super.legal")}
       </Text>
     </ScrollView>
   );

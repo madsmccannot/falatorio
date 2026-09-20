@@ -21,4 +21,6 @@ export { TaxiIcon } from "./TaxiIcon";
 export { PencilIcon } from "./PencilIcon";
 export { ChatIcon } from "./ChatIcon";
 export { MedalIcon } from "./MedalIcon";
+export { GearIcon } from "./GearIcon";
+export { UserIcon } from "./UserIcon";
 export { AppIcon } from "./AppIcon";

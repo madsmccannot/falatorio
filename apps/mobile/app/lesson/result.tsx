@@ -7,6 +7,7 @@ import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { GoldPrisms } from "@/components/icons";
+import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 export default function LessonResultScreen() {
@@ -21,6 +22,7 @@ export default function LessonResultScreen() {
     passed: string;
   }>();
 
+  const { t } = useTranslation();
   const xpEarned = Number(params.xpEarned ?? 0);
   const crystalsEarned = Number(params.crystalsEarned ?? 0);
   const totalExercises = Number(params.totalExercises ?? 0);
@@ -45,26 +47,24 @@ export default function LessonResultScreen() {
         <View style={[styles.scoreCircle, passed ? styles.scorePassed : styles.scoreFailed]}>
           <Text style={styles.scoreNumber}>{percentage}%</Text>
           <Text style={styles.scoreLabel}>
-            {passed ? "Passed" : "Try again"}
+            {passed ? t("result.passed") : t("result.try_again")}
           </Text>
         </View>
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(400).duration(300)}>
         <Text style={styles.resultTitle}>
-          {passed ? "Lesson complete!" : "Almost there"}
+          {passed ? t("result.complete_title") : t("result.almost_title")}
         </Text>
         <Text style={styles.resultSubtitle}>
-          {passed
-            ? "Great work. Keep up the momentum."
-            : "You need 80% to pass. Review and try again."}
+          {passed ? t("result.complete_text") : t("result.almost_text")}
         </Text>
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(600).duration(300)} style={styles.statsRow}>
         <Card style={styles.statCard}>
           <Text style={styles.statValue}>{correctCount}/{totalExercises}</Text>
-          <Text style={styles.statLabel}>Correct</Text>
+          <Text style={styles.statLabel}>{t("result.correct")}</Text>
         </Card>
         <Card style={styles.statCard}>
           <Text style={[styles.statValue, { color: colors.xp }]}>+{xpEarned}</Text>
@@ -73,13 +73,13 @@ export default function LessonResultScreen() {
         <Card style={styles.statCard}>
           <GoldPrisms size={20} />
           <Text style={[styles.statValue, { color: colors.crystal }]}>+{crystalsEarned}</Text>
-          <Text style={styles.statLabel}>Ouro</Text>
+          <Text style={styles.statLabel}>{t("result.ouro")}</Text>
         </Card>
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(800).duration(300)} style={styles.actions}>
         <Button
-          title={passed ? "Continue" : "Try again"}
+          title={passed ? t("result.continue") : t("result.try_again")}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.replace("/tabs/learn");
@@ -89,7 +89,7 @@ export default function LessonResultScreen() {
         />
         {passed && (
           <Button
-            title="Review mistakes"
+            title={t("result.review_mistakes")}
             onPress={() => router.replace("/tabs/practice")}
             variant="outline"
             style={styles.secondaryAction}

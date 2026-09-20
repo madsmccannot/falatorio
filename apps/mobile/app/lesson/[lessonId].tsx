@@ -20,12 +20,14 @@ import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { Modal } from "@/components/ui/Modal";
 import { HeartIcon } from "@/components/icons";
+import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 export default function LessonScreen() {
   const { lessonId } = useLocalSearchParams<{ lessonId: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { hearts, unlimited, continueWithCrystals } = useHearts();
 
   const {
@@ -63,16 +65,16 @@ export default function LessonScreen() {
   }, [hearts, unlimited, state]);
 
   if (isStarting) {
-    return <Loading fullScreen message="Preparing lesson..." />;
+    return <Loading fullScreen message={t("lesson.preparing")} />;
   }
 
   if (error) {
     return (
       <View style={[styles.container, styles.centered, { paddingTop: insets.top }]}>
-        <Text style={styles.errorTitle}>Something went wrong</Text>
+        <Text style={styles.errorTitle}>{t("lesson.error_title")}</Text>
         <Text style={styles.errorText}>{String(error)}</Text>
         <Button
-          title="Go back"
+          title={t("lesson.go_back")}
           onPress={() => router.back()}
           variant="outline"
           style={{ marginTop: spacing.lg }}
@@ -118,7 +120,7 @@ export default function LessonScreen() {
           style={styles.exerciseArea}
         >
           <Text style={styles.exerciseType}>
-            {formatExerciseType(currentExercise.type)}
+            {formatExerciseType(currentExercise.type, t)}
           </Text>
           <Text style={styles.prompt}>
             {currentExercise.prompt}
@@ -229,7 +231,7 @@ export default function LessonScreen() {
           style={styles.modalButton}
         />
         <Button
-          title="Quit"
+          title={t("lesson.quit")}
           onPress={() => router.back()}
           variant="danger"
           style={styles.modalButton}
@@ -237,13 +239,12 @@ export default function LessonScreen() {
       </Modal>
 
       <Modal visible={showOutOfHearts} onDismiss={() => {}}>
-        <Text style={styles.modalTitle}>Out of hearts</Text>
+        <Text style={styles.modalTitle}>{t("lesson.out_of_hearts")}</Text>
         <Text style={styles.modalText}>
-          You need hearts to continue. Spend 50 ouro to keep going, or wait for
-          hearts to refill.
+          {t("lesson.out_of_hearts_text")}
         </Text>
         <Button
-          title="Continue (50 ouro)"
+          title={t("lesson.continue_ouro")}
           onPress={async () => {
             await continueWithCrystals(lessonId!);
             setShowOutOfHearts(false);
@@ -251,7 +252,7 @@ export default function LessonScreen() {
           style={styles.modalButton}
         />
         <Button
-          title="Leave lesson"
+          title={t("lesson.leave")}
           onPress={() => router.back()}
           variant="outline"
           style={styles.modalButton}
@@ -261,17 +262,17 @@ export default function LessonScreen() {
   );
 }
 
-function formatExerciseType(type: string): string {
-  const labels: Record<string, string> = {
-    translate: "Translate this sentence",
-    fill_blank: "Fill in the blank",
-    listen_type: "Listen and type",
-    match_pairs: "Match the pairs",
-    pick_correct: "Pick the correct answer",
-    reorder: "Put the words in order",
-    speak: "Say this in Portuguese",
+function formatExerciseType(type: string, t: (k: any) => string): string {
+  const map: Record<string, string> = {
+    translate: t("lesson.type_translate"),
+    fill_blank: t("lesson.type_fill_blank"),
+    listen_type: t("lesson.type_listen_type"),
+    match_pairs: t("lesson.type_match_pairs"),
+    pick_correct: t("lesson.type_pick_correct"),
+    reorder: t("lesson.type_reorder"),
+    speak: t("lesson.type_speak"),
   };
-  return labels[type] ?? type;
+  return map[type] ?? type;
 }
 
 const styles = StyleSheet.create({

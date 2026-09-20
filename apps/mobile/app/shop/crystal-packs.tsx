@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { GoldPrisms } from "@/components/icons";
+import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type CrystalPack = {
@@ -30,6 +31,7 @@ const PACKS: CrystalPack[] = [
 export default function CrystalPacksScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useTranslation();
   const { balance } = useCrystals();
   const { showToast } = useToast();
   const [purchasing, setPurchasing] = React.useState<string | null>(null);
@@ -61,8 +63,8 @@ export default function CrystalPacksScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Button title="Back" onPress={() => router.back()} variant="ghost" size="sm" />
-        <Text style={styles.title}>Crystal Packs</Text>
+        <Button title={t("crystals.back")} onPress={() => router.back()} variant="ghost" size="sm" />
+        <Text style={styles.title}>{t("crystals.title")}</Text>
         <View style={styles.balanceChip}>
           <GoldPrisms size={14} />
           <Text style={styles.balanceValue}>{balance}</Text>
