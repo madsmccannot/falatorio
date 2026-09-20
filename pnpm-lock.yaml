@@ -143,13 +143,13 @@ importers:
     dependencies:
       next:
         specifier: ^15.0.0
-        version: 15.5.25(@types/node@20.17.6)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0(react@19.2.3))(react@19.2.3)(sass@1.77.4)
+        version: 15.5.25(@types/node@20.17.6)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.77.4)
       react:
-        specifier: ^19.0.0
+        specifier: 19.2.3
         version: 19.2.3
       react-dom:
-        specifier: ^19.0.0
-        version: 19.3.0(react@19.2.3)
+        specifier: 19.2.3
+        version: 19.2.3(react@19.2.3)
     devDependencies:
       '@types/node':
         specifier: 20.17.6
@@ -15908,14 +15908,14 @@ snapshots:
     dependencies:
       content-type: 2.1.0
 
-  next@15.5.25(@types/node@20.17.6)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0(react@19.2.3))(react@19.2.3)(sass@1.77.4):
+  next@15.5.25(@types/node@20.17.6)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.77.4):
     dependencies:
       '@next/env': 15.5.25
       '@swc/helpers': 0.5.15
       caniuse-lite: 1.0.30001810
       postcss: 8.4.31
       react: 19.2.3
-      react-dom: 19.3.0(react@19.2.3)
+      react-dom: 19.2.3(react@19.2.3)
       styled-jsx: 5.1.6(react@19.2.3)
     optionalDependencies:
       '@next/swc-darwin-arm64': 15.5.25
@@ -16501,11 +16501,6 @@ snapshots:
     dependencies:
       react: 19.2.3
       scheduler: 0.27.0
-
-  react-dom@19.3.0(react@19.2.3):
-    dependencies:
-      react: 19.2.3
-      scheduler: 0.28.0
 
   react-dom@19.3.0(react@19.3.0):
     dependencies:

@@ -30,6 +30,7 @@ coverage/
 # Mobile builds
 apps/mobile/ios/
 apps/mobile/android/
+apps/mobile/start-mobile.sh
 *.apk
 *.ipa
 *.aab
