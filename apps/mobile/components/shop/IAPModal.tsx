@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
-import { colors, spacing, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   visible: boolean;

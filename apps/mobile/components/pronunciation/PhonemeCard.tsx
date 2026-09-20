@@ -8,8 +8,8 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from "react-native-reanimated";
-import type { PhoneticDifficulty } from "@fala-pt/core/l1-profiles/types";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import type { PhoneticDifficulty } from "@falatorio/core/l1-profiles/types";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { MouthDiagram } from "./MouthDiagram";
 
 interface PhonemeCardProps {

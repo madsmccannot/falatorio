@@ -3,9 +3,9 @@ import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { shopItems, transactions, users, iapReceipts } from "@fala-pt/db/schema";
-import { computeBalance, type Transaction } from "@fala-pt/core/economy";
-import { HEARTS } from "@fala-pt/core";
+import { shopItems, transactions, users, iapReceipts } from "@falatorio/db/schema";
+import { computeBalance, type Transaction } from "@falatorio/core/economy";
+import { HEARTS } from "@falatorio/core";
 
 export const shopRouter = t.router({
   listItems: protectedProcedure.query(async ({ ctx }) => {

@@ -1,5 +1,5 @@
 {
-  "name": "@fala-pt/server",
+  "name": "@falatorio/server",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -11,8 +11,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@fala-pt/core": "workspace:*",
-    "@fala-pt/db": "workspace:*",
+    "@falatorio/core": "workspace:*",
+    "@falatorio/db": "workspace:*",
     "@trpc/server": "^11.0.0",
     "fastify": "^5.1.0",
     "superjson": "^2.2.0",

@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function TranslateExercise({ exercise, onAnswer, disabled }: ExerciseProps) {

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Preços",
-  description: "Compara os planos Grátis e Super do Fala PT.",
+  description: "Compara os planos Grátis e Super do Falatório.",
 };
 
 export default function PricingPage() {

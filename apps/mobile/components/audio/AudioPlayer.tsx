@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   uri: string;

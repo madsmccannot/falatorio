@@ -3,9 +3,9 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
-import { USER_GOALS, type UserGoal } from "@fala-pt/core";
+import { USER_GOALS, type UserGoal } from "@falatorio/core";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 const GOAL_INFO: Record<UserGoal, { label: string; description: string }> = {
   tourism: {

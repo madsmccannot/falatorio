@@ -14,7 +14,7 @@ import { useStreak } from "@/hooks/useStreak";
 import { useCrystals } from "@/hooks/useCrystals";
 import { Card } from "@/components/ui/Card";
 import { Loading } from "@/components/ui/Loading";
-import { colors, spacing, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 export default function LearnScreen() {
   const router = useRouter();

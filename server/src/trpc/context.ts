@@ -1,5 +1,5 @@
 import type { CreateFastifyContextOptions } from "@trpc/server/adapters/fastify";
-import type { Database } from "@fala-pt/db/client";
+import type { Database } from "@falatorio/db/client";
 import type { Redis } from "ioredis";
 import { verifyToken } from "@clerk/backend";
 import { env } from "../env.js";

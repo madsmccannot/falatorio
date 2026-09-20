@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native";
 import Svg, { Path, Ellipse, G, Text as SvgText } from "react-native-svg";
-import type { MouthPosition } from "@fala-pt/core/l1-profiles/types";
-import { colors } from "@fala-pt/ui/tokens";
+import type { MouthPosition } from "@falatorio/core/l1-profiles/types";
+import { colors } from "@falatorio/ui/tokens";
 
 interface MouthDiagramProps {
   position: MouthPosition;

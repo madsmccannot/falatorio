@@ -3,16 +3,16 @@ import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { users, adEvents, transactions } from "@fala-pt/db/schema";
-import { HEARTS, CRYSTALS } from "@fala-pt/core";
+import { users, adEvents, transactions } from "@falatorio/db/schema";
+import { HEARTS, CRYSTALS } from "@falatorio/core";
 import {
   shouldShowBannerAd,
   shouldShowInterstitialAd,
   canShowRewardAd,
   getRewardAdOptions,
   type AdState,
-} from "@fala-pt/core/ads";
-import type { Tier } from "@fala-pt/core";
+} from "@falatorio/core/ads";
+import type { Tier } from "@falatorio/core";
 
 export const adsRouter = t.router({
   getAdDecision: protectedProcedure

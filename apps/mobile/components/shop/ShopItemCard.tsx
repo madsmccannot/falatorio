@@ -2,7 +2,7 @@ import { Text, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   name: string;

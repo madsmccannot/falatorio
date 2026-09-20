@@ -6,7 +6,7 @@ import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { colors, spacing, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 export default function LessonResultScreen() {
   const router = useRouter();

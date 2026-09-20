@@ -1,6 +1,6 @@
 import { View, Text, FlatList, StyleSheet } from "react-native";
-import type { PhoneticDifficulty } from "@fala-pt/core/l1-profiles/types";
-import { colors, spacing, typography } from "@fala-pt/ui/tokens";
+import type { PhoneticDifficulty } from "@falatorio/core/l1-profiles/types";
+import { colors, spacing, typography } from "@falatorio/ui/tokens";
 import { PhonemeCard } from "./PhonemeCard";
 
 interface PronunciationGuideProps {

@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 type MatchState = "idle" | "selected" | "matched" | "wrong";

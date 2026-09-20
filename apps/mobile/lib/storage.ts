@@ -1,6 +1,6 @@
 import { MMKV } from "react-native-mmkv";
 
-export const storage = new MMKV({ id: "fala-pt" });
+export const storage = new MMKV({ id: "falatorio" });
 
 export function getString(key: string): string | undefined {
   return storage.getString(key);
@@ -47,7 +47,7 @@ export { KEYS };
 export function getApiUrl(): string {
   const custom = getString(KEYS.API_URL);
   if (custom) return custom;
-  return __DEV__ ? "http://localhost:3001" : "https://api.falapt.com";
+  return __DEV__ ? "http://localhost:3001" : "https://api.falatorio.com";
 }
 
 export function hasCompletedOnboarding(): boolean {

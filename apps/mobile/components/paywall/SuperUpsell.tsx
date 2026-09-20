@@ -1,6 +1,6 @@
 import { Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   feature: string;
@@ -30,7 +30,7 @@ export function SuperUpsell({ feature, compact }: Props) {
     >
       <Text style={styles.title}>Upgrade to Super</Text>
       <Text style={styles.description}>
-        Get {feature} and more with Fala PT Super.
+        Get {feature} and more with Falatório Super.
       </Text>
       <Text style={styles.cta}>Learn more →</Text>
     </Pressable>

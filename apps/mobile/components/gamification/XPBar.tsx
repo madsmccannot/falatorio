@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from "react-native-reanimated";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   current: number;

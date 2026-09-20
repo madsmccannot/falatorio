@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
-import { hasFeature, type Feature } from "@fala-pt/core/entitlements";
-import type { Tier } from "@fala-pt/core";
+import { hasFeature, type Feature } from "@falatorio/core/entitlements";
+import type { Tier } from "@falatorio/core";
 
 export function useEntitlements() {
   const session = trpc.auth.getSession.useQuery();

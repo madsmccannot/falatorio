@@ -6,7 +6,7 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import { colors, radii } from "@fala-pt/ui/tokens";
+import { colors, radii } from "@falatorio/ui/tokens";
 
 type Props = {
   current: number;

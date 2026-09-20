@@ -4,8 +4,8 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
-import { SUPER_PRICING } from "@fala-pt/core";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { SUPER_PRICING } from "@falatorio/core";
 import { setOnboardingComplete } from "@/lib/storage";
 
 type Plan = "free" | "super";

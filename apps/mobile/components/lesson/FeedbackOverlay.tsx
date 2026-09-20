@@ -3,7 +3,7 @@ import { Text, StyleSheet } from "react-native";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   correct: boolean;

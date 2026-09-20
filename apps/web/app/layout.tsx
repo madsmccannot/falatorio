@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "Fala PT — Aprende Português Europeu",
-    template: "%s | Fala PT",
+    default: "Falatório — Aprende Português Europeu",
+    template: "%s | Falatório",
   },
   description:
     "A plataforma para aprender português europeu de verdade. Lições adaptativas, repetição espaçada e conversação com IA — tudo adaptado à tua língua materna.",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "european portuguese",
   ],
   openGraph: {
-    title: "Fala PT — Aprende Português Europeu",
+    title: "Falatório — Aprende Português Europeu",
     description:
       "Lições adaptativas, repetição espaçada e conversação com IA — tudo adaptado à tua língua materna.",
     locale: "pt_PT",

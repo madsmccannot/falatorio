@@ -7,7 +7,7 @@ import {
   exercises,
   lessons,
   units,
-} from "@fala-pt/db/schema";
+} from "@falatorio/db/schema";
 
 export const progressRouter = t.router({
   getDueReviews: protectedProcedure

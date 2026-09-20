@@ -1,9 +1,9 @@
 import type React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useEntitlements } from "@/hooks/useEntitlements";
-import type { Feature } from "@fala-pt/core/entitlements";
+import type { Feature } from "@falatorio/core/entitlements";
 import { SuperUpsell } from "./SuperUpsell";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   feature: Feature;

@@ -6,10 +6,10 @@
     "typeRoots": ["./node_modules/@types"],
     "paths": {
       "@/*": ["./*"],
-      "@fala-pt/core": ["../../packages/core/src"],
-      "@fala-pt/core/*": ["../../packages/core/src/*"],
-      "@fala-pt/ui": ["../../packages/ui/src"],
-      "@fala-pt/api": ["../../packages/api/src"]
+      "@falatorio/core": ["../../packages/core/src"],
+      "@falatorio/core/*": ["../../packages/core/src/*"],
+      "@falatorio/ui": ["../../packages/ui/src"],
+      "@falatorio/api": ["../../packages/api/src"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "expo-env.d.ts"],

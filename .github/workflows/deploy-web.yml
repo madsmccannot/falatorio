@@ -33,7 +33,7 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build --filter=@fala-pt/web
+      - run: pnpm build --filter=@falatorio/web
 
       - name: Deploy to Vercel
         if: ${{ vars.VERCEL_PROJECT_ID != '' }}

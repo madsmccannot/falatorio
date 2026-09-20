@@ -9,7 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   onRecordingComplete: (base64: string) => void;

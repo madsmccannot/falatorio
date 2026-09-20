@@ -18,7 +18,7 @@ const envSchema = z.object({
   R2_ACCOUNT_ID: z.string().min(1),
   R2_ACCESS_KEY_ID: z.string().min(1),
   R2_SECRET_ACCESS_KEY: z.string().min(1),
-  R2_BUCKET_NAME: z.string().default("fala-pt-audio"),
+  R2_BUCKET_NAME: z.string().default("falatorio-audio"),
 
   FCM_PROJECT_ID: z.string().min(1).optional(),
   FCM_CLIENT_EMAIL: z.string().email().optional(),

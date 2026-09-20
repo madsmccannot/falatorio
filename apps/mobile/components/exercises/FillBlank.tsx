@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, typography } from "@falatorio/ui/tokens";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function FillBlank({ exercise, onAnswer, disabled }: ExerciseProps) {

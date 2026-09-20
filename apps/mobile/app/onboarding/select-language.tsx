@@ -9,9 +9,9 @@ import {
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
-import { L1_CODES, type L1Code } from "@fala-pt/core";
+import { L1_CODES, type L1Code } from "@falatorio/core";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { setString, KEYS } from "@/lib/storage";
 
 const L1_LABELS: Record<L1Code, { name: string; native: string; flag: string }> = {

@@ -1,5 +1,5 @@
 {
-  "name": "@fala-pt/mobile",
+  "name": "@falatorio/mobile",
   "version": "0.1.0",
   "private": true,
   "main": "expo-router/entry",
@@ -13,9 +13,9 @@
   "dependencies": {
     "@clerk/clerk-expo": "^2.5.0",
     "@expo/vector-icons": "^14.0.0",
-    "@fala-pt/api": "workspace:*",
-    "@fala-pt/core": "workspace:*",
-    "@fala-pt/ui": "workspace:*",
+    "@falatorio/api": "workspace:*",
+    "@falatorio/core": "workspace:*",
+    "@falatorio/ui": "workspace:*",
     "@tanstack/react-query": "^5.60.0",
     "@trpc/client": "^11.0.0",
     "@trpc/react-query": "^11.0.0",

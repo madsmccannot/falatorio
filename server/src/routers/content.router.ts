@@ -10,8 +10,8 @@ import {
   exercises,
   audioClips,
   l1CulturalContent,
-} from "@fala-pt/db/schema";
-import { CEFR_LEVELS, L1_CODES, EXERCISE_TYPES, type L1Code, type CEFRLevel, type ExerciseType } from "@fala-pt/core";
+} from "@falatorio/db/schema";
+import { CEFR_LEVELS, L1_CODES, EXERCISE_TYPES, type L1Code, type CEFRLevel, type ExerciseType } from "@falatorio/core";
 import { generateLesson, generateSingleExercise } from "../services/content-generator.service.js";
 import { seedCourseStructure, seedAllPhase1Courses } from "../services/seed-content.service.js";
 

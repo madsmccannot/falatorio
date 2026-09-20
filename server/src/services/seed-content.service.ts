@@ -1,7 +1,7 @@
-import type { Database } from "@fala-pt/db/client";
-import { courses, units, lessons } from "@fala-pt/db/schema";
-import { L1_PHASE_1, type L1Code, type CEFRLevel } from "@fala-pt/core";
-import { getProfile } from "@fala-pt/core/l1-profiles";
+import type { Database } from "@falatorio/db/client";
+import { courses, units, lessons } from "@falatorio/db/schema";
+import { L1_PHASE_1, type L1Code, type CEFRLevel } from "@falatorio/core";
+import { getProfile } from "@falatorio/core/l1-profiles";
 
 interface UnitDef {
   title: string;

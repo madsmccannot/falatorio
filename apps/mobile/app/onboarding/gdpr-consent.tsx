@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { setBoolean, KEYS } from "@/lib/storage";
 
 export default function GDPRConsentScreen() {
@@ -27,7 +27,7 @@ export default function GDPRConsentScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.title}>Privacy & Ads</Text>
         <Text style={styles.subtitle}>
-          Fala PT is free to use. Ads help keep it that way.
+          Falatório is free to use. Ads help keep it that way.
         </Text>
 
         <View style={styles.card}>

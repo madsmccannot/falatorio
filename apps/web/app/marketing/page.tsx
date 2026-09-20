@@ -229,7 +229,7 @@ export default function MarketingPage() {
           color: "#A8A29E",
         }}
       >
-        Fala PT — Aprende português europeu de verdade
+        Falatório — Aprende português europeu de verdade
       </footer>
     </main>
   );

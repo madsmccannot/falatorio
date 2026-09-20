@@ -8,7 +8,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StyleSheet } from "react-native";
 import { useTRPCClient } from "@/lib/trpc";
 import { ToastProvider } from "@/components/ui/Toast";
-import { colors } from "@fala-pt/ui/tokens";
+import { colors } from "@falatorio/ui/tokens";
 import * as SecureStore from "expo-secure-store";
 
 SplashScreen.preventAutoHideAsync();

@@ -16,7 +16,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { Modal } from "@/components/ui/Modal";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Message = {
   id: string;

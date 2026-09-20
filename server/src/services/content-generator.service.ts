@@ -5,8 +5,8 @@ import {
   type ExerciseType,
   type CEFRLevel,
   type L1Code,
-} from "@fala-pt/core";
-import { getProfile, getCulturalRefs } from "@fala-pt/core/l1-profiles";
+} from "@falatorio/core";
+import { getProfile, getCulturalRefs } from "@falatorio/core/l1-profiles";
 
 const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 

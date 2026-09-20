@@ -3,13 +3,13 @@ import { eq, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { users, exercises, userProgress } from "@fala-pt/db/schema";
-import { LESSON } from "@fala-pt/core";
-import { scoreTextAnswer } from "@fala-pt/core/scoring";
-import { scoreToRating } from "@fala-pt/core/fsrs";
-import { schedule, createNewCard, type FSRSCard } from "@fala-pt/core/fsrs";
-import { calculateXP } from "@fala-pt/core/gamification";
-import { getLessonReward } from "@fala-pt/core/economy";
+import { users, exercises, userProgress } from "@falatorio/db/schema";
+import { LESSON } from "@falatorio/core";
+import { scoreTextAnswer } from "@falatorio/core/scoring";
+import { scoreToRating } from "@falatorio/core/fsrs";
+import { schedule, createNewCard, type FSRSCard } from "@falatorio/core/fsrs";
+import { calculateXP } from "@falatorio/core/gamification";
+import { getLessonReward } from "@falatorio/core/economy";
 
 export const lessonRouter = t.router({
   startLesson: protectedProcedure

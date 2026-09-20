@@ -8,10 +8,10 @@ import {
   leagueEntries,
   achievements,
   transactions,
-} from "@fala-pt/db/schema";
-import { LEAGUE, CRYSTALS } from "@fala-pt/core";
-import { checkStreak, recordActivity } from "@fala-pt/core/gamification";
-import { computeBalance, type Transaction } from "@fala-pt/core/economy";
+} from "@falatorio/db/schema";
+import { LEAGUE, CRYSTALS } from "@falatorio/core";
+import { checkStreak, recordActivity } from "@falatorio/core/gamification";
+import { computeBalance, type Transaction } from "@falatorio/core/economy";
 
 export const gamificationRouter = t.router({
   getStreak: protectedProcedure.query(async ({ ctx }) => {

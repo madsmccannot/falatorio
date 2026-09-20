@@ -87,7 +87,7 @@ export async function validateGoogleReceipt(
   }
 
   const accessToken = await getGoogleAccessToken();
-  const packageName = "com.falapt.app";
+  const packageName = "com.falatorio.app";
 
   const isSubscription = productId.includes("super_");
   const endpoint = isSubscription

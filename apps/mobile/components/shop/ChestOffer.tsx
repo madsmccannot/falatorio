@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { ZoomIn, useSharedValue, useAnimatedStyle, withRepeat, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import { colors, spacing, radii, typography, shadows } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography, shadows } from "@falatorio/ui/tokens";
 
 type Props = {
   title: string;

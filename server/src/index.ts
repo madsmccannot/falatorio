@@ -1,7 +1,7 @@
 import Fastify from "fastify";
 import helmet from "@fastify/helmet";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
-import { createDb } from "@fala-pt/db/client";
+import { createDb } from "@falatorio/db/client";
 import Redis from "ioredis";
 import { env } from "./env.js";
 import { appRouter } from "./trpc/router.js";

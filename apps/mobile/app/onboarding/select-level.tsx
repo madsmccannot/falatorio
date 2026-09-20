@@ -3,9 +3,9 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
-import { CEFR_LEVELS, type CEFRLevel } from "@fala-pt/core";
+import { CEFR_LEVELS, type CEFRLevel } from "@falatorio/core";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 const LEVEL_INFO: Record<string, { label: string; description: string }> = {
   A1: { label: "Complete beginner", description: "I know little to no Portuguese" },

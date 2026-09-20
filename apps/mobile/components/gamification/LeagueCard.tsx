@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Card } from "@/components/ui/Card";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   tier: string;

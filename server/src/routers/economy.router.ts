@@ -3,8 +3,8 @@ import { eq, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { transactions } from "@fala-pt/db/schema";
-import { computeBalance, type Transaction } from "@fala-pt/core/economy";
+import { transactions } from "@falatorio/db/schema";
+import { computeBalance, type Transaction } from "@falatorio/core/economy";
 
 export const economyRouter = t.router({
   getBalance: protectedProcedure.query(async ({ ctx }) => {

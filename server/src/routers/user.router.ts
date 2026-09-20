@@ -2,8 +2,8 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { users } from "@fala-pt/db/schema";
-import { USER_GOALS, CEFR_LEVELS } from "@fala-pt/core";
+import { users } from "@falatorio/db/schema";
+import { USER_GOALS, CEFR_LEVELS } from "@falatorio/core";
 
 export const userRouter = t.router({
   getProfile: protectedProcedure.query(async ({ ctx }) => {

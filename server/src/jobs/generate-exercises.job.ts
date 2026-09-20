@@ -1,8 +1,8 @@
 import type { Job } from "bullmq";
-import type { Database } from "@fala-pt/db/client";
+import type { Database } from "@falatorio/db/client";
 import { eq } from "drizzle-orm";
-import { lessons, exercises } from "@fala-pt/db/schema";
-import type { CEFRLevel, ExerciseType, L1Code } from "@fala-pt/core";
+import { lessons, exercises } from "@falatorio/db/schema";
+import type { CEFRLevel, ExerciseType, L1Code } from "@falatorio/core";
 import { generateLesson } from "../services/content-generator.service.js";
 
 export interface GenerateExercisesData {

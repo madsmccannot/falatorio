@@ -5,7 +5,7 @@ import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { Card } from "@/components/ui/Card";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 const SCENARIOS = [
   { id: "cafe", title: "At the cafe", description: "Order a coffee and pastry in Lisbon", cefrMin: "A1", icon: "cafe" },

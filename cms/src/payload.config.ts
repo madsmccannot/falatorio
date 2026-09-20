@@ -18,7 +18,7 @@ export default buildConfig({
   admin: {
     user: "users",
     meta: {
-      titleSuffix: "— Fala PT CMS",
+      titleSuffix: "— Falatório CMS",
     },
   },
   editor: lexicalEditor({}),
@@ -46,7 +46,7 @@ export default buildConfig({
           prefix: "audio",
         },
       },
-      bucket: process.env["R2_BUCKET"] ?? "falapt-media",
+      bucket: process.env["R2_BUCKET"] ?? "falatorio-media",
       config: {
         endpoint: process.env["R2_ENDPOINT"] ?? "",
         region: "auto",

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, type ViewStyle } from "react-native";
-import { colors, spacing, radii, shadows } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, shadows } from "@falatorio/ui/tokens";
 
 interface CardProps {
   children: React.ReactNode;

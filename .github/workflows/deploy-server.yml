@@ -67,5 +67,5 @@ jobs:
         run: |
           corepack enable
           corepack prepare pnpm@9.12.0 --activate
-          pnpm install --frozen-lockfile --filter @fala-pt/db...
+          pnpm install --frozen-lockfile --filter @falatorio/db...
           pnpm db:migrate

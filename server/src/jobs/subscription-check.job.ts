@@ -1,8 +1,8 @@
 import type { Job } from "bullmq";
-import type { createDb } from "@fala-pt/db";
+import type { createDb } from "@falatorio/db";
 import { eq, and, isNotNull, sql } from "drizzle-orm";
-import { users } from "@fala-pt/db/schema";
-import { HEARTS } from "@fala-pt/core";
+import { users } from "@falatorio/db/schema";
+import { HEARTS } from "@falatorio/core";
 
 export interface SubscriptionCheckData {
   batchSize: number;

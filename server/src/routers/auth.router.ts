@@ -2,8 +2,8 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { users } from "@fala-pt/db/schema";
-import { L1_CODES, USER_GOALS } from "@fala-pt/core";
+import { users } from "@falatorio/db/schema";
+import { L1_CODES, USER_GOALS } from "@falatorio/core";
 
 export const authRouter = t.router({
   register: t.procedure

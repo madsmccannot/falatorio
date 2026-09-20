@@ -8,7 +8,7 @@ import { useCrystals } from "@/hooks/useCrystals";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type CrystalPack = {
   id: string;

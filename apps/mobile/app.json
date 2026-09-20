@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Fala PT",
-    "slug": "fala-pt",
+    "name": "Falatório",
+    "slug": "falatorio",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "falapt",
+    "scheme": "falatorio",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.falapt.app",
+      "bundleIdentifier": "com.falatorio.app",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "Fala PT needs your microphone to evaluate pronunciation exercises.",
+        "NSMicrophoneUsageDescription": "Falatório needs your microphone to evaluate pronunciation exercises.",
         "NSUserTrackingUsageDescription": "We use this to show relevant ads. You can opt out anytime."
       }
     },
     "android": {
-      "package": "com.falapt.app",
+      "package": "com.falatorio.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#059669"

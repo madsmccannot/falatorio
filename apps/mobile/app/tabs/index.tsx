@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, typography } from "@fala-pt/ui/tokens";
+import { colors, typography } from "@falatorio/ui/tokens";
 
 export default function TabsLayout() {
   return (

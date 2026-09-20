@@ -8,7 +8,7 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors, spacing, radii, typography, shadows } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography, shadows } from "@falatorio/ui/tokens";
 
 type ToastType = "success" | "error" | "info";
 

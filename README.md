@@ -1,4 +1,4 @@
-# Fala PT
+# Falatório
 
 A language learning app built exclusively for **European Portuguese (PT-EU)**. Mobile-first, with L1-customized experiences per source language — the learning path adapts based on where the learner is coming from.
 
@@ -7,7 +7,7 @@ A language learning app built exclusively for **European Portuguese (PT-EU)**. M
 Turborepo monorepo with pnpm workspaces. TypeScript strict mode everywhere.
 
 ```
-falapt/
+falatorio/
 ├── apps/
 │   ├── mobile/          React Native + Expo (expo-router)
 │   └── web/             Next.js (deprioritized)
@@ -167,13 +167,13 @@ PAYLOAD_SECRET=         # Payload CMS
 
 ```bash
 # Start Expo dev server
-pnpm --filter @fala-pt/mobile dev
+pnpm --filter @falatorio/mobile dev
 
 # Build preview APK
-pnpm --filter @fala-pt/mobile eas:build --profile preview
+pnpm --filter @falatorio/mobile eas:build --profile preview
 
 # Build production
-pnpm --filter @fala-pt/mobile eas:build --profile production
+pnpm --filter @falatorio/mobile eas:build --profile production
 ```
 
 ## CI/CD

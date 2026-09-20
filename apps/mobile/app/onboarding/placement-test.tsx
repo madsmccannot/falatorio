@@ -5,15 +5,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import {
   createPlacementState,
   recordPlacementResponse,
   getPlacementResult,
   type PlacementQuestion,
-} from "@fala-pt/core/lesson";
+} from "@falatorio/core/lesson";
 import { getString, KEYS } from "@/lib/storage";
-import type { L1Code } from "@fala-pt/core";
+import type { L1Code } from "@falatorio/core";
 
 type DisplayQuestion = PlacementQuestion & {
   prompt: string;

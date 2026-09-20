@@ -5,8 +5,8 @@ import { useHearts } from "@/hooks/useHearts";
 import { useCrystals } from "@/hooks/useCrystals";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, typography } from "@fala-pt/ui/tokens";
-import { HEARTS } from "@fala-pt/core";
+import { colors, spacing, typography } from "@falatorio/ui/tokens";
+import { HEARTS } from "@falatorio/core";
 
 type Props = {
   visible: boolean;

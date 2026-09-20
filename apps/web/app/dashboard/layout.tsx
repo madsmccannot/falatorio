@@ -21,7 +21,7 @@ export default function DashboardLayout({
             marginBottom: 32,
           }}
         >
-          Fala PT
+          Falatório
         </div>
         <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
           {[

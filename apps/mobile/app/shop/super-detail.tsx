@@ -8,8 +8,8 @@ import { purchasePackage, getOfferings, type PurchasesPackage } from "@/lib/reve
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
-import { SUPER_PRICING } from "@fala-pt/core";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { SUPER_PRICING } from "@falatorio/core";
 
 const FEATURES = [
   { title: "Unlimited hearts", desc: "Never wait for hearts to refill" },
@@ -83,7 +83,7 @@ export default function SuperDetailScreen() {
       />
 
       <Animated.View entering={FadeInDown.delay(100).duration(300)} style={styles.hero}>
-        <Text style={styles.heroTitle}>Fala PT Super</Text>
+        <Text style={styles.heroTitle}>Falatório Super</Text>
         <Text style={styles.heroSubtitle}>
           Learn faster, without limits.
         </Text>

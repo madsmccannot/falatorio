@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
-import { colors, spacing, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, typography } from "@falatorio/ui/tokens";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function SpeakAndScore({ exercise, onAnswer, disabled }: ExerciseProps) {

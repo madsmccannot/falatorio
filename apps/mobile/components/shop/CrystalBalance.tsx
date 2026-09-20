@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useCrystals } from "@/hooks/useCrystals";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   onPress?: () => void;

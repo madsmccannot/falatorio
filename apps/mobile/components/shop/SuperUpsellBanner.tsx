@@ -1,6 +1,6 @@
 import { Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   message?: string;

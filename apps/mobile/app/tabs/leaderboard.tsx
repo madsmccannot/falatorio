@@ -2,8 +2,8 @@ import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { trpc } from "@/lib/trpc";
 import { Loading } from "@/components/ui/Loading";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
-import { LEAGUE } from "@fala-pt/core";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { LEAGUE } from "@falatorio/core";
 
 export default function LeaderboardScreen() {
   const insets = useSafeAreaInsets();

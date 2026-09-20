@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   days: number;

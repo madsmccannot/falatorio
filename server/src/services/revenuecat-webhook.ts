@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { users } from "@fala-pt/db/schema";
+import { users } from "@falatorio/db/schema";
 import { env } from "../env.js";
-import type { createDb } from "@fala-pt/db";
+import type { createDb } from "@falatorio/db";
 
 type RevenueCatEvent =
   | { type: "INITIAL_PURCHASE"; app_user_id: string; product_id: string; expiration_at_ms: number }

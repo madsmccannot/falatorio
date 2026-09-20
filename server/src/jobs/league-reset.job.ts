@@ -1,9 +1,9 @@
 import type { Job } from "bullmq";
-import type { createDb } from "@fala-pt/db";
+import type { createDb } from "@falatorio/db";
 import { eq, and } from "drizzle-orm";
-import { leagueEntries } from "@fala-pt/db/schema";
-import { LEAGUE_TIERS, type LeagueTier } from "@fala-pt/core";
-import { calculatePromotions, type LeagueEntry } from "@fala-pt/core/gamification";
+import { leagueEntries } from "@falatorio/db/schema";
+import { LEAGUE_TIERS, type LeagueTier } from "@falatorio/core";
+import { calculatePromotions, type LeagueEntry } from "@falatorio/core/gamification";
 
 export interface LeagueResetData {
   seasonWeek: string;

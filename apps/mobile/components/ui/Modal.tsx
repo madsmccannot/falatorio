@@ -10,7 +10,7 @@ import Animated, {
   SlideInDown,
   SlideOutDown,
 } from "react-native-reanimated";
-import { colors, spacing, radii } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii } from "@falatorio/ui/tokens";
 
 export interface ModalProps {
   visible: boolean;

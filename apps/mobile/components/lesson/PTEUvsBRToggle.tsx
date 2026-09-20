@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import { colors, spacing, radii, typography } from "@fala-pt/ui/tokens";
+import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
   variant: "pt-PT" | "pt-BR";
@@ -56,7 +56,7 @@ export function PTEUvsBRToggle({ variant: initialVariant, textPT, textBR }: Prop
         </Text>
         {variant === "pt-BR" && (
           <Text style={styles.note}>
-            Note: Fala PT teaches European Portuguese (PT-EU).
+            Note: Falatório teaches European Portuguese (PT-EU).
             This shows the Brazilian variant for comparison.
           </Text>
         )}
