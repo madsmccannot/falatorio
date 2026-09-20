@@ -31,7 +31,7 @@ falapt/
 | Auth | Clerk (JWT, cached in Redis) |
 | CMS | Payload CMS v3, PostgreSQL adapter, R2 storage |
 | Payments | RevenueCat (subscriptions), AdMob (GDPR-aware) |
-| AI | Claude (conversation tutor, exercise generation), OpenAI Whisper (speech), Azure TTS |
+| AI | Claude (conversation tutor, dynamic content generation, exercise generation), OpenAI Whisper (speech), Azure TTS |
 | Storage | Cloudflare R2 (audio, media) |
 | CI/CD | GitHub Actions, Docker (GHCR), Railway, Vercel |
 
@@ -42,6 +42,10 @@ falapt/
 Every source language is a separate product. Each L1 profile contains phonetic transfer maps, grammar interference patterns, false friends, and cultural bridges. 15 profiles: en, es, fr, de, hi, ur, ar, bn, zh, ru, uk, tr, pl, ko, ja.
 
 Phase 1 languages (en, es, fr, hi, ur, ar, bn) have full production profiles: 15-40 false friends, 12-15 phonetic difficulties, 12-15 grammar gaps, 15-30 cognates, and 15-25 cultural references per language. Phase 2 languages (de, zh, ru, uk, tr, pl, ko, ja) have functional stubs.
+
+### Dynamic Content Generation
+
+Exercises are not statically authored. L1 profiles provide seed knowledge (false friends, grammar gaps, phonetic difficulties, cognates, cultural references), and Claude generates personalized exercises dynamically based on the user's L1, CEFR level, and demonstrated weaknesses. Generated exercises are stored in the database so they are not regenerated. The seed content service creates the course structure (courses, units, lessons) per L1, while exercises fill in dynamically on demand.
 
 ### FSRS (Free Spaced Repetition Scheduler)
 
@@ -91,11 +95,11 @@ Users, courses, units, lessons, exercises, audio clips, user progress, streaks, 
 
 **Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads.
 
-**Services:** Whisper (transcription), Azure TTS, Claude LLM (conversation tutor), FCM push, R2 storage, IAP validation (Apple + Google), RevenueCat webhooks.
+**Services:** Whisper (transcription), Azure TTS, Claude LLM (conversation tutor), content generator (dynamic lesson/exercise generation using L1 profiles), seed content (course structure seeding per L1), FCM push, R2 storage, IAP validation (Apple + Google), RevenueCat webhooks.
 
-**Jobs (BullMQ):** exercise generation, league reset, streak reminders, quality flagging, heart refill, subscription checks.
+**Jobs (BullMQ):** exercise generation (uses content-generator service), league reset, streak reminders, quality flagging, heart refill, subscription checks.
 
-### `apps/mobile` — 19 screens, 38 components, 8 hooks
+### `apps/mobile` — 19 screens, 41 components, 8 hooks
 
 **Onboarding:** language select, GDPR consent, goal, level, placement test, plan.
 
@@ -105,7 +109,7 @@ Users, courses, units, lessons, exercises, audio clips, user progress, streaks, 
 
 **Conversation:** scenario picker, chat with Claude-powered PT-EU tutor with error extraction.
 
-**Components:** UI primitives (Button, Card, Modal, Toast, Loading), exercise renderers, lesson components (progress bar, heart indicator, feedback, PT-EU vs PT-BR toggle), audio (player, recorder, waveform), gamification (XP bar, streak badge, league card, achievement toast), paywall (out of hearts, mid-lesson, Super upsell, feature lock, ad-or-pay choice), shop (crystal balance, item card, IAP modal, chest offer, Super banner), ads (provider, banner, interstitial, reward).
+**Components:** UI primitives (Button, Card, Modal, Toast, Loading), exercise renderers, lesson components (progress bar, heart indicator, feedback, PT-EU vs PT-BR toggle), audio (player, recorder, waveform), gamification (XP bar, streak badge, league card, achievement toast), paywall (out of hearts, mid-lesson, Super upsell, feature lock, ad-or-pay choice), shop (crystal balance, item card, IAP modal, chest offer, Super banner), ads (provider, banner, interstitial, reward), pronunciation (mouth diagram SVG, phoneme card with animation, L1-based pronunciation guide).
 
 ### `cms` — 8 collections
 

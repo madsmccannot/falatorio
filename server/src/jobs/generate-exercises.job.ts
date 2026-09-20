@@ -1,8 +1,9 @@
 import type { Job } from "bullmq";
-import type { createDb } from "@fala-pt/db";
+import type { Database } from "@fala-pt/db/client";
 import { eq } from "drizzle-orm";
 import { lessons, exercises } from "@fala-pt/db/schema";
-import { EXERCISE_TYPES, type ExerciseType } from "@fala-pt/core";
+import type { CEFRLevel, ExerciseType, L1Code } from "@fala-pt/core";
+import { generateLesson } from "../services/content-generator.service.js";
 
 export interface GenerateExercisesData {
   lessonId: string;
@@ -11,13 +12,14 @@ export interface GenerateExercisesData {
   grammarFocus: string[];
   vocabTarget: string[];
   l1Source: string;
+  weaknesses?: string[];
 }
 
 export async function processGenerateExercises(
   job: Job<GenerateExercisesData>,
-  db: ReturnType<typeof createDb>,
+  db: Database,
 ): Promise<void> {
-  const { lessonId, count, cefrLevel, grammarFocus, vocabTarget, l1Source } = job.data;
+  const { lessonId, count, cefrLevel, grammarFocus, vocabTarget, l1Source, weaknesses } = job.data;
 
   const [lesson] = await db
     .select()
@@ -29,23 +31,16 @@ export async function processGenerateExercises(
     throw new Error(`Lesson ${lessonId} not found`);
   }
 
-  const Anthropic = (await import("@anthropic-ai/sdk")).default;
-  const client = new Anthropic();
-
-  const prompt = buildExercisePrompt(cefrLevel, grammarFocus, vocabTarget, l1Source, count);
-
-  const response = await client.messages.create({
-    model: "claude-sonnet-5-20250514",
-    max_tokens: 4096,
-    messages: [{ role: "user", content: prompt }],
+  const result = await generateLesson({
+    l1: l1Source as L1Code,
+    cefrLevel: cefrLevel as CEFRLevel,
+    grammarFocus,
+    vocabTopics: vocabTarget,
+    weaknesses: weaknesses ?? [],
+    exerciseCount: count,
   });
 
-  const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock) throw new Error("No text in LLM response");
-
-  const generated = parseExerciseResponse(textBlock.text);
-
-  for (const ex of generated) {
+  for (const ex of result.exercises) {
     await db.insert(exercises).values({
       lessonId,
       type: ex.type as ExerciseType,
@@ -53,55 +48,9 @@ export async function processGenerateExercises(
       prompt: ex.prompt,
       acceptedAnswers: ex.acceptedAnswers,
       difficulty: ex.difficulty,
-      l1Tip: ex.l1Tips,
+      l1Tip: ex.l1Tip,
     });
   }
 
   await job.updateProgress(100);
-}
-
-function buildExercisePrompt(
-  cefrLevel: string,
-  grammarFocus: string[],
-  vocabTarget: string[],
-  l1Source: string,
-  count: number,
-): string {
-  return `Generate ${count} European Portuguese (PT-EU, NOT Brazilian) exercises for a ${cefrLevel} language learner whose native language is ${l1Source}.
-
-Grammar focus: ${grammarFocus.join(", ") || "general"}
-Vocabulary topics: ${vocabTarget.join(", ") || "general"}
-
-For each exercise, output JSON with:
-- type: one of ${EXERCISE_TYPES.join(", ")}
-- prompt: the exercise content as a JSON object with appropriate fields for the type
-- acceptedAnswers: array of valid answer strings (include common alternatives)
-- difficulty: 1-5 integer
-- l1Tips: object mapping L1 codes to helpful tips (at minimum include "${l1Source}")
-
-Output ONLY a JSON array. No markdown, no explanation.
-Use European Portuguese exclusively: tu/vós conjugations, placement of pronouns (mesóclise/enclíse), vocabulary (autocarro not ônibus, telemóvel not celular).`;
-}
-
-interface ParsedExercise {
-  type: string;
-  prompt: Record<string, unknown>;
-  acceptedAnswers: string[];
-  difficulty: number;
-  l1Tips: Record<string, string>;
-}
-
-function parseExerciseResponse(text: string): ParsedExercise[] {
-  const jsonMatch = text.match(/\[[\s\S]*\]/);
-  if (!jsonMatch) throw new Error("No JSON array found in LLM response");
-
-  const parsed = JSON.parse(jsonMatch[0]) as ParsedExercise[];
-  if (!Array.isArray(parsed)) throw new Error("Response is not an array");
-
-  return parsed.filter(
-    (ex) =>
-      typeof ex.type === "string" &&
-      Array.isArray(ex.acceptedAnswers) &&
-      ex.acceptedAnswers.length > 0,
-  );
 }

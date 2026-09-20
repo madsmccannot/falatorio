@@ -11,7 +11,9 @@ import {
   audioClips,
   l1CulturalContent,
 } from "@fala-pt/db/schema";
-import type { L1Code } from "@fala-pt/core";
+import { CEFR_LEVELS, L1_CODES, EXERCISE_TYPES, type L1Code, type CEFRLevel, type ExerciseType } from "@fala-pt/core";
+import { generateLesson, generateSingleExercise } from "../services/content-generator.service.js";
+import { seedCourseStructure, seedAllPhase1Courses } from "../services/seed-content.service.js";
 
 export const contentRouter = t.router({
   getCourses: protectedProcedure.query(async ({ ctx }) => {
@@ -133,5 +135,92 @@ export const contentRouter = t.router({
         speaker: clip.speaker,
         url: clip.url,
       };
+    }),
+
+  generateLessonOnDemand: protectedProcedure
+    .input(
+      z.object({
+        lessonId: z.string().uuid(),
+        cefrLevel: z.enum(CEFR_LEVELS),
+        grammarFocus: z.array(z.string()).optional(),
+        vocabTopics: z.array(z.string()).optional(),
+        weaknesses: z.array(z.string()).optional(),
+        exerciseCount: z.number().int().min(5).max(25).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const [lesson] = await ctx.db
+        .select()
+        .from(lessons)
+        .where(eq(lessons.id, input.lessonId))
+        .limit(1);
+
+      if (!lesson) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const result = await generateLesson({
+        l1: ctx.user.l1 as L1Code,
+        cefrLevel: input.cefrLevel as CEFRLevel,
+        grammarFocus: input.grammarFocus ?? lesson.grammarFocus,
+        vocabTopics: input.vocabTopics ?? lesson.vocabTarget,
+        weaknesses: input.weaknesses ?? [],
+        exerciseCount: input.exerciseCount ?? 15,
+      });
+
+      for (const ex of result.exercises) {
+        await ctx.db.insert(exercises).values({
+          lessonId: input.lessonId,
+          type: ex.type as ExerciseType,
+          status: "live",
+          prompt: ex.prompt,
+          acceptedAnswers: ex.acceptedAnswers,
+          difficulty: ex.difficulty,
+          l1Tip: ex.l1Tip,
+        });
+      }
+
+      return {
+        exercisesGenerated: result.exercises.length,
+        grammarFocus: result.grammarFocus,
+        vocabTopics: result.vocabTopics,
+      };
+    }),
+
+  generateExercise: protectedProcedure
+    .input(
+      z.object({
+        type: z.enum(EXERCISE_TYPES),
+        cefrLevel: z.enum(CEFR_LEVELS),
+        topic: z.string().min(1).max(100),
+        weakness: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const exercise = await generateSingleExercise({
+        l1: ctx.user.l1 as L1Code,
+        cefrLevel: input.cefrLevel as CEFRLevel,
+        type: input.type as ExerciseType,
+        topic: input.topic,
+        weakness: input.weakness,
+      });
+
+      return exercise;
+    }),
+
+  seedContent: protectedProcedure
+    .input(
+      z.object({
+        l1: z.enum(L1_CODES).optional(),
+        seedAll: z.boolean().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (input.seedAll) {
+        const results = await seedAllPhase1Courses(ctx.db);
+        return { seeded: results };
+      }
+
+      const l1 = (input.l1 ?? ctx.user.l1) as L1Code;
+      const result = await seedCourseStructure(l1, ctx.db);
+      return { seeded: { [l1]: result } };
     }),
 });

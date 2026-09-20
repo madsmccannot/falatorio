@@ -24,11 +24,18 @@ export interface FalseFriend {
   ptMeaning: string;
 }
 
+export type MouthPosition =
+  | "rest" | "nasal_ao" | "nasal_vowel" | "palatal_lateral"
+  | "palatal_nasal" | "uvular_r" | "alveolar_tap" | "open_e"
+  | "closed_e" | "open_o" | "closed_o" | "sibilant_s"
+  | "sibilant_sh" | "labiodental_v";
+
 export interface PhoneticDifficulty {
   sound: string;
   ipa: string;
   description: string;
   tip: string;
+  mouthPosition?: MouthPosition;
 }
 
 export interface GrammarGap {
