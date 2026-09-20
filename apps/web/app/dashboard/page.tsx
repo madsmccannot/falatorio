@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -81,7 +82,7 @@ export default function DashboardPage() {
         <p style={{ color: "#78716C", fontSize: 14, marginBottom: 24 }}>
           Completa a tua lição diária para manter o streak ativo.
         </p>
-        <a
+        <Link
           href="/dashboard/lesson/1"
           style={{
             display: "inline-block",
@@ -95,7 +96,7 @@ export default function DashboardPage() {
           }}
         >
           Começar lição
-        </a>
+        </Link>
       </div>
     </div>
   );

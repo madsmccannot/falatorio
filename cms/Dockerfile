@@ -5,7 +5,7 @@ WORKDIR /app
 FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY cms/package.json ./cms/
-RUN pnpm install --frozen-lockfile --filter @fala-pt/cms...
+RUN pnpm install --frozen-lockfile --filter @falatorio/cms...
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules

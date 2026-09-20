@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: {
@@ -30,17 +33,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="pt" className={inter.className}>
       <body
         style={{
           margin: 0,
-          fontFamily: "'Inter', system-ui, sans-serif",
           backgroundColor: "#FAFAF9",
           color: "#1C1917",
         }}
