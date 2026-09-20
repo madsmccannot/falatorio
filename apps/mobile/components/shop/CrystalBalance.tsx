@@ -1,6 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useCrystals } from "@/hooks/useCrystals";
+import { GoldPrisms } from "@/components/icons";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
@@ -17,7 +18,7 @@ export function CrystalBalance({ onPress, compact }: Props) {
   if (compact) {
     return (
       <Pressable onPress={handlePress} style={styles.compactContainer}>
-        <Text style={styles.compactIcon}>◆</Text>
+        <GoldPrisms size={14} />
         <Text style={styles.compactValue}>{balance}</Text>
       </Pressable>
     );
@@ -25,7 +26,7 @@ export function CrystalBalance({ onPress, compact }: Props) {
 
   return (
     <Pressable onPress={handlePress} style={styles.container}>
-      <Text style={styles.icon}>◆</Text>
+      <GoldPrisms size={20} />
       <View>
         <Text style={styles.value}>{balance.toLocaleString()}</Text>
         <Text style={styles.label}>ouro</Text>
@@ -44,10 +45,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: radii.full,
     gap: spacing.sm,
-  },
-  icon: {
-    fontSize: 18,
-    color: colors.crystal,
   },
   value: {
     fontSize: typography.sizes.md,
@@ -72,10 +69,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: radii.full,
-  },
-  compactIcon: {
-    fontSize: 12,
-    color: colors.crystal,
   },
   compactValue: {
     fontSize: typography.sizes.sm,

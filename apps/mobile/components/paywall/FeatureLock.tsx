@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import type { Feature } from "@falatorio/core/entitlements";
 import { SuperUpsell } from "./SuperUpsell";
+import { LockIcon } from "@/components/icons";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
@@ -23,7 +24,7 @@ export function FeatureLock({ feature, children, fallback }: Props) {
       <View style={styles.locked}>
         {fallback ?? (
           <View style={styles.defaultFallback}>
-            <Text style={styles.lockIcon}>🔒</Text>
+            <LockIcon size={24} />
             <Text style={styles.lockText}>
               This feature requires Super
             </Text>
@@ -49,7 +50,6 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
   },
   lockIcon: {
-    fontSize: 24,
     marginBottom: spacing.sm,
   },
   lockText: {

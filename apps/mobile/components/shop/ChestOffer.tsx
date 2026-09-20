@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { ZoomIn, useSharedValue, useAnimatedStyle, withRepeat, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { GoldPrisms } from "@/components/icons";
 import { colors, spacing, radii, typography, shadows } from "@falatorio/ui/tokens";
 
 type Props = {
@@ -38,7 +39,7 @@ export function ChestOffer({ title, description, priceCrystals, onPurchase, disa
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
         <View style={styles.priceRow}>
-          <Text style={styles.priceIcon}>◆</Text>
+          <GoldPrisms size={18} />
           <Text style={styles.priceValue}>{priceCrystals}</Text>
         </View>
       </Animated.View>
@@ -73,10 +74,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.xs,
-  },
-  priceIcon: {
-    fontSize: 16,
-    color: colors.crystal,
   },
   priceValue: {
     fontSize: typography.sizes.xl,

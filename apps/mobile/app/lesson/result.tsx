@@ -6,6 +6,7 @@ import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { GoldPrisms } from "@/components/icons";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 export default function LessonResultScreen() {
@@ -70,6 +71,7 @@ export default function LessonResultScreen() {
           <Text style={styles.statLabel}>XP</Text>
         </Card>
         <Card style={styles.statCard}>
+          <GoldPrisms size={20} />
           <Text style={[styles.statValue, { color: colors.crystal }]}>+{crystalsEarned}</Text>
           <Text style={styles.statLabel}>Ouro</Text>
         </Card>

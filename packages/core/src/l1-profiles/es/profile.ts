@@ -130,6 +130,24 @@ export const esProfile: L1Profile = {
         description: "Palatal nasal nh",
         tip: "Equivalent to Spanish 'ñ'. Written 'nh' in PT. 'Espanha' = 'España'. Same sound, different spelling.",
       },
+      {
+        sound: "b/v distinction",
+        ipa: "/b/ vs /v/",
+        description: "B and V are different sounds",
+        tip: "Spanish merges b/v into one sound. PT-EU keeps them distinct: 'bola' (ball) has a bilabial /b/, 'vela' (candle) has a labiodental /v/ with lip-teeth contact. Practice: 'beber' vs 'viver'.",
+      },
+      {
+        sound: "word-final -e",
+        ipa: "/ɨ/ or silent",
+        description: "Final -e is nearly silent",
+        tip: "Spanish pronounces final 'e' clearly. PT-EU reduces it to a barely audible /ɨ/ or drops it entirely. 'Cidade' sounds like 'cidadɨ' or 'cidad'. This is why PT-EU sounds 'Slavic' to Spanish ears.",
+      },
+      {
+        sound: "nasal diphthongs -ões/-ães",
+        ipa: "/õj̃ʃ/ /ɐ̃j̃ʃ/",
+        description: "Complex nasal diphthongs in plurals",
+        tip: "Spanish plurals are simple (-es). PT-EU nasalizes AND diphthongizes: 'coração' → 'corações' /kuɾɐsõj̃ʃ/. The -ões ending has no Spanish parallel. Practice: limão → limões, pão → pães.",
+      },
     ],
     grammarGaps: [
       {

@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import Animated, { ZoomIn } from "react-native-reanimated";
+import { StreakIcon } from "@/components/icons";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
@@ -12,7 +13,7 @@ export function StreakBadge({ days, frozen, compact }: Props) {
   if (compact) {
     return (
       <View style={styles.compactContainer}>
-        <Text style={styles.compactIcon}>⚡</Text>
+        <StreakIcon size={14} color={colors.streak} />
         <Text style={styles.compactCount}>{days}</Text>
       </View>
     );
@@ -20,7 +21,7 @@ export function StreakBadge({ days, frozen, compact }: Props) {
 
   return (
     <Animated.View entering={ZoomIn.duration(300)} style={[styles.container, frozen && styles.frozen]}>
-      <Text style={styles.icon}>⚡</Text>
+      <StreakIcon size={28} color="#FFFFFF" />
       <Text style={styles.count}>{days}</Text>
       <Text style={styles.label}>day streak</Text>
       {frozen && <Text style={styles.frozenLabel}>Frozen</Text>}
@@ -38,9 +39,6 @@ const styles = StyleSheet.create({
   },
   frozen: {
     backgroundColor: colors.neutral[300],
-  },
-  icon: {
-    fontSize: 28,
   },
   count: {
     fontSize: 32,
@@ -62,10 +60,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 2,
-  },
-  compactIcon: {
-    fontSize: 14,
-    color: colors.streak,
   },
   compactCount: {
     fontSize: typography.sizes.sm,

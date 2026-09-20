@@ -2,11 +2,13 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { AppIcon } from "@/components/icons";
 import { colors, spacing, radii, typography, shadows } from "@falatorio/ui/tokens";
 
 type Props = {
   title: string;
   description?: string;
+  icon?: string;
   visible: boolean;
   onDismiss: () => void;
   autoHideMs?: number;
@@ -15,6 +17,7 @@ type Props = {
 export function AchievementToast({
   title,
   description,
+  icon,
   visible,
   onDismiss,
   autoHideMs = 4000,
@@ -36,7 +39,7 @@ export function AchievementToast({
       style={styles.container}
     >
       <View style={styles.iconContainer}>
-        <Text style={styles.icon}>★</Text>
+        <AppIcon name={icon ?? "star"} size={20} color="#FFFFFF" />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
@@ -70,10 +73,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.xp,
     alignItems: "center",
     justifyContent: "center",
-  },
-  icon: {
-    fontSize: 20,
-    color: "#FFFFFF",
   },
   textContainer: {
     flex: 1,

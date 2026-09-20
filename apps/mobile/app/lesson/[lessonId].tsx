@@ -19,6 +19,7 @@ import { useHearts } from "@/hooks/useHearts";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { Modal } from "@/components/ui/Modal";
+import { HeartIcon } from "@/components/icons";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 export default function LessonScreen() {
@@ -103,7 +104,7 @@ export default function LessonScreen() {
         </View>
         {!unlimited && (
           <View style={styles.heartsChip}>
-            <Text style={styles.heartIcon}>♥</Text>
+            <HeartIcon size={16} />
             <Text style={styles.heartCount}>{hearts}</Text>
           </View>
         )}
@@ -306,10 +307,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 2,
-  },
-  heartIcon: {
-    fontSize: 16,
-    color: colors.heart,
   },
   heartCount: {
     fontSize: typography.sizes.sm,

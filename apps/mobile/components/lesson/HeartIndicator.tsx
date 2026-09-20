@@ -1,6 +1,7 @@
 import React from "react";
 import { Text, StyleSheet } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSequence, withTiming } from "react-native-reanimated";
+import { HeartIcon } from "@/components/icons";
 import { colors, typography } from "@falatorio/ui/tokens";
 
 type Props = {
@@ -29,7 +30,7 @@ export function HeartIndicator({ hearts, unlimited }: Props) {
 
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
-      <Text style={styles.icon}>♥</Text>
+      <HeartIcon size={16} />
       <Text style={styles.count}>{unlimited ? "∞" : hearts}</Text>
     </Animated.View>
   );
@@ -40,10 +41,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 2,
-  },
-  icon: {
-    fontSize: 16,
-    color: colors.heart,
   },
   count: {
     fontSize: typography.sizes.sm,

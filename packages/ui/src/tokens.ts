@@ -36,7 +36,7 @@ export const colors = {
     800: "#292524",
     900: "#1C1917",
   },
-  crystal: "#7C3AED",
+  crystal: "#DAA520",
   heart: "#EF4444",
   xp: "#F59E0B",
   streak: "#F97316",

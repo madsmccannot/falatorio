@@ -232,7 +232,7 @@ Each element has: type, prompt, acceptedAnswers (array of valid strings), diffic
 - Cultural refs should appear in at least 1 exercise`;
 }
 
-function parseExerciseArray(text: string): GeneratedExercise[] {
+export function parseExerciseArray(text: string): GeneratedExercise[] {
   const jsonMatch = text.match(/\[[\s\S]*\]/);
   if (!jsonMatch) throw new Error("No JSON array found in LLM response");
 
@@ -248,7 +248,7 @@ function parseExerciseArray(text: string): GeneratedExercise[] {
   );
 }
 
-function cefrLevelIndex(level: CEFRLevel): number {
+export function cefrLevelIndex(level: CEFRLevel): number {
   const order: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
   return order.indexOf(level);
 }

@@ -1,7 +1,8 @@
-import { Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { AppIcon } from "@/components/icons";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 type Props = {
@@ -27,13 +28,17 @@ export function ShopItemCard({
 }: Props) {
   return (
     <Card style={styles.container}>
-      {icon && <Text style={styles.icon}>{icon}</Text>}
+      {icon && (
+        <View style={styles.iconContainer}>
+          <AppIcon name={icon} size={28} />
+        </View>
+      )}
       <Text style={styles.name}>{name}</Text>
       {description && <Text style={styles.description}>{description}</Text>}
 
       {priceCrystals !== null ? (
         <Button
-          title={`◆ ${priceCrystals}`}
+          title={`${priceCrystals} ouro`}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             onPurchase();
@@ -62,8 +67,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: spacing.md,
   },
-  icon: {
-    fontSize: 28,
+  iconContainer: {
     marginBottom: spacing.sm,
   },
   name: {

@@ -14,6 +14,7 @@ import { useEntitlements } from "@/hooks/useEntitlements";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
+import { GoldPrisms, AppIcon } from "@/components/icons";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 export default function ShopScreen() {
@@ -38,7 +39,7 @@ export default function ShopScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Shop</Text>
         <View style={styles.balanceChip}>
-          <Text style={styles.balanceIcon}>◆</Text>
+          <GoldPrisms size={16} />
           <Text style={styles.balanceValue}>{balance}</Text>
         </View>
       </View>
@@ -71,11 +72,15 @@ export default function ShopScreen() {
 
             return (
               <Card style={styles.itemCard}>
-                <Text style={styles.itemIcon}>{item.icon ?? "📦"}</Text>
+                {item.icon && (
+                  <View style={styles.itemIconContainer}>
+                    <AppIcon name={item.icon} size={28} />
+                  </View>
+                )}
                 <Text style={styles.itemName} numberOfLines={2}>{name}</Text>
                 {item.priceCrystals !== null && (
                   <Button
-                    title={`◆ ${item.priceCrystals}`}
+                    title={`${item.priceCrystals} ouro`}
                     onPress={() => handlePurchase(item.id)}
                     variant={canAfford ? "primary" : "secondary"}
                     size="sm"
@@ -129,10 +134,6 @@ const styles = StyleSheet.create({
     borderRadius: radii.full,
     gap: spacing.xs,
   },
-  balanceIcon: {
-    fontSize: 14,
-    color: colors.xp,
-  },
   balanceValue: {
     fontSize: typography.sizes.sm,
     fontWeight: "700",
@@ -175,8 +176,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
     padding: spacing.md,
   },
-  itemIcon: {
-    fontSize: 28,
+  itemIconContainer: {
     marginBottom: spacing.sm,
   },
   itemName: {

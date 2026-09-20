@@ -3,15 +3,32 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "strict": true,
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
     "paths": {
-      "@/*": ["./*"],
-      "@falatorio/core": ["../../packages/core/src"],
-      "@falatorio/core/*": ["../../packages/core/src/*"],
-      "@falatorio/ui": ["../../packages/ui/src"],
-      "@falatorio/api": ["../../packages/api/src"]
+      "@/*": [
+        "./*"
+      ],
+      "@falatorio/core": [
+        "../../packages/core/src"
+      ],
+      "@falatorio/core/*": [
+        "../../packages/core/src/*"
+      ],
+      "@falatorio/ui": [
+        "../../packages/ui/src"
+      ],
+      "@falatorio/api": [
+        "../../packages/api/src"
+      ]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "expo-env.d.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

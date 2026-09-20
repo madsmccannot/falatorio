@@ -5,6 +5,7 @@ import { useHearts } from "@/hooks/useHearts";
 import { useCrystals } from "@/hooks/useCrystals";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
+import { HeartIcon } from "@/components/icons";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 import { HEARTS } from "@falatorio/core";
 
@@ -24,7 +25,7 @@ export function OutOfHeartsModal({ visible, onDismiss, context }: Props) {
   return (
     <Modal visible={visible} onDismiss={onDismiss}>
       <View style={styles.iconRow}>
-        <Text style={styles.heartIcon}>♥</Text>
+        <HeartIcon size={48} />
       </View>
       <Text style={styles.title}>Out of hearts</Text>
       <Text style={styles.subtitle}>
@@ -74,10 +75,6 @@ const styles = StyleSheet.create({
   iconRow: {
     alignItems: "center",
     marginBottom: spacing.md,
-  },
-  heartIcon: {
-    fontSize: 48,
-    color: colors.heart,
   },
   title: {
     fontSize: typography.sizes.xl,

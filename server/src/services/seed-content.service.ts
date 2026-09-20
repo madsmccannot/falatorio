@@ -3,7 +3,7 @@ import { courses, units, lessons } from "@falatorio/db/schema";
 import { L1_PHASE_1, type L1Code, type CEFRLevel } from "@falatorio/core";
 import { getProfile } from "@falatorio/core/l1-profiles";
 
-interface UnitDef {
+export interface UnitDef {
   title: string;
   theme: string;
   description: string;
@@ -11,54 +11,54 @@ interface UnitDef {
   vocabTarget: string[];
 }
 
-const COURSE_UNITS: Record<CEFRLevel, UnitDef[]> = {
+export const COURSE_UNITS: Record<CEFRLevel, UnitDef[]> = {
   A1: [
-    { title: "Cumprimentos e apresentacoes", theme: "greetings", description: "Ola, como te chamas, de onde es", grammarFocus: ["ser present", "articles"], vocabTarget: ["greetings", "introductions"] },
-    { title: "Numeros e datas", theme: "numbers", description: "Contar, dias da semana, meses", grammarFocus: ["cardinal numbers", "ordinal numbers"], vocabTarget: ["numbers", "dates", "time"] },
-    { title: "Familia e relacoes", theme: "family", description: "Mae, pai, irmaos, amigos", grammarFocus: ["possessives", "gender agreement"], vocabTarget: ["family", "relationships"] },
-    { title: "Comida e bebida", theme: "food", description: "No restaurante, no cafe, no supermercado", grammarFocus: ["querer present", "partitive"], vocabTarget: ["food", "drinks", "restaurant"] },
-    { title: "A casa", theme: "home", description: "Divisoes, mobilia, rotina em casa", grammarFocus: ["estar present", "prepositions em/de"], vocabTarget: ["rooms", "furniture", "daily objects"] },
-    { title: "O corpo e a saude", theme: "body", description: "Partes do corpo, dizer como te sentes", grammarFocus: ["ter present", "doer"], vocabTarget: ["body parts", "health", "feelings"] },
-    { title: "Transportes e direcoes", theme: "transport", description: "Autocarro, comboio, telemovel, pedir direcoes", grammarFocus: ["ir present", "imperative basic"], vocabTarget: ["transport", "directions", "city"] },
-    { title: "Compras e dinheiro", theme: "shopping", description: "Na loja, precos, pagar", grammarFocus: ["poder present", "demonstratives"], vocabTarget: ["shopping", "clothes", "money"] },
+    { title: "Cumprimentos e apresentações", theme: "greetings", description: "Olá, como te chamas, de onde és", grammarFocus: ["ser present", "articles"], vocabTarget: ["greetings", "introductions"] },
+    { title: "Números e datas", theme: "numbers", description: "Contar, dias da semana, meses", grammarFocus: ["cardinal numbers", "ordinal numbers"], vocabTarget: ["numbers", "dates", "time"] },
+    { title: "Família e relações", theme: "family", description: "Mãe, pai, irmãos, amigos", grammarFocus: ["possessives", "gender agreement"], vocabTarget: ["family", "relationships"] },
+    { title: "Comida e bebida", theme: "food", description: "No restaurante, no café, no supermercado", grammarFocus: ["querer present", "partitive"], vocabTarget: ["food", "drinks", "restaurant"] },
+    { title: "A casa", theme: "home", description: "Divisões, mobília, rotina em casa", grammarFocus: ["estar present", "prepositions em/de"], vocabTarget: ["rooms", "furniture", "daily objects"] },
+    { title: "O corpo e a saúde", theme: "body", description: "Partes do corpo, dizer como te sentes", grammarFocus: ["ter present", "doer"], vocabTarget: ["body parts", "health", "feelings"] },
+    { title: "Transportes e direções", theme: "transport", description: "Autocarro, comboio, telemóvel, pedir direções", grammarFocus: ["ir present", "imperative basic"], vocabTarget: ["transport", "directions", "city"] },
+    { title: "Compras e dinheiro", theme: "shopping", description: "Na loja, preços, pagar", grammarFocus: ["poder present", "demonstratives"], vocabTarget: ["shopping", "clothes", "money"] },
   ],
   A2: [
-    { title: "Rotina diaria", theme: "routine", description: "O meu dia, horas, habitos", grammarFocus: ["reflexive verbs", "frequency adverbs"], vocabTarget: ["daily routine", "time expressions"] },
-    { title: "Tempo e estacoes", theme: "weather", description: "Como esta o tempo, estacoes do ano", grammarFocus: ["fazer weather", "comparative"], vocabTarget: ["weather", "seasons", "nature"] },
-    { title: "Profissoes e trabalho", theme: "work", description: "O que fazes, o escritorio, entrevistas", grammarFocus: ["preterite regular", "porque/por que"], vocabTarget: ["professions", "workplace"] },
-    { title: "Viagens e ferias", theme: "travel", description: "No aeroporto, no hotel, ferias", grammarFocus: ["preterite irregular", "prepositions para/a"], vocabTarget: ["travel", "accommodation", "tourism"] },
-    { title: "Lazer e passatempos", theme: "leisure", description: "Desporto, musica, cinema, hobbies", grammarFocus: ["gostar de", "imperfect introduction"], vocabTarget: ["hobbies", "sports", "entertainment"] },
-    { title: "A cidade e servicos", theme: "city", description: "Correios, banco, hospital, policia", grammarFocus: ["imperfect regular", "object pronouns direct"], vocabTarget: ["city services", "public places"] },
-    { title: "Saude e bem-estar", theme: "health", description: "No medico, na farmacia, emergencias", grammarFocus: ["imperfect irregular", "subjunctive present intro"], vocabTarget: ["medical", "pharmacy", "emergency"] },
-    { title: "Festas e tradicoes", theme: "traditions", description: "Santos Populares, Natal, Pascoa, casamentos", grammarFocus: ["preterite vs imperfect", "indirect objects"], vocabTarget: ["celebrations", "traditions", "culture"] },
+    { title: "Rotina diária", theme: "routine", description: "O meu dia, horas, hábitos", grammarFocus: ["reflexive verbs", "frequency adverbs"], vocabTarget: ["daily routine", "time expressions"] },
+    { title: "Tempo e estações", theme: "weather", description: "Como está o tempo, estações do ano", grammarFocus: ["fazer weather", "comparative"], vocabTarget: ["weather", "seasons", "nature"] },
+    { title: "Profissões e trabalho", theme: "work", description: "O que fazes, o escritório, entrevistas", grammarFocus: ["preterite regular", "porque/por que"], vocabTarget: ["professions", "workplace"] },
+    { title: "Viagens e férias", theme: "travel", description: "No aeroporto, no hotel, férias", grammarFocus: ["preterite irregular", "prepositions para/a"], vocabTarget: ["travel", "accommodation", "tourism"] },
+    { title: "Lazer e passatempos", theme: "leisure", description: "Desporto, música, cinema, hobbies", grammarFocus: ["gostar de", "imperfect introduction"], vocabTarget: ["hobbies", "sports", "entertainment"] },
+    { title: "A cidade e serviços", theme: "city", description: "Correios, banco, hospital, polícia", grammarFocus: ["imperfect regular", "object pronouns direct"], vocabTarget: ["city services", "public places"] },
+    { title: "Saúde e bem-estar", theme: "health", description: "No médico, na farmácia, emergências", grammarFocus: ["imperfect irregular", "subjunctive present intro"], vocabTarget: ["medical", "pharmacy", "emergency"] },
+    { title: "Festas e tradições", theme: "traditions", description: "Santos Populares, Natal, Páscoa, casamentos", grammarFocus: ["preterite vs imperfect", "indirect objects"], vocabTarget: ["celebrations", "traditions", "culture"] },
   ],
   B1: [
-    { title: "Opiniao e debate", theme: "opinion", description: "Concordar, discordar, argumentar", grammarFocus: ["subjunctive present", "conjunctions"], vocabTarget: ["opinions", "debate", "connectors"] },
-    { title: "Noticias e media", theme: "news", description: "Jornais, televisao, redes sociais", grammarFocus: ["passive voice", "reported speech intro"], vocabTarget: ["media", "news", "technology"] },
+    { title: "Opinião e debate", theme: "opinion", description: "Concordar, discordar, argumentar", grammarFocus: ["subjunctive present", "conjunctions"], vocabTarget: ["opinions", "debate", "connectors"] },
+    { title: "Notícias e media", theme: "news", description: "Jornais, televisão, redes sociais", grammarFocus: ["passive voice", "reported speech intro"], vocabTarget: ["media", "news", "technology"] },
     { title: "Cultura portuguesa", theme: "culture", description: "Fado, literatura, cinema, arte", grammarFocus: ["relative pronouns", "subjunctive with emotions"], vocabTarget: ["arts", "music", "literature"] },
-    { title: "Trabalho e carreira", theme: "career", description: "CV, entrevista, promocao, reunioes", grammarFocus: ["conditional", "por/para distinction"], vocabTarget: ["career", "business", "meetings"] },
-    { title: "Educacao e formacao", theme: "education", description: "Universidade, cursos, aprender", grammarFocus: ["future subjunctive", "personal infinitive"], vocabTarget: ["education", "studying", "exams"] },
-    { title: "Ambiente e natureza", theme: "environment", description: "Reciclagem, alteracoes climaticas, ecologia", grammarFocus: ["imperfect subjunctive", "conditional sentences"], vocabTarget: ["environment", "ecology", "sustainability"] },
-    { title: "Tecnologia e inovacao", theme: "technology", description: "Internet, apps, inteligencia artificial", grammarFocus: ["compound tenses intro", "gerund vs infinitive"], vocabTarget: ["technology", "innovation", "digital"] },
-    { title: "Relacoes e emocoes", theme: "relationships", description: "Amizade, amor, conflitos, emocoes", grammarFocus: ["subjunctive with doubt", "pronoun placement"], vocabTarget: ["emotions", "relationships", "personality"] },
+    { title: "Trabalho e carreira", theme: "career", description: "CV, entrevista, promoção, reuniões", grammarFocus: ["conditional", "por/para distinction"], vocabTarget: ["career", "business", "meetings"] },
+    { title: "Educação e formação", theme: "education", description: "Universidade, cursos, aprender", grammarFocus: ["future subjunctive", "personal infinitive"], vocabTarget: ["education", "studying", "exams"] },
+    { title: "Ambiente e natureza", theme: "environment", description: "Reciclagem, alterações climáticas, ecologia", grammarFocus: ["imperfect subjunctive", "conditional sentences"], vocabTarget: ["environment", "ecology", "sustainability"] },
+    { title: "Tecnologia e inovação", theme: "technology", description: "Internet, apps, inteligência artificial", grammarFocus: ["compound tenses intro", "gerund vs infinitive"], vocabTarget: ["technology", "innovation", "digital"] },
+    { title: "Relações e emoções", theme: "relationships", description: "Amizade, amor, conflitos, emoções", grammarFocus: ["subjunctive with doubt", "pronoun placement"], vocabTarget: ["emotions", "relationships", "personality"] },
   ],
   B2: [
-    { title: "Politica e sociedade", theme: "politics", description: "Democracia, eleicoes, problemas sociais", grammarFocus: ["pluperfect subjunctive", "complex conditionals"], vocabTarget: ["politics", "society", "government"] },
-    { title: "Economia e negocios", theme: "economy", description: "Mercado, investimento, empreendedorismo", grammarFocus: ["future perfect", "formal register"], vocabTarget: ["economics", "business", "finance"] },
-    { title: "Arte e estetica", theme: "art", description: "Pintura, escultura, fotografia, design", grammarFocus: ["subjunctive in relative clauses", "passive se"], vocabTarget: ["art", "aesthetics", "criticism"] },
-    { title: "Literatura portuguesa", theme: "literature", description: "Pessoa, Saramago, Camoes, poesia", grammarFocus: ["literary tenses", "mesoclisis"], vocabTarget: ["literature", "poetry", "authors"] },
-    { title: "Ciencia e descoberta", theme: "science", description: "Investigacao, descobertas, medicina", grammarFocus: ["compound subjunctive", "abstract nominalization"], vocabTarget: ["science", "research", "discovery"] },
-    { title: "Portugal no mundo", theme: "world", description: "Descobrimentos, CPLP, emigracao, diaspora", grammarFocus: ["narrative tenses", "discourse connectors"], vocabTarget: ["history", "diaspora", "lusophone world"] },
+    { title: "Política e sociedade", theme: "politics", description: "Democracia, eleições, problemas sociais", grammarFocus: ["pluperfect subjunctive", "complex conditionals"], vocabTarget: ["politics", "society", "government"] },
+    { title: "Economia e negócios", theme: "economy", description: "Mercado, investimento, empreendedorismo", grammarFocus: ["future perfect", "formal register"], vocabTarget: ["economics", "business", "finance"] },
+    { title: "Arte e estética", theme: "art", description: "Pintura, escultura, fotografia, design", grammarFocus: ["subjunctive in relative clauses", "passive se"], vocabTarget: ["art", "aesthetics", "criticism"] },
+    { title: "Literatura portuguesa", theme: "literature", description: "Pessoa, Saramago, Camões, poesia", grammarFocus: ["literary tenses", "mesoclisis"], vocabTarget: ["literature", "poetry", "authors"] },
+    { title: "Ciência e descoberta", theme: "science", description: "Investigação, descobertas, medicina", grammarFocus: ["compound subjunctive", "abstract nominalization"], vocabTarget: ["science", "research", "discovery"] },
+    { title: "Portugal no mundo", theme: "world", description: "Descobrimentos, CPLP, emigração, diáspora", grammarFocus: ["narrative tenses", "discourse connectors"], vocabTarget: ["history", "diaspora", "lusophone world"] },
   ],
   C1: [
-    { title: "Expressoes idiomaticas", theme: "idioms", description: "Estar-se nas tintas, dar o litro, ficar a ver navios", grammarFocus: ["idiomatic usage", "register variation"], vocabTarget: ["idioms", "colloquialisms", "slang"] },
-    { title: "Registo formal e academico", theme: "formal", description: "Textos academicos, correspondencia formal, discursos", grammarFocus: ["formal subjunctive", "impersonal constructions"], vocabTarget: ["academic", "formal writing", "correspondence"] },
-    { title: "Textos literarios", theme: "literary", description: "Analise de textos, critica, interpretacao", grammarFocus: ["stylistic devices", "archaic forms"], vocabTarget: ["literary analysis", "criticism", "interpretation"] },
-    { title: "Argumentacao e retorica", theme: "rhetoric", description: "Persuasao, debate formal, ensaio", grammarFocus: ["advanced connectors", "subjunctive nuances"], vocabTarget: ["argumentation", "rhetoric", "persuasion"] },
+    { title: "Expressões idiomáticas", theme: "idioms", description: "Estar-se nas tintas, dar o litro, ficar a ver navios", grammarFocus: ["idiomatic usage", "register variation"], vocabTarget: ["idioms", "colloquialisms", "slang"] },
+    { title: "Registo formal e académico", theme: "formal", description: "Textos académicos, correspondência formal, discursos", grammarFocus: ["formal subjunctive", "impersonal constructions"], vocabTarget: ["academic", "formal writing", "correspondence"] },
+    { title: "Textos literários", theme: "literary", description: "Análise de textos, crítica, interpretação", grammarFocus: ["stylistic devices", "archaic forms"], vocabTarget: ["literary analysis", "criticism", "interpretation"] },
+    { title: "Argumentação e retórica", theme: "rhetoric", description: "Persuasão, debate formal, ensaio", grammarFocus: ["advanced connectors", "subjunctive nuances"], vocabTarget: ["argumentation", "rhetoric", "persuasion"] },
   ],
   C2: [
-    { title: "Dominio nativo", theme: "mastery", description: "Nuances, humor, duplo sentido, registos", grammarFocus: ["all tenses review", "regional variation"], vocabTarget: ["nuance", "humor", "register"] },
-    { title: "Producao criativa", theme: "creative", description: "Escrita criativa, traducao, adaptacao", grammarFocus: ["stylistic choices", "creative grammar"], vocabTarget: ["creative writing", "translation", "adaptation"] },
+    { title: "Domínio nativo", theme: "mastery", description: "Nuances, humor, duplo sentido, registos", grammarFocus: ["all tenses review", "regional variation"], vocabTarget: ["nuance", "humor", "register"] },
+    { title: "Produção criativa", theme: "creative", description: "Escrita criativa, tradução, adaptação", grammarFocus: ["stylistic choices", "creative grammar"], vocabTarget: ["creative writing", "translation", "adaptation"] },
   ],
 };
 
@@ -75,7 +75,7 @@ export async function seedCourseStructure(
   const [course] = await db
     .insert(courses)
     .values({
-      title: { pt: `Portugues europeu para falantes de ${profile.nativeName}`, [l1]: `European Portuguese for ${profile.name} speakers` },
+      title: { pt: `Português europeu para falantes de ${profile.nativeName}`, [l1]: `European Portuguese for ${profile.name} speakers` },
       description: { pt: `Curso completo de PT-EU adaptado para falantes de ${profile.name}`, [l1]: `Complete PT-EU course adapted for ${profile.name} speakers` },
       l1Source: l1,
       cefrMin: startLevel,

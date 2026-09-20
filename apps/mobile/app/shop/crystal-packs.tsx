@@ -8,6 +8,7 @@ import { useCrystals } from "@/hooks/useCrystals";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
+import { GoldPrisms } from "@/components/icons";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type CrystalPack = {
@@ -63,6 +64,7 @@ export default function CrystalPacksScreen() {
         <Button title="Back" onPress={() => router.back()} variant="ghost" size="sm" />
         <Text style={styles.title}>Crystal Packs</Text>
         <View style={styles.balanceChip}>
+          <GoldPrisms size={14} />
           <Text style={styles.balanceValue}>{balance}</Text>
         </View>
       </View>
@@ -74,6 +76,7 @@ export default function CrystalPacksScreen() {
         renderItem={({ item: pack }) => (
           <Card elevated style={styles.packCard}>
             <View style={styles.packTop}>
+              <GoldPrisms size={40} />
               <Text style={styles.packAmount}>{pack.amount.toLocaleString()}</Text>
               <Text style={styles.packName}>{pack.name}</Text>
               {pack.bonus && (
@@ -118,6 +121,9 @@ const styles = StyleSheet.create({
     color: colors.neutral[900],
   },
   balanceChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
     backgroundColor: colors.neutral[100],
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,

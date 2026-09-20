@@ -14,6 +14,7 @@ import { useStreak } from "@/hooks/useStreak";
 import { useCrystals } from "@/hooks/useCrystals";
 import { Card } from "@/components/ui/Card";
 import { Loading } from "@/components/ui/Loading";
+import { HeartIcon, StreakIcon, GoldPrisms } from "@/components/icons";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 export default function LearnScreen() {
@@ -29,17 +30,17 @@ export default function LearnScreen() {
       <View style={styles.header}>
         <View style={styles.statsRow}>
           <View style={styles.stat}>
-            <Text style={styles.statIcon}>♥</Text>
+            <HeartIcon size={18} />
             <Text style={styles.statValue}>
               {unlimited ? "∞" : hearts}
             </Text>
           </View>
           <View style={styles.stat}>
-            <Text style={[styles.statIcon, { color: colors.streak }]}>⚡</Text>
+            <StreakIcon size={18} color={colors.streak} />
             <Text style={styles.statValue}>{currentDays}</Text>
           </View>
           <View style={styles.stat}>
-            <Text style={[styles.statIcon, { color: colors.xp }]}>◆</Text>
+            <GoldPrisms size={18} />
             <Text style={styles.statValue}>{balance}</Text>
           </View>
         </View>
@@ -115,10 +116,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.xs,
-  },
-  statIcon: {
-    fontSize: 18,
-    color: colors.heart,
   },
   statValue: {
     fontSize: typography.sizes.md,

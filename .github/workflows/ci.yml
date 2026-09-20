@@ -113,7 +113,7 @@ jobs:
   db-check:
     name: DB Migration Check
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    needs: lint-and-typecheck
     services:
       postgres:
         image: postgres:16-alpine
