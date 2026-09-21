@@ -41,3 +41,5 @@ apps/mobile/start-mobile.sh
 03-directory-tree.html
 falatorio-roadmap-pedagogico.html
 *.html:Zone.Identifier
+*.jpg
+Screenshot_*.jpg
