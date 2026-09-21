@@ -39,16 +39,16 @@ export default function SuperDetailScreen() {
         (p: PurchasesPackage) => p.identifier === packageId
       );
       if (!pkg) {
-        showToast({ message: "Plan not available", type: "error" });
+        showToast({ message: t("toast.plan_unavailable"), type: "error" });
         return;
       }
       await purchasePackage(pkg);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      showToast({ message: "Welcome to Super!", type: "success" });
+      showToast({ message: t("toast.welcome_super"), type: "success" });
       router.replace("/tabs/learn");
     } catch (err: unknown) {
       if (!(err as Record<string, boolean>)?.["userCancelled"]) {
-        showToast({ message: "Purchase failed", type: "error" });
+        showToast({ message: t("toast.purchase_failed"), type: "error" });
       }
     } finally {
       setPurchasing(false);
@@ -130,7 +130,7 @@ export default function SuperDetailScreen() {
             €{SUPER_PRICING.YEARLY_EUR.toFixed(2)}/yr
           </Text>
           <Text style={styles.planSaving}>
-            Save {Math.round((1 - SUPER_PRICING.YEARLY_EUR / (SUPER_PRICING.MONTHLY_EUR * 12)) * 100)}%
+            {t("super.save", { percent: Math.round((1 - SUPER_PRICING.YEARLY_EUR / (SUPER_PRICING.MONTHLY_EUR * 12)) * 100) })}
           </Text>
           <Button
             title={t("super.trial")}

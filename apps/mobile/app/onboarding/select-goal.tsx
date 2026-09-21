@@ -1,42 +1,30 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { USER_GOALS, type UserGoal } from "@falatorio/core";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { useTheme } from "@/lib/theme";
+import { onboardingStyles } from "@/lib/styles";
+import { useTranslation } from "@/lib/i18n";
+import { spacing } from "@falatorio/ui/tokens";
 
-const GOAL_INFO: Record<UserGoal, { label: string; description: string }> = {
-  tourism: {
-    label: "Tourism",
-    description: "Visiting Portugal for holidays or short stays",
-  },
-  residency: {
-    label: "Residency",
-    description: "Moving to Portugal or already living there",
-  },
-  work: {
-    label: "Work",
-    description: "Working in Portugal or with Portuguese-speaking colleagues",
-  },
-  citizenship: {
-    label: "Citizenship",
-    description: "Preparing for the A2 citizenship language exam",
-  },
-  family: {
-    label: "Family",
-    description: "Learning for a Portuguese-speaking partner or family",
-  },
-  academic: {
-    label: "Academic",
-    description: "Studying Portuguese at university or for research",
-  },
+const GOAL_KEYS: Record<UserGoal, { label: string; desc: string }> = {
+  tourism: { label: "onboarding.goal_tourism", desc: "onboarding.goal_tourism_desc" },
+  residency: { label: "onboarding.goal_residency", desc: "onboarding.goal_residency_desc" },
+  work: { label: "onboarding.goal_work", desc: "onboarding.goal_work_desc" },
+  citizenship: { label: "onboarding.goal_citizenship", desc: "onboarding.goal_citizenship_desc" },
+  family: { label: "onboarding.goal_family", desc: "onboarding.goal_family_desc" },
+  academic: { label: "onboarding.goal_academic", desc: "onboarding.goal_academic_desc" },
 };
 
 export default function SelectGoalScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const [selected, setSelected] = useState<UserGoal | null>(null);
 
   const handleSelect = (goal: UserGoal) => {
@@ -50,34 +38,34 @@ export default function SelectGoalScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + spacing.xl }]}>
-      <Text style={styles.title}>Why are you learning?</Text>
-      <Text style={styles.subtitle}>
-        This helps us prioritize the right vocabulary and scenarios for you.
+    <View style={[shared.screen, { paddingTop: insets.top + spacing.xl }]}>
+      <Text style={shared.title}>{t("onboarding.goal_title")}</Text>
+      <Text style={shared.subtitle}>
+        {t("onboarding.goal_subtitle")}
       </Text>
 
-      <View style={styles.options}>
+      <View style={local.options}>
         {USER_GOALS.map((goal) => {
-          const info = GOAL_INFO[goal];
+          const keys = GOAL_KEYS[goal];
           const isSelected = selected === goal;
           return (
             <Pressable
               key={goal}
               onPress={() => handleSelect(goal)}
-              style={[styles.option, isSelected && styles.optionSelected]}
+              style={[shared.optionCardVertical, isSelected && shared.optionSelected]}
             >
-              <Text style={[styles.optionLabel, isSelected && styles.labelSelected]}>
-                {info.label}
+              <Text style={[shared.optionLabel, isSelected && shared.optionLabelSelected]}>
+                {t(keys.label as any)}
               </Text>
-              <Text style={styles.optionDesc}>{info.description}</Text>
+              <Text style={[shared.optionDesc, { lineHeight: 18 }]}>{t(keys.desc as any)}</Text>
             </Pressable>
           );
         })}
       </View>
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.lg }]}>
+      <View style={[shared.footer, { paddingBottom: insets.bottom + spacing.lg }]}>
         <Button
-          title="Continue"
+          title={t("onboarding.continue")}
           onPress={handleContinue}
           disabled={!selected}
           size="lg"
@@ -87,56 +75,8 @@ export default function SelectGoalScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.neutral[50],
-    paddingHorizontal: spacing.lg,
-  },
-  title: {
-    fontSize: typography.sizes["2xl"],
-    fontWeight: "700",
-    color: colors.neutral[900],
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    fontSize: typography.sizes.sm,
-    color: colors.neutral[500],
-    marginBottom: spacing.xl,
-    lineHeight: 20,
-  },
+const local = StyleSheet.create({
   options: {
     flex: 1,
-  },
-  option: {
-    backgroundColor: colors.neutral[0],
-    borderRadius: radii.md,
-    borderWidth: 1.5,
-    borderColor: colors.neutral[200],
-    padding: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  optionSelected: {
-    borderColor: colors.primary[600],
-    backgroundColor: colors.primary[50],
-  },
-  optionLabel: {
-    fontSize: typography.sizes.md,
-    fontWeight: "600",
-    color: colors.neutral[900],
-    marginBottom: 2,
-  },
-  labelSelected: {
-    color: colors.primary[700],
-  },
-  optionDesc: {
-    fontSize: typography.sizes.xs,
-    color: colors.neutral[500],
-    lineHeight: 18,
-  },
-  footer: {
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.neutral[200],
   },
 });

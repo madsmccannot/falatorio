@@ -1,14 +1,20 @@
-import { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { useState, useMemo } from "react";
+import { View, Text, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { useTheme } from "@/lib/theme";
+import { onboardingStyles } from "@/lib/styles";
+import { useTranslation } from "@/lib/i18n";
+import { spacing } from "@falatorio/ui/tokens";
 import { setBoolean, KEYS } from "@/lib/storage";
 
 export default function GDPRConsentScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const [loading, setLoading] = useState(false);
 
   const handleAccept = () => {
@@ -23,103 +29,50 @@ export default function GDPRConsentScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + spacing.xl }]}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.title}>Privacy & Ads</Text>
-        <Text style={styles.subtitle}>
-          Falatório is free to use. Ads help keep it that way.
+    <View style={[shared.screen, { paddingTop: insets.top + spacing.xl }]}>
+      <ScrollView contentContainerStyle={{ paddingBottom: spacing.xl }}>
+        <Text style={shared.title}>{t("onboarding.gdpr_title")}</Text>
+        <Text style={[shared.subtitle, { fontSize: 15, lineHeight: 22 }]}>
+          {t("onboarding.gdpr_subtitle")}
         </Text>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>What we collect</Text>
-          <Text style={styles.cardText}>
-            Learning progress, exercise scores, and usage patterns to personalize your experience.
-            No data is sold to third parties.
+        <View style={shared.card}>
+          <Text style={shared.cardTitle}>{t("onboarding.gdpr_collect_title")}</Text>
+          <Text style={shared.cardText}>
+            {t("onboarding.gdpr_collect_text")}
           </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Personalized ads</Text>
-          <Text style={styles.cardText}>
-            If you consent, we show ads tailored to your interests.
-            Without consent, you still see ads — just not personalized ones.
-            Super subscribers see zero ads.
+        <View style={shared.card}>
+          <Text style={shared.cardTitle}>{t("onboarding.gdpr_ads_title")}</Text>
+          <Text style={shared.cardText}>
+            {t("onboarding.gdpr_ads_text")}
           </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Your rights</Text>
-          <Text style={styles.cardText}>
-            You can change this anytime in Settings. You can request data export or deletion at any time.
+        <View style={shared.card}>
+          <Text style={shared.cardTitle}>{t("onboarding.gdpr_rights_title")}</Text>
+          <Text style={shared.cardText}>
+            {t("onboarding.gdpr_rights_text")}
           </Text>
         </View>
       </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.lg }]}>
+      <View style={[shared.footer, { paddingBottom: insets.bottom + spacing.lg }]}>
         <Button
-          title="Accept personalized ads"
+          title={t("onboarding.gdpr_accept")}
           onPress={handleAccept}
           loading={loading}
           size="lg"
         />
         <Button
-          title="Continue without personalization"
+          title={t("onboarding.gdpr_decline")}
           onPress={handleDecline}
           variant="ghost"
           size="md"
-          style={styles.declineButton}
+          style={{ marginTop: spacing.sm }}
         />
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.neutral[50],
-    paddingHorizontal: spacing.lg,
-  },
-  scroll: {
-    paddingBottom: spacing.xl,
-  },
-  title: {
-    fontSize: typography.sizes["2xl"],
-    fontWeight: "700",
-    color: colors.neutral[900],
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    fontSize: typography.sizes.md,
-    color: colors.neutral[500],
-    marginBottom: spacing.xl,
-    lineHeight: 22,
-  },
-  card: {
-    backgroundColor: colors.neutral[0],
-    borderRadius: radii.md,
-    borderWidth: 1,
-    borderColor: colors.neutral[200],
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-  },
-  cardTitle: {
-    fontSize: typography.sizes.md,
-    fontWeight: "600",
-    color: colors.neutral[900],
-    marginBottom: spacing.xs,
-  },
-  cardText: {
-    fontSize: typography.sizes.sm,
-    color: colors.neutral[600],
-    lineHeight: 20,
-  },
-  footer: {
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.neutral[200],
-  },
-  declineButton: {
-    marginTop: spacing.sm,
-  },
-});

@@ -45,15 +45,15 @@ export default function CrystalPacksScreen() {
         (p: PurchasesPackage) => p.identifier === pack.packageId
       );
       if (!pkg) {
-        showToast({ message: "Pack not available", type: "error" });
+        showToast({ message: t("toast.pack_unavailable"), type: "error" });
         return;
       }
       await purchasePackage(pkg);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      showToast({ message: `${pack.amount} ouro added!`, type: "success" });
+      showToast({ message: t("toast.ouro_added", { amount: pack.amount }), type: "success" });
     } catch (err: any) {
       if (!err?.userCancelled) {
-        showToast({ message: "Purchase failed", type: "error" });
+        showToast({ message: t("toast.purchase_failed"), type: "error" });
       }
     } finally {
       setPurchasing(null);

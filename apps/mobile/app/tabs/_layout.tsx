@@ -34,35 +34,35 @@ export default function TabsLayout() {
         name="learn"
         options={{
           title: t("tabs.learn"),
-          tabBarIcon: ({ color, size }) => <BookIcon size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <BookIcon size={size} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="practice"
         options={{
           title: t("tabs.practice"),
-          tabBarIcon: ({ color, size }) => <StreakIcon size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <StreakIcon size={size} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="leaderboard"
         options={{
           title: t("tabs.leaderboard"),
-          tabBarIcon: ({ color, size }) => <TrophyIcon size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <TrophyIcon size={size} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="shop"
         options={{
           title: t("tabs.shop"),
-          tabBarIcon: ({ color, size }) => <GoldPrisms size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <GoldPrisms size={size} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: t("tabs.profile"),
-          tabBarIcon: ({ color, size }) => <UserIcon size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <UserIcon size={size} color={color as string} />,
         }}
       />
       <Tabs.Screen name="index" options={{ href: null }} />

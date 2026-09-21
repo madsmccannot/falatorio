@@ -6,7 +6,6 @@ import { trpc } from "@/lib/trpc";
 import { useHearts } from "@/hooks/useHearts";
 import { useStreak } from "@/hooks/useStreak";
 import { useCrystals } from "@/hooks/useCrystals";
-import { Card } from "@/components/ui/Card";
 import { Loading } from "@/components/ui/Loading";
 import { HeartIcon, StreakIcon, GoldPrisms, BookIcon } from "@/components/icons";
 import { useTheme } from "@/lib/theme";

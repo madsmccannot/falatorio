@@ -8,8 +8,10 @@ import { StyleSheet, useColorScheme } from "react-native";
 import { useTRPCClient } from "@/lib/trpc";
 import { ToastProvider } from "@/components/ui/Toast";
 import * as SecureStore from "expo-secure-store";
+import { applyThemePref } from "@/lib/theme";
 
 SplashScreen.preventAutoHideAsync();
+applyThemePref();
 
 const CLERK_KEY = process.env["EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY"] ?? "";
 

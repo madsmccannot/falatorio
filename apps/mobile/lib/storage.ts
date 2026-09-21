@@ -75,7 +75,7 @@ const KEYS = {
   ONBOARDING_COMPLETE: "onboarding_complete",
   SELECTED_L1: "selected_l1",
   GDPR_CONSENT: "gdpr_consent",
-  DARK_MODE: "dark_mode",
+  THEME_PREF: "theme_pref",
   API_URL: "api_url",
 } as const;
 

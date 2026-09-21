@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { useTheme } from "@/lib/theme";
+import { onboardingStyles } from "@/lib/styles";
+import { useTranslation } from "@/lib/i18n";
+import { colors, spacing, typography } from "@falatorio/ui/tokens";
 import {
   createPlacementState,
   recordPlacementResponse,
@@ -37,6 +40,9 @@ const SAMPLE_QUESTIONS: DisplayQuestion[] = [
 export default function PlacementTestScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const l1 = (getString(KEYS.SELECTED_L1) ?? "en") as L1Code;
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -76,30 +82,31 @@ export default function PlacementTestScreen() {
     const result = getPlacementResult(state);
 
     return (
-      <View style={[styles.container, styles.resultContainer, { paddingTop: insets.top + spacing["5xl"] }]}>
-        <Text style={styles.resultLevel}>{result.cefrLevel}</Text>
-        <Text style={styles.resultTitle}>Your estimated level</Text>
-        <Text style={styles.resultSubtitle}>
-          You got {correctCount}/{totalQuestions} correct.
-          We'll start your journey at {result.cefrLevel}.
+      <View style={[shared.screen, local.resultContainer, { paddingTop: insets.top + spacing["5xl"] }]}>
+        <Text style={[local.resultLevel, { color: theme.isDark ? colors.primary[400] : colors.primary[600] }]}>
+          {result.cefrLevel}
+        </Text>
+        <Text style={[local.resultTitle, { color: theme.text }]}>{t("onboarding.result_title")}</Text>
+        <Text style={[local.resultSubtitle, { color: theme.textMuted }]}>
+          {t("onboarding.result_text", { correct: correctCount, total: totalQuestions, level: result.cefrLevel })}
         </Text>
         <Button
-          title="Choose your plan"
+          title={t("onboarding.choose_plan")}
           onPress={() => router.push("/onboarding/plan")}
           size="lg"
-          style={styles.resultButton}
+          style={local.resultButton}
         />
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + spacing.xl }]}>
-      <View style={styles.progressContainer}>
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+    <View style={[shared.screen, { paddingTop: insets.top + spacing.xl }]}>
+      <View style={local.progressContainer}>
+        <View style={[local.progressTrack, { backgroundColor: theme.border }]}>
+          <View style={[local.progressFill, { width: `${progress * 100}%` }]} />
         </View>
-        <Text style={styles.progressText}>
+        <Text style={[local.progressText, { color: theme.textMuted }]}>
           {currentIndex + 1}/{totalQuestions}
         </Text>
       </View>
@@ -108,9 +115,9 @@ export default function PlacementTestScreen() {
         key={currentIndex}
         entering={FadeInRight.duration(250)}
         exiting={FadeOutLeft.duration(200)}
-        style={styles.questionContainer}
+        style={local.questionContainer}
       >
-        <Text style={styles.question}>{question!.prompt}</Text>
+        <Text style={[local.question, { color: theme.text }]}>{question!.prompt}</Text>
 
         {question!.options.map((option, index) => {
           const isSelected = selectedOption === index;
@@ -122,9 +129,15 @@ export default function PlacementTestScreen() {
               key={index}
               onPress={() => handleSelectOption(index)}
               disabled={selectedOption !== null}
-              style={[styles.option, showFeedback && isCorrect && styles.optionCorrect, showFeedback && isSelected && !isCorrect && styles.optionWrong]}
+              style={[
+                shared.optionCardVertical,
+                showFeedback && isCorrect && { borderColor: colors.primary[600], backgroundColor: theme.optionSelectedBg },
+                showFeedback && isSelected && !isCorrect && { borderColor: colors.accent[500], backgroundColor: theme.isDark ? "#2D1111" : colors.accent[50] },
+              ]}
             >
-              <Text style={[styles.optionText, showFeedback && isCorrect && styles.optionTextCorrect]}>{option}</Text>
+              <Text style={[shared.optionLabel, { fontWeight: "500" }, showFeedback && isCorrect && shared.optionLabelSelected]}>
+                {option}
+              </Text>
             </Pressable>
           );
         })}
@@ -133,12 +146,7 @@ export default function PlacementTestScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.neutral[50],
-    paddingHorizontal: spacing.lg,
-  },
+const local = StyleSheet.create({
   progressContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -147,7 +155,6 @@ const styles = StyleSheet.create({
   progressTrack: {
     flex: 1,
     height: 8,
-    backgroundColor: colors.neutral[200],
     borderRadius: 4,
     overflow: "hidden",
   },
@@ -159,7 +166,6 @@ const styles = StyleSheet.create({
   progressText: {
     marginLeft: spacing.sm,
     fontSize: typography.sizes.xs,
-    color: colors.neutral[500],
     fontWeight: "600",
   },
   questionContainer: {
@@ -168,33 +174,8 @@ const styles = StyleSheet.create({
   question: {
     fontSize: typography.sizes.xl,
     fontWeight: "700",
-    color: colors.neutral[900],
     marginBottom: spacing["2xl"],
     lineHeight: 28,
-  },
-  option: {
-    backgroundColor: colors.neutral[0],
-    borderRadius: radii.md,
-    borderWidth: 1.5,
-    borderColor: colors.neutral[200],
-    padding: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  optionCorrect: {
-    borderColor: colors.primary[600],
-    backgroundColor: colors.primary[50],
-  },
-  optionWrong: {
-    borderColor: colors.accent[500],
-    backgroundColor: colors.accent[50],
-  },
-  optionText: {
-    fontSize: typography.sizes.md,
-    fontWeight: "500",
-    color: colors.neutral[900],
-  },
-  optionTextCorrect: {
-    color: colors.primary[700],
   },
   resultContainer: {
     alignItems: "center",
@@ -203,18 +184,15 @@ const styles = StyleSheet.create({
   resultLevel: {
     fontSize: 56,
     fontWeight: "800",
-    color: colors.primary[600],
     marginBottom: spacing.sm,
   },
   resultTitle: {
     fontSize: typography.sizes.xl,
     fontWeight: "600",
-    color: colors.neutral[900],
     marginBottom: spacing.sm,
   },
   resultSubtitle: {
     fontSize: typography.sizes.md,
-    color: colors.neutral[500],
     textAlign: "center",
     lineHeight: 22,
     paddingHorizontal: spacing.xl,

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, Modal, FlatList, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, Modal, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState, useCallback } from "react";

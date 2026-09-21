@@ -1,5 +1,8 @@
-import { useColorScheme } from "react-native";
+import { useColorScheme, Appearance } from "react-native";
 import { colors } from "@falatorio/ui/tokens";
+import { getString, setString, KEYS } from "./storage";
+
+export type ThemePref = "system" | "light" | "dark";
 
 const light = {
   bg: "#F8FAFC",
@@ -29,6 +32,12 @@ const light = {
   settingsHeader: "#64748B",
   switchTrack: "#CBD5E1",
   switchTrackActive: colors.primary[500],
+  optionBg: "#FFFFFF",
+  optionBorder: "#E2E8F0",
+  optionSelectedBg: colors.primary[50],
+  optionSelectedBorder: colors.primary[600],
+  optionSelectedText: colors.primary[700],
+  footerBorder: "#E2E8F0",
 } as const;
 
 const dark = {
@@ -59,9 +68,31 @@ const dark = {
   settingsHeader: "#64748B",
   switchTrack: "#1E2D45",
   switchTrackActive: colors.primary[600],
+  optionBg: "#172032",
+  optionBorder: "#1E2D45",
+  optionSelectedBg: "#0C2933",
+  optionSelectedBorder: colors.primary[400],
+  optionSelectedText: colors.primary[300],
+  footerBorder: "#1E2D45",
 } as const;
 
-export type Theme = typeof light;
+export type Theme = { [K in keyof typeof light]: string };
+
+export function getThemePref(): ThemePref {
+  const v = getString(KEYS.THEME_PREF);
+  if (v === "light" || v === "dark") return v;
+  return "system";
+}
+
+export function setThemePref(pref: ThemePref): void {
+  setString(KEYS.THEME_PREF, pref);
+  applyThemePref();
+}
+
+export function applyThemePref(): void {
+  const pref = getThemePref();
+  Appearance.setColorScheme(pref === "system" ? "unspecified" : pref);
+}
 
 export function useTheme(): Theme & { isDark: boolean } {
   const scheme = useColorScheme();

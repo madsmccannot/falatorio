@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFSRS } from "@/hooks/useFSRS";
@@ -68,7 +68,7 @@ export default function PracticeScreen() {
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation();
-  const { dueItems, dueCount, isLoading } = useFSRS();
+  const { dueCount, isLoading } = useFSRS();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>

@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { useTheme } from "@/lib/theme";
+import { onboardingStyles } from "@/lib/styles";
+import { useTranslation } from "@/lib/i18n";
+import { spacing, radii, typography } from "@falatorio/ui/tokens";
 import { SUPER_PRICING } from "@falatorio/core";
 import { setOnboardingComplete } from "@/lib/storage";
 
@@ -13,6 +16,9 @@ type Plan = "free" | "super";
 export default function PlanScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const [selected, setSelected] = useState<Plan>("free");
 
   const handleSelect = (plan: Plan) => {
@@ -30,51 +36,51 @@ export default function PlanScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + spacing.xl }]}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.title}>Choose your path</Text>
-        <Text style={styles.subtitle}>
-          You can upgrade to Super anytime from the shop.
+    <View style={[shared.screen, { paddingTop: insets.top + spacing.xl }]}>
+      <ScrollView contentContainerStyle={{ paddingBottom: spacing.xl }}>
+        <Text style={shared.title}>{t("onboarding.plan_title")}</Text>
+        <Text style={shared.subtitle}>
+          {t("onboarding.plan_subtitle")}
         </Text>
 
         <Pressable
           onPress={() => handleSelect("free")}
-          style={[styles.planCard, selected === "free" && styles.planSelected]}
+          style={[local.planCard, { backgroundColor: theme.optionBg, borderColor: selected === "free" ? theme.optionSelectedBorder : theme.optionBorder }]}
         >
-          <Text style={styles.planName}>Free</Text>
-          <Text style={styles.planPrice}>Forever free</Text>
-          <View style={styles.features}>
-            <Text style={styles.feature}>5 hearts per session</Text>
-            <Text style={styles.feature}>Earn ouro by completing lessons</Text>
-            <Text style={styles.feature}>Full course access</Text>
-            <Text style={styles.feature}>Ads between lessons</Text>
+          <Text style={[local.planName, { color: theme.text }]}>{t("onboarding.plan_free")}</Text>
+          <Text style={[local.planPrice, { color: theme.textMuted }]}>{t("onboarding.plan_free_price")}</Text>
+          <View style={local.features}>
+            <Text style={[local.feature, { color: theme.textSecondary }]}>{t("onboarding.plan_free_hearts")}</Text>
+            <Text style={[local.feature, { color: theme.textSecondary }]}>{t("onboarding.plan_free_ouro")}</Text>
+            <Text style={[local.feature, { color: theme.textSecondary }]}>{t("onboarding.plan_free_courses")}</Text>
+            <Text style={[local.feature, { color: theme.textSecondary }]}>{t("onboarding.plan_free_ads")}</Text>
           </View>
         </Pressable>
 
         <Pressable
           onPress={() => handleSelect("super")}
-          style={[styles.planCard, styles.superCard, selected === "super" && styles.superSelected]}
+          style={[local.planCard, local.superCard, { borderColor: selected === "super" ? (theme.isDark ? "#67E8F9" : "#0891B2") : (theme.isDark ? "#1E2D45" : "#292524") }]}
         >
-          <View style={styles.trialBadge}>
-            <Text style={styles.trialText}>{SUPER_PRICING.TRIAL_DAYS} days free trial</Text>
+          <View style={local.trialBadge}>
+            <Text style={local.trialText}>{t("onboarding.plan_trial", { days: SUPER_PRICING.TRIAL_DAYS })}</Text>
           </View>
-          <Text style={[styles.planName, styles.superName]}>Super</Text>
-          <Text style={[styles.planPrice, styles.superPrice]}>
+          <Text style={[local.planName, { color: "#FFFFFF" }]}>{t("onboarding.plan_super")}</Text>
+          <Text style={[local.planPrice, { color: "#94A3B8" }]}>
             {SUPER_PRICING.MONTHLY_EUR.toFixed(2)}/mo
           </Text>
-          <View style={styles.features}>
-            <Text style={[styles.feature, styles.superFeature]}>Unlimited hearts</Text>
-            <Text style={[styles.feature, styles.superFeature]}>Zero ads</Text>
-            <Text style={[styles.feature, styles.superFeature]}>AI error review with L1 explanations</Text>
-            <Text style={[styles.feature, styles.superFeature]}>Streak recovery (1x/week)</Text>
-            <Text style={[styles.feature, styles.superFeature]}>Bonus monthly power-ups</Text>
+          <View style={local.features}>
+            <Text style={[local.feature, { color: "#D6D3D1" }]}>{t("onboarding.plan_super_hearts")}</Text>
+            <Text style={[local.feature, { color: "#D6D3D1" }]}>{t("onboarding.plan_super_ads")}</Text>
+            <Text style={[local.feature, { color: "#D6D3D1" }]}>{t("onboarding.plan_super_ai")}</Text>
+            <Text style={[local.feature, { color: "#D6D3D1" }]}>{t("onboarding.plan_super_streak")}</Text>
+            <Text style={[local.feature, { color: "#D6D3D1" }]}>{t("onboarding.plan_super_bonus")}</Text>
           </View>
         </Pressable>
       </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.lg }]}>
+      <View style={[shared.footer, { paddingBottom: insets.bottom + spacing.lg }]}>
         <Button
-          title={selected === "super" ? "Start free trial" : "Start learning"}
+          title={selected === "super" ? t("onboarding.start_trial") : t("onboarding.start_learning")}
           onPress={handleContinue}
           size="lg"
         />
@@ -83,46 +89,19 @@ export default function PlanScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.neutral[50],
-    paddingHorizontal: spacing.lg,
-  },
-  scroll: {
-    paddingBottom: spacing.xl,
-  },
-  title: {
-    fontSize: typography.sizes["2xl"],
-    fontWeight: "700",
-    color: colors.neutral[900],
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    fontSize: typography.sizes.sm,
-    color: colors.neutral[500],
-    marginBottom: spacing["2xl"],
-  },
+const local = StyleSheet.create({
   planCard: {
-    backgroundColor: colors.neutral[0],
     borderRadius: radii.lg,
     borderWidth: 2,
-    borderColor: colors.neutral[200],
     padding: spacing.xl,
     marginBottom: spacing.md,
   },
-  planSelected: {
-    borderColor: colors.primary[600],
-  },
   superCard: {
-    backgroundColor: colors.neutral[900],
-  },
-  superSelected: {
-    borderColor: colors.primary[400],
+    backgroundColor: "#1C1917",
   },
   trialBadge: {
     alignSelf: "flex-start",
-    backgroundColor: colors.primary[500],
+    backgroundColor: "#0891B2",
     borderRadius: radii.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
@@ -136,34 +115,17 @@ const styles = StyleSheet.create({
   planName: {
     fontSize: typography.sizes.xl,
     fontWeight: "700",
-    color: colors.neutral[900],
     marginBottom: spacing.xs,
-  },
-  superName: {
-    color: "#FFFFFF",
   },
   planPrice: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[500],
     marginBottom: spacing.lg,
-  },
-  superPrice: {
-    color: colors.neutral[400],
   },
   features: {
     gap: spacing.sm,
   },
   feature: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[600],
     lineHeight: 20,
-  },
-  superFeature: {
-    color: colors.neutral[300],
-  },
-  footer: {
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.neutral[200],
   },
 });

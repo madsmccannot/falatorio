@@ -2,7 +2,7 @@ import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { trpc } from "@/lib/trpc";
 import { Loading } from "@/components/ui/Loading";
-import { TrophyIcon, StarIcon, FlameIcon, ShieldIcon } from "@/components/icons";
+import { TrophyIcon, StarIcon } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
 import type { TKey } from "@/lib/i18n";

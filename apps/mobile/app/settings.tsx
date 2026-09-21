@@ -2,7 +2,7 @@ import { View, Text, ScrollView, Pressable, Switch, StyleSheet } from "react-nat
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
-import { useTheme } from "@/lib/theme";
+import { useTheme, getThemePref, setThemePref, type ThemePref } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
 import { getBoolean, setBoolean } from "@/lib/storage";
 import { BookIcon, HeartIcon, BoltIcon, ShieldIcon } from "@/components/icons";
@@ -55,6 +55,7 @@ export default function SettingsScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
 
+  const [themePref, setThemePrefState] = useState<ThemePref>(() => getThemePref());
   const [soundEnabled, setSoundEnabled] = useState(() => getBoolean("settings_sound") !== false);
   const [hapticsEnabled, setHapticsEnabled] = useState(() => getBoolean("settings_haptics") !== false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => getBoolean("settings_notifications") !== false);
@@ -75,6 +76,11 @@ export default function SettingsScreen() {
   const toggleDailyReminder = (v: boolean) => {
     setDailyReminder(v);
     setBoolean("settings_daily_reminder", v);
+  };
+
+  const handleThemePref = (pref: ThemePref) => {
+    setThemePrefState(pref);
+    setThemePref(pref);
   };
 
   return (
@@ -105,13 +111,13 @@ export default function SettingsScreen() {
 
         <Text style={[styles.sectionHeader, { color: theme.settingsHeader }]}>{t("settings.preferences")}</Text>
         <View style={[styles.card, { backgroundColor: theme.settingsCard, borderColor: theme.settingsBorder }]}>
-          <SettingsToggleRow
+          <SettingsThemeRow
             icon={<SunMoonIcon size={20} color={colors.info} />}
-            label={t("settings.dark_mode")}
-            sublabel={t("settings.dark_mode_desc")}
-            value={theme.isDark}
-            disabled
+            label={t("settings.theme")}
+            value={themePref}
+            onChange={handleThemePref}
             theme={theme}
+            t={t as (key: string) => string}
           />
           <Divider color={theme.settingsBorder} />
           <SettingsToggleRow
@@ -200,6 +206,61 @@ function SettingsNavRow({
       </View>
       <ChevronRight color={theme.textMuted} />
     </Pressable>
+  );
+}
+
+function SettingsThemeRow({
+  icon,
+  label,
+  value,
+  onChange,
+  theme,
+  t,
+}: {
+  icon?: React.ReactNode;
+  label: string;
+  value: ThemePref;
+  onChange: (pref: ThemePref) => void;
+  theme: ReturnType<typeof import("@/lib/theme").useTheme>;
+  t: (key: string) => string;
+}) {
+  const options: { key: ThemePref; labelKey: string }[] = [
+    { key: "system", labelKey: "settings.theme_system" },
+    { key: "light", labelKey: "settings.theme_light" },
+    { key: "dark", labelKey: "settings.theme_dark" },
+  ];
+
+  return (
+    <View style={styles.row}>
+      <View style={styles.rowLeft}>
+        {icon && <View style={styles.rowIcon}>{icon}</View>}
+        <Text style={[styles.rowLabel, { color: theme.text }]}>{label}</Text>
+      </View>
+      <View style={themePickerStyles.segmented}>
+        {options.map((opt) => {
+          const active = value === opt.key;
+          return (
+            <Pressable
+              key={opt.key}
+              onPress={() => onChange(opt.key)}
+              style={[
+                themePickerStyles.segment,
+                { backgroundColor: active ? (theme.isDark ? "#1E2D45" : "#E2E8F0") : "transparent" },
+              ]}
+            >
+              <Text
+                style={[
+                  themePickerStyles.segmentText,
+                  { color: active ? theme.text : theme.textMuted },
+                ]}
+              >
+                {t(opt.labelKey)}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
   );
 }
 
@@ -319,5 +380,23 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.xs,
     marginTop: spacing["2xl"],
     marginBottom: spacing.xl,
+  },
+});
+
+const themePickerStyles = StyleSheet.create({
+  segmented: {
+    flexDirection: "row",
+    borderRadius: radii.sm,
+    overflow: "hidden",
+    gap: 2,
+  },
+  segment: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.xs,
+  },
+  segmentText: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "600",
   },
 });
