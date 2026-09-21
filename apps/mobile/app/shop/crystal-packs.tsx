@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { GoldPrisms } from "@/components/icons";
 import { useTranslation } from "@/lib/i18n";
+import { useTheme } from "@/lib/theme";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type CrystalPack = {
@@ -31,6 +32,7 @@ const PACKS: CrystalPack[] = [
 export default function CrystalPacksScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const theme = useTheme();
   const { t } = useTranslation();
   const { balance } = useCrystals();
   const { showToast } = useToast();
@@ -61,13 +63,13 @@ export default function CrystalPacksScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: insets.top }]}>
+      <View style={[styles.header, { borderBottomColor: theme.border, backgroundColor: theme.bgElevated }]}>
         <Button title={t("crystals.back")} onPress={() => router.back()} variant="ghost" size="sm" />
-        <Text style={styles.title}>{t("crystals.title")}</Text>
-        <View style={styles.balanceChip}>
+        <Text style={[styles.title, { color: theme.text }]}>{t("crystals.title")}</Text>
+        <View style={[styles.balanceChip, { backgroundColor: theme.bgInput }]}>
           <GoldPrisms size={14} />
-          <Text style={styles.balanceValue}>{balance}</Text>
+          <Text style={[styles.balanceValue, { color: theme.text }]}>{balance}</Text>
         </View>
       </View>
 
@@ -80,10 +82,10 @@ export default function CrystalPacksScreen() {
             <View style={styles.packTop}>
               <GoldPrisms size={40} />
               <Text style={styles.packAmount}>{pack.amount.toLocaleString()}</Text>
-              <Text style={styles.packName}>{pack.name}</Text>
+              <Text style={[styles.packName, { color: theme.textSecondary }]}>{pack.name}</Text>
               {pack.bonus && (
-                <View style={styles.bonusBadge}>
-                  <Text style={styles.bonusText}>{pack.bonus}</Text>
+                <View style={[styles.bonusBadge, { backgroundColor: theme.bgAccent }]}>
+                  <Text style={[styles.bonusText, { color: theme.isDark ? colors.primary[400] : colors.primary[700] }]}>{pack.bonus}</Text>
                 </View>
               )}
             </View>
@@ -105,7 +107,6 @@ export default function CrystalPacksScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
   },
   header: {
     flexDirection: "row",
@@ -114,19 +115,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[200],
-    backgroundColor: colors.neutral[0],
   },
   title: {
     fontSize: typography.sizes.lg,
     fontWeight: "700",
-    color: colors.neutral[900],
   },
   balanceChip: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.xs,
-    backgroundColor: colors.neutral[100],
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: radii.full,
@@ -134,7 +131,6 @@ const styles = StyleSheet.create({
   balanceValue: {
     fontSize: typography.sizes.sm,
     fontWeight: "700",
-    color: colors.neutral[900],
   },
   list: {
     padding: spacing.lg,
@@ -157,12 +153,10 @@ const styles = StyleSheet.create({
   packName: {
     fontSize: typography.sizes.md,
     fontWeight: "600",
-    color: colors.neutral[700],
     marginTop: spacing.xs,
   },
   bonusBadge: {
     marginTop: spacing.sm,
-    backgroundColor: colors.primary[50],
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: radii.sm,
@@ -170,7 +164,6 @@ const styles = StyleSheet.create({
   bonusText: {
     fontSize: typography.sizes.xs,
     fontWeight: "700",
-    color: colors.primary[700],
   },
   buyButton: {
     width: "100%",

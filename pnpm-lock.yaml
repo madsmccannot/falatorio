@@ -177,7 +177,7 @@ importers:
     dependencies:
       '@payloadcms/db-postgres':
         specifier: ^3.0.0
-        version: 3.90.1(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(payload@3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))
+        version: 3.90.1(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(payload@3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(postgres@3.4.9)
       '@payloadcms/richtext-lexical':
         specifier: ^3.0.0
         version: 3.90.1(@faceless-ui/modal@3.0.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@faceless-ui/scroll-info@2.0.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@payloadcms/next@3.90.1(@types/react@19.3.0)(graphql@16.14.2)(monaco-editor@0.56.0)(next@15.5.25(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))(payload@3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.9.3))(@types/react@19.3.0)(bufferutil@4.1.0)(monaco-editor@0.56.0)(next@15.5.25(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))(payload@3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(yjs@13.6.32)
@@ -245,7 +245,10 @@ importers:
         version: 0.10.4
       drizzle-orm:
         specifier: ^0.36.0
-        version: 0.36.4(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.2.18)(pg@8.20.0)(react@19.3.0)
+        version: 0.36.4(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.2.18)(pg@8.20.0)(postgres@3.4.9)(react@19.3.0)
+      postgres:
+        specifier: ^3.4.9
+        version: 3.4.9
     devDependencies:
       drizzle-kit:
         specifier: ^0.31.0
@@ -294,7 +297,7 @@ importers:
         version: 5.81.5
       drizzle-orm:
         specifier: ^0.36.0
-        version: 0.36.4(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.2.18)(pg@8.20.0)(react@19.3.0)
+        version: 0.36.4(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.2.18)(pg@8.20.0)(postgres@3.4.9)(react@19.3.0)
       fastify:
         specifier: ^5.1.0
         version: 5.12.5
@@ -7043,6 +7046,10 @@ packages:
   postgres-range@1.1.4:
     resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
 
+  postgres@3.4.9:
+    resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
+    engines: {node: '>=12'}
+
   preact@10.24.2:
     resolution: {integrity: sha512-1cSoF0aCC8uaARATfrlz4VCBqE8LwZwRfLgkxJOQwAlQt6ayTmi0D9OF7nXid1POI5SZidFuG9CnlXbDfLqY/Q==}
 
@@ -10831,13 +10838,13 @@ snapshots:
 
   '@nolyfill/is-core-module@1.0.39': {}
 
-  '@payloadcms/db-postgres@3.90.1(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(payload@3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))':
+  '@payloadcms/db-postgres@3.90.1(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(payload@3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(postgres@3.4.9)':
     dependencies:
-      '@payloadcms/drizzle': 3.90.1(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(payload@3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(pg@8.20.0)
+      '@payloadcms/drizzle': 3.90.1(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(payload@3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(pg@8.20.0)(postgres@3.4.9)
       '@types/pg': 8.20.0
       console-table-printer: 2.12.1
       drizzle-kit: 0.31.7
-      drizzle-orm: 0.45.2(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(pg@8.20.0)
+      drizzle-orm: 0.45.2(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(pg@8.20.0)(postgres@3.4.9)
       payload: 3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6)
       pg: 8.20.0
       prompts: 2.4.2
@@ -10874,11 +10881,11 @@ snapshots:
       - sqlite3
       - supports-color
 
-  '@payloadcms/drizzle@3.90.1(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(payload@3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(pg@8.20.0)':
+  '@payloadcms/drizzle@3.90.1(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(payload@3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(pg@8.20.0)(postgres@3.4.9)':
     dependencies:
       console-table-printer: 2.12.1
       dequal: 2.0.3
-      drizzle-orm: 0.45.2(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(pg@8.20.0)
+      drizzle-orm: 0.45.2(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(pg@8.20.0)(postgres@3.4.9)
       payload: 3.90.1(bufferutil@4.1.0)(graphql@16.14.2)(typescript@5.9.3)(utf-8-validate@6.0.6)
       prompts: 2.4.2
       to-snake-case: 1.0.0
@@ -13593,21 +13600,23 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.36.4(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.2.18)(pg@8.20.0)(react@19.3.0):
+  drizzle-orm@0.36.4(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(@types/react@19.2.18)(pg@8.20.0)(postgres@3.4.9)(react@19.3.0):
     optionalDependencies:
       '@libsql/client-wasm': 0.18.0
       '@neondatabase/serverless': 0.10.4
       '@types/pg': 8.20.0
       '@types/react': 19.2.18
       pg: 8.20.0
+      postgres: 3.4.9
       react: 19.3.0
 
-  drizzle-orm@0.45.2(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(pg@8.20.0):
+  drizzle-orm@0.45.2(@libsql/client-wasm@0.18.0)(@neondatabase/serverless@0.10.4)(@types/pg@8.20.0)(pg@8.20.0)(postgres@3.4.9):
     optionalDependencies:
       '@libsql/client-wasm': 0.18.0
       '@neondatabase/serverless': 0.10.4
       '@types/pg': 8.20.0
       pg: 8.20.0
+      postgres: 3.4.9
 
   dunder-proto@1.0.1:
     dependencies:
@@ -16408,6 +16417,8 @@ snapshots:
   postgres-interval@3.0.0: {}
 
   postgres-range@1.1.4: {}
+
+  postgres@3.4.9: {}
 
   preact@10.24.2: {}
 

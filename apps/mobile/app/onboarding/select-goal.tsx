@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/lib/theme";
 import { onboardingStyles } from "@/lib/styles";
 import { useTranslation } from "@/lib/i18n";
+import { setString, KEYS } from "@/lib/storage";
 import { spacing } from "@falatorio/ui/tokens";
 
 const GOAL_KEYS: Record<UserGoal, { label: string; desc: string }> = {
@@ -34,6 +35,7 @@ export default function SelectGoalScreen() {
 
   const handleContinue = () => {
     if (!selected) return;
+    setString(KEYS.SELECTED_GOAL, selected);
     router.push("/onboarding/select-level");
   };
 

@@ -24,3 +24,5 @@ export { MedalIcon } from "./MedalIcon";
 export { GearIcon } from "./GearIcon";
 export { UserIcon } from "./UserIcon";
 export { AppIcon } from "./AppIcon";
+export { CheckIcon } from "./CheckIcon";
+export { FlagIcon } from "./FlagIcon";

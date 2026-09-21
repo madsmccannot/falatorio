@@ -1,6 +1,7 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import { migrate } from "drizzle-orm/neon-http/migrator";
+import { migrate as neonMigrate } from "drizzle-orm/neon-http/migrator";
+import { migrate as pgMigrate } from "drizzle-orm/postgres-js/migrator";
+
+const MIGRATIONS_FOLDER = "./drizzle/migrations";
 
 async function main() {
   const databaseUrl = process.env["DATABASE_URL"];
@@ -8,11 +9,25 @@ async function main() {
     throw new Error("DATABASE_URL is required");
   }
 
-  const sql = neon(databaseUrl);
-  const db = drizzle(sql);
-
   console.log("Running migrations...");
-  await migrate(db, { migrationsFolder: "./drizzle/migrations" });
+
+  const isNeon = databaseUrl.includes("neon.tech");
+
+  if (isNeon) {
+    const { neon } = await import("@neondatabase/serverless");
+    const { drizzle } = await import("drizzle-orm/neon-http");
+    const sql = neon(databaseUrl);
+    const db = drizzle(sql);
+    await neonMigrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
+  } else {
+    const postgres = (await import("postgres")).default;
+    const { drizzle } = await import("drizzle-orm/postgres-js");
+    const sql = postgres(databaseUrl, { max: 1 });
+    const db = drizzle(sql);
+    await pgMigrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
+    await sql.end();
+  }
+
   console.log("Migrations complete.");
 }
 

@@ -1,6 +1,6 @@
 # Falatório
 
-A language learning app built exclusively for **European Portuguese (PT-PT)**. Mobile-first, designed for immigrants in Portugal — primarily Hindi, Bengali, and Urdu speakers. The learning path adapts based on the learner's native language (L1), with personalized phonetic guides, false friend warnings, and culturally relevant scenarios.
+A language learning app built exclusively for **European Portuguese (PT-PT)**. Mobile-first, designed for immigrants in Portugal — including Hindi, Bengali, and Urdu speakers since lately there has been an increasing number of immigranats from the locations where these languages are spoken. The learning path adapts based on the learner's native language (L1), with personalized phonetic guides, false friend warnings, and culturally relevant scenarios.
 
 ## Architecture
 

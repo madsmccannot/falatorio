@@ -74,6 +74,9 @@ export function clearAll(): void {
 const KEYS = {
   ONBOARDING_COMPLETE: "onboarding_complete",
   SELECTED_L1: "selected_l1",
+  SELECTED_GOAL: "selected_goal",
+  SELECTED_LEVEL: "selected_level",
+  PLACEMENT_LEVEL: "placement_level",
   GDPR_CONSENT: "gdpr_consent",
   THEME_PREF: "theme_pref",
   API_URL: "api_url",

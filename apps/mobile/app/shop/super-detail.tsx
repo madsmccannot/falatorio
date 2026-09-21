@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { useTranslation } from "@/lib/i18n";
 import type { TKey } from "@/lib/i18n";
+import { useTheme } from "@/lib/theme";
+import { CheckIcon } from "@/components/icons";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { SUPER_PRICING } from "@falatorio/core";
 
@@ -24,6 +26,7 @@ const FEATURES: { titleKey: TKey; descKey: TKey }[] = [
 export default function SuperDetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const theme = useTheme();
   const { t } = useTranslation();
   const { isSuper } = useEntitlements();
   const { showToast } = useToast();
@@ -57,9 +60,9 @@ export default function SuperDetailScreen() {
 
   if (isSuper) {
     return (
-      <View style={[styles.container, styles.centered, { paddingTop: insets.top }]}>
-        <Text style={styles.activeTitle}>{t("super.active_title")}</Text>
-        <Text style={styles.activeSubtitle}>
+      <View style={[styles.container, styles.centered, { backgroundColor: theme.isDark ? theme.bg : "#1C1917", paddingTop: insets.top }]}>
+        <Text style={[styles.activeTitle, { color: theme.isDark ? theme.text : "#FFFFFF" }]}>{t("super.active_title")}</Text>
+        <Text style={[styles.activeSubtitle, { color: theme.textMuted }]}>
           {t("super.active_text")}
         </Text>
         <Button
@@ -72,9 +75,13 @@ export default function SuperDetailScreen() {
     );
   }
 
+  const cardBg = theme.isDark ? theme.bgCard : "#292524";
+  const cardBorder = theme.isDark ? theme.border : "#44403C";
+  const bestBorder = theme.isDark ? colors.primary[400] : colors.primary[500];
+
   return (
     <ScrollView
-      style={[styles.container, { paddingTop: insets.top }]}
+      style={[styles.container, { backgroundColor: theme.isDark ? theme.bg : "#1C1917", paddingTop: insets.top }]}
       contentContainerStyle={styles.scroll}
     >
       <Button
@@ -86,8 +93,8 @@ export default function SuperDetailScreen() {
       />
 
       <Animated.View entering={FadeInDown.delay(100).duration(300)} style={styles.hero}>
-        <Text style={styles.heroTitle}>{t("super.title")}</Text>
-        <Text style={styles.heroSubtitle}>
+        <Text style={[styles.heroTitle, { color: theme.isDark ? theme.text : "#FFFFFF" }]}>{t("super.title")}</Text>
+        <Text style={[styles.heroSubtitle, { color: theme.textMuted }]}>
           {t("super.subtitle")}
         </Text>
       </Animated.View>
@@ -96,21 +103,21 @@ export default function SuperDetailScreen() {
         {FEATURES.map((f, i) => (
           <View key={i} style={styles.featureRow}>
             <View style={styles.featureCheck}>
-              <Text style={styles.checkMark}>✓</Text>
+              <CheckIcon size={14} color="#FFFFFF" />
             </View>
             <View style={styles.featureText}>
-              <Text style={styles.featureTitle}>{t(f.titleKey)}</Text>
-              <Text style={styles.featureDesc}>{t(f.descKey)}</Text>
+              <Text style={[styles.featureTitle, { color: theme.isDark ? theme.text : "#FFFFFF" }]}>{t(f.titleKey)}</Text>
+              <Text style={[styles.featureDesc, { color: theme.textMuted }]}>{t(f.descKey)}</Text>
             </View>
           </View>
         ))}
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(500).duration(300)} style={styles.plans}>
-        <View style={styles.planCard}>
-          <Text style={styles.planPeriod}>{t("super.monthly")}</Text>
-          <Text style={styles.planPrice}>
-            €{SUPER_PRICING.MONTHLY_EUR.toFixed(2)}/mo
+        <View style={[styles.planCard, { backgroundColor: cardBg, borderColor: cardBorder }]}>
+          <Text style={[styles.planPeriod, { color: theme.textMuted }]}>{t("super.monthly")}</Text>
+          <Text style={[styles.planPrice, { color: theme.isDark ? theme.text : "#FFFFFF" }]}>
+            {"€"}{SUPER_PRICING.MONTHLY_EUR.toFixed(2)}/mo
           </Text>
           <Button
             title={t("super.subscribe")}
@@ -121,13 +128,13 @@ export default function SuperDetailScreen() {
           />
         </View>
 
-        <View style={[styles.planCard, styles.planCardBest]}>
+        <View style={[styles.planCard, { backgroundColor: cardBg, borderColor: bestBorder }]}>
           <View style={styles.bestBadge}>
             <Text style={styles.bestText}>{t("super.best_value")}</Text>
           </View>
-          <Text style={[styles.planPeriod, styles.planPeriodBest]}>{t("super.yearly")}</Text>
-          <Text style={[styles.planPrice, styles.planPriceBest]}>
-            €{SUPER_PRICING.YEARLY_EUR.toFixed(2)}/yr
+          <Text style={[styles.planPeriod, { color: theme.textSecondary }]}>{t("super.yearly")}</Text>
+          <Text style={[styles.planPrice, { color: colors.primary[400] }]}>
+            {"€"}{SUPER_PRICING.YEARLY_EUR.toFixed(2)}/yr
           </Text>
           <Text style={styles.planSaving}>
             {t("super.save", { percent: Math.round((1 - SUPER_PRICING.YEARLY_EUR / (SUPER_PRICING.MONTHLY_EUR * 12)) * 100) })}
@@ -141,7 +148,7 @@ export default function SuperDetailScreen() {
         </View>
       </Animated.View>
 
-      <Text style={styles.legalText}>
+      <Text style={[styles.legalText, { color: theme.textMuted }]}>
         {t("super.legal")}
       </Text>
     </ScrollView>
@@ -151,7 +158,6 @@ export default function SuperDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[900],
   },
   centered: {
     alignItems: "center",
@@ -173,12 +179,10 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#FFFFFF",
     marginBottom: spacing.xs,
   },
   heroSubtitle: {
     fontSize: typography.sizes.md,
-    color: colors.neutral[400],
   },
   features: {
     marginBottom: spacing["2xl"],
@@ -197,22 +201,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  checkMark: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#FFFFFF",
-  },
   featureText: {
     flex: 1,
   },
   featureTitle: {
     fontSize: typography.sizes.md,
     fontWeight: "600",
-    color: "#FFFFFF",
   },
   featureDesc: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[400],
     marginTop: 2,
   },
   plans: {
@@ -222,16 +219,10 @@ const styles = StyleSheet.create({
   },
   planCard: {
     flex: 1,
-    backgroundColor: colors.neutral[800],
     borderRadius: radii.lg,
     padding: spacing.lg,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: colors.neutral[700],
-  },
-  planCardBest: {
-    borderColor: colors.primary[500],
-    backgroundColor: colors.neutral[800],
   },
   bestBadge: {
     position: "absolute",
@@ -249,21 +240,13 @@ const styles = StyleSheet.create({
   planPeriod: {
     fontSize: typography.sizes.sm,
     fontWeight: "600",
-    color: colors.neutral[400],
     marginBottom: spacing.xs,
     marginTop: spacing.sm,
-  },
-  planPeriodBest: {
-    color: colors.neutral[300],
   },
   planPrice: {
     fontSize: typography.sizes.xl,
     fontWeight: "800",
-    color: "#FFFFFF",
     marginBottom: spacing.sm,
-  },
-  planPriceBest: {
-    color: colors.primary[400],
   },
   planSaving: {
     fontSize: typography.sizes.xs,
@@ -277,17 +260,14 @@ const styles = StyleSheet.create({
   activeTitle: {
     fontSize: typography.sizes["2xl"],
     fontWeight: "700",
-    color: "#FFFFFF",
   },
   activeSubtitle: {
     fontSize: typography.sizes.md,
-    color: colors.neutral[400],
     marginTop: spacing.xs,
     textAlign: "center",
   },
   legalText: {
     fontSize: typography.sizes.xs,
-    color: colors.neutral[500],
     textAlign: "center",
     lineHeight: 16,
   },

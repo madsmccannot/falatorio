@@ -15,7 +15,7 @@ import {
   getPlacementResult,
   type PlacementQuestion,
 } from "@falatorio/core/lesson";
-import { getString, KEYS } from "@/lib/storage";
+import { getString, setString, KEYS } from "@/lib/storage";
 import type { L1Code } from "@falatorio/core";
 
 type DisplayQuestion = PlacementQuestion & {
@@ -80,6 +80,7 @@ export default function PlacementTestScreen() {
       state = recordPlacementResponse(state, q.id, answers[i]!, q.difficulty);
     }
     const result = getPlacementResult(state);
+    setString(KEYS.PLACEMENT_LEVEL, result.cefrLevel);
 
     return (
       <View style={[shared.screen, local.resultContainer, { paddingTop: insets.top + spacing["5xl"] }]}>

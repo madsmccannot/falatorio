@@ -7,7 +7,7 @@ import { useStreak } from "@/hooks/useStreak";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
-import { StarIcon, FlameIcon, TrophyIcon, MedalIcon, GearIcon } from "@/components/icons";
+import { StarIcon, FlameIcon, TrophyIcon, MedalIcon, GearIcon, CheckIcon } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
 import { getString, setString } from "@/lib/storage";
@@ -213,7 +213,7 @@ export default function ProfileScreen() {
             <Text style={[styles.pickerSublabel, { color: theme.textMuted }]}>{opt.label}</Text>
             {selectedL1 === opt.code && (
               <View style={[styles.pickerCheck, { backgroundColor: colors.primary[500] }]}>
-                <Text style={styles.pickerCheckText}>{'✓'}</Text>
+                <CheckIcon size={14} color="#FFFFFF" />
               </View>
             )}
           </Pressable>
@@ -240,7 +240,7 @@ export default function ProfileScreen() {
             <Text style={[styles.pickerSublabel, { color: theme.textMuted }]}>{t(opt.descKey)}</Text>
             {dailyGoal === opt.min && (
               <View style={[styles.pickerCheck, { backgroundColor: colors.primary[500] }]}>
-                <Text style={styles.pickerCheckText}>{'✓'}</Text>
+                <CheckIcon size={14} color="#FFFFFF" />
               </View>
             )}
           </Pressable>

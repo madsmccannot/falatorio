@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/lib/theme";
 import { onboardingStyles } from "@/lib/styles";
 import { useTranslation } from "@/lib/i18n";
+import { setString, KEYS } from "@/lib/storage";
 import { spacing, radii, typography } from "@falatorio/ui/tokens";
 
 const LEVEL_KEYS: Record<string, { label: string; desc: string }> = {
@@ -34,6 +35,7 @@ export default function SelectLevelScreen() {
 
   const handleContinue = () => {
     if (!selected) return;
+    setString(KEYS.SELECTED_LEVEL, selected);
     if (selected === "A1") {
       router.push("/onboarding/plan");
     } else {

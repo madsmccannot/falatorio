@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { L1_CODES, type L1Code } from "@falatorio/core";
 import { Button } from "@/components/ui/Button";
+import { FlagIcon, CheckIcon } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
 import { onboardingStyles } from "@/lib/styles";
 import { useTranslation } from "@/lib/i18n";
@@ -67,7 +68,7 @@ export default function SelectLanguageScreen() {
               onPress={() => handleSelect(code)}
               style={[shared.optionCard, isSelected && shared.optionSelected]}
             >
-              <Text style={local.flag}>{label.flag}</Text>
+              <FlagIcon code={label.flag} size={36} />
               <View style={local.labelContainer}>
                 <Text style={[shared.optionLabel, isSelected && shared.optionLabelSelected]}>
                   {label.native}
@@ -76,7 +77,7 @@ export default function SelectLanguageScreen() {
               </View>
               {isSelected && (
                 <View style={shared.checkmark}>
-                  <Text style={shared.checkmarkText}>✓</Text>
+                  <CheckIcon size={14} color="#FFFFFF" />
                 </View>
               )}
             </Pressable>
@@ -99,11 +100,6 @@ export default function SelectLanguageScreen() {
 const local = StyleSheet.create({
   list: {
     paddingBottom: spacing["3xl"],
-  },
-  flag: {
-    fontSize: 20,
-    width: 36,
-    textAlign: "center",
   },
   labelContainer: {
     flex: 1,
