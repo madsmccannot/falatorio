@@ -2,7 +2,7 @@ import { Tabs } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
-import { BookIcon, StreakIcon, TrophyIcon, GoldPrisms, UserIcon } from "@/components/icons";
+import { BookIcon, StreakIcon, TrophyIcon, GoldPrisms, UserIcon, ReferenceIcon } from "@/components/icons";
 
 export default function TabsLayout() {
   const theme = useTheme();
@@ -38,6 +38,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="reference"
+        options={{
+          title: t("tabs.reference"),
+          tabBarIcon: ({ color, size }) => <ReferenceIcon size={size} color={color as string} />,
+        }}
+      />
+      <Tabs.Screen
         name="practice"
         options={{
           title: t("tabs.practice"),
@@ -55,7 +62,7 @@ export default function TabsLayout() {
         name="shop"
         options={{
           title: t("tabs.shop"),
-          tabBarIcon: ({ color, size }) => <GoldPrisms size={size} color={color as string} />,
+          tabBarIcon: ({ size }) => <GoldPrisms size={size} />,
         }}
       />
       <Tabs.Screen

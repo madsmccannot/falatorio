@@ -3,6 +3,7 @@ import { getString, KEYS } from "./storage";
 
 const en = {
   "tabs.learn": "Learn",
+  "tabs.reference": "Reference",
   "tabs.practice": "Practice",
   "tabs.leaderboard": "League",
   "tabs.shop": "Shop",
@@ -158,6 +159,14 @@ const en = {
   "ouro.title": "Gold Packs",
   "ouro.back": "Back",
 
+  "reference.title": "Reference",
+  "reference.alphabet_title": "ALPHABET & PHONETICS",
+  "reference.alphabet_desc": "Learn how letters and sounds work in European Portuguese. Tap a group to practise.",
+  "reference.glossary_title": "GLOSSARY",
+  "reference.glossary_desc": "Grammar and vocabulary you have encountered so far.",
+  "reference.glossary_empty": "Complete some lessons to start building your glossary.",
+  "reference.loading": "Loading glossary...",
+
   "onboarding.continue": "Continue",
   "onboarding.start_learning": "Start learning",
   "onboarding.i_speak": "I speak...",
@@ -234,6 +243,7 @@ type TKey = keyof typeof en;
 
 const es: Record<string, string> = {
   "tabs.learn": "Aprender",
+  "tabs.reference": "Referencia",
   "tabs.practice": "Practicar",
   "tabs.leaderboard": "Liga",
   "tabs.shop": "Tienda",
@@ -404,6 +414,7 @@ const es: Record<string, string> = {
 
 const fr: Record<string, string> = {
   "tabs.learn": "Apprendre",
+  "tabs.reference": "Référence",
   "tabs.practice": "Pratiquer",
   "tabs.leaderboard": "Classement",
   "tabs.shop": "Boutique",
@@ -574,6 +585,7 @@ const fr: Record<string, string> = {
 
 const hi: Record<string, string> = {
   "tabs.learn": "सीखें",
+  "tabs.reference": "संदर्भ",
   "tabs.practice": "अभ्यास",
   "tabs.leaderboard": "लीग",
   "tabs.shop": "दुकान",
@@ -744,6 +756,7 @@ const hi: Record<string, string> = {
 
 const ur: Record<string, string> = {
   "tabs.learn": "سیکھیں",
+  "tabs.reference": "حوالہ",
   "tabs.practice": "مشق",
   "tabs.leaderboard": "لیگ",
   "tabs.shop": "دکان",
@@ -914,6 +927,7 @@ const ur: Record<string, string> = {
 
 const ar: Record<string, string> = {
   "tabs.learn": "تعلّم",
+  "tabs.reference": "مرجع",
   "tabs.practice": "تدريب",
   "tabs.leaderboard": "الترتيب",
   "tabs.shop": "المتجر",
@@ -1084,6 +1098,7 @@ const ar: Record<string, string> = {
 
 const bn: Record<string, string> = {
   "tabs.learn": "শিখুন",
+  "tabs.reference": "রেফারেন্স",
   "tabs.practice": "অনুশীলন",
   "tabs.leaderboard": "লীগ",
   "tabs.shop": "দোকান",
@@ -1254,6 +1269,7 @@ const bn: Record<string, string> = {
 
 const pt: Record<string, string> = {
   "tabs.learn": "Aprender",
+  "tabs.reference": "Referência",
   "tabs.practice": "Praticar",
   "tabs.leaderboard": "Classificação",
   "tabs.shop": "Loja",
@@ -1408,6 +1424,14 @@ const pt: Record<string, string> = {
 
   "ouro.title": "Pacotes de ouro",
   "ouro.back": "Voltar",
+
+  "reference.title": "Referência",
+  "reference.alphabet_title": "ALFABETO E FONÉTICA",
+  "reference.alphabet_desc": "Aprende como funcionam as letras e os sons do português europeu. Toca num grupo para praticar.",
+  "reference.glossary_title": "GLOSSÁRIO",
+  "reference.glossary_desc": "Gramática e vocabulário que já encontraste nas lições.",
+  "reference.glossary_empty": "Completa algumas lições para começar a construir o teu glossário.",
+  "reference.loading": "A carregar glossário...",
 
   "onboarding.continue": "Continuar",
   "onboarding.start_learning": "Começar a aprender",

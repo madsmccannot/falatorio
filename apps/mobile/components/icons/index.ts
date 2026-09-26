@@ -26,3 +26,4 @@ export { UserIcon } from "./UserIcon";
 export { AppIcon } from "./AppIcon";
 export { CheckIcon } from "./CheckIcon";
 export { FlagIcon } from "./FlagIcon";
+export { ReferenceIcon } from "./ReferenceIcon";
