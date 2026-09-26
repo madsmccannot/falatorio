@@ -14,7 +14,7 @@ export interface Theme {
     primaryBackground: string;
     accent: string;
     accentBackground: string;
-    crystal: string;
+    ouro: string;
     heart: string;
     xp: string;
     streak: string;
@@ -42,7 +42,7 @@ export const lightTheme: Theme = {
     primaryBackground: colors.primary[50],
     accent: colors.accent[600],
     accentBackground: colors.accent[50],
-    crystal: colors.crystal,
+    ouro: colors.ouro,
     heart: colors.heart,
     xp: colors.xp,
     streak: colors.streak,
@@ -70,7 +70,7 @@ export const darkTheme: Theme = {
     primaryBackground: "#052E16",
     accent: colors.accent[400],
     accentBackground: "#2D1111",
-    crystal: "#A78BFA",
+    ouro: "#A78BFA",
     heart: "#F87171",
     xp: "#FBBF24",
     streak: "#FB923C",

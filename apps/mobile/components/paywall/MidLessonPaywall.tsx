@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useHearts } from "@/hooks/useHearts";
-import { useCrystals } from "@/hooks/useCrystals";
+import { useOuro } from "@/hooks/useOuro";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
@@ -17,14 +17,14 @@ type Props = {
 
 export function MidLessonPaywall({ visible, sessionId, onContinue, onQuit }: Props) {
   const router = useRouter();
-  const { continueWithCrystals } = useHearts();
-  const { balance } = useCrystals();
+  const { continueWithOuro } = useHearts();
+  const { balance } = useOuro();
   const cost = HEARTS.CONTINUE_COST;
   const canAfford = balance >= cost;
 
   const handleContinue = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    await continueWithCrystals(sessionId ?? "");
+    await continueWithOuro(sessionId ?? "");
     onContinue();
   };
 
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   balanceValue: {
     fontSize: typography.sizes.sm,
     fontWeight: "700",
-    color: colors.crystal,
+    color: colors.ouro,
   },
   action: {
     width: "100%",

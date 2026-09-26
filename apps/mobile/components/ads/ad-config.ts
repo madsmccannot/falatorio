@@ -23,5 +23,5 @@ export const AD_COOLDOWNS = {
 
 export const AD_REWARDS = {
   REWARD_HEARTS: 1,
-  REWARD_CRYSTALS: 25,
+  REWARD_OURO: 25,
 } as const;

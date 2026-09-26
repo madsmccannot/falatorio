@@ -1,5 +1,5 @@
 import { normalizeForComparison } from "./phonetic-rules-pteu.js";
-import type { L1Code } from "../constants.js";
+import type { L1Code, CognitiveLevel } from "../constants.js";
 
 export interface SpeechScoreResult {
   correct: boolean;
@@ -8,6 +8,23 @@ export interface SpeechScoreResult {
   feedback: "correct" | "close" | "incorrect";
   l1Tip: string | null;
 }
+
+interface Thresholds {
+  correct: number;
+  close: number;
+}
+
+const COGNITIVE_THRESHOLDS: Record<CognitiveLevel, Thresholds> = {
+  recognition: { correct: 0.85, close: 0.5 },
+  comprehension: { correct: 0.85, close: 0.5 },
+  controlled_production: { correct: 0.80, close: 0.45 },
+  transformation: { correct: 0.80, close: 0.45 },
+  translation: { correct: 0.80, close: 0.45 },
+  free_production: { correct: 0.75, close: 0.40 },
+  communication: { correct: 0.75, close: 0.40 },
+};
+
+const DEFAULT_THRESHOLDS: Thresholds = { correct: 0.85, close: 0.5 };
 
 interface L1PhoneticTip {
   pattern: RegExp;
@@ -38,6 +55,10 @@ const L1_TIPS: Partial<Record<L1Code, readonly L1PhoneticTip[]>> = {
     { pattern: /ão/, tip: "Nasalize the -ão like Urdu nasal vowels — but add a diphthong." },
     { pattern: /lh/, tip: "The lh sound is close to the Urdu لی — tongue touches the palate." },
   ],
+  bn: [
+    { pattern: /ão/, tip: "Think of -ão as combining a nasal with a glide — similar to Bengali nasalized vowels but stronger." },
+    { pattern: /r/, tip: "Initial R in PT-EU is uvular, not the flapped r of Bengali." },
+  ],
 };
 
 function getL1Tip(expected: string, l1: L1Code): string | null {
@@ -56,6 +77,7 @@ export function scoreSpeechAnswer(
   transcription: string,
   expected: string,
   l1: L1Code,
+  cognitiveLevel?: CognitiveLevel,
 ): SpeechScoreResult {
   const normTranscription = normalizeForComparison(transcription);
   const normExpected = normalizeForComparison(expected);
@@ -71,8 +93,13 @@ export function scoreSpeechAnswer(
   }
 
   const score = words.length > 0 ? matched / words.length : 0;
-  const correct = score >= 0.85;
-  const close = score >= 0.5;
+
+  const thresholds = cognitiveLevel
+    ? COGNITIVE_THRESHOLDS[cognitiveLevel]
+    : DEFAULT_THRESHOLDS;
+
+  const correct = score >= thresholds.correct;
+  const close = score >= thresholds.close;
 
   return {
     correct,

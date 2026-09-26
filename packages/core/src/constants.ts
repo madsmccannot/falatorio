@@ -64,7 +64,7 @@ export type TransactionType = (typeof TRANSACTION_TYPES)[number];
 export const AD_TYPES = ["banner", "interstitial", "reward"] as const;
 export type AdType = (typeof AD_TYPES)[number];
 
-export const AD_REWARD_TYPES = ["heart", "crystal"] as const;
+export const AD_REWARD_TYPES = ["heart", "ouro"] as const;
 export type AdRewardType = (typeof AD_REWARD_TYPES)[number];
 
 export const SHOP_ITEM_TYPES = ["consumable", "subscription"] as const;
@@ -88,6 +88,17 @@ export const KNOWLEDGE_RELATION_TYPES = [
 ] as const;
 export type KnowledgeRelationType = (typeof KNOWLEDGE_RELATION_TYPES)[number];
 
+export const EXERCISE_COGNITIVE_MAP: Record<ExerciseType, CognitiveLevel> = {
+  match_pairs: "recognition",
+  pick_correct: "recognition",
+  listen_and_type: "comprehension",
+  fill_blank: "controlled_production",
+  reorder_words: "transformation",
+  translate_l1_to_pt: "translation",
+  translate_pt_to_l1: "translation",
+  speak_and_score: "controlled_production",
+};
+
 // ─── Game economy constants ───
 
 export const HEARTS = {
@@ -100,12 +111,15 @@ export const HEARTS = {
   REWARD_AD_AMOUNT: 1,
 } as const;
 
-export const CRYSTALS = {
+export const OURO = {
   EARN_LESSON_COMPLETE: 5,
   EARN_PERFECT_LESSON: 10,
   EARN_DAILY_STREAK: 2,
   EARN_REWARD_AD: 15,
   EARN_MILESTONE_100_LESSONS: 50,
+  EARN_SKILL_MASTERED: 25,
+  EARN_FIRST_PRODUCTION: 5,
+  EARN_DOMAIN_MILESTONE: 50,
   COST_STREAK_FREEZE: 50,
   COST_HEART_REFILL: 30,
   COST_CONTINUE_LESSON: 50,
@@ -115,9 +129,9 @@ export const CRYSTALS = {
 } as const;
 
 export const IAP_TIERS = [
-  { id: "crystals_1200", amount: 1200, priceEur: 4.99 },
-  { id: "crystals_3000", amount: 3000, priceEur: 9.99 },
-  { id: "crystals_6500", amount: 6500, priceEur: 20.99 },
+  { id: "ouro_1200", amount: 1200, priceEur: 4.99 },
+  { id: "ouro_3000", amount: 3000, priceEur: 9.99 },
+  { id: "ouro_6500", amount: 6500, priceEur: 20.99 },
 ] as const;
 
 export const SUPER_PRICING = {

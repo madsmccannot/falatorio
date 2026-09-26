@@ -146,8 +146,8 @@ export default function ProfileScreen() {
             <Text style={[styles.statLabel, { color: theme.textMuted }]}>{t("profile.record")}</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-            <MedalIcon size={20} color={colors.crystal} />
-            <Text style={[styles.statValue, { color: colors.crystal }]}>
+            <MedalIcon size={20} color={colors.ouro} />
+            <Text style={[styles.statValue, { color: colors.ouro }]}>
               {(achievements.data?.length ?? 0).toString()}
             </Text>
             <Text style={[styles.statLabel, { color: theme.textMuted }]}>{t("profile.medals")}</Text>
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   superBadge: {
-    backgroundColor: colors.crystal,
+    backgroundColor: colors.ouro,
     borderRadius: radii.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: 4,

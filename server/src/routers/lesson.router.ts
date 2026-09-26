@@ -3,13 +3,48 @@ import { eq, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { users, exercises, userProgress } from "@falatorio/db/schema";
-import { LESSON } from "@falatorio/core";
+import { users, exercises, userProgress, exerciseKnowledge, skillEvidence } from "@falatorio/db/schema";
+import { LESSON, EXERCISE_COGNITIVE_MAP } from "@falatorio/core";
 import { scoreTextAnswer } from "@falatorio/core/scoring";
 import { scoreToRating } from "@falatorio/core/fsrs";
 import { schedule, createNewCard, type FSRSCard } from "@falatorio/core/fsrs";
 import { calculateXP } from "@falatorio/core/gamification";
 import { getLessonReward } from "@falatorio/core/economy";
+import type { ExerciseType, CognitiveLevel } from "@falatorio/core";
+
+function exerciseToCognitiveLevel(exerciseType: string): CognitiveLevel {
+  return EXERCISE_COGNITIVE_MAP[exerciseType as ExerciseType] ?? "recognition";
+}
+
+function highestCognitiveLevel(levels: CognitiveLevel[]): CognitiveLevel {
+  const order: CognitiveLevel[] = [
+    "recognition",
+    "comprehension",
+    "controlled_production",
+    "transformation",
+    "translation",
+    "free_production",
+    "communication",
+  ];
+  let maxIdx = 0;
+  for (const level of levels) {
+    const idx = order.indexOf(level);
+    if (idx > maxIdx) maxIdx = idx;
+  }
+  return order[maxIdx]!;
+}
+
+interface LessonSession {
+  userId: string;
+  lessonId: string;
+  exerciseIds: string[];
+  currentIndex: number;
+  correctCount: number;
+  incorrectCount: number;
+  xpEarned: number;
+  startedAt: string;
+  cognitiveLevels: CognitiveLevel[];
+}
 
 export const lessonRouter = t.router({
   startLesson: protectedProcedure
@@ -48,19 +83,26 @@ export const lessonRouter = t.router({
         });
       }
 
+      const cognitiveLevels = lessonExercises.map((e) =>
+        exerciseToCognitiveLevel(e.type),
+      );
+
       const sessionId = crypto.randomUUID();
+      const session: LessonSession = {
+        userId: ctx.user.userId,
+        lessonId: input.lessonId,
+        exerciseIds: lessonExercises.map((e) => e.id),
+        currentIndex: 0,
+        correctCount: 0,
+        incorrectCount: 0,
+        xpEarned: 0,
+        startedAt: new Date().toISOString(),
+        cognitiveLevels,
+      };
+
       await ctx.redis.set(
         `session:${sessionId}`,
-        JSON.stringify({
-          userId: ctx.user.userId,
-          lessonId: input.lessonId,
-          exerciseIds: lessonExercises.map((e) => e.id),
-          currentIndex: 0,
-          correctCount: 0,
-          incorrectCount: 0,
-          xpEarned: 0,
-          startedAt: new Date().toISOString(),
-        }),
+        JSON.stringify(session),
         "EX",
         3600,
       );
@@ -92,16 +134,7 @@ export const lessonRouter = t.router({
       if (!sessionRaw) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Session expired" });
       }
-      const session = JSON.parse(sessionRaw) as {
-        userId: string;
-        lessonId: string;
-        exerciseIds: string[];
-        currentIndex: number;
-        correctCount: number;
-        incorrectCount: number;
-        xpEarned: number;
-        startedAt: string;
-      };
+      const session = JSON.parse(sessionRaw) as LessonSession;
 
       if (session.userId !== ctx.user.userId) {
         throw new TRPCError({ code: "FORBIDDEN" });
@@ -115,7 +148,8 @@ export const lessonRouter = t.router({
 
       if (!exercise) throw new TRPCError({ code: "NOT_FOUND" });
 
-      const result = scoreTextAnswer(input.answer, exercise.acceptedAnswers);
+      const cognitiveLevel = exerciseToCognitiveLevel(exercise.type);
+      const result = scoreTextAnswer(input.answer, exercise.acceptedAnswers, cognitiveLevel);
 
       const [user] = await ctx.db
         .select({ hearts: users.hearts, tier: users.tier, streakDays: users.streakDays })
@@ -196,6 +230,23 @@ export const lessonRouter = t.router({
         });
       }
 
+      const linkedKIs = await ctx.db
+        .select({ knowledgeItemId: exerciseKnowledge.knowledgeItemId })
+        .from(exerciseKnowledge)
+        .where(eq(exerciseKnowledge.exerciseId, input.exerciseId));
+
+      if (linkedKIs.length > 0) {
+        await ctx.db.insert(skillEvidence).values(
+          linkedKIs.map((ki) => ({
+            userId: ctx.user.userId,
+            knowledgeItemId: ki.knowledgeItemId,
+            exerciseId: input.exerciseId,
+            score: result.score,
+            exerciseType: exercise.type,
+          })),
+        );
+      }
+
       session.currentIndex += 1;
       if (result.correct) session.correctCount += 1;
       else session.incorrectCount += 1;
@@ -219,6 +270,7 @@ export const lessonRouter = t.router({
         heartsRemaining,
         outOfHearts,
         l1Tip,
+        cognitiveLevel,
       };
     }),
 
@@ -229,12 +281,7 @@ export const lessonRouter = t.router({
       if (!sessionRaw) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Session expired" });
       }
-      const session = JSON.parse(sessionRaw) as {
-        userId: string;
-        correctCount: number;
-        incorrectCount: number;
-        startedAt: string;
-      };
+      const session = JSON.parse(sessionRaw) as LessonSession;
 
       if (session.userId !== ctx.user.userId) {
         throw new TRPCError({ code: "FORBIDDEN" });
@@ -243,6 +290,10 @@ export const lessonRouter = t.router({
       const total = session.correctCount + session.incorrectCount;
       const accuracy = total > 0 ? session.correctCount / total : 0;
       const isPerfect = accuracy === 1;
+
+      const dominantLevel = session.cognitiveLevels.length > 0
+        ? highestCognitiveLevel(session.cognitiveLevels)
+        : undefined;
 
       const [user] = await ctx.db
         .select({ streakDays: users.streakDays, totalXp: users.totalXp })
@@ -258,9 +309,10 @@ export const lessonRouter = t.router({
         isPerfect,
         isFirstOfDay: false,
         hasXPBoost: false,
+        cognitiveLevel: dominantLevel,
       });
 
-      const crystalReward = getLessonReward(isPerfect);
+      const ouroReward = getLessonReward(isPerfect);
 
       await ctx.db
         .update(users)
@@ -279,9 +331,10 @@ export const lessonRouter = t.router({
         passed,
         accuracy,
         xpEarned: xpResult.total,
-        crystalsEarned: crystalReward.amount,
+        ouroEarned: ouroReward.amount,
         isPerfect,
         xpBreakdown: xpResult,
+        dominantCognitiveLevel: dominantLevel ?? null,
       };
     }),
 });

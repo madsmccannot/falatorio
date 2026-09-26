@@ -3,9 +3,10 @@ import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { exercises } from "@falatorio/db/schema";
+import { exercises, exerciseKnowledge, skillEvidence } from "@falatorio/db/schema";
 import { scoreSpeechAnswer } from "@falatorio/core/scoring";
-import type { L1Code } from "@falatorio/core";
+import { EXERCISE_COGNITIVE_MAP } from "@falatorio/core";
+import type { L1Code, ExerciseType } from "@falatorio/core";
 
 export const speechRouter = t.router({
   transcribe: protectedProcedure
@@ -21,6 +22,7 @@ export const speechRouter = t.router({
 
       const [exercise] = await ctx.db
         .select({
+          type: exercises.type,
           acceptedAnswers: exercises.acceptedAnswers,
           l1Tip: exercises.l1Tip,
         })
@@ -30,11 +32,31 @@ export const speechRouter = t.router({
 
       if (!exercise) throw new TRPCError({ code: "NOT_FOUND" });
 
+      const cognitiveLevel = EXERCISE_COGNITIVE_MAP[exercise.type as ExerciseType] ?? "recognition";
+
       const result = scoreSpeechAnswer(
         transcription,
         exercise.acceptedAnswers[0] ?? "",
         ctx.user.l1 as L1Code,
+        cognitiveLevel,
       );
+
+      const linkedKIs = await ctx.db
+        .select({ knowledgeItemId: exerciseKnowledge.knowledgeItemId })
+        .from(exerciseKnowledge)
+        .where(eq(exerciseKnowledge.exerciseId, input.exerciseId));
+
+      if (linkedKIs.length > 0) {
+        await ctx.db.insert(skillEvidence).values(
+          linkedKIs.map((ki) => ({
+            userId: ctx.user.userId,
+            knowledgeItemId: ki.knowledgeItemId,
+            exerciseId: input.exerciseId,
+            score: result.score,
+            exerciseType: exercise.type,
+          })),
+        );
+      }
 
       const l1Tip = exercise.l1Tip
         ? (exercise.l1Tip as Record<string, string>)[ctx.user.l1] ?? null
@@ -46,6 +68,7 @@ export const speechRouter = t.router({
         score: result.score,
         feedback: result.feedback,
         l1Tip: result.l1Tip ?? l1Tip,
+        cognitiveLevel,
       };
     }),
 

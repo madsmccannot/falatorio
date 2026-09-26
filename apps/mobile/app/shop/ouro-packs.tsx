@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { purchasePackage, getOfferings, type PurchasesPackage } from "@/lib/revenuecat";
-import { useCrystals } from "@/hooks/useCrystals";
+import { useOuro } from "@/hooks/useOuro";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -13,7 +13,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
-type CrystalPack = {
+type OuroPack = {
   id: string;
   name: string;
   amount: number;
@@ -22,23 +22,23 @@ type CrystalPack = {
   packageId: string;
 };
 
-const PACKS: CrystalPack[] = [
-  { id: "small", name: "Pouch", amount: 500, priceLabel: "€1.99", packageId: "crystals_500" },
-  { id: "medium", name: "Bag", amount: 1200, priceLabel: "€3.99", bonus: "+200 bonus", packageId: "crystals_1200" },
-  { id: "large", name: "Chest", amount: 3000, priceLabel: "€7.99", bonus: "+500 bonus", packageId: "crystals_3000" },
-  { id: "vault", name: "Vault", amount: 8000, priceLabel: "€17.99", bonus: "+2000 bonus", packageId: "crystals_8000" },
+const PACKS: OuroPack[] = [
+  { id: "small", name: "Saco", amount: 500, priceLabel: "€1.99", packageId: "ouro_500" },
+  { id: "medium", name: "Bolsa", amount: 1200, priceLabel: "€3.99", bonus: "+200 bonus", packageId: "ouro_1200" },
+  { id: "large", name: "Cofre", amount: 3000, priceLabel: "€7.99", bonus: "+500 bonus", packageId: "ouro_3000" },
+  { id: "vault", name: "Tesouro", amount: 8000, priceLabel: "€17.99", bonus: "+2000 bonus", packageId: "ouro_8000" },
 ];
 
-export default function CrystalPacksScreen() {
+export default function OuroPacksScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation();
-  const { balance } = useCrystals();
+  const { balance } = useOuro();
   const { showToast } = useToast();
   const [purchasing, setPurchasing] = React.useState<string | null>(null);
 
-  const handlePurchase = async (pack: CrystalPack) => {
+  const handlePurchase = async (pack: OuroPack) => {
     try {
       setPurchasing(pack.id);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -65,8 +65,8 @@ export default function CrystalPacksScreen() {
   return (
     <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: insets.top }]}>
       <View style={[styles.header, { borderBottomColor: theme.border, backgroundColor: theme.bgElevated }]}>
-        <Button title={t("crystals.back")} onPress={() => router.back()} variant="ghost" size="sm" />
-        <Text style={[styles.title, { color: theme.text }]}>{t("crystals.title")}</Text>
+        <Button title={t("ouro.back")} onPress={() => router.back()} variant="ghost" size="sm" />
+        <Text style={[styles.title, { color: theme.text }]}>{t("ouro.title")}</Text>
         <View style={[styles.balanceChip, { backgroundColor: theme.bgInput }]}>
           <GoldPrisms size={14} />
           <Text style={[styles.balanceValue, { color: theme.text }]}>{balance}</Text>
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   packAmount: {
     fontSize: 36,
     fontWeight: "800",
-    color: colors.crystal,
+    color: colors.ouro,
   },
   packName: {
     fontSize: typography.sizes.md,

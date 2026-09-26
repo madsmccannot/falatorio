@@ -160,7 +160,7 @@ export default function SettingsScreen() {
         <Text style={[styles.sectionHeader, { color: theme.settingsHeader }]}>{t("settings.subscription")}</Text>
         <View style={[styles.card, { backgroundColor: theme.settingsCard, borderColor: theme.settingsBorder }]}>
           <SettingsNavRow
-            icon={<HeartIcon size={20} color={colors.crystal} />}
+            icon={<HeartIcon size={20} color={colors.ouro} />}
             label={t("settings.manage_plan")}
             theme={theme}
           />

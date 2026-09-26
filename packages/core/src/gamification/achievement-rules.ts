@@ -18,6 +18,10 @@ export interface UserStats {
   leagueTier: string;
   cefrLevel: string;
   scenariosCompleted: readonly string[];
+  skillsMastered: number;
+  knowledgeItemsLearned: number;
+  productionExercisesCompleted: number;
+  domainsCovered: number;
 }
 
 export const ACHIEVEMENTS: readonly AchievementDef[] = [
@@ -132,6 +136,62 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     icon: "medal",
     category: "social",
     condition: (s) => s.leagueTier === "gold" || s.leagueTier === "diamond" || s.leagueTier === "obsidian",
+  },
+  {
+    id: "first_skill_mastered",
+    name: "First Mastery",
+    description: "Master your first skill",
+    icon: "key",
+    category: "learning",
+    condition: (s) => s.skillsMastered >= 1,
+  },
+  {
+    id: "skills_10",
+    name: "Knowledge Explorer",
+    description: "Master 10 skills",
+    icon: "compass",
+    category: "learning",
+    condition: (s) => s.skillsMastered >= 10,
+  },
+  {
+    id: "skills_50",
+    name: "Grammar Architect",
+    description: "Master 50 skills",
+    icon: "building",
+    category: "milestone",
+    condition: (s) => s.skillsMastered >= 50,
+  },
+  {
+    id: "production_25",
+    name: "Finding My Voice",
+    description: "Complete 25 production exercises",
+    icon: "microphone",
+    category: "learning",
+    condition: (s) => s.productionExercisesCompleted >= 25,
+  },
+  {
+    id: "production_100",
+    name: "Active Speaker",
+    description: "Complete 100 production exercises",
+    icon: "speaker",
+    category: "learning",
+    condition: (s) => s.productionExercisesCompleted >= 100,
+  },
+  {
+    id: "domains_5",
+    name: "Well-Rounded",
+    description: "Study across 5 different domains",
+    icon: "globe",
+    category: "milestone",
+    condition: (s) => s.domainsCovered >= 5,
+  },
+  {
+    id: "knowledge_50",
+    name: "Knowledge Builder",
+    description: "Learn 50 knowledge items",
+    icon: "lightbulb",
+    category: "learning",
+    condition: (s) => s.knowledgeItemsLearned >= 50,
   },
 ];
 

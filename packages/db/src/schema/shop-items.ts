@@ -18,7 +18,7 @@ export const shopItems = pgTable("shop_items", {
   name: jsonb("name").notNull().$type<Record<string, string>>(),
   description: jsonb("description").$type<Record<string, string>>(),
   type: shopItemTypeEnum("type").notNull(),
-  priceCrystals: integer("price_crystals"),
+  priceOuro: integer("price_crystals"),
   priceEur: real("price_eur"),
   effect: jsonb("effect").notNull(),
   icon: varchar("icon", { length: 16 }),

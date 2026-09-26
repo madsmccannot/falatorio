@@ -16,7 +16,7 @@ export default function LessonResultScreen() {
   const params = useLocalSearchParams<{
     score: string;
     xpEarned: string;
-    crystalsEarned: string;
+    ouroEarned: string;
     totalExercises: string;
     correctCount: string;
     passed: string;
@@ -24,7 +24,7 @@ export default function LessonResultScreen() {
 
   const { t } = useTranslation();
   const xpEarned = Number(params.xpEarned ?? 0);
-  const crystalsEarned = Number(params.crystalsEarned ?? 0);
+  const ouroEarned = Number(params.ouroEarned ?? 0);
   const totalExercises = Number(params.totalExercises ?? 0);
   const correctCount = Number(params.correctCount ?? 0);
   const passed = params.passed === "true";
@@ -72,7 +72,7 @@ export default function LessonResultScreen() {
         </Card>
         <Card style={styles.statCard}>
           <GoldPrisms size={20} />
-          <Text style={[styles.statValue, { color: colors.crystal }]}>+{crystalsEarned}</Text>
+          <Text style={[styles.statValue, { color: colors.ouro }]}>+{ouroEarned}</Text>
           <Text style={styles.statLabel}>{t("result.ouro")}</Text>
         </Card>
       </Animated.View>

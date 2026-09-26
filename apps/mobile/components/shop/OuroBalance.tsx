@@ -1,6 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { useCrystals } from "@/hooks/useCrystals";
+import { useOuro } from "@/hooks/useOuro";
 import { GoldPrisms } from "@/components/icons";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
@@ -9,11 +9,11 @@ type Props = {
   compact?: boolean;
 };
 
-export function CrystalBalance({ onPress, compact }: Props) {
+export function OuroBalance({ onPress, compact }: Props) {
   const router = useRouter();
-  const { balance } = useCrystals();
+  const { balance } = useOuro();
 
-  const handlePress = onPress ?? (() => router.push("/shop/crystal-packs"));
+  const handlePress = onPress ?? (() => router.push("/shop/ouro-packs"));
 
   if (compact) {
     return (

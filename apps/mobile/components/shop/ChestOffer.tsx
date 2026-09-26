@@ -8,12 +8,12 @@ import { colors, spacing, radii, typography, shadows } from "@falatorio/ui/token
 type Props = {
   title: string;
   description: string;
-  priceCrystals: number;
+  priceOuro: number;
   onPurchase: () => void;
   disabled?: boolean;
 };
 
-export function ChestOffer({ title, description, priceCrystals, onPurchase, disabled }: Props) {
+export function ChestOffer({ title, description, priceOuro, onPurchase, disabled }: Props) {
   const glow = useSharedValue(0);
 
   React.useEffect(() => {
@@ -40,7 +40,7 @@ export function ChestOffer({ title, description, priceCrystals, onPurchase, disa
         <Text style={styles.description}>{description}</Text>
         <View style={styles.priceRow}>
           <GoldPrisms size={18} />
-          <Text style={styles.priceValue}>{priceCrystals}</Text>
+          <Text style={styles.priceValue}>{priceOuro}</Text>
         </View>
       </Animated.View>
     </Pressable>

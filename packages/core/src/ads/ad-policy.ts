@@ -1,5 +1,5 @@
 import type { Tier } from "../constants.js";
-import { ADS, HEARTS, CRYSTALS } from "../constants.js";
+import { ADS, HEARTS, OURO } from "../constants.js";
 
 export interface AdState {
   lastBannerShownAt: Date | null;
@@ -61,14 +61,14 @@ export function canShowRewardAd(tier: Tier, state: AdState, now: Date = new Date
 }
 
 export interface RewardAdClaim {
-  type: "heart" | "crystal";
+  type: "heart" | "ouro";
   amount: number;
 }
 
 export function getRewardAdOptions(): readonly RewardAdClaim[] {
   return [
     { type: "heart", amount: HEARTS.REWARD_AD_AMOUNT },
-    { type: "crystal", amount: CRYSTALS.EARN_REWARD_AD },
+    { type: "ouro", amount: OURO.EARN_REWARD_AD },
   ];
 }
 

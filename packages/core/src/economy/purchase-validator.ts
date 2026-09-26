@@ -5,7 +5,7 @@ import { validateIAPProductId } from "./iap-tiers.js";
 export type PurchaseError =
   | "item_not_found"
   | "item_inactive"
-  | "insufficient_crystals"
+  | "insufficient_ouro"
   | "requires_real_money"
   | "invalid_product_id"
   | "already_subscribed";
@@ -16,7 +16,7 @@ export interface PurchaseValidation {
   item: ShopItem | null;
 }
 
-export function validateCrystalPurchase(
+export function validateOuroPurchase(
   itemId: string,
   balance: number,
 ): PurchaseValidation {
@@ -30,12 +30,12 @@ export function validateCrystalPurchase(
     return { valid: false, error: "item_inactive", item };
   }
 
-  if (item.priceCrystals === null) {
+  if (item.priceOuro === null) {
     return { valid: false, error: "requires_real_money", item };
   }
 
-  if (!canAfford(balance, item.priceCrystals)) {
-    return { valid: false, error: "insufficient_crystals", item };
+  if (!canAfford(balance, item.priceOuro)) {
+    return { valid: false, error: "insufficient_ouro", item };
   }
 
   return { valid: true, error: null, item };

@@ -106,7 +106,7 @@ export function recordAnswer(
   return { session: updatedSession, result };
 }
 
-export function continueWithCrystals(session: SessionState): SessionState {
+export function continueWithOuro(session: SessionState): SessionState {
   if (session.status !== "out_of_hearts") {
     throw new Error("Session is not out of hearts");
   }

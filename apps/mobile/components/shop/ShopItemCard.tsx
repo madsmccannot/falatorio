@@ -9,7 +9,7 @@ type Props = {
   name: string;
   description?: string;
   icon?: string;
-  priceCrystals: number | null;
+  priceOuro: number | null;
   priceLabel?: string;
   canAfford: boolean;
   onPurchase: () => void;
@@ -20,7 +20,7 @@ export function ShopItemCard({
   name,
   description,
   icon,
-  priceCrystals,
+  priceOuro,
   priceLabel,
   canAfford,
   onPurchase,
@@ -36,9 +36,9 @@ export function ShopItemCard({
       <Text style={styles.name}>{name}</Text>
       {description && <Text style={styles.description}>{description}</Text>}
 
-      {priceCrystals !== null ? (
+      {priceOuro !== null ? (
         <Button
-          title={`${priceCrystals} ouro`}
+          title={`${priceOuro} ouro`}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             onPurchase();

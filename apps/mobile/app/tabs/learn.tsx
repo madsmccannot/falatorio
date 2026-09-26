@@ -5,7 +5,7 @@ import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
 import { useHearts } from "@/hooks/useHearts";
 import { useStreak } from "@/hooks/useStreak";
-import { useCrystals } from "@/hooks/useCrystals";
+import { useOuro } from "@/hooks/useOuro";
 import { Loading } from "@/components/ui/Loading";
 import { HeartIcon, StreakIcon, GoldPrisms, BookIcon } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
@@ -18,7 +18,7 @@ export default function LearnScreen() {
   const theme = useTheme();
   const { hearts, unlimited } = useHearts();
   const { currentDays } = useStreak();
-  const { balance } = useCrystals();
+  const { balance } = useOuro();
   const { t } = useTranslation();
   const courses = trpc.content.getCourses.useQuery();
 
@@ -39,7 +39,7 @@ export default function LearnScreen() {
           </View>
           <View style={[styles.stat, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
             <GoldPrisms size={16} />
-            <Text style={[styles.statValue, { color: colors.crystal }]}>{balance}</Text>
+            <Text style={[styles.statValue, { color: colors.ouro }]}>{balance}</Text>
           </View>
         </View>
       </View>

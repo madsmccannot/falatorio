@@ -11,6 +11,9 @@ export {
   getDailyStreakReward,
   getRewardAdReward,
   getMilestoneReward,
+  getSkillMasteredReward,
+  getFirstProductionReward,
+  getDomainMilestoneReward,
   type EarnReason,
   type EarnReward,
 } from "./earn-rules.js";
@@ -34,7 +37,7 @@ export {
   type IAPTier,
 } from "./iap-tiers.js";
 export {
-  validateCrystalPurchase,
+  validateOuroPurchase,
   validateIAPPurchase,
   type PurchaseError,
   type PurchaseValidation,

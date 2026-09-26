@@ -9,7 +9,7 @@ export function useAdReward() {
 
   const canWatch = adDecision.data?.show ?? false;
 
-  const claimReward = async (rewardType: "heart" | "crystal") => {
+  const claimReward = async (rewardType: "heart" | "ouro") => {
     setIsWatching(true);
     try {
       const result = await recordMutation.mutateAsync({

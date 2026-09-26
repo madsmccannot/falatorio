@@ -13,8 +13,8 @@ const TIER_COLORS: Record<string, string> = {
   bronze: "#CD7F32",
   silver: "#C0C0C0",
   gold: "#FFD700",
-  platinum: "#E5E4E2",
   diamond: "#B9F2FF",
+  obsidian: "#2D2D2D",
 };
 
 export function LeagueCard({ tier, rank, totalPlayers, weeklyXp }: Props) {

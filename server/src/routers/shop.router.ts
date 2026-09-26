@@ -20,14 +20,14 @@ export const shopRouter = t.router({
       name: item.name,
       description: item.description,
       type: item.type,
-      priceCrystals: item.priceCrystals,
+      priceOuro: item.priceOuro,
       priceEur: item.priceEur,
       icon: item.icon,
       effect: item.effect,
     }));
   }),
 
-  purchaseWithCrystals: protectedProcedure
+  purchaseWithOuro: protectedProcedure
     .input(z.object({ itemId: z.string().max(64) }))
     .mutation(async ({ ctx, input }) => {
       const [item] = await ctx.db
@@ -40,10 +40,10 @@ export const shopRouter = t.router({
         throw new TRPCError({ code: "NOT_FOUND", message: "Item not found" });
       }
 
-      if (item.priceCrystals === null) {
+      if (item.priceOuro === null) {
         throw new TRPCError({
           code: "PRECONDITION_FAILED",
-          message: "Item cannot be purchased with crystals",
+          message: "Item cannot be purchased with ouro",
         });
       }
 
@@ -58,17 +58,17 @@ export const shopRouter = t.router({
       }));
 
       const balance = computeBalance(txs);
-      if (balance < item.priceCrystals) {
+      if (balance < item.priceOuro) {
         throw new TRPCError({
           code: "PRECONDITION_FAILED",
-          message: "insufficient_crystals",
+          message: "insufficient_ouro",
         });
       }
 
       await ctx.db.insert(transactions).values({
         userId: ctx.user.userId,
         type: "spend",
-        amount: -item.priceCrystals,
+        amount: -item.priceOuro,
         reason: "shop_purchase",
         itemId: item.id,
       });
@@ -79,8 +79,8 @@ export const shopRouter = t.router({
       return {
         purchased: true,
         itemId: item.id,
-        crystalsSpent: item.priceCrystals,
-        newBalance: balance - item.priceCrystals,
+        ouroSpent: item.priceOuro,
+        newBalance: balance - item.priceOuro,
       };
     }),
 

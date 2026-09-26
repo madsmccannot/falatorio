@@ -2,17 +2,17 @@ import { trpc } from "@/lib/trpc";
 
 export function useHearts() {
   const state = trpc.hearts.getState.useQuery();
-  const refillMutation = trpc.hearts.refillWithCrystals.useMutation();
-  const continueMutation = trpc.hearts.continueWithCrystals.useMutation();
+  const refillMutation = trpc.hearts.refillWithOuro.useMutation();
+  const continueMutation = trpc.hearts.continueWithOuro.useMutation();
   const utils = trpc.useUtils();
 
-  const refillWithCrystals = async () => {
+  const refillWithOuro = async () => {
     await refillMutation.mutateAsync();
     await utils.hearts.getState.invalidate();
     await utils.economy.getBalance.invalidate();
   };
 
-  const continueWithCrystals = async (sessionId: string) => {
+  const continueWithOuro = async (sessionId: string) => {
     const result = await continueMutation.mutateAsync({ sessionId });
     await utils.hearts.getState.invalidate();
     await utils.economy.getBalance.invalidate();
@@ -27,8 +27,8 @@ export function useHearts() {
       ? Math.max(0, new Date(state.data.nextRefillAt).getTime() - Date.now())
       : null,
     isLoading: state.isLoading,
-    refillWithCrystals,
-    continueWithCrystals,
+    refillWithOuro,
+    continueWithOuro,
     isRefilling: refillMutation.isPending,
     isContinuing: continueMutation.isPending,
   };

@@ -28,7 +28,7 @@ export default function LessonScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { hearts, unlimited, continueWithCrystals } = useHearts();
+  const { hearts, unlimited, continueWithOuro } = useHearts();
 
   const {
     state,
@@ -246,7 +246,7 @@ export default function LessonScreen() {
         <Button
           title={t("lesson.continue_ouro")}
           onPress={async () => {
-            await continueWithCrystals(lessonId!);
+            await continueWithOuro(lessonId!);
             setShowOutOfHearts(false);
           }}
           style={styles.modalButton}

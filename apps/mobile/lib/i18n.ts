@@ -155,8 +155,8 @@ const en = {
   "scenarios.limit": "3 free error reviews / day",
   "scenarios.unlock": "Reach {{level}} to unlock",
 
-  "crystals.title": "Crystal Packs",
-  "crystals.back": "Back",
+  "ouro.title": "Gold Packs",
+  "ouro.back": "Back",
 
   "onboarding.continue": "Continue",
   "onboarding.start_learning": "Start learning",
@@ -1406,8 +1406,8 @@ const pt: Record<string, string> = {
   "scenarios.limit": "3 revisões de erros grátis / dia",
   "scenarios.unlock": "Alcança {{level}} para desbloquear",
 
-  "crystals.title": "Pacotes de ouro",
-  "crystals.back": "Voltar",
+  "ouro.title": "Pacotes de ouro",
+  "ouro.back": "Voltar",
 
   "onboarding.continue": "Continuar",
   "onboarding.start_learning": "Começar a aprender",

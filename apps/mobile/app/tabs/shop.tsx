@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
-import { useCrystals } from "@/hooks/useCrystals";
+import { useOuro } from "@/hooks/useOuro";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
@@ -35,10 +35,10 @@ export default function ShopScreen() {
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation();
-  const { balance } = useCrystals();
+  const { balance } = useOuro();
   const { isSuper } = useEntitlements();
   const items = trpc.shop.listItems.useQuery();
-  const purchaseMutation = trpc.shop.purchaseWithCrystals.useMutation();
+  const purchaseMutation = trpc.shop.purchaseWithOuro.useMutation();
   const utils = trpc.useUtils();
 
   const handlePurchase = async (itemId: string) => {
@@ -57,7 +57,7 @@ export default function ShopScreen() {
         <Text style={[styles.title, { color: theme.text }]}>{t("shop.title")}</Text>
         <View style={[styles.balanceChip, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
           <GoldPrisms size={16} />
-          <Text style={[styles.balanceValue, { color: colors.crystal }]}>{balance}</Text>
+          <Text style={[styles.balanceValue, { color: colors.ouro }]}>{balance}</Text>
         </View>
       </View>
 
@@ -76,7 +76,7 @@ export default function ShopScreen() {
               </Text>
               <Text style={styles.superCta}>{t("shop.trial_cta")}</Text>
             </View>
-            <CrownIcon size={40} color={colors.crystal} />
+            <CrownIcon size={40} color={colors.ouro} />
           </View>
         </Pressable>
       )}
@@ -92,16 +92,16 @@ export default function ShopScreen() {
           contentContainerStyle={styles.list}
           renderItem={({ item }) => {
             const name = (item.name as Record<string, string>)["pt"] ?? (item.name as Record<string, string>)["en"] ?? item.id;
-            const canAfford = item.priceCrystals !== null && balance >= item.priceCrystals;
+            const canAfford = item.priceOuro !== null && balance >= item.priceOuro;
 
             return (
               <View style={[styles.itemCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
                 <Text style={[styles.itemName, { color: theme.text }]} numberOfLines={2}>
                   {name}
                 </Text>
-                {item.priceCrystals !== null && (
+                {item.priceOuro !== null && (
                   <Button
-                    title={`${item.priceCrystals} ouro`}
+                    title={`${item.priceOuro} ouro`}
                     onPress={() => handlePurchase(item.id)}
                     variant={canAfford ? "primary" : "secondary"}
                     size="sm"
@@ -129,7 +129,7 @@ export default function ShopScreen() {
                 <Text style={[styles.previewName, { color: theme.text }]}>{t(item.nameKey)}</Text>
                 <View style={styles.previewPrice}>
                   <GoldPrisms size={14} />
-                  <Text style={[styles.previewPriceText, { color: colors.crystal }]}>{item.price}</Text>
+                  <Text style={[styles.previewPriceText, { color: colors.ouro }]}>{item.price}</Text>
                 </View>
               </View>
               <Button

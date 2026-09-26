@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useHearts } from "@/hooks/useHearts";
-import { useCrystals } from "@/hooks/useCrystals";
+import { useOuro } from "@/hooks/useOuro";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { HeartIcon } from "@/components/icons";
@@ -17,8 +17,8 @@ type Props = {
 
 export function OutOfHeartsModal({ visible, onDismiss, context }: Props) {
   const router = useRouter();
-  const { refillWithCrystals, nextRefillIn } = useHearts();
-  const { balance } = useCrystals();
+  const { refillWithOuro, nextRefillIn } = useHearts();
+  const { balance } = useOuro();
   const refillCost = HEARTS.REFILL_COST;
   const canAfford = balance >= refillCost;
 
@@ -42,7 +42,7 @@ export function OutOfHeartsModal({ visible, onDismiss, context }: Props) {
         title={`Refill hearts (${refillCost} ouro)`}
         onPress={async () => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          await refillWithCrystals();
+          await refillWithOuro();
           onDismiss();
         }}
         disabled={!canAfford}

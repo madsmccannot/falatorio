@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 
-export function useCrystals() {
+export function useOuro() {
   const balance = trpc.economy.getBalance.useQuery();
   const history = trpc.economy.getHistory.useQuery({ limit: 20, offset: 0 });
   const utils = trpc.useUtils();

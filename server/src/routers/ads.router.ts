@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
 import { users, adEvents, transactions } from "@falatorio/db/schema";
-import { HEARTS, CRYSTALS } from "@falatorio/core";
+import { HEARTS, OURO } from "@falatorio/core";
 import {
   shouldShowBannerAd,
   shouldShowInterstitialAd,
@@ -66,7 +66,7 @@ export const adsRouter = t.router({
     .input(
       z.object({
         adType: z.enum(["banner", "interstitial", "reward"]),
-        rewardType: z.enum(["heart", "crystal"]).optional(),
+        rewardType: z.enum(["heart", "ouro"]).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -76,8 +76,8 @@ export const adsRouter = t.router({
         rewardType: input.rewardType ?? null,
         rewardAmount: input.rewardType === "heart"
           ? HEARTS.REWARD_AD_AMOUNT
-          : input.rewardType === "crystal"
-            ? CRYSTALS.EARN_REWARD_AD
+          : input.rewardType === "ouro"
+            ? OURO.EARN_REWARD_AD
             : null,
       });
 
@@ -103,15 +103,15 @@ export const adsRouter = t.router({
         return { rewarded: true, rewardType: "heart", amount: HEARTS.REWARD_AD_AMOUNT };
       }
 
-      if (input.rewardType === "crystal") {
+      if (input.rewardType === "ouro") {
         await ctx.db.insert(transactions).values({
           userId: ctx.user.userId,
           type: "earn",
-          amount: CRYSTALS.EARN_REWARD_AD,
+          amount: OURO.EARN_REWARD_AD,
           reason: "reward_ad",
         });
 
-        return { rewarded: true, rewardType: "crystal", amount: CRYSTALS.EARN_REWARD_AD };
+        return { rewarded: true, rewardType: "ouro", amount: OURO.EARN_REWARD_AD };
       }
 
       return { rewarded: false, rewardType: null, amount: 0 };

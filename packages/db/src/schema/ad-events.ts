@@ -13,7 +13,7 @@ export const adTypeEnum = pgEnum("ad_type", [
 ]);
 
 export const adRewardTypeEnum = pgEnum("ad_reward_type", [
-  "heart", "crystal",
+  "heart", "ouro",
 ]);
 
 export const adEvents = pgTable("ad_events", {

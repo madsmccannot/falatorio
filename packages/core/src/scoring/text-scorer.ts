@@ -1,4 +1,5 @@
 import { normalizeForComparison } from "./phonetic-rules-pteu.js";
+import type { CognitiveLevel } from "../constants.js";
 
 export interface TextScoreResult {
   correct: boolean;
@@ -6,6 +7,23 @@ export interface TextScoreResult {
   matchedAnswer: string | null;
   feedback: "correct" | "close" | "incorrect";
 }
+
+interface Thresholds {
+  correct: number;
+  close: number;
+}
+
+const COGNITIVE_THRESHOLDS: Record<CognitiveLevel, Thresholds> = {
+  recognition: { correct: 0.95, close: 0.7 },
+  comprehension: { correct: 0.95, close: 0.7 },
+  controlled_production: { correct: 0.90, close: 0.65 },
+  transformation: { correct: 0.90, close: 0.65 },
+  translation: { correct: 0.90, close: 0.65 },
+  free_production: { correct: 0.85, close: 0.55 },
+  communication: { correct: 0.85, close: 0.55 },
+};
+
+const DEFAULT_THRESHOLDS: Thresholds = { correct: 0.95, close: 0.7 };
 
 function levenshteinDistance(a: string, b: string): number {
   const m = a.length;
@@ -40,6 +58,7 @@ function similarity(a: string, b: string): number {
 export function scoreTextAnswer(
   userAnswer: string,
   acceptedAnswers: readonly string[],
+  cognitiveLevel?: CognitiveLevel,
 ): TextScoreResult {
   if (acceptedAnswers.length === 0) {
     return { correct: false, score: 0, matchedAnswer: null, feedback: "incorrect" };
@@ -59,8 +78,12 @@ export function scoreTextAnswer(
     }
   }
 
-  const correct = bestScore >= 0.95;
-  const close = bestScore >= 0.7;
+  const thresholds = cognitiveLevel
+    ? COGNITIVE_THRESHOLDS[cognitiveLevel]
+    : DEFAULT_THRESHOLDS;
+
+  const correct = bestScore >= thresholds.correct;
+  const close = bestScore >= thresholds.close;
 
   return {
     correct,

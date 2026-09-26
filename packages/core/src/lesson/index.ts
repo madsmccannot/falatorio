@@ -2,7 +2,7 @@ export {
   createSession,
   startSession,
   recordAnswer,
-  continueWithCrystals,
+  continueWithOuro,
   abandonSession,
   completeSession,
   isSessionComplete,

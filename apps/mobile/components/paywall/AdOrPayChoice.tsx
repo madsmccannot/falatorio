@@ -8,20 +8,20 @@ type Props = {
   visible: boolean;
   onDismiss: () => void;
   rewardLabel: string;
-  crystalCost: number;
+  ouroCost: number;
   canAfford: boolean;
   onWatchAd: () => void;
-  onPayCrystals: () => void;
+  onPayOuro: () => void;
 };
 
 export function AdOrPayChoice({
   visible,
   onDismiss,
   rewardLabel,
-  crystalCost,
+  ouroCost,
   canAfford,
   onWatchAd,
-  onPayCrystals,
+  onPayOuro,
 }: Props) {
   return (
     <Modal visible={visible} onDismiss={onDismiss}>
@@ -44,10 +44,10 @@ export function AdOrPayChoice({
       </View>
 
       <Button
-        title={`Spend ${crystalCost} ouro`}
+        title={`Spend ${ouroCost} ouro`}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          onPayCrystals();
+          onPayOuro();
         }}
         variant="secondary"
         disabled={!canAfford}

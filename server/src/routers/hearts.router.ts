@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
 import { users, transactions } from "@falatorio/db/schema";
-import { HEARTS, CRYSTALS } from "@falatorio/core";
+import { HEARTS, OURO } from "@falatorio/core";
 import { getHearts } from "@falatorio/core/entitlements";
 import { computeBalance, type Transaction } from "@falatorio/core/economy";
 import type { Tier } from "@falatorio/core";
@@ -39,7 +39,7 @@ export const heartsRouter = t.router({
     };
   }),
 
-  refillWithCrystals: protectedProcedure.mutation(async ({ ctx }) => {
+  refillWithOuro: protectedProcedure.mutation(async ({ ctx }) => {
     const [user] = await ctx.db
       .select({ hearts: users.hearts, tier: users.tier })
       .from(users)
@@ -66,10 +66,10 @@ export const heartsRouter = t.router({
     }));
 
     const balance = computeBalance(txs);
-    if (balance < CRYSTALS.COST_HEART_REFILL) {
+    if (balance < OURO.COST_HEART_REFILL) {
       throw new TRPCError({
         code: "PRECONDITION_FAILED",
-        message: "insufficient_crystals",
+        message: "insufficient_ouro",
       });
     }
 
@@ -78,7 +78,7 @@ export const heartsRouter = t.router({
       .values({
         userId: ctx.user.userId,
         type: "spend",
-        amount: -CRYSTALS.COST_HEART_REFILL,
+        amount: -OURO.COST_HEART_REFILL,
         reason: "heart_refill",
       });
 
@@ -91,10 +91,10 @@ export const heartsRouter = t.router({
       })
       .where(eq(users.id, ctx.user.userId));
 
-    return { hearts: HEARTS.MAX, crystalsSpent: CRYSTALS.COST_HEART_REFILL };
+    return { hearts: HEARTS.MAX, ouroSpent: OURO.COST_HEART_REFILL };
   }),
 
-  continueWithCrystals: protectedProcedure
+  continueWithOuro: protectedProcedure
     .input(z.object({ sessionId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       const rows = await ctx.db
@@ -108,10 +108,10 @@ export const heartsRouter = t.router({
       }));
 
       const balance = computeBalance(txs);
-      if (balance < CRYSTALS.COST_CONTINUE_LESSON) {
+      if (balance < OURO.COST_CONTINUE_LESSON) {
         throw new TRPCError({
           code: "PRECONDITION_FAILED",
-          message: "insufficient_crystals",
+          message: "insufficient_ouro",
         });
       }
 
@@ -120,7 +120,7 @@ export const heartsRouter = t.router({
         .values({
           userId: ctx.user.userId,
           type: "spend",
-          amount: -CRYSTALS.COST_CONTINUE_LESSON,
+          amount: -OURO.COST_CONTINUE_LESSON,
           reason: "continue_lesson",
           itemId: input.sessionId,
         });
@@ -130,6 +130,6 @@ export const heartsRouter = t.router({
         .set({ hearts: 1, updatedAt: new Date() })
         .where(eq(users.id, ctx.user.userId));
 
-      return { hearts: 1, crystalsSpent: CRYSTALS.COST_CONTINUE_LESSON };
+      return { hearts: 1, ouroSpent: OURO.COST_CONTINUE_LESSON };
     }),
 });

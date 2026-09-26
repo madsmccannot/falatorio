@@ -9,7 +9,7 @@ import {
   achievements,
   transactions,
 } from "@falatorio/db/schema";
-import { LEAGUE, CRYSTALS } from "@falatorio/core";
+import { LEAGUE, OURO } from "@falatorio/core";
 import { checkStreak, recordActivity } from "@falatorio/core/gamification";
 import { computeBalance, type Transaction } from "@falatorio/core/economy";
 
@@ -122,17 +122,17 @@ export const gamificationRouter = t.router({
     }));
 
     const balance = computeBalance(txs);
-    if (balance < CRYSTALS.COST_STREAK_FREEZE) {
+    if (balance < OURO.COST_STREAK_FREEZE) {
       throw new TRPCError({
         code: "PRECONDITION_FAILED",
-        message: "insufficient_crystals",
+        message: "insufficient_ouro",
       });
     }
 
     await ctx.db.insert(transactions).values({
       userId: ctx.user.userId,
       type: "spend",
-      amount: -CRYSTALS.COST_STREAK_FREEZE,
+      amount: -OURO.COST_STREAK_FREEZE,
       reason: "streak_freeze",
     });
 
@@ -141,7 +141,7 @@ export const gamificationRouter = t.router({
       .set({ freezeAvailable: true, updatedAt: new Date() })
       .where(eq(streaks.userId, ctx.user.userId));
 
-    return { purchased: true, crystalsSpent: CRYSTALS.COST_STREAK_FREEZE };
+    return { purchased: true, ouroSpent: OURO.COST_STREAK_FREEZE };
   }),
 
   getLeaderboard: protectedProcedure.query(async ({ ctx }) => {

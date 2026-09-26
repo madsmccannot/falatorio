@@ -1,4 +1,4 @@
-import { CRYSTALS } from "../constants.js";
+import { OURO } from "../constants.js";
 
 export type SpendItem =
   | "streak_freeze"
@@ -14,12 +14,12 @@ export interface SpendCost {
 }
 
 const COSTS: Record<SpendItem, number> = {
-  streak_freeze: CRYSTALS.COST_STREAK_FREEZE,
-  heart_refill: CRYSTALS.COST_HEART_REFILL,
-  continue_lesson: CRYSTALS.COST_CONTINUE_LESSON,
-  xp_boost: CRYSTALS.COST_XP_BOOST,
-  time_extend: CRYSTALS.COST_TIME_EXTEND,
-  full_energy: CRYSTALS.COST_FULL_ENERGY,
+  streak_freeze: OURO.COST_STREAK_FREEZE,
+  heart_refill: OURO.COST_HEART_REFILL,
+  continue_lesson: OURO.COST_CONTINUE_LESSON,
+  xp_boost: OURO.COST_XP_BOOST,
+  time_extend: OURO.COST_TIME_EXTEND,
+  full_energy: OURO.COST_FULL_ENERGY,
 };
 
 export function getSpendCost(item: SpendItem): SpendCost {

@@ -1,12 +1,12 @@
 import type { ShopItemType } from "../constants.js";
-import { CRYSTALS, SUPER_PRICING } from "../constants.js";
+import { OURO, SUPER_PRICING } from "../constants.js";
 
 export interface ShopItem {
   id: string;
   name: string;
   description: string;
   type: ShopItemType;
-  priceCrystals: number | null;
+  priceOuro: number | null;
   priceEur: number | null;
   icon: string;
   effect: ShopEffect;
@@ -21,7 +21,7 @@ export type ShopEffect =
   | { kind: "continue_lesson" }
   | { kind: "xp_boost"; multiplier: number; durationMs: number }
   | { kind: "time_extend" }
-  | { kind: "crystal_pack"; crystals: number }
+  | { kind: "ouro_pack"; amount: number }
   | { kind: "super_subscription"; period: "monthly" | "yearly" };
 
 export const SHOP_ITEMS: readonly ShopItem[] = [
@@ -30,7 +30,7 @@ export const SHOP_ITEMS: readonly ShopItem[] = [
     name: "Streak Freeze",
     description: "Protect your streak for one day",
     type: "consumable",
-    priceCrystals: CRYSTALS.COST_STREAK_FREEZE,
+    priceOuro: OURO.COST_STREAK_FREEZE,
     priceEur: null,
     icon: "shield",
     effect: { kind: "streak_freeze" },
@@ -42,7 +42,7 @@ export const SHOP_ITEMS: readonly ShopItem[] = [
     name: "Heart Refill",
     description: "Refill one heart",
     type: "consumable",
-    priceCrystals: CRYSTALS.COST_HEART_REFILL,
+    priceOuro: OURO.COST_HEART_REFILL,
     priceEur: null,
     icon: "heart",
     effect: { kind: "heart_refill", amount: 1 },
@@ -54,7 +54,7 @@ export const SHOP_ITEMS: readonly ShopItem[] = [
     name: "Full Energy",
     description: "Refill all hearts to maximum",
     type: "consumable",
-    priceCrystals: CRYSTALS.COST_FULL_ENERGY,
+    priceOuro: OURO.COST_FULL_ENERGY,
     priceEur: null,
     icon: "bolt",
     effect: { kind: "full_energy" },
@@ -66,7 +66,7 @@ export const SHOP_ITEMS: readonly ShopItem[] = [
     name: "XP Boost",
     description: "Double XP for 15 minutes",
     type: "consumable",
-    priceCrystals: CRYSTALS.COST_XP_BOOST,
+    priceOuro: OURO.COST_XP_BOOST,
     priceEur: null,
     icon: "rocket",
     effect: { kind: "xp_boost", multiplier: 2, durationMs: 15 * 60 * 1000 },
@@ -78,7 +78,7 @@ export const SHOP_ITEMS: readonly ShopItem[] = [
     name: "Time Extend",
     description: "Extra time on timed challenges",
     type: "consumable",
-    priceCrystals: CRYSTALS.COST_TIME_EXTEND,
+    priceOuro: OURO.COST_TIME_EXTEND,
     priceEur: null,
     icon: "timer",
     effect: { kind: "time_extend" },
@@ -86,38 +86,38 @@ export const SHOP_ITEMS: readonly ShopItem[] = [
     sortOrder: 5,
   },
   {
-    id: "crystals_1200",
-    name: "Crystal Pouch",
-    description: "1,200 crystals",
+    id: "ouro_1200",
+    name: "Saco de Ouro",
+    description: "1.200 ouro",
     type: "consumable",
-    priceCrystals: null,
+    priceOuro: null,
     priceEur: 4.99,
     icon: "prisms",
-    effect: { kind: "crystal_pack", crystals: 1200 },
+    effect: { kind: "ouro_pack", amount: 1200 },
     active: true,
     sortOrder: 10,
   },
   {
-    id: "crystals_3000",
-    name: "Crystal Chest",
-    description: "3,000 crystals",
+    id: "ouro_3000",
+    name: "Cofre de Ouro",
+    description: "3.000 ouro",
     type: "consumable",
-    priceCrystals: null,
+    priceOuro: null,
     priceEur: 9.99,
     icon: "prisms",
-    effect: { kind: "crystal_pack", crystals: 3000 },
+    effect: { kind: "ouro_pack", amount: 3000 },
     active: true,
     sortOrder: 11,
   },
   {
-    id: "crystals_6500",
-    name: "Crystal Vault",
-    description: "6,500 crystals",
+    id: "ouro_6500",
+    name: "Tesouro de Ouro",
+    description: "6.500 ouro",
     type: "consumable",
-    priceCrystals: null,
+    priceOuro: null,
     priceEur: 20.99,
     icon: "prisms",
-    effect: { kind: "crystal_pack", crystals: 6500 },
+    effect: { kind: "ouro_pack", amount: 6500 },
     active: true,
     sortOrder: 12,
   },
@@ -126,7 +126,7 @@ export const SHOP_ITEMS: readonly ShopItem[] = [
     name: "Super Monthly",
     description: "Unlimited hearts, no ads, error review",
     type: "subscription",
-    priceCrystals: null,
+    priceOuro: null,
     priceEur: SUPER_PRICING.MONTHLY_EUR,
     icon: "crown",
     effect: { kind: "super_subscription", period: "monthly" },
@@ -138,7 +138,7 @@ export const SHOP_ITEMS: readonly ShopItem[] = [
     name: "Super Yearly",
     description: "Best value — save over 35%",
     type: "subscription",
-    priceCrystals: null,
+    priceOuro: null,
     priceEur: SUPER_PRICING.YEARLY_EUR,
     icon: "crown",
     effect: { kind: "super_subscription", period: "yearly" },
