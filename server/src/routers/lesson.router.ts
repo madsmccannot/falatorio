@@ -11,6 +11,9 @@ import { schedule, createNewCard, type FSRSCard } from "@falatorio/core/fsrs";
 import { calculateXP } from "@falatorio/core/gamification";
 import { getLessonReward } from "@falatorio/core/economy";
 import type { ExerciseType, CognitiveLevel } from "@falatorio/core";
+import { knowledgeItems } from "@falatorio/db/schema";
+import { explainExerciseError } from "../services/llm.service.js";
+import { EXPLAINS } from "@falatorio/core";
 
 function exerciseToCognitiveLevel(exerciseType: string): CognitiveLevel {
   return EXERCISE_COGNITIVE_MAP[exerciseType as ExerciseType] ?? "recognition";
@@ -335,6 +338,80 @@ export const lessonRouter = t.router({
         isPerfect,
         xpBreakdown: xpResult,
         dominantCognitiveLevel: dominantLevel ?? null,
+      };
+    }),
+
+  explainExercise: protectedProcedure
+    .input(
+      z.object({
+        exerciseId: z.string().uuid(),
+        userAnswer: z.string().max(2000),
+        correctAnswer: z.string().max(2000),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dailyKey = `explains:${ctx.user.userId}:${new Date().toISOString().slice(0, 10)}`;
+      const current = await ctx.redis.incr(dailyKey);
+      if (current === 1) await ctx.redis.expire(dailyKey, 86400);
+
+      const isSuper = ctx.user.tier === "super";
+      const limit = isSuper ? EXPLAINS.SUPER_LIMIT : EXPLAINS.FREE_DAILY_LIMIT;
+
+      if (current > limit) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "daily_explain_limit_reached",
+        });
+      }
+
+      const [exercise] = await ctx.db
+        .select()
+        .from(exercises)
+        .where(eq(exercises.id, input.exerciseId))
+        .limit(1);
+
+      if (!exercise) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const linkedKIs = await ctx.db
+        .select({
+          code: knowledgeItems.code,
+          rule: knowledgeItems.rule,
+        })
+        .from(exerciseKnowledge)
+        .innerJoin(knowledgeItems, eq(exerciseKnowledge.knowledgeItemId, knowledgeItems.id))
+        .where(eq(exerciseKnowledge.exerciseId, input.exerciseId))
+        .limit(1);
+
+      const ki = linkedKIs[0];
+
+      const errorCountResult = await ctx.db
+        .select({ lapses: userProgress.lapses })
+        .from(userProgress)
+        .where(
+          and(
+            eq(userProgress.userId, ctx.user.userId),
+            eq(userProgress.exerciseId, input.exerciseId),
+          ),
+        )
+        .limit(1);
+
+      const errorCount = errorCountResult[0]?.lapses ?? 1;
+
+      const explanation = await explainExerciseError(
+        exercise.type,
+        input.userAnswer,
+        input.correctAnswer,
+        ki?.rule ?? "",
+        ctx.user.l1,
+        ki?.code ?? exercise.id,
+        errorCount,
+      );
+
+      return {
+        explanation,
+        remaining: Math.max(0, limit - current),
+        knowledgeItemCode: ki?.code ?? null,
+        errorCount,
       };
     }),
 });

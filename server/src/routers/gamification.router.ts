@@ -1,4 +1,4 @@
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
@@ -12,6 +12,7 @@ import {
 import { LEAGUE, OURO } from "@falatorio/core";
 import { checkStreak, recordActivity } from "@falatorio/core/gamification";
 import { computeBalance, type Transaction } from "@falatorio/core/economy";
+import * as lb from "../services/leaderboard.service.js";
 
 export const gamificationRouter = t.router({
   getStreak: protectedProcedure.query(async ({ ctx }) => {
@@ -155,6 +156,40 @@ export const gamificationRouter = t.router({
       return { entries: [], myRank: null, tier: null };
     }
 
+    const redisEntries = await lb.getTopN(
+      ctx.redis,
+      myEntry.leagueTier,
+      myEntry.seasonWeek,
+      LEAGUE.USERS_PER_LEAGUE,
+    );
+
+    if (redisEntries.length > 0) {
+      const userIds = redisEntries.map((e) => e.userId);
+      const userRows = await ctx.db
+        .select({ id: users.id, name: users.name })
+        .from(users)
+        .where(inArray(users.id, userIds));
+      const nameMap = new Map(userRows.map((u) => [u.id, u.name]));
+
+      const myRank = await lb.getRank(
+        ctx.redis,
+        ctx.user.userId,
+        myEntry.leagueTier,
+        myEntry.seasonWeek,
+      );
+
+      return {
+        entries: redisEntries.map((e, i) => ({
+          rank: i + 1,
+          userId: e.userId,
+          name: nameMap.get(e.userId) ?? null,
+          weeklyXp: e.xp,
+        })),
+        myRank,
+        tier: myEntry.leagueTier,
+      };
+    }
+
     const entries = await ctx.db
       .select({
         userId: leagueEntries.userId,
@@ -171,6 +206,16 @@ export const gamificationRouter = t.router({
       )
       .orderBy(desc(leagueEntries.weeklyXp))
       .limit(LEAGUE.USERS_PER_LEAGUE);
+
+    await lb.syncFromDB(
+      ctx.redis,
+      entries.map((e) => ({
+        userId: e.userId,
+        weeklyXp: e.weeklyXp,
+        leagueTier: myEntry.leagueTier,
+        seasonWeek: myEntry.seasonWeek,
+      })),
+    );
 
     const myRank = entries.findIndex((e) => e.userId === ctx.user.userId) + 1;
 

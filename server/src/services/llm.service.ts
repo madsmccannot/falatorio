@@ -72,6 +72,39 @@ export async function explainGrammarError(
   return textBlock?.text ?? "";
 }
 
+export async function explainExerciseError(
+  exerciseType: string,
+  userAnswer: string,
+  correctAnswer: string,
+  rule: string,
+  l1: string,
+  knowledgeItemCode: string,
+  errorCount: number,
+): Promise<string> {
+  const depth = errorCount >= 3 ? "detailed" : "brief";
+  const response = await client.messages.create({
+    model: "claude-sonnet-5-20250514",
+    max_tokens: depth === "detailed" ? 600 : 300,
+    system: `You are a Portuguese (PT-EU) tutor. The student's L1 is ${l1}. Explain exercise errors in a way native ${l1} speakers understand. Use European Portuguese ONLY. Be ${depth}. If the student has made this error ${errorCount} times, explain from a different angle or use an L1 comparison.`,
+    messages: [
+      {
+        role: "user",
+        content: `Exercise type: ${exerciseType}
+Knowledge item: ${knowledgeItemCode}
+Rule: ${rule}
+Student answered: "${userAnswer}"
+Correct answer: "${correctAnswer}"
+Times failed: ${errorCount}
+
+Explain why the student's answer is wrong and how to remember the correct form.`,
+      },
+    ],
+  });
+
+  const textBlock = response.content.find((b) => b.type === "text");
+  return textBlock?.text ?? "";
+}
+
 function buildTutorSystemPrompt(scenarioId: string, l1: string): string {
   return `You are a Portuguese (PT-EU) conversation tutor running scenario "${scenarioId}".
 The student's native language is ${l1}. Stay in character for the scenario.

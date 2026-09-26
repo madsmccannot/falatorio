@@ -20,6 +20,7 @@ import { shopRouter } from "../routers/shop.router.js";
 import { heartsRouter } from "../routers/hearts.router.js";
 import { adsRouter } from "../routers/ads.router.js";
 import { masteryRouter } from "../routers/mastery.router.js";
+import { qualityRouter } from "../routers/quality.router.js";
 
 export const appRouter = t.router({
   health: t.procedure.query(() => ({
@@ -39,6 +40,7 @@ export const appRouter = t.router({
   hearts: heartsRouter,
   ads: adsRouter,
   mastery: masteryRouter,
+  quality: qualityRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -16,8 +16,10 @@ export {
 } from "./session-state.js";
 export {
   selectExercises,
+  selectAdaptive,
   type CandidateExercise,
   type SelectionConfig,
+  type AdaptiveSelectionInput,
 } from "./adaptive-selector.js";
 export {
   createPlacementState,
@@ -29,3 +31,18 @@ export {
   type PlacementQuestion,
   type PlacementResult,
 } from "./placement.js";
+export {
+  analyzeErrors,
+  escalate,
+  shouldTriggerExplanation,
+  getExplanationContext,
+  type ErrorRecord,
+  type ErrorPattern,
+  type ErrorEscalation,
+} from "./error-engine.js";
+export {
+  computeDifficulty,
+  selectCognitiveLevel,
+  type DifficultyProfile,
+  type DifficultyInput,
+} from "./difficulty-controller.js";
