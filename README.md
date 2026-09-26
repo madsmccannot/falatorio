@@ -26,7 +26,7 @@ falatorio/
 |-------|-----------|
 | Mobile | React Native 0.86, Expo SDK 57, expo-router, Reanimated 4.5, Gesture Handler |
 | Server | Fastify 5, tRPC 11, superjson |
-| Database | PostgreSQL (Neon), Drizzle ORM, 17 schema tables |
+| Database | PostgreSQL (Neon), Drizzle ORM, 23 schema tables |
 | Cache/Queue | Redis (ioredis), BullMQ (6 queues) |
 | Auth | Clerk (JWT, cached in Redis) — optional, app runs in preview mode without it |
 | CMS | Payload CMS v3, PostgreSQL adapter, R2 storage |
@@ -44,13 +44,21 @@ Every source language is a separate product. Each L1 profile contains phonetic t
 
 Phase 1 languages (en, es, fr, hi, ur, ar, bn) have full production profiles: 15-40 false friends, 12-15 phonetic difficulties, 12-15 grammar gaps, 15-30 cognates, and 15-25 cultural references per language. Phase 2 languages (de, zh, ru, uk, tr, pl, ko, ja) have functional stubs.
 
+### Skill / Knowledge / Mastery Model
+
+The pedagogical layer sits on top of the course tree. Skills represent linguistic competencies (e.g. `PT.VERBS.PRESENT`, `PT.SYNTAX.SUBORDINATION.CAUSAL`), each decomposed into atomic KnowledgeItems. Every exercise is linked to one or more KnowledgeItems via the `exercise_knowledge` bridge table, so results flow into per-skill mastery scores rather than just per-exercise progress.
+
+Mastery is calculated from 3 weighted signals: accuracy (recent performance, 50%), variety (exercise type diversity, 25%), and production ratio (harder output tasks vs recognition, 25%). Confidence factors in repetition count, variety, and recency. CEFR level is estimated per user by aggregating skill mastery across levels, with an explicit confidence percentage — never a binary label.
+
+The mastery logic is deterministic and auditable (`packages/core/src/mastery/`). AI does not drive the adaptive engine; it generates content for a structured exercise bank.
+
 ### Dynamic Content Generation
 
 Exercises are not statically authored. L1 profiles provide seed knowledge (false friends, grammar gaps, phonetic difficulties, cognates, cultural references), and AI generates personalized exercises dynamically based on the user's L1, CEFR level, and demonstrated weaknesses. Generated exercises are stored in the database so they are not regenerated. The seed content service creates the course structure (courses, units, lessons) per L1, while exercises fill in dynamically on demand.
 
 ### FSRS (Free Spaced Repetition Scheduler)
 
-Exercises are scheduled using the FSRS algorithm. The system tracks stability, difficulty, and optimal review intervals per exercise per user.
+Exercises are scheduled using the FSRS algorithm. The system tracks stability, difficulty, and optimal review intervals per exercise per user. FSRS also feeds into the mastery layer — review results produce skill evidence alongside spaced repetition state.
 
 ### Economy
 
@@ -90,15 +98,16 @@ Pure business logic, zero dependencies on I/O or frameworks:
 - **FSRS** — scheduler, rating, card state machine
 - **Scoring** — text scorer, speech scorer, PT-EU phonetic rules
 - **Lesson** — session state, adaptive exercise selector, placement test
+- **Mastery** — evidence recorder, mastery calculator (accuracy/variety/production weights), CEFR estimator with confidence scores
 - **Economy** — currency ops, earn/spend rules, shop catalog, IAP tiers
 - **Entitlements** — feature gates, heart system, access checks
 - **Gamification** — XP calculator, streak logic, league promotion, achievements
 - **Ads** — ad policy (GDPR, tier, cooldowns)
 - **L1 Profiles** — 15 language transfer profiles with cultural content (7 fully expanded)
 
-### `packages/db` — 17 schema tables
+### `packages/db` — 23 schema tables
 
-Users, courses, units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content. Initial Drizzle migration generated.
+Users, courses, units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge, skill evidence, skill mastery. Initial Drizzle migration generated.
 
 ### `server` — 12 routers, 7 services, 6 jobs
 
