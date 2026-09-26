@@ -11,10 +11,16 @@ interface Exercise {
   difficulty: number;
 }
 
+interface PunctuationWarning {
+  type: "missing_accent" | "missing_punctuation";
+  message: string;
+}
+
 interface FeedbackState {
   correct: boolean;
   correctAnswer?: string;
   l1Tip?: string;
+  warnings?: PunctuationWarning[];
 }
 
 type LessonPhase = "loading" | "answering" | "complete";
@@ -95,6 +101,7 @@ export function useLesson(lessonId?: string) {
         correct: result.correct,
         correctAnswer: (result as Record<string, unknown>)["correctAnswer"] as string | undefined,
         l1Tip: (result as Record<string, unknown>)["l1Tip"] as string | undefined,
+        warnings: (result as Record<string, unknown>)["warnings"] as PunctuationWarning[] | undefined,
       },
       results: [...prev.results, {
         correct: result.correct,

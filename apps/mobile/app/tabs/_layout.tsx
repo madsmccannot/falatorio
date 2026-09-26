@@ -13,20 +13,16 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel: false,
         tabBarActiveTintColor: theme.tabActive,
         tabBarInactiveTintColor: theme.tabInactive,
         tabBarStyle: {
           backgroundColor: theme.tabBar,
           borderTopColor: theme.tabBarBorder,
           borderTopWidth: 1,
-          paddingTop: 6,
-          paddingBottom: Math.max(insets.bottom, 12),
-          height: 56 + Math.max(insets.bottom, 12),
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: "600",
-          marginTop: 2,
+          paddingTop: 8,
+          paddingBottom: Math.max(insets.bottom, 8),
+          height: 48 + Math.max(insets.bottom, 8),
         },
       }}
     >

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
 import { useEntitlements } from "@/hooks/useEntitlements";
-import { Card } from "@/components/ui/Card";
+import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
@@ -22,21 +22,24 @@ const SCENARIOS = [
 export default function ScenariosScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const theme = useTheme();
   const { t } = useTranslation();
   const { isSuper } = useEntitlements();
   const session = trpc.auth.getSession.useQuery();
   const userLevel = session.data?.cefrLevel ?? "A1";
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t("scenarios.title")}</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.title, { color: theme.text }]}>{t("scenarios.title")}</Text>
+        <Text style={[styles.subtitle, { color: theme.textMuted }]}>
           {t("scenarios.subtitle")}
         </Text>
         {!isSuper && (
-          <View style={styles.limitBadge}>
-            <Text style={styles.limitText}>{t("scenarios.limit")}</Text>
+          <View style={[styles.limitBadge, { backgroundColor: theme.isDark ? "#3B1A1A" : colors.accent[50] }]}>
+            <Text style={[styles.limitText, { color: theme.isDark ? "#F87171" : colors.accent[700] }]}>
+              {t("scenarios.limit")}
+            </Text>
           </View>
         )}
       </View>
@@ -60,20 +63,22 @@ export default function ScenariosScreen() {
               }}
               style={{ opacity: locked ? 0.5 : 1 }}
             >
-              <Card elevated style={styles.scenarioCard}>
+              <View style={[styles.scenarioCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
                 <View style={styles.scenarioHeader}>
-                  <Text style={styles.scenarioTitle}>{item.title}</Text>
-                  <View style={styles.cefrBadge}>
-                    <Text style={styles.cefrText}>{item.cefrMin}+</Text>
+                  <Text style={[styles.scenarioTitle, { color: theme.text }]}>{item.title}</Text>
+                  <View style={[styles.cefrBadge, { backgroundColor: theme.isDark ? colors.primary[900] : colors.primary[50] }]}>
+                    <Text style={[styles.cefrText, { color: theme.isDark ? colors.primary[300] : colors.primary[700] }]}>
+                      {item.cefrMin}+
+                    </Text>
                   </View>
                 </View>
-                <Text style={styles.scenarioDesc}>{item.description}</Text>
+                <Text style={[styles.scenarioDesc, { color: theme.textMuted }]}>{item.description}</Text>
                 {locked && (
-                  <Text style={styles.lockedText}>
+                  <Text style={[styles.lockedText, { color: theme.textMuted }]}>
                     {t("scenarios.unlock").replace("{{level}}", item.cefrMin)}
                   </Text>
                 )}
-              </Card>
+              </View>
             </Pressable>
           );
         }}
@@ -85,7 +90,6 @@ export default function ScenariosScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
   },
   header: {
     paddingHorizontal: spacing.lg,
@@ -95,18 +99,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.sizes["2xl"],
     fontWeight: "700",
-    color: colors.neutral[900],
   },
   subtitle: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[500],
     marginTop: spacing.xs,
     lineHeight: 20,
   },
   limitBadge: {
     alignSelf: "flex-start",
     marginTop: spacing.sm,
-    backgroundColor: colors.accent[50],
     borderRadius: radii.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
@@ -114,7 +115,6 @@ const styles = StyleSheet.create({
   limitText: {
     fontSize: typography.sizes.xs,
     fontWeight: "600",
-    color: colors.accent[700],
   },
   list: {
     paddingHorizontal: spacing.lg,
@@ -122,6 +122,9 @@ const styles = StyleSheet.create({
   },
   scenarioCard: {
     marginBottom: spacing.md,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    padding: spacing.lg,
   },
   scenarioHeader: {
     flexDirection: "row",
@@ -132,11 +135,9 @@ const styles = StyleSheet.create({
   scenarioTitle: {
     fontSize: typography.sizes.md,
     fontWeight: "700",
-    color: colors.neutral[900],
     flex: 1,
   },
   cefrBadge: {
-    backgroundColor: colors.primary[50],
     borderRadius: radii.sm,
     paddingHorizontal: spacing.xs,
     paddingVertical: 1,
@@ -144,16 +145,13 @@ const styles = StyleSheet.create({
   cefrText: {
     fontSize: typography.sizes.xs,
     fontWeight: "600",
-    color: colors.primary[700],
   },
   scenarioDesc: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[500],
     lineHeight: 20,
   },
   lockedText: {
     fontSize: typography.sizes.xs,
-    color: colors.neutral[400],
     marginTop: spacing.xs,
     fontStyle: "italic",
   },

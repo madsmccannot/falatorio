@@ -1,18 +1,24 @@
 import React from "react";
-import { Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
+type PunctuationWarning = {
+  type: "missing_accent" | "missing_punctuation";
+  message: string;
+};
+
 type Props = {
   correct: boolean;
   correctAnswer?: string;
   l1Tip?: string;
+  warnings?: PunctuationWarning[];
   onContinue: () => void;
 };
 
-export function FeedbackOverlay({ correct, correctAnswer, l1Tip, onContinue }: Props) {
+export function FeedbackOverlay({ correct, correctAnswer, l1Tip, warnings, onContinue }: Props) {
   React.useEffect(() => {
     if (correct) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -21,17 +27,27 @@ export function FeedbackOverlay({ correct, correctAnswer, l1Tip, onContinue }: P
     }
   }, []);
 
+  const hasWarnings = warnings && warnings.length > 0;
+
   return (
     <Animated.View
       entering={SlideInDown.duration(250)}
-      style={[styles.container, correct ? styles.correct : styles.wrong]}
+      style={[styles.container, correct ? (hasWarnings ? styles.correctWarning : styles.correct) : styles.wrong]}
     >
       <Text style={styles.title}>
-        {correct ? "Correct!" : "Not quite"}
+        {correct ? (hasWarnings ? "Almost perfect!" : "Correct!") : "Not quite"}
       </Text>
 
       {!correct && correctAnswer && (
         <Text style={styles.answer}>Correct answer: {correctAnswer}</Text>
+      )}
+
+      {hasWarnings && (
+        <View style={styles.warningBox}>
+          {warnings.map((w, i) => (
+            <Text key={i} style={styles.warningText}>{w.message}</Text>
+          ))}
+        </View>
       )}
 
       {l1Tip && (
@@ -58,6 +74,9 @@ const styles = StyleSheet.create({
   correct: {
     backgroundColor: "#ECFDF5",
   },
+  correctWarning: {
+    backgroundColor: "#FFFBEB",
+  },
   wrong: {
     backgroundColor: "#FFF1F2",
   },
@@ -71,6 +90,17 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     color: colors.neutral[700],
     marginBottom: spacing.xs,
+  },
+  warningBox: {
+    backgroundColor: "#FEF3C7",
+    borderRadius: radii.md,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  warningText: {
+    fontSize: typography.sizes.sm,
+    color: "#92400E",
+    lineHeight: 18,
   },
   tip: {
     fontSize: typography.sizes.sm,

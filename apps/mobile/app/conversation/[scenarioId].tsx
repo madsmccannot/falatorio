@@ -16,6 +16,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { Modal } from "@/components/ui/Modal";
+import { useTheme } from "@/lib/theme";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Message = {
@@ -29,12 +30,14 @@ export default function ConversationScreen() {
   const { scenarioId } = useLocalSearchParams<{ scenarioId: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
   const flatListRef = useRef<FlatList>(null);
 
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState("");
   const [sessionId, setSessionId] = React.useState<string | null>(null);
   const [selectedError, setSelectedError] = React.useState<Message["errors"]>(undefined);
+  const [startError, setStartError] = React.useState(false);
 
   const startMutation = trpc.conversation.startSession.useMutation();
   const sendMutation = trpc.conversation.sendMessage.useMutation();
@@ -42,15 +45,19 @@ export default function ConversationScreen() {
 
   React.useEffect(() => {
     (async () => {
-      const result = await startMutation.mutateAsync({ scenarioId: scenarioId! });
-      setSessionId(result.sessionId);
-      setMessages([
-        {
-          id: "tutor-0",
-          role: "tutor",
-          text: "Olá! Vamos praticar português. Diz-me alguma coisa!",
-        },
-      ]);
+      try {
+        const result = await startMutation.mutateAsync({ scenarioId: scenarioId! });
+        setSessionId(result.sessionId);
+        setMessages([
+          {
+            id: "tutor-0",
+            role: "tutor",
+            text: "Ola! Vamos praticar portugues. Diz-me alguma coisa!",
+          },
+        ]);
+      } catch {
+        setStartError(true);
+      }
     })();
   }, []);
 
@@ -66,41 +73,71 @@ export default function ConversationScreen() {
     };
     setMessages((prev) => [...prev, userMsg]);
 
-    const result = await sendMutation.mutateAsync({
-      sessionId,
-      message: userText,
-    });
+    try {
+      const result = await sendMutation.mutateAsync({
+        sessionId,
+        message: userText,
+      });
 
-    const tutorMsg: Message = {
-      id: `tutor-${Date.now()}`,
-      role: "tutor",
-      text: result.reply,
-      errors: result.errors?.length ? result.errors : undefined,
-    };
-    setMessages((prev) => [...prev, tutorMsg]);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const tutorMsg: Message = {
+        id: `tutor-${Date.now()}`,
+        role: "tutor",
+        text: result.reply,
+        errors: result.errors?.length ? result.errors : undefined,
+      };
+      setMessages((prev) => [...prev, tutorMsg]);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch {
+      const errorMsg: Message = {
+        id: `error-${Date.now()}`,
+        role: "tutor",
+        text: "Something went wrong. Try again.",
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    }
   };
 
   const handleEnd = async () => {
     if (sessionId) {
-      await completeMutation.mutateAsync({ sessionId });
+      try {
+        await completeMutation.mutateAsync({ sessionId });
+      } catch {}
     }
     router.back();
   };
 
-  if (startMutation.isPending) {
-    return <Loading fullScreen message="Starting conversation..." />;
+  if (startError) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg, justifyContent: "center", alignItems: "center" }]}>
+        <Text style={[styles.errorText, { color: theme.text }]}>
+          Could not start conversation.
+        </Text>
+        <Button title="Go back" onPress={() => router.back()} style={{ marginTop: spacing.md }} />
+      </View>
+    );
   }
+
+  if (startMutation.isPending) {
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.bg }}>
+        <Loading fullScreen message="Starting conversation..." />
+      </View>
+    );
+  }
+
+  const userBubbleBg = colors.primary[600];
+  const tutorBubbleBg = theme.isDark ? theme.bgCard : colors.neutral[0];
+  const tutorBorderColor = theme.border;
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { paddingTop: insets.top }]}
+      style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={0}
     >
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { borderBottomColor: theme.border, backgroundColor: theme.bgElevated }]}>
         <Button title="End" onPress={handleEnd} variant="ghost" size="sm" />
-        <Text style={styles.topTitle}>{scenarioId}</Text>
+        <Text style={[styles.topTitle, { color: theme.text }]}>{scenarioId}</Text>
         <View style={{ width: 50 }} />
       </View>
 
@@ -117,13 +154,17 @@ export default function ConversationScreen() {
             entering={FadeInUp.duration(200)}
             style={[
               styles.bubble,
-              item.role === "user" ? styles.userBubble : styles.tutorBubble,
+              item.role === "user"
+                ? [styles.userBubble, { backgroundColor: userBubbleBg }]
+                : [styles.tutorBubble, { backgroundColor: tutorBubbleBg, borderColor: tutorBorderColor }],
             ]}
           >
             <Text
               style={[
                 styles.bubbleText,
-                item.role === "user" ? styles.userText : styles.tutorText,
+                item.role === "user"
+                  ? styles.userText
+                  : { color: theme.text },
               ]}
             >
               {item.text}
@@ -143,17 +184,17 @@ export default function ConversationScreen() {
 
       {sendMutation.isPending && (
         <View style={styles.typing}>
-          <Text style={styles.typingText}>Tutor is typing...</Text>
+          <Text style={[styles.typingText, { color: theme.textMuted }]}>Tutor is typing...</Text>
         </View>
       )}
 
-      <View style={[styles.inputBar, { paddingBottom: insets.bottom + spacing.sm }]}>
+      <View style={[styles.inputBar, { paddingBottom: insets.bottom + spacing.sm, borderTopColor: theme.border, backgroundColor: theme.bgElevated }]}>
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, { backgroundColor: theme.bgInput, color: theme.text }]}
           value={input}
           onChangeText={setInput}
           placeholder="Type in Portuguese..."
-          placeholderTextColor={colors.neutral[400]}
+          placeholderTextColor={theme.textMuted}
           multiline
           maxLength={500}
           editable={!sendMutation.isPending}
@@ -171,12 +212,12 @@ export default function ConversationScreen() {
         visible={!!selectedError}
         onDismiss={() => setSelectedError(undefined)}
       >
-        <Text style={styles.modalTitle}>Errors in your message</Text>
+        <Text style={[styles.modalTitle, { color: theme.text }]}>Errors in your message</Text>
         {selectedError?.map((err, i) => (
-          <View key={i} style={styles.errorCard}>
+          <View key={i} style={[styles.errorCard, { backgroundColor: theme.bgInput }]}>
             <Text style={styles.errorFragment}>"{err.userSaid}"</Text>
             <Text style={styles.errorCorrection}>{err.correct}</Text>
-            <Text style={styles.errorExplanation}>{err.explanation}</Text>
+            <Text style={[styles.errorExplanation, { color: theme.textSecondary }]}>{err.explanation}</Text>
           </View>
         ))}
         <Button
@@ -192,7 +233,6 @@ export default function ConversationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
   },
   topBar: {
     flexDirection: "row",
@@ -201,14 +241,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[200],
-    backgroundColor: colors.neutral[0],
   },
   topTitle: {
     fontSize: typography.sizes.md,
     fontWeight: "600",
-    color: colors.neutral[900],
     textTransform: "capitalize",
+  },
+  errorText: {
+    fontSize: typography.sizes.md,
+    fontWeight: "600",
+    textAlign: "center",
   },
   messageList: {
     padding: spacing.lg,
@@ -222,15 +264,12 @@ const styles = StyleSheet.create({
   },
   userBubble: {
     alignSelf: "flex-end",
-    backgroundColor: colors.primary[600],
     borderBottomRightRadius: radii.xs,
   },
   tutorBubble: {
     alignSelf: "flex-start",
-    backgroundColor: colors.neutral[0],
     borderBottomLeftRadius: radii.xs,
     borderWidth: 1,
-    borderColor: colors.neutral[200],
   },
   bubbleText: {
     fontSize: typography.sizes.md,
@@ -238,9 +277,6 @@ const styles = StyleSheet.create({
   },
   userText: {
     color: "#FFFFFF",
-  },
-  tutorText: {
-    color: colors.neutral[900],
   },
   errorButton: {
     alignSelf: "flex-start",
@@ -252,7 +288,6 @@ const styles = StyleSheet.create({
   },
   typingText: {
     fontSize: typography.sizes.xs,
-    color: colors.neutral[400],
     fontStyle: "italic",
   },
   inputBar: {
@@ -261,29 +296,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: colors.neutral[200],
-    backgroundColor: colors.neutral[0],
     gap: spacing.sm,
   },
   textInput: {
     flex: 1,
     minHeight: 40,
     maxHeight: 100,
-    backgroundColor: colors.neutral[50],
     borderRadius: radii.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     fontSize: typography.sizes.md,
-    color: colors.neutral[900],
   },
   modalTitle: {
     fontSize: typography.sizes.lg,
     fontWeight: "700",
-    color: colors.neutral[900],
     marginBottom: spacing.md,
   },
   errorCard: {
-    backgroundColor: colors.neutral[50],
     borderRadius: radii.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -302,7 +331,6 @@ const styles = StyleSheet.create({
   },
   errorExplanation: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[600],
     lineHeight: 18,
   },
 });

@@ -41,54 +41,55 @@ function TRPCWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AuthenticatedNavigator() {
-  const { ClerkProvider, useAuth } = require("@clerk/clerk-expo");
+function AuthInner() {
+  const { useAuth } = require("@clerk/clerk-expo");
+  const { isLoaded, isSignedIn } = useAuth();
   const bg = useStackBg();
 
-  function Inner() {
-    const { isLoaded, isSignedIn } = useAuth();
+  useEffect(() => {
+    if (isLoaded) SplashScreen.hideAsync();
+  }, [isLoaded]);
 
-    useEffect(() => {
-      if (isLoaded) SplashScreen.hideAsync();
-    }, [isLoaded]);
+  if (!isLoaded) return null;
 
-    if (!isLoaded) return null;
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: bg },
+        animation: "slide_from_right",
+      }}
+    >
+      {!isSignedIn ? (
+        <Stack.Screen name="onboarding" />
+      ) : (
+        <>
+          <Stack.Screen name="tabs" />
+          <Stack.Screen
+            name="lesson"
+            options={{ gestureEnabled: false, animation: "slide_from_bottom" }}
+          />
+          <Stack.Screen name="conversation" />
+          <Stack.Screen
+            name="shop"
+            options={{ animation: "slide_from_bottom" }}
+          />
+          <Stack.Screen
+            name="settings"
+            options={{ animation: "slide_from_right" }}
+          />
+        </>
+      )}
+    </Stack>
+  );
+}
 
-    return (
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: bg },
-          animation: "slide_from_right",
-        }}
-      >
-        {!isSignedIn ? (
-          <Stack.Screen name="onboarding" />
-        ) : (
-          <>
-            <Stack.Screen name="tabs" />
-            <Stack.Screen
-              name="lesson"
-              options={{ gestureEnabled: false, animation: "slide_from_bottom" }}
-            />
-            <Stack.Screen name="conversation" />
-            <Stack.Screen
-              name="shop"
-              options={{ animation: "slide_from_bottom" }}
-            />
-            <Stack.Screen
-              name="settings"
-              options={{ animation: "slide_from_right" }}
-            />
-          </>
-        )}
-      </Stack>
-    );
-  }
+function AuthenticatedNavigator() {
+  const { ClerkProvider } = require("@clerk/clerk-expo");
 
   return (
     <ClerkProvider publishableKey={CLERK_KEY} tokenCache={tokenCache}>
-      <Inner />
+      <AuthInner />
     </ClerkProvider>
   );
 }

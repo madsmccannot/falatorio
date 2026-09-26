@@ -1,4 +1,4 @@
-export { scoreTextAnswer, type TextScoreResult } from "./text-scorer.js";
+export { scoreTextAnswer, type TextScoreResult, type PunctuationWarning } from "./text-scorer.js";
 export { scoreSpeechAnswer, type SpeechScoreResult } from "./speech-scorer.js";
 export {
   normalizeForComparison,

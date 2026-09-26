@@ -1,11 +1,17 @@
 import { normalizeForComparison } from "./phonetic-rules-pteu.js";
 import type { CognitiveLevel } from "../constants.js";
 
+export interface PunctuationWarning {
+  type: "missing_accent" | "missing_punctuation";
+  message: string;
+}
+
 export interface TextScoreResult {
   correct: boolean;
   score: number;
   matchedAnswer: string | null;
   feedback: "correct" | "close" | "incorrect";
+  warnings: PunctuationWarning[];
 }
 
 interface Thresholds {
@@ -55,13 +61,51 @@ function similarity(a: string, b: string): number {
   return 1 - levenshteinDistance(a, b) / maxLen;
 }
 
+function stripPunctuation(text: string): string {
+  return text.replace(/[.,;:!?¡¿\-—""''«»()[\]{}…]/g, "").replace(/\s+/g, " ").trim();
+}
+
+function stripAccents(text: string): string {
+  return text.normalize("NFD").replace(/[̀-ͯ]/g, "").normalize("NFC");
+}
+
+function detectPunctuationWarnings(userAnswer: string, matchedAnswer: string): PunctuationWarning[] {
+  const warnings: PunctuationWarning[] = [];
+
+  const userStripped = stripAccents(userAnswer.toLowerCase());
+  const matchedStripped = stripAccents(matchedAnswer.toLowerCase());
+  const userNorm = userAnswer.toLowerCase();
+  const matchedNorm = matchedAnswer.toLowerCase();
+
+  if (userStripped === matchedStripped && userNorm !== matchedNorm) {
+    warnings.push({
+      type: "missing_accent",
+      message: "Watch out for accents - they can change meaning in Portuguese (e.g. avo/avo, la/la).",
+    });
+  }
+
+  const userNoPunct = stripPunctuation(userAnswer);
+  const matchedNoPunct = stripPunctuation(matchedAnswer);
+  if (userNoPunct.toLowerCase() === matchedNoPunct.toLowerCase() && userAnswer.trim() !== matchedAnswer.trim()) {
+    const hasMissingAccent = warnings.length > 0;
+    if (!hasMissingAccent) {
+      warnings.push({
+        type: "missing_punctuation",
+        message: "Pay attention to punctuation - it helps clarify meaning.",
+      });
+    }
+  }
+
+  return warnings;
+}
+
 export function scoreTextAnswer(
   userAnswer: string,
   acceptedAnswers: readonly string[],
   cognitiveLevel?: CognitiveLevel,
 ): TextScoreResult {
   if (acceptedAnswers.length === 0) {
-    return { correct: false, score: 0, matchedAnswer: null, feedback: "incorrect" };
+    return { correct: false, score: 0, matchedAnswer: null, feedback: "incorrect", warnings: [] };
   }
 
   const normalizedUser = normalizeForComparison(userAnswer);
@@ -82,13 +126,49 @@ export function scoreTextAnswer(
     ? COGNITIVE_THRESHOLDS[cognitiveLevel]
     : DEFAULT_THRESHOLDS;
 
-  const correct = bestScore >= thresholds.correct;
+  let correct = bestScore >= thresholds.correct;
   const close = bestScore >= thresholds.close;
+  let warnings: PunctuationWarning[] = [];
+
+  if (!correct && bestMatch) {
+    const userNoPunct = stripPunctuation(userAnswer).toLowerCase();
+    const matchNoPunct = stripPunctuation(bestMatch).toLowerCase();
+    const userNoAccent = stripAccents(userNoPunct);
+    const matchNoAccent = stripAccents(matchNoPunct);
+
+    if (userNoAccent === matchNoAccent) {
+      correct = true;
+      bestScore = 1;
+
+      if (userNoPunct !== matchNoPunct) {
+        warnings.push({
+          type: "missing_accent",
+          message: "Watch out for accents - they can change meaning in Portuguese (e.g. avo/avo, la/la).",
+        });
+      }
+
+      if (stripPunctuation(userAnswer.trim()) !== stripPunctuation(bestMatch.trim()) ||
+          userAnswer.trim().length !== bestMatch.trim().length) {
+        const hasAccentWarning = warnings.some(w => w.type === "missing_accent");
+        if (!hasAccentWarning) {
+          warnings.push({
+            type: "missing_punctuation",
+            message: "Pay attention to punctuation - it helps clarify meaning.",
+          });
+        }
+      }
+    }
+  }
+
+  if (correct && bestMatch && warnings.length === 0) {
+    warnings = detectPunctuationWarnings(userAnswer, bestMatch);
+  }
 
   return {
     correct,
     score: bestScore,
     matchedAnswer: bestMatch,
     feedback: correct ? "correct" : close ? "close" : "incorrect",
+    warnings,
   };
 }

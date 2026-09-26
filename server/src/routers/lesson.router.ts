@@ -270,6 +270,7 @@ export const lessonRouter = t.router({
         score: result.score,
         feedback: result.feedback,
         matchedAnswer: result.matchedAnswer,
+        warnings: result.warnings,
         heartsRemaining,
         outOfHearts,
         l1Tip,

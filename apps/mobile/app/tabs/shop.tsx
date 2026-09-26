@@ -1,11 +1,10 @@
-import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
 import { useOuro } from "@/hooks/useOuro";
 import { useEntitlements } from "@/hooks/useEntitlements";
-import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { GoldPrisms, CrownIcon, HeartIcon, FlameIcon, ShieldIcon, TimerIcon } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
@@ -13,11 +12,11 @@ import { useTranslation } from "@/lib/i18n";
 import type { TKey } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
-const PREVIEW_ITEMS: { id: string; nameKey: TKey; price: number; icon: string; color: string }[] = [
-  { id: "hearts_refill", nameKey: "shop.hearts_refill", price: 350, icon: "heart", color: colors.heart },
-  { id: "streak_freeze", nameKey: "shop.streak_freeze", price: 200, icon: "shield", color: colors.info },
-  { id: "double_xp", nameKey: "shop.double_xp", price: 500, icon: "flame", color: colors.xp },
-  { id: "timer_boost", nameKey: "shop.timer_boost", price: 150, icon: "timer", color: colors.streak },
+const PREVIEW_ITEMS: { id: string; nameKey: TKey; descKey: TKey | null; price: number; icon: string; color: string }[] = [
+  { id: "hearts_refill", nameKey: "shop.hearts_refill", descKey: null, price: 350, icon: "heart", color: colors.heart },
+  { id: "streak_freeze", nameKey: "shop.streak_freeze", descKey: null, price: 200, icon: "shield", color: colors.info },
+  { id: "double_xp", nameKey: "shop.double_xp", descKey: null, price: 500, icon: "flame", color: colors.xp },
+  { id: "timer_boost", nameKey: "shop.timer_boost", descKey: null, price: 150, icon: "timer", color: colors.streak },
 ];
 
 function ItemIcon({ type, size, color }: { type: string; size: number; color: string }) {
@@ -26,7 +25,7 @@ function ItemIcon({ type, size, color }: { type: string; size: number; color: st
     case "shield": return <ShieldIcon size={size} color={color} />;
     case "flame": return <FlameIcon size={size} color={color} />;
     case "timer": return <TimerIcon size={size} color={color} />;
-    default: return <GoldPrisms size={size} color={color} />;
+    default: return <GoldPrisms size={size} />;
   }
 }
 
@@ -49,10 +48,11 @@ export default function ShopScreen() {
     await utils.shop.listItems.invalidate();
   };
 
-  const shopItems = (items.data && items.data.length > 0) ? items.data : null;
-
   return (
-    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.bg }]}
+      contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom + 100 }}
+    >
       <View style={styles.header}>
         <Text style={[styles.title, { color: theme.text }]}>{t("shop.title")}</Text>
         <View style={[styles.balanceChip, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
@@ -64,87 +64,94 @@ export default function ShopScreen() {
       {!isSuper && (
         <Pressable
           onPress={() => router.push("/shop/super-detail")}
-          style={[styles.superBanner, { backgroundColor: theme.superBanner }]}
+          style={[styles.superBanner]}
         >
-          <View style={styles.superRow}>
+          <View style={styles.superGradient}>
             <View style={styles.superLeft}>
-              <Text style={[styles.superTitle, { color: theme.superBannerText }]}>
-                {t("shop.upgrade_title")}
-              </Text>
-              <Text style={[styles.superSubtitle, { color: theme.textMuted }]}>
-                {t("shop.upgrade_desc")}
-              </Text>
-              <Text style={styles.superCta}>{t("shop.trial_cta")}</Text>
+              <Text style={styles.superLabel}>SUPER</Text>
+              <Text style={styles.superTitle}>{t("shop.upgrade_title")}</Text>
+              <Text style={styles.superSubtitle}>{t("shop.upgrade_desc")}</Text>
+              <View style={styles.superCtaRow}>
+                <Text style={styles.superCtaText}>{t("shop.trial_cta")}</Text>
+              </View>
             </View>
-            <CrownIcon size={40} color={colors.ouro} />
+            <CrownIcon size={48} color={colors.ouro} />
           </View>
         </Pressable>
       )}
 
+      <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
+        {t("shop.available")}
+      </Text>
+
       {items.isLoading ? (
         <Loading message={t("shop.loading")} />
-      ) : shopItems ? (
-        <FlatList
-          data={shopItems}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => {
-            const name = (item.name as Record<string, string>)["pt"] ?? (item.name as Record<string, string>)["en"] ?? item.id;
-            const canAfford = item.priceOuro !== null && balance >= item.priceOuro;
-
+      ) : (
+        <View style={styles.itemsList}>
+          {PREVIEW_ITEMS.map(item => {
+            const canAfford = balance >= item.price;
             return (
-              <View style={[styles.itemCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-                <Text style={[styles.itemName, { color: theme.text }]} numberOfLines={2}>
-                  {name}
-                </Text>
-                {item.priceOuro !== null && (
-                  <Button
-                    title={`${item.priceOuro} ouro`}
-                    onPress={() => handlePurchase(item.id)}
-                    variant={canAfford ? "primary" : "secondary"}
-                    size="sm"
-                    disabled={!canAfford || purchaseMutation.isPending}
-                    loading={purchaseMutation.isPending}
-                    style={styles.buyButton}
-                  />
-                )}
+              <View
+                key={item.id}
+                style={[styles.itemCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
+              >
+                <View style={[styles.itemIconBg, { backgroundColor: item.color + "20" }]}>
+                  <ItemIcon type={item.icon} size={24} color={item.color} />
+                </View>
+                <View style={styles.itemInfo}>
+                  <Text style={[styles.itemName, { color: theme.text }]}>{t(item.nameKey)}</Text>
+                  <View style={styles.itemPriceRow}>
+                    <GoldPrisms size={14} />
+                    <Text style={[styles.itemPriceText, { color: colors.ouro }]}>{item.price}</Text>
+                  </View>
+                </View>
+                <Pressable
+                  onPress={() => {
+                    if (!canAfford) return;
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    handlePurchase(item.id);
+                  }}
+                  disabled={!canAfford || purchaseMutation.isPending}
+                  style={[
+                    styles.buyPill,
+                    canAfford
+                      ? { backgroundColor: colors.primary[500] }
+                      : { backgroundColor: theme.isDark ? "#1E2D45" : "#E2E8F0" },
+                  ]}
+                >
+                  <GoldPrisms size={12} />
+                  <Text style={[
+                    styles.buyPillText,
+                    canAfford
+                      ? { color: "#FFFFFF" }
+                      : { color: theme.textMuted },
+                  ]}>
+                    {item.price}
+                  </Text>
+                </Pressable>
               </View>
             );
-          }}
-        />
-      ) : (
-        <View style={styles.previewList}>
-          <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>{t("shop.available")}</Text>
-          {PREVIEW_ITEMS.map(item => (
-            <View
-              key={item.id}
-              style={[styles.previewCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
-            >
-              <View style={[styles.previewIconBg, { backgroundColor: item.color + "20" }]}>
-                <ItemIcon type={item.icon} size={24} color={item.color} />
-              </View>
-              <View style={styles.previewInfo}>
-                <Text style={[styles.previewName, { color: theme.text }]}>{t(item.nameKey)}</Text>
-                <View style={styles.previewPrice}>
-                  <GoldPrisms size={14} />
-                  <Text style={[styles.previewPriceText, { color: colors.ouro }]}>{item.price}</Text>
-                </View>
-              </View>
-              <Button
-                title={t("shop.buy")}
-                variant={balance >= item.price ? "primary" : "secondary"}
-                size="sm"
-                disabled={balance < item.price}
-                onPress={() => handlePurchase(item.id)}
-                style={styles.previewButton}
-              />
-            </View>
-          ))}
+          })}
         </View>
       )}
-    </View>
+
+      <Text style={[styles.sectionTitle, { color: theme.textSecondary, marginTop: spacing.lg }]}>
+        OURO
+      </Text>
+      <Pressable
+        onPress={() => router.push("/shop/ouro-packs")}
+        style={[styles.ouroCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
+      >
+        <GoldPrisms size={32} />
+        <View style={styles.ouroCardInfo}>
+          <Text style={[styles.ouroCardTitle, { color: theme.text }]}>{t("ouro.title")}</Text>
+          <Text style={[styles.ouroCardDesc, { color: theme.textMuted }]}>
+            Get more ouro to unlock items
+          </Text>
+        </View>
+        <Text style={[styles.ouroArrow, { color: theme.textMuted }]}>&rsaquo;</Text>
+      </Pressable>
+    </ScrollView>
   );
 }
 
@@ -179,70 +186,64 @@ const styles = StyleSheet.create({
   },
   superBanner: {
     marginHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
-    padding: spacing.xl,
-    borderRadius: radii.lg,
+    marginBottom: spacing.xl,
+    borderRadius: radii.xl,
+    overflow: "hidden",
   },
-  superRow: {
+  superGradient: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    padding: spacing.xl,
+    backgroundColor: "#1A1040",
   },
   superLeft: {
     flex: 1,
     marginRight: spacing.md,
   },
+  superLabel: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "800",
+    color: colors.ouro,
+    letterSpacing: 1.5,
+    marginBottom: spacing.xs,
+  },
   superTitle: {
-    fontSize: typography.sizes.lg,
+    fontSize: typography.sizes.xl,
     fontWeight: "700",
+    color: "#FFFFFF",
   },
   superSubtitle: {
     fontSize: typography.sizes.sm,
+    color: "#B0A0D0",
     marginTop: spacing.xs,
     lineHeight: 20,
   },
-  superCta: {
+  superCtaRow: {
+    marginTop: spacing.md,
+    alignSelf: "flex-start",
+    backgroundColor: colors.primary[500],
+    borderRadius: radii.full,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  superCtaText: {
     fontSize: typography.sizes.sm,
     fontWeight: "700",
-    color: colors.primary[400],
-    marginTop: spacing.md,
-  },
-  list: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing["5xl"],
-  },
-  row: {
-    gap: spacing.sm,
-  },
-  itemCard: {
-    flex: 1,
-    alignItems: "center",
-    marginBottom: spacing.sm,
-    padding: spacing.lg,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-  },
-  itemName: {
-    fontSize: typography.sizes.sm,
-    fontWeight: "600",
-    textAlign: "center",
-    marginBottom: spacing.sm,
-  },
-  buyButton: {
-    width: "100%",
-  },
-  previewList: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing["5xl"],
+    color: "#FFFFFF",
   },
   sectionTitle: {
     fontSize: typography.sizes.xs,
     fontWeight: "700",
     letterSpacing: 0.5,
+    paddingHorizontal: spacing.lg,
     marginBottom: spacing.sm,
     marginLeft: spacing.xs,
   },
-  previewCard: {
+  itemsList: {
+    paddingHorizontal: spacing.lg,
+  },
+  itemCard: {
     flexDirection: "row",
     alignItems: "center",
     padding: spacing.lg,
@@ -251,31 +252,64 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
     gap: spacing.md,
   },
-  previewIconBg: {
+  itemIconBg: {
     width: 48,
     height: 48,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
   },
-  previewInfo: {
+  itemInfo: {
     flex: 1,
   },
-  previewName: {
+  itemName: {
     fontSize: typography.sizes.md,
     fontWeight: "600",
     marginBottom: 4,
   },
-  previewPrice: {
+  itemPriceRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
   },
-  previewPriceText: {
+  itemPriceText: {
     fontSize: typography.sizes.sm,
     fontWeight: "700",
   },
-  previewButton: {
-    minWidth: 80,
+  buyPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: radii.full,
+  },
+  buyPillText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "700",
+  },
+  ouroCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: spacing.lg,
+    padding: spacing.lg,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    gap: spacing.md,
+  },
+  ouroCardInfo: {
+    flex: 1,
+  },
+  ouroCardTitle: {
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+    marginBottom: 2,
+  },
+  ouroCardDesc: {
+    fontSize: typography.sizes.sm,
+  },
+  ouroArrow: {
+    fontSize: 28,
+    fontWeight: "300",
   },
 });
