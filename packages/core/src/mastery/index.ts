@@ -72,3 +72,15 @@ export type {
   SelectorInput,
   SelectorOutput,
 } from "./adaptive-types.js";
+
+export {
+  checkArchitectureReadiness,
+  checkContentReadiness,
+  checkVerticalSlice,
+  checkPhaseStatus,
+  RECOMMENDED_VERTICAL_SLICES,
+  type ArchitectureReadiness,
+  type ContentReadiness,
+  type VerticalSliceCheck,
+  type PhaseStatus,
+} from "./readiness.js";

@@ -52,7 +52,9 @@ Mastery is calculated from 3 weighted signals: accuracy (recent performance, 50%
 
 KnowledgeItems carry 7 cognitive levels (recognition, comprehension, controlled production, transformation, translation, free production, communication) that specify which exercise types are appropriate. They also declare inter-knowledge relations (related, confusable_with, reinforces) for exercise generation and error prediction, and per-L1 difficulty metadata for personalized prioritisation.
 
-The mastery logic is deterministic and auditable (`packages/core/src/mastery/`). AI does not drive the adaptive engine; it generates content for a structured exercise bank.
+The mastery module (`packages/core/src/mastery/`) includes: QA validator (schema, graph integrity, linguistic completeness), prerequisite checker with topological sort, coverage metrics, exercise generation spec with alignment validation, adaptive engine types for the future selector, and a readiness checker that validates Definition of Done criteria and vertical slice completeness across 10 implementation phases. The taxonomy seed (192 Skills, 55 KnowledgeItems) has 7 complete vertical slices: PT.TENSES.PRESENT, PT.PREP.BASIC, PT.SYNTAX.DIRECT_OBJECT, PT.SYNTAX.SUB.CAUSAL, PT.SEM.ASPECT.HABITUAL, PT.DISCOURSE.COHESION.LEXICAL, PT.RHETORIC.METAPHOR.
+
+The mastery logic is deterministic and auditable. AI does not drive the adaptive engine; it generates content for a structured exercise bank.
 
 ### Dynamic Content Generation
 
