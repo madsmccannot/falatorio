@@ -70,6 +70,24 @@ export type AdRewardType = (typeof AD_REWARD_TYPES)[number];
 export const SHOP_ITEM_TYPES = ["consumable", "subscription"] as const;
 export type ShopItemType = (typeof SHOP_ITEM_TYPES)[number];
 
+export const COGNITIVE_LEVELS = [
+  "recognition",
+  "comprehension",
+  "controlled_production",
+  "transformation",
+  "translation",
+  "free_production",
+  "communication",
+] as const;
+export type CognitiveLevel = (typeof COGNITIVE_LEVELS)[number];
+
+export const KNOWLEDGE_RELATION_TYPES = [
+  "related",
+  "confusable_with",
+  "reinforces",
+] as const;
+export type KnowledgeRelationType = (typeof KNOWLEDGE_RELATION_TYPES)[number];
+
 // ─── Game economy constants ───
 
 export const HEARTS = {

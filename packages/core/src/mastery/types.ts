@@ -1,4 +1,4 @@
-import type { CEFRLevel, ExerciseType } from "../constants.js";
+import type { CEFRLevel, ExerciseType, CognitiveLevel, KnowledgeRelationType } from "../constants.js";
 
 export const SKILL_DOMAINS = [
   "phonetics",
@@ -20,6 +20,12 @@ export type MasteryCriteria = {
   minReps: number;
 };
 
+export type L1Difficulty = {
+  difficulty: "low" | "medium" | "high";
+  reason: string;
+  expectedErrors?: string[];
+};
+
 export type KnowledgeItem = {
   id: string;
   skillId: string;
@@ -29,9 +35,16 @@ export type KnowledgeItem = {
   examples: string[];
   counterexamples: string[];
   commonErrors: string[];
-  l1Notes: Record<string, string> | null;
+  l1Notes: Record<string, string | L1Difficulty> | null;
   shortExplanation: Record<string, string> | null;
+  exerciseTypes: CognitiveLevel[];
   masteryCriteria: MasteryCriteria | null;
+};
+
+export type KnowledgeRelation = {
+  sourceId: string;
+  targetId: string;
+  relationType: KnowledgeRelationType;
 };
 
 export type Skill = {
@@ -42,6 +55,12 @@ export type Skill = {
   description: Record<string, string> | null;
   cefrLevel: CEFRLevel;
   sortOrder: number;
+};
+
+export type LessonSkill = {
+  lessonId: string;
+  skillId: string;
+  isPrimary: boolean;
 };
 
 export type EvidenceEntry = {

@@ -26,7 +26,7 @@ falatorio/
 |-------|-----------|
 | Mobile | React Native 0.86, Expo SDK 57, expo-router, Reanimated 4.5, Gesture Handler |
 | Server | Fastify 5, tRPC 11, superjson |
-| Database | PostgreSQL (Neon), Drizzle ORM, 23 schema tables |
+| Database | PostgreSQL (Neon), Drizzle ORM, 26 schema tables |
 | Cache/Queue | Redis (ioredis), BullMQ (6 queues) |
 | Auth | Clerk (JWT, cached in Redis) — optional, app runs in preview mode without it |
 | CMS | Payload CMS v3, PostgreSQL adapter, R2 storage |
@@ -49,6 +49,8 @@ Phase 1 languages (en, es, fr, hi, ur, ar, bn) have full production profiles: 15
 The pedagogical layer sits on top of the course tree. Skills represent linguistic competencies (e.g. `PT.VERBS.PRESENT`, `PT.SYNTAX.SUBORDINATION.CAUSAL`), each decomposed into atomic KnowledgeItems. Every exercise is linked to one or more KnowledgeItems via the `exercise_knowledge` bridge table, so results flow into per-skill mastery scores rather than just per-exercise progress.
 
 Mastery is calculated from 3 weighted signals: accuracy (recent performance, 50%), variety (exercise type diversity, 25%), and production ratio (harder output tasks vs recognition, 25%). Confidence factors in repetition count, variety, and recency. CEFR level is estimated per user by aggregating skill mastery across levels, with an explicit confidence percentage — never a binary label.
+
+KnowledgeItems carry 7 cognitive levels (recognition, comprehension, controlled production, transformation, translation, free production, communication) that specify which exercise types are appropriate. They also declare inter-knowledge relations (related, confusable_with, reinforces) for exercise generation and error prediction, and per-L1 difficulty metadata for personalized prioritisation.
 
 The mastery logic is deterministic and auditable (`packages/core/src/mastery/`). AI does not drive the adaptive engine; it generates content for a structured exercise bank.
 
@@ -107,7 +109,7 @@ Pure business logic, zero dependencies on I/O or frameworks:
 
 ### `packages/db` — 23 schema tables
 
-Users, courses, units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge, skill evidence, skill mastery. Initial Drizzle migration generated.
+Users, courses, units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). Initial Drizzle migration generated.
 
 ### `server` — 12 routers, 7 services, 6 jobs
 

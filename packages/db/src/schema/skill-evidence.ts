@@ -4,6 +4,7 @@ import {
   real,
   varchar,
   timestamp,
+  index,
 } from "drizzle-orm/pg-core";
 import { users } from "./users";
 import { knowledgeItems } from "./knowledge-items";
@@ -17,4 +18,7 @@ export const skillEvidence = pgTable("skill_evidence", {
   score: real("score").notNull(),
   exerciseType: varchar("exercise_type", { length: 64 }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => ({
+  userKnowledgeIdx: index("skill_evidence_user_knowledge_idx").on(table.userId, table.knowledgeItemId),
+  userCreatedIdx: index("skill_evidence_user_created_idx").on(table.userId, table.createdAt),
+}));

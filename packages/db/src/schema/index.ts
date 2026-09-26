@@ -21,3 +21,5 @@ export { skillPrerequisites } from "./skill-prerequisites";
 export { exerciseKnowledge } from "./exercise-knowledge";
 export { skillEvidence } from "./skill-evidence";
 export { skillMastery } from "./skill-mastery";
+export { knowledgeRelations, knowledgeRelationTypeEnum } from "./knowledge-relations";
+export { lessonSkills } from "./lesson-skills";

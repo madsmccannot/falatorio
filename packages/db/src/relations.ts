@@ -21,6 +21,8 @@ import {
   exerciseKnowledge,
   skillEvidence,
   skillMastery,
+  knowledgeRelations,
+  lessonSkills,
 } from "./schema/index";
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -61,6 +63,7 @@ export const lessonsRelations = relations(lessons, ({ one, many }) => ({
     references: [units.id],
   }),
   exercises: many(exercises),
+  skillLinks: many(lessonSkills),
 }));
 
 export const exercisesRelations = relations(exercises, ({ one, many }) => ({
@@ -152,6 +155,7 @@ export const skillsRelations = relations(skills, ({ many }) => ({
   mastery: many(skillMastery),
   prerequisiteOf: many(skillPrerequisites, { relationName: "skill" }),
   prerequisites: many(skillPrerequisites, { relationName: "prerequisite" }),
+  lessonLinks: many(lessonSkills),
 }));
 
 export const knowledgeItemsRelations = relations(knowledgeItems, ({ one, many }) => ({
@@ -161,6 +165,8 @@ export const knowledgeItemsRelations = relations(knowledgeItems, ({ one, many })
   }),
   exerciseLinks: many(exerciseKnowledge),
   evidence: many(skillEvidence),
+  relationsFrom: many(knowledgeRelations, { relationName: "source" }),
+  relationsTo: many(knowledgeRelations, { relationName: "target" }),
 }));
 
 export const skillPrerequisitesRelations = relations(skillPrerequisites, ({ one }) => ({
@@ -209,6 +215,30 @@ export const skillMasteryRelations = relations(skillMastery, ({ one }) => ({
   }),
   skill: one(skills, {
     fields: [skillMastery.skillId],
+    references: [skills.id],
+  }),
+}));
+
+export const knowledgeRelationsRelations = relations(knowledgeRelations, ({ one }) => ({
+  source: one(knowledgeItems, {
+    fields: [knowledgeRelations.sourceId],
+    references: [knowledgeItems.id],
+    relationName: "source",
+  }),
+  target: one(knowledgeItems, {
+    fields: [knowledgeRelations.targetId],
+    references: [knowledgeItems.id],
+    relationName: "target",
+  }),
+}));
+
+export const lessonSkillsRelations = relations(lessonSkills, ({ one }) => ({
+  lesson: one(lessons, {
+    fields: [lessonSkills.lessonId],
+    references: [lessons.id],
+  }),
+  skill: one(skills, {
+    fields: [lessonSkills.skillId],
     references: [skills.id],
   }),
 }));
