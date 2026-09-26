@@ -8,6 +8,7 @@ export const QUEUE_NAMES = {
   QUALITY_FLAG: "quality-flag",
   HEART_REFILL: "heart-refill",
   SUBSCRIPTION_CHECK: "subscription-check",
+  CONTENT_SYNC: "content-sync",
 } as const;
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];

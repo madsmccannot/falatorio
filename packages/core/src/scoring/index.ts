@@ -6,3 +6,10 @@ export {
   PTEU_PHONETIC_RULES,
   type PhoneticRule,
 } from "./phonetic-rules-pteu.js";
+export {
+  selectRegionalAudio,
+  getRandomRegion,
+  PT_REGIONS,
+  type PTRegion,
+  type RegionalAudioConfig,
+} from "./regional-audio.js";

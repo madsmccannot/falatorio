@@ -80,6 +80,8 @@ const KEYS = {
   GDPR_CONSENT: "gdpr_consent",
   THEME_PREF: "theme_pref",
   API_URL: "api_url",
+  OFFLINE_SYNC_QUEUE: "offline_sync_queue",
+  OFFLINE_LESSON_MANIFEST: "offline_lesson_manifest",
 } as const;
 
 export { KEYS };
