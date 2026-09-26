@@ -6,6 +6,7 @@ import {
   type CEFRLevel,
   type L1Code,
 } from "@falatorio/core";
+import type { ExerciseGenerationRequest } from "@falatorio/core";
 import { getProfile, getCulturalRefs } from "@falatorio/core/l1-profiles";
 
 const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
@@ -246,6 +247,69 @@ export function parseExerciseArray(text: string): GeneratedExercise[] {
       ex.acceptedAnswers.length > 0 &&
       ex.prompt != null,
   );
+}
+
+export async function generateFromKnowledgeItem(params: {
+  request: ExerciseGenerationRequest;
+  rule: string;
+  examples: string[];
+  commonErrors?: string[];
+  l1Notes?: string;
+}): Promise<GeneratedExercise> {
+  const { request, rule, examples, commonErrors, l1Notes } = params;
+
+  const profile = getProfile(request.l1);
+
+  const prompt = `Generate 1 European Portuguese (PT-EU, NOT Brazilian) exercise.
+
+=== KNOWLEDGE ITEM ===
+Skill: ${request.skillCode}
+Knowledge: ${request.knowledgeItemCode}
+Rule: ${rule}
+Examples: ${examples.join(" | ")}
+${commonErrors?.length ? `Common errors: ${commonErrors.join("; ")}` : ""}
+${l1Notes ? `L1-specific note (${request.l1}): ${l1Notes}` : ""}
+
+=== PARAMETERS ===
+L1: ${profile.name} (${request.l1})
+CEFR: ${request.cefrLevel}
+Exercise type: ${request.exerciseType}
+Cognitive level: ${request.cognitiveLevel}
+Difficulty: ${request.difficulty} (1-10)
+${request.constraints?.avoidVocabulary?.length ? `Avoid vocabulary: ${request.constraints.avoidVocabulary.join(", ")}` : ""}
+${request.constraints?.requireContext ? `Required context: ${request.constraints.requireContext}` : ""}
+
+=== COGNITIVE LEVEL GUIDE ===
+- recognition: multiple choice, identify correct form
+- comprehension: explain why a form is used
+- controlled_production: fill in blank, complete sentence
+- transformation: change form (e.g. singular to plural, direct to indirect speech)
+- translation: translate between L1 and PT-EU
+- free_production: open-ended sentence/paragraph writing
+- communication: role-play, real scenario usage
+
+=== OUTPUT ===
+JSON object with: type, prompt, acceptedAnswers, difficulty, l1Tip.
+European Portuguese EXCLUSIVELY.`;
+
+  const response = await client.messages.create({
+    model: "claude-sonnet-5-20250514",
+    max_tokens: 1024,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const textBlock = response.content.find((b) => b.type === "text");
+  if (!textBlock) throw new Error("No text in LLM response");
+
+  const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("No JSON object in response");
+
+  const parsed = JSON.parse(jsonMatch[0]) as GeneratedExercise;
+  if (!parsed.type || !parsed.acceptedAnswers) {
+    throw new Error("Invalid exercise structure");
+  }
+
+  return parsed;
 }
 
 export function cefrLevelIndex(level: CEFRLevel): number {

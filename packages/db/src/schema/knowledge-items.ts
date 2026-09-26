@@ -4,10 +4,19 @@ import {
   varchar,
   jsonb,
   text,
+  integer,
   timestamp,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { skills } from "./skills";
 import { cefrEnum } from "./users";
+
+export const knowledgeStatusEnum = pgEnum("knowledge_status", [
+  "draft",
+  "review",
+  "approved",
+  "live",
+]);
 
 export const knowledgeItems = pgTable("knowledge_items", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -22,6 +31,8 @@ export const knowledgeItems = pgTable("knowledge_items", {
   shortExplanation: jsonb("short_explanation").$type<Record<string, string>>(),
   exerciseTypes: jsonb("exercise_types").$type<string[]>().default([]),
   masteryCriteria: jsonb("mastery_criteria").$type<{ minAccuracy: number; minVariety: number; minReps: number }>(),
+  version: integer("version").notNull().default(1),
+  status: knowledgeStatusEnum("status").notNull().default("draft"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

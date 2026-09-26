@@ -2,7 +2,10 @@ export type {
   SkillDomain,
   MasteryCriteria,
   KnowledgeItem,
+  KnowledgeRelation,
+  L1Difficulty,
   Skill,
+  LessonSkill,
   EvidenceEntry,
   MasteryScore,
   CEFREstimate,
@@ -27,3 +30,45 @@ export {
 export {
   estimateCEFR,
 } from "./cefr-estimator.js";
+
+export {
+  validateKnowledgeItemSchema,
+  validateSkillSchema,
+  validateGraphIntegrity,
+  validateLinguisticCompleteness,
+  runFullQA,
+  type QAResult,
+} from "./qa-validator.js";
+
+export {
+  checkPrerequisitesSatisfied,
+  getAvailableSkills,
+  getBlockingPrerequisites,
+  getDependents,
+  topologicalSort,
+  type PrerequisiteCheck,
+} from "./prerequisites.js";
+
+export {
+  computeCoverageMetrics,
+  computeExerciseCoverage,
+  type CoverageMetrics,
+  type ExerciseCoverageMetrics,
+} from "./coverage.js";
+
+export {
+  validateExerciseAlignment,
+  type ExerciseGenerationRequest,
+  type ExerciseConstraints,
+  type ExerciseValidationResult,
+} from "./exercise-spec.js";
+
+export type {
+  AdaptiveContext,
+  RecentError,
+  AdaptiveRecommendation,
+  RecommendationReason,
+  CurriculumPosition,
+  SelectorInput,
+  SelectorOutput,
+} from "./adaptive-types.js";

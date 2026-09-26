@@ -26,7 +26,7 @@ falatorio/
 |-------|-----------|
 | Mobile | React Native 0.86, Expo SDK 57, expo-router, Reanimated 4.5, Gesture Handler |
 | Server | Fastify 5, tRPC 11, superjson |
-| Database | PostgreSQL (Neon), Drizzle ORM, 26 schema tables |
+| Database | PostgreSQL (Neon), Drizzle ORM, 26 tables + 3 enums |
 | Cache/Queue | Redis (ioredis), BullMQ (6 queues) |
 | Auth | Clerk (JWT, cached in Redis) — optional, app runs in preview mode without it |
 | CMS | Payload CMS v3, PostgreSQL adapter, R2 storage |
@@ -100,7 +100,7 @@ Pure business logic, zero dependencies on I/O or frameworks:
 - **FSRS** — scheduler, rating, card state machine
 - **Scoring** — text scorer, speech scorer, PT-EU phonetic rules
 - **Lesson** — session state, adaptive exercise selector, placement test
-- **Mastery** — evidence recorder, mastery calculator (accuracy/variety/production weights), CEFR estimator with confidence scores
+- **Mastery** — evidence recorder, mastery calculator (accuracy/variety/production weights), CEFR estimator with confidence scores, QA validator, prerequisite checker, coverage metrics, exercise generation spec, adaptive engine types
 - **Economy** — currency ops, earn/spend rules, shop catalog, IAP tiers
 - **Entitlements** — feature gates, heart system, access checks
 - **Gamification** — XP calculator, streak logic, league promotion, achievements

@@ -11,6 +11,8 @@ import { AudioClips } from "./collections/AudioClips";
 import { L1CulturalContent } from "./collections/L1CulturalContent";
 import { ReviewQueue } from "./collections/ReviewQueue";
 import { Users } from "./collections/Users";
+import { Skills } from "./collections/Skills";
+import { KnowledgeItems } from "./collections/KnowledgeItems";
 
 export default buildConfig({
   serverURL: process.env["PAYLOAD_PUBLIC_SERVER_URL"] ?? "http://localhost:3002",
@@ -38,6 +40,8 @@ export default buildConfig({
     AudioClips,
     L1CulturalContent,
     ReviewQueue,
+    Skills,
+    KnowledgeItems,
   ],
   plugins: [
     s3Storage({

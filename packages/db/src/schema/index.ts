@@ -16,7 +16,7 @@ export { iapReceipts, iapPlatformEnum } from "./iap-receipts";
 export { adEvents, adTypeEnum, adRewardTypeEnum } from "./ad-events";
 export { l1CulturalContent, culturalContentTypeEnum } from "./l1-cultural-content";
 export { skills, skillDomainEnum } from "./skills";
-export { knowledgeItems } from "./knowledge-items";
+export { knowledgeItems, knowledgeStatusEnum } from "./knowledge-items";
 export { skillPrerequisites } from "./skill-prerequisites";
 export { exerciseKnowledge } from "./exercise-knowledge";
 export { skillEvidence } from "./skill-evidence";
