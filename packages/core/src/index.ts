@@ -6,6 +6,7 @@ export * from "./gamification/index.js";
 export * from "./economy/index.js";
 export * from "./entitlements/index.js";
 export * from "./ads/index.js";
+export * from "./mastery/index.js";
 export {
   getProfile,
   getCulturalRefs,

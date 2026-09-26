@@ -15,6 +15,12 @@ import {
   transactions,
   iapReceipts,
   adEvents,
+  skills,
+  knowledgeItems,
+  skillPrerequisites,
+  exerciseKnowledge,
+  skillEvidence,
+  skillMastery,
 } from "./schema/index";
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -33,6 +39,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   transactions: many(transactions),
   iapReceipts: many(iapReceipts),
   adEvents: many(adEvents),
+  skillEvidence: many(skillEvidence),
+  skillMastery: many(skillMastery),
 }));
 
 export const coursesRelations = relations(courses, ({ many }) => ({
@@ -62,6 +70,7 @@ export const exercisesRelations = relations(exercises, ({ one, many }) => ({
   }),
   audioClips: many(audioClips),
   progress: many(userProgress),
+  knowledgeLinks: many(exerciseKnowledge),
 }));
 
 export const userProgressRelations = relations(userProgress, ({ one }) => ({
@@ -135,5 +144,71 @@ export const adEventsRelations = relations(adEvents, ({ one }) => ({
   user: one(users, {
     fields: [adEvents.userId],
     references: [users.id],
+  }),
+}));
+
+export const skillsRelations = relations(skills, ({ many }) => ({
+  knowledgeItems: many(knowledgeItems),
+  mastery: many(skillMastery),
+  prerequisiteOf: many(skillPrerequisites, { relationName: "skill" }),
+  prerequisites: many(skillPrerequisites, { relationName: "prerequisite" }),
+}));
+
+export const knowledgeItemsRelations = relations(knowledgeItems, ({ one, many }) => ({
+  skill: one(skills, {
+    fields: [knowledgeItems.skillId],
+    references: [skills.id],
+  }),
+  exerciseLinks: many(exerciseKnowledge),
+  evidence: many(skillEvidence),
+}));
+
+export const skillPrerequisitesRelations = relations(skillPrerequisites, ({ one }) => ({
+  skill: one(skills, {
+    fields: [skillPrerequisites.skillId],
+    references: [skills.id],
+    relationName: "skill",
+  }),
+  prerequisite: one(skills, {
+    fields: [skillPrerequisites.prerequisiteId],
+    references: [skills.id],
+    relationName: "prerequisite",
+  }),
+}));
+
+export const exerciseKnowledgeRelations = relations(exerciseKnowledge, ({ one }) => ({
+  exercise: one(exercises, {
+    fields: [exerciseKnowledge.exerciseId],
+    references: [exercises.id],
+  }),
+  knowledgeItem: one(knowledgeItems, {
+    fields: [exerciseKnowledge.knowledgeItemId],
+    references: [knowledgeItems.id],
+  }),
+}));
+
+export const skillEvidenceRelations = relations(skillEvidence, ({ one }) => ({
+  user: one(users, {
+    fields: [skillEvidence.userId],
+    references: [users.id],
+  }),
+  knowledgeItem: one(knowledgeItems, {
+    fields: [skillEvidence.knowledgeItemId],
+    references: [knowledgeItems.id],
+  }),
+  exercise: one(exercises, {
+    fields: [skillEvidence.exerciseId],
+    references: [exercises.id],
+  }),
+}));
+
+export const skillMasteryRelations = relations(skillMastery, ({ one }) => ({
+  user: one(users, {
+    fields: [skillMastery.userId],
+    references: [users.id],
+  }),
+  skill: one(skills, {
+    fields: [skillMastery.skillId],
+    references: [skills.id],
   }),
 }));
