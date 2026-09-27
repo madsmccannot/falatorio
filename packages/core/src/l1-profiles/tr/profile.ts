@@ -36,6 +36,18 @@ export const trProfile: L1Profile = {
       { word: "dos", l1Meaning: "dos means 'back (anatomy)' in Turkish (from French)", ptMeaning: "dos means 'two' or 'of the' (de + os)" },
       { word: "sol", l1Meaning: "sol means 'left (direction)' in Turkish", ptMeaning: "sol means 'sun' — left = esquerda" },
       { word: "ay", l1Meaning: "ay means 'moon/month' in Turkish", ptMeaning: "sounds like 'ai' (ouch!) — moon = lua, month = mês" },
+      { word: "comer", l1Meaning: "no Turkish cognate", ptMeaning: "comer means 'to eat'" },
+      { word: "largo", l1Meaning: "no Turkish cognate", ptMeaning: "largo means 'wide' or 'public square' — wide = geniş in Turkish" },
+      { word: "gato", l1Meaning: "no Turkish cognate (kedi = cat)", ptMeaning: "gato means 'cat'" },
+      { word: "porta", l1Meaning: "no Turkish cognate (kapı = door)", ptMeaning: "porta means 'door'" },
+      { word: "banco", l1Meaning: "banka means 'bank' in Turkish", ptMeaning: "banco means 'bank' AND 'bench' — two meanings" },
+      { word: "dar", l1Meaning: "dar means 'narrow/tight' in Turkish", ptMeaning: "dar means 'to give' — narrow = estreito" },
+      { word: "ser", l1Meaning: "ser means 'head/leader' in old Turkish", ptMeaning: "ser means 'to be' (identity/permanent)" },
+      { word: "pena", l1Meaning: "no Turkish cognate (kalem/tüy)", ptMeaning: "pena means 'feather' or 'pity' or 'penalty'" },
+      { word: "cola", l1Meaning: "kola means 'cola drink' or 'arm' in Turkish", ptMeaning: "cola means 'glue' — also slang for cheating on a test" },
+      { word: "caro", l1Meaning: "no Turkish cognate (pahalı = expensive)", ptMeaning: "caro means 'expensive' or 'dear'" },
+      { word: "conta", l1Meaning: "no Turkish cognate (hesap = bill)", ptMeaning: "conta means 'bill/account/story'" },
+      { word: "data", l1Meaning: "data — no Turkish cognate (tarih = date)", ptMeaning: "data means 'date'" },
     ],
     phoneticDifficulties: [
       {

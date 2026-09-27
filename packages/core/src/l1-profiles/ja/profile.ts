@@ -38,6 +38,18 @@ export const jaProfile: L1Profile = {
       { word: "sol", l1Meaning: "ソル (soru) — sounds like 'to shave'", ptMeaning: "sol means 'sun'" },
       { word: "campo", l1Meaning: "カンポ — no standard Japanese meaning", ptMeaning: "campo means 'field/countryside'" },
       { word: "manga", l1Meaning: "漫画 (manga) — comics/graphic novels", ptMeaning: "manga primarily means 'sleeve' — also means mango. NOT Japanese-style comics" },
+      { word: "comer", l1Meaning: "コメル — sounds like 米 (kome, rice)", ptMeaning: "comer means 'to eat' — rice = arroz" },
+      { word: "largo", l1Meaning: "ラルゴ — music term (broadly)", ptMeaning: "largo means 'wide' or 'public square'" },
+      { word: "mar", l1Meaning: "マル (maru) — circle/correct mark", ptMeaning: "mar means 'sea/ocean'" },
+      { word: "ser", l1Meaning: "セル (seru) — cell (loanword)", ptMeaning: "ser means 'to be' (identity/permanent)" },
+      { word: "ter", l1Meaning: "テル (teru) — to shine/clear up", ptMeaning: "ter means 'to have'" },
+      { word: "porta", l1Meaning: "ポルタ — no standard meaning (ドア = door)", ptMeaning: "porta means 'door'" },
+      { word: "banco", l1Meaning: "バンコ — no Japanese meaning (銀行 = bank)", ptMeaning: "banco means 'bank' or 'bench'" },
+      { word: "gato", l1Meaning: "ガト — sounds like ガトー (gâteau/cake)", ptMeaning: "gato means 'cat' — cake = bolo" },
+      { word: "cola", l1Meaning: "コーラ (kōra) — cola drink", ptMeaning: "cola means 'glue' — cola drink = Coca-Cola" },
+      { word: "caro", l1Meaning: "カロ — no standard meaning (高い = expensive)", ptMeaning: "caro means 'expensive' or 'dear'" },
+      { word: "dar", l1Meaning: "ダル — sounds like だるい (darui, sluggish)", ptMeaning: "dar means 'to give' — sluggish = preguiçoso" },
+      { word: "conta", l1Meaning: "コンタ — sounds like コンタクト (contact)", ptMeaning: "conta means 'bill/account/story'" },
     ],
     phoneticDifficulties: [
       {

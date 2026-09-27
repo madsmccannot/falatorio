@@ -45,6 +45,18 @@ export const deProfile: L1Profile = {
       { word: "Mist", l1Meaning: "Mist means 'manure/rubbish' in German", ptMeaning: "misto means 'mixed' (e.g., tosta mista = grilled cheese sandwich)" },
       { word: "nota", l1Meaning: "Note means 'grade/mark' in German too", ptMeaning: "nota also means 'banknote' in PT, not just grade" },
       { word: "bar", l1Meaning: "Bar means 'bar/pub' in both languages", ptMeaning: "same meaning — but 'bar' in German also means 'cash' (bar bezahlen), which it doesn't in PT" },
+      { word: "comer", l1Meaning: "sounds like 'kommen' (to come) in German", ptMeaning: "comer means 'to eat' — to come = vir/chegar" },
+      { word: "largo", l1Meaning: "sounds like 'lang' (long) in German", ptMeaning: "largo means 'wide' or 'public square' — long = comprido" },
+      { word: "balde", l1Meaning: "sounds like 'bald' (soon) in German", ptMeaning: "balde means 'bucket' — soon = em breve" },
+      { word: "cola", l1Meaning: "Cola means 'cola drink' in German", ptMeaning: "cola means 'glue' — also slang for cheating on a test" },
+      { word: "arte", l1Meaning: "Art means 'kind/type/manner' in German", ptMeaning: "arte means 'art/fine art' — kind/type = tipo/espécie" },
+      { word: "carta", l1Meaning: "Karte means 'card/map/ticket' in German", ptMeaning: "carta means 'letter' — card = cartão, map = mapa" },
+      { word: "taça", l1Meaning: "sounds like 'Tasse' (teacup) in German", ptMeaning: "taça means 'trophy/wine glass/goblet' — teacup = chávena" },
+      { word: "pena", l1Meaning: "sounds like 'Pein' (agony) in old German", ptMeaning: "pena means 'feather' or 'pity' or 'penalty' — agony = agonia" },
+      { word: "caro", l1Meaning: "sounds like 'Karo' (diamonds/check pattern)", ptMeaning: "caro means 'expensive' or 'dear'" },
+      { word: "falar", l1Meaning: "sounds like 'fallen' (to fall) in German", ptMeaning: "falar means 'to speak' — to fall = cair" },
+      { word: "ata", l1Meaning: "no German cognate, but looks like 'hat' backwards", ptMeaning: "ata means 'minutes (of a meeting)' — do not confuse with até (until)" },
+      { word: "vaga", l1Meaning: "sounds like 'vage' (vague) in German", ptMeaning: "vaga means 'wave' or 'vacancy' — vague = vago (different word)" },
     ],
     phoneticDifficulties: [
       {

@@ -38,6 +38,18 @@ export const ukProfile: L1Profile = {
       { word: "bar", l1Meaning: "бар (bar) — same meaning", ptMeaning: "bar means a drinking establishment — true cognate" },
       { word: "campo", l1Meaning: "sounds like компот (kompot) — stewed fruit drink", ptMeaning: "campo means 'field/countryside'" },
       { word: "dom", l1Meaning: "дім (dim) — home/house", ptMeaning: "dom means 'Mr/Sir' (title) or 'gift' — house = casa" },
+      { word: "comer", l1Meaning: "sounds like комер — no Ukrainian meaning", ptMeaning: "comer means 'to eat'" },
+      { word: "largo", l1Meaning: "ларго — musical term (broadly)", ptMeaning: "largo means 'wide' or 'public square'" },
+      { word: "mar", l1Meaning: "мар — no standard meaning (мара = ghost)", ptMeaning: "mar means 'sea/ocean'" },
+      { word: "ser", l1Meaning: "сер — sounds like сірий (grey)", ptMeaning: "ser means 'to be' (identity/permanent)" },
+      { word: "caro", l1Meaning: "sounds like каро — no meaning", ptMeaning: "caro means 'expensive' or 'dear'" },
+      { word: "porta", l1Meaning: "порта — sounds like порт (port)", ptMeaning: "porta means 'door' — port = porto" },
+      { word: "gato", l1Meaning: "sounds like ґато — no meaning (кіт = cat)", ptMeaning: "gato means 'cat'" },
+      { word: "banco", l1Meaning: "банко — sounds like банк (bank)", ptMeaning: "banco means 'bank' AND 'bench'" },
+      { word: "cola", l1Meaning: "кола (kola) — cola drink or колo (wheel)", ptMeaning: "cola means 'glue' — cola drink = Coca-Cola" },
+      { word: "conta", l1Meaning: "конта — no Ukrainian word", ptMeaning: "conta means 'bill/account/story'" },
+      { word: "data", l1Meaning: "дата (data) — date — same!", ptMeaning: "data means 'date' — true cognate" },
+      { word: "prato", l1Meaning: "прато — no meaning", ptMeaning: "prato means 'plate/dish' — do not confuse with prato (course of a meal)" },
     ],
     phoneticDifficulties: [
       {

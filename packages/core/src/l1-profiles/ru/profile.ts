@@ -38,6 +38,18 @@ export const ruProfile: L1Profile = {
       { word: "manga", l1Meaning: "манга (manga) — Japanese comics", ptMeaning: "manga primarily means 'sleeve' — also means mango fruit" },
       { word: "prima", l1Meaning: "прима (prima) — prima donna / lead actress", ptMeaning: "prima means 'female cousin' — lead = protagonista" },
       { word: "forma", l1Meaning: "форма (forma) — uniform/shape in Russian", ptMeaning: "forma means 'form/shape/mould' — uniform = farda" },
+      { word: "comer", l1Meaning: "sounds like комер (komer) — no standard Russian word", ptMeaning: "comer means 'to eat'" },
+      { word: "largo", l1Meaning: "sounds like 'largo' in music — broadly", ptMeaning: "largo means 'wide' or 'public square' — broadly = amplamente" },
+      { word: "mar", l1Meaning: "мар — no standard meaning", ptMeaning: "mar means 'sea/ocean'" },
+      { word: "ser", l1Meaning: "сер — sounds like 'grey' (серый)", ptMeaning: "ser means 'to be' (identity/permanent)" },
+      { word: "dom", l1Meaning: "дом (dom) means 'house/home' in Russian", ptMeaning: "dom means 'Mr/Sir' (title) or 'gift/talent' — house = casa" },
+      { word: "caro", l1Meaning: "каро — no meaning", ptMeaning: "caro means 'expensive' or 'dear'" },
+      { word: "porta", l1Meaning: "порта — no standard meaning (порт = port)", ptMeaning: "porta means 'door' — port = porto" },
+      { word: "gato", l1Meaning: "sounds like гад (gad) — 'reptile/vermin'", ptMeaning: "gato means 'cat'" },
+      { word: "banco", l1Meaning: "банко — sounds like банк (bank)", ptMeaning: "banco means 'bank' AND 'bench' — both meanings" },
+      { word: "cola", l1Meaning: "кола (kola) — cola drink", ptMeaning: "cola means 'glue' — also slang for cheating on a test" },
+      { word: "conta", l1Meaning: "конта — no standard Russian word", ptMeaning: "conta means 'bill/account/story'" },
+      { word: "data", l1Meaning: "дата (data) — date in both languages", ptMeaning: "data means 'date' — true cognate but in PT also used for computer data" },
     ],
     phoneticDifficulties: [
       {

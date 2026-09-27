@@ -46,3 +46,9 @@ export {
   type DifficultyProfile,
   type DifficultyInput,
 } from "./difficulty-controller.js";
+export {
+  runAdaptiveEngine,
+  buildSelectorOutput,
+  type AdaptiveEngineInput,
+  type AdaptiveEngineOutput,
+} from "./adaptive-engine.js";

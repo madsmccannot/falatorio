@@ -38,6 +38,18 @@ export const plProfile: L1Profile = {
       { word: "prima", l1Meaning: "prima means 'prima donna' in Polish", ptMeaning: "prima means 'female cousin' — prima donna = protagonista" },
       { word: "dom", l1Meaning: "dom means 'house/home' in Polish", ptMeaning: "dom means 'Mr/Sir' (title) or 'gift/talent' — house = casa" },
       { word: "manga", l1Meaning: "manga — Japanese comics", ptMeaning: "manga primarily means 'sleeve' — also mango" },
+      { word: "comer", l1Meaning: "no Polish cognate", ptMeaning: "comer means 'to eat'" },
+      { word: "largo", l1Meaning: "largo — music term (broadly)", ptMeaning: "largo means 'wide' or 'public square' in PT" },
+      { word: "gato", l1Meaning: "sounds like 'gad' — no meaning (kot = cat)", ptMeaning: "gato means 'cat'" },
+      { word: "porta", l1Meaning: "porta — sounds like port", ptMeaning: "porta means 'door' — port = porto" },
+      { word: "banco", l1Meaning: "sounds like bank", ptMeaning: "banco means 'bank' AND 'bench'" },
+      { word: "pena", l1Meaning: "pena sounds like Polish 'pena' — no standard meaning", ptMeaning: "pena means 'feather' or 'pity' or 'penalty'" },
+      { word: "cola", l1Meaning: "kola — cola drink in Polish", ptMeaning: "cola means 'glue' in PT — cola drink = Coca-Cola" },
+      { word: "caro", l1Meaning: "no Polish cognate (drogi = expensive)", ptMeaning: "caro means 'expensive' or 'dear'" },
+      { word: "conta", l1Meaning: "konto means 'account' in Polish", ptMeaning: "conta means 'bill/account/story' — similar but broader" },
+      { word: "data", l1Meaning: "data means 'date' in Polish too", ptMeaning: "data means 'date' — true cognate" },
+      { word: "ser", l1Meaning: "ser — sounds like 'ser' (cheese, regional)", ptMeaning: "ser means 'to be' (identity/permanent)" },
+      { word: "dar", l1Meaning: "dar means 'gift' in some Slavic dialects", ptMeaning: "dar means 'to give' in PT — gift = presente" },
     ],
     phoneticDifficulties: [
       {

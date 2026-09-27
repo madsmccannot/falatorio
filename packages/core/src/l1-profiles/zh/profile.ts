@@ -26,6 +26,18 @@ export const zhProfile: L1Profile = {
       { word: "mala", l1Meaning: "麻辣 (málà) sounds similar — means 'numbing spicy'", ptMeaning: "mala means 'suitcase/bag'" },
       { word: "chá", l1Meaning: "茶 (chá) — same word! Tea came to Europe via Portuguese trade with China", ptMeaning: "chá means 'tea' — one of the few true Chinese-Portuguese cognates" },
       { word: "sopa", l1Meaning: "sounds like 缩 (suō) + 怕 (pà) — no meaning", ptMeaning: "sopa means 'soup'" },
+      { word: "largo", l1Meaning: "拉过 (lā guò) — 'pulled past'", ptMeaning: "largo means 'wide' or 'public square'" },
+      { word: "comer", l1Meaning: "可么 — no standard meaning", ptMeaning: "comer means 'to eat'" },
+      { word: "mar", l1Meaning: "马 (mǎ) sounds similar — 'horse'", ptMeaning: "mar means 'sea/ocean'" },
+      { word: "ser", l1Meaning: "色 (sè) sounds similar — 'colour'", ptMeaning: "ser means 'to be' (identity/permanent)" },
+      { word: "ter", l1Meaning: "特 (tè) sounds similar — 'special'", ptMeaning: "ter means 'to have'" },
+      { word: "nome", l1Meaning: "no direct Mandarin cognate", ptMeaning: "nome means 'name'" },
+      { word: "porta", l1Meaning: "泼他 (pō tā) — 'splash him'", ptMeaning: "porta means 'door'" },
+      { word: "conta", l1Meaning: "sounds like 看他 (kàn tā) — 'look at him'", ptMeaning: "conta means 'bill/account/story'" },
+      { word: "caro", l1Meaning: "卡肉 — no meaning", ptMeaning: "caro means 'expensive' or 'dear'" },
+      { word: "gato", l1Meaning: "嘎头 — no standard meaning", ptMeaning: "gato means 'cat'" },
+      { word: "banco", l1Meaning: "搬口 — no meaning", ptMeaning: "banco means 'bank' or 'bench'" },
+      { word: "rua", l1Meaning: "如啊 — no meaning", ptMeaning: "rua means 'street'" },
     ],
     phoneticDifficulties: [
       {
