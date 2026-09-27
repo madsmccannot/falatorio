@@ -13,6 +13,7 @@ import { getLessonReward } from "@falatorio/core/economy";
 import type { ExerciseType, CognitiveLevel } from "@falatorio/core";
 import { knowledgeItems } from "@falatorio/db/schema";
 import { explainExerciseError } from "../services/llm.service.js";
+import { checkAndUnlockAchievements } from "../services/achievement-checker.service.js";
 import { EXPLAINS } from "@falatorio/core";
 
 function exerciseToCognitiveLevel(exerciseType: string): CognitiveLevel {
@@ -331,6 +332,11 @@ export const lessonRouter = t.router({
 
       const passed = accuracy >= LESSON.PASS_THRESHOLD;
 
+      const achievementResult = await checkAndUnlockAchievements(
+        ctx.db,
+        ctx.user.userId,
+      );
+
       return {
         passed,
         accuracy,
@@ -339,6 +345,7 @@ export const lessonRouter = t.router({
         isPerfect,
         xpBreakdown: xpResult,
         dominantCognitiveLevel: dominantLevel ?? null,
+        newAchievements: achievementResult.newlyUnlocked,
       };
     }),
 

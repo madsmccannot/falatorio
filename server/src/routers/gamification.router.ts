@@ -10,8 +10,9 @@ import {
   transactions,
 } from "@falatorio/db/schema";
 import { LEAGUE, OURO } from "@falatorio/core";
-import { checkStreak, recordActivity } from "@falatorio/core/gamification";
+import { checkStreak, recordActivity, ACHIEVEMENTS } from "@falatorio/core/gamification";
 import { computeBalance, type Transaction } from "@falatorio/core/economy";
+import { checkAndUnlockAchievements } from "../services/achievement-checker.service.js";
 import * as lb from "../services/leaderboard.service.js";
 
 export const gamificationRouter = t.router({
@@ -237,9 +238,34 @@ export const gamificationRouter = t.router({
       .from(achievements)
       .where(eq(achievements.userId, ctx.user.userId));
 
-    return rows.map((r) => ({
-      badgeId: r.badgeId,
-      unlockedAt: r.unlockedAt,
-    }));
+    const unlockedIds = new Set(rows.map((r) => r.badgeId));
+
+    return {
+      unlocked: rows.map((r) => ({
+        badgeId: r.badgeId,
+        unlockedAt: r.unlockedAt,
+      })),
+      all: ACHIEVEMENTS.map((a) => ({
+        id: a.id,
+        name: a.name,
+        description: a.description,
+        icon: a.icon,
+        category: a.category,
+        isUnlocked: unlockedIds.has(a.id),
+      })),
+    };
+  }),
+
+  checkAchievements: protectedProcedure.mutation(async ({ ctx }) => {
+    const result = await checkAndUnlockAchievements(ctx.db, ctx.user.userId);
+    return {
+      newlyUnlocked: result.newlyUnlocked,
+      achievements: result.newlyUnlocked.map((id) => {
+        const def = ACHIEVEMENTS.find((a) => a.id === id);
+        return def
+          ? { id: def.id, name: def.name, description: def.description, icon: def.icon }
+          : { id, name: id, description: "", icon: "star" };
+      }),
+    };
   }),
 });
