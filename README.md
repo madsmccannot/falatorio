@@ -34,7 +34,7 @@ falatorio/
 | AI | LLM-powered conversation tutor, dynamic content generation, exercise generation; OpenAI Whisper (speech), Azure TTS |
 | Storage | MMKV (device), Cloudflare R2 (audio, media) |
 | CI/CD | GitHub Actions, Docker (GHCR), Railway, Vercel |
-| Observability | Sentry (crash reporting, performance), custom analytics (batched event queue) |
+| Observability | Sentry (crash reporting, performance), PostHog (analytics, A/B testing, feature flags), custom analytics (batched event queue) |
 | i18n | Custom hook-based system, 15 languages (en, pt, es, fr, hi, ur, ar, bn, de, zh, ru, uk, tr, pl, ko, ja) |
 
 ## Core Concepts
@@ -190,6 +190,8 @@ FCM_PRIVATE_KEY=
 PAYLOAD_SECRET=         # Payload CMS
 EXPO_PUBLIC_SENTRY_DSN= # Sentry crash reporting (mobile)
 EXPO_PUBLIC_ANALYTICS_ENDPOINT= # Custom analytics endpoint
+EXPO_PUBLIC_POSTHOG_API_KEY= # PostHog analytics, A/B testing, feature flags
+EXPO_PUBLIC_POSTHOG_HOST= # PostHog host (default: https://eu.i.posthog.com)
 ```
 
 ### Mobile Development

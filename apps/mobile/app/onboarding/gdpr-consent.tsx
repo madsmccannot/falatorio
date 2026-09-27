@@ -20,12 +20,12 @@ export default function GDPRConsentScreen() {
   const handleAccept = () => {
     setLoading(true);
     setBoolean(KEYS.GDPR_CONSENT, true);
-    router.push("/onboarding/select-goal");
+    router.push("/onboarding/l1-intro");
   };
 
   const handleDecline = () => {
     setBoolean(KEYS.GDPR_CONSENT, false);
-    router.push("/onboarding/select-goal");
+    router.push("/onboarding/l1-intro");
   };
 
   return (

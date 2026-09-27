@@ -3,14 +3,16 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
-import { CEFR_LEVELS, type CEFRLevel } from "@falatorio/core";
+import { CEFR_LEVELS, type CEFRLevel, type L1Code } from "@falatorio/core";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/lib/theme";
 import { onboardingStyles } from "@/lib/styles";
 import { useTranslation } from "@/lib/i18n";
-import { setString, KEYS } from "@/lib/storage";
+import { getString, setString, KEYS } from "@/lib/storage";
 import { trackOnboardingStep, trackScreenView } from "@/lib/analytics";
 import { spacing, radii, typography } from "@falatorio/ui/tokens";
+
+const ROMANCE_L1S: L1Code[] = ["es", "fr"];
 
 const LEVEL_KEYS: Record<string, { label: string; desc: string }> = {
   A1: { label: "onboarding.level_a1", desc: "onboarding.level_a1_desc" },
@@ -38,11 +40,16 @@ export default function SelectLevelScreen() {
     setSelected(level);
   };
 
+  const l1 = (getString(KEYS.SELECTED_L1) ?? "en") as L1Code;
+  const isRomance = ROMANCE_L1S.includes(l1);
+
   const handleContinue = () => {
     if (!selected) return;
     setString(KEYS.SELECTED_LEVEL, selected);
     trackOnboardingStep("level_selected", selected);
-    if (selected === "A1") {
+    if (isRomance) {
+      router.push("/onboarding/placement-test");
+    } else if (selected === "A1") {
       router.push("/onboarding/plan");
     } else {
       router.push("/onboarding/placement-test");
@@ -84,7 +91,7 @@ export default function SelectLevelScreen() {
 
       <View style={[shared.footer, { paddingBottom: insets.bottom + spacing.lg }]}>
         <Button
-          title={selected === "A1" ? t("onboarding.start_learning") : t("onboarding.take_test")}
+          title={selected === "A1" && !isRomance ? t("onboarding.start_learning") : t("onboarding.take_test")}
           onPress={handleContinue}
           disabled={!selected}
           size="lg"

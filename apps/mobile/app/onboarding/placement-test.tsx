@@ -45,14 +45,19 @@ export default function PlacementTestScreen() {
   const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const l1 = (getString(KEYS.SELECTED_L1) ?? "en") as L1Code;
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const ROMANCE_L1S: L1Code[] = ["es", "fr"];
+  const isRomance = ROMANCE_L1S.includes(l1);
+  const startIndex = isRomance ? 2 : 0;
+
+  const [currentIndex, setCurrentIndex] = useState(startIndex);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
 
-  const totalQuestions = Math.min(SAMPLE_QUESTIONS.length, 10);
+  const totalQuestions = SAMPLE_QUESTIONS.length - startIndex;
   const question = SAMPLE_QUESTIONS[currentIndex];
-  const progress = (currentIndex + 1) / totalQuestions;
+  const answeredCount = currentIndex - startIndex;
+  const progress = (answeredCount + 1) / totalQuestions;
 
   const handleSelectOption = (index: number) => {
     if (selectedOption !== null) return;
@@ -63,7 +68,7 @@ export default function PlacementTestScreen() {
     setAnswers((prev) => [...prev, isCorrect]);
 
     setTimeout(() => {
-      if (currentIndex + 1 >= totalQuestions) {
+      if (currentIndex + 1 >= startIndex + totalQuestions) {
         setShowResult(true);
       } else {
         setCurrentIndex((prev) => prev + 1);
@@ -74,9 +79,10 @@ export default function PlacementTestScreen() {
 
   if (showResult) {
     const correctCount = answers.filter(Boolean).length;
-    let state = createPlacementState(SAMPLE_QUESTIONS, l1);
+    const testQuestions = SAMPLE_QUESTIONS.slice(startIndex);
+    let state = createPlacementState(testQuestions, l1);
     for (let i = 0; i < answers.length; i++) {
-      const q = SAMPLE_QUESTIONS[i]!;
+      const q = testQuestions[i]!;
       state = recordPlacementResponse(state, q.id, answers[i]!, q.difficulty);
     }
     const result = getPlacementResult(state);
@@ -108,7 +114,7 @@ export default function PlacementTestScreen() {
           <View style={[local.progressFill, { width: `${progress * 100}%` }]} />
         </View>
         <Text style={[local.progressText, { color: theme.textMuted }]}>
-          {currentIndex + 1}/{totalQuestions}
+          {answeredCount + 1}/{totalQuestions}
         </Text>
       </View>
 

@@ -10,12 +10,14 @@ import { ToastProvider } from "@/components/ui/Toast";
 import * as SecureStore from "expo-secure-store";
 import { applyThemePref } from "@/lib/theme";
 import { initSentry, identifyUser } from "@/lib/sentry";
+import { initPostHog, identifyPostHogUser } from "@/lib/posthog";
 import { getString, KEYS } from "@/lib/storage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 SplashScreen.preventAutoHideAsync();
 applyThemePref();
 initSentry();
+initPostHog();
 
 const CLERK_KEY = process.env["EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY"] ?? "";
 
@@ -58,6 +60,7 @@ function AuthInner() {
   useEffect(() => {
     if (user?.id) {
       identifyUser(user.id, getString(KEYS.SELECTED_L1) ?? undefined);
+      identifyPostHogUser(user.id);
     }
   }, [user?.id]);
 
