@@ -12,6 +12,7 @@ import { useTranslation } from "@/lib/i18n";
 import type { TKey } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 import { CheckIcon } from "@/components/icons";
+import { track, trackScreenView } from "@/lib/analytics";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { SUPER_PRICING } from "@falatorio/core";
 
@@ -32,6 +33,10 @@ export default function SuperDetailScreen() {
   const { showToast } = useToast();
   const [purchasing, setPurchasing] = React.useState(false);
 
+  React.useEffect(() => {
+    trackScreenView("super_detail");
+  }, []);
+
   const handleSubscribe = async (period: "monthly" | "yearly") => {
     try {
       setPurchasing(true);
@@ -46,6 +51,7 @@ export default function SuperDetailScreen() {
         return;
       }
       await purchasePackage(pkg);
+      track("super_subscribe", { period });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       showToast({ message: t("toast.welcome_super"), type: "success" });
       router.replace("/tabs/learn");

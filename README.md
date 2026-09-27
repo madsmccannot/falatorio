@@ -34,7 +34,8 @@ falatorio/
 | AI | LLM-powered conversation tutor, dynamic content generation, exercise generation; OpenAI Whisper (speech), Azure TTS |
 | Storage | MMKV (device), Cloudflare R2 (audio, media) |
 | CI/CD | GitHub Actions, Docker (GHCR), Railway, Vercel |
-| i18n | Custom hook-based system, 8 languages (en, pt, es, fr, hi, ur, ar, bn) |
+| Observability | Sentry (crash reporting, performance), custom analytics (batched event queue) |
+| i18n | Custom hook-based system, 15 languages (en, pt, es, fr, hi, ur, ar, bn, de, zh, ru, uk, tr, pl, ko, ja) |
 
 ## Core Concepts
 
@@ -87,7 +88,7 @@ Text scoring uses Levenshtein distance with PT-EU phonetic normalization. Speech
 
 ### Internationalization (i18n)
 
-All user-facing strings are translatable via the `useTranslation()` hook (`apps/mobile/lib/i18n.ts`). The system reads the user's selected L1 from MMKV storage and resolves strings through a fallback chain: `L1 dictionary -> English -> raw key`. English is the source of truth; Portuguese (PT-PT) has full coverage with proper diacritics. Other supported languages (es, fr, hi, ur, ar, bn) have partial coverage and fall back to English for missing keys.
+All user-facing strings are translatable via the `useTranslation()` hook (`apps/mobile/lib/i18n.ts`). The system reads the user's selected L1 from MMKV storage and resolves strings through a fallback chain: `L1 dictionary -> English -> raw key`. English is the source of truth (225 keys); Portuguese (PT-PT) has full coverage with proper diacritics. All 15 L1 languages have full 225-key parity: Phase 1 (es, fr, hi, ur, ar, bn) and Phase 2 (de, zh, ru, uk, tr, pl, ko, ja).
 
 ### Onboarding Gate
 
@@ -187,6 +188,8 @@ FCM_PROJECT_ID=         # Firebase push notifications
 FCM_CLIENT_EMAIL=
 FCM_PRIVATE_KEY=
 PAYLOAD_SECRET=         # Payload CMS
+EXPO_PUBLIC_SENTRY_DSN= # Sentry crash reporting (mobile)
+EXPO_PUBLIC_ANALYTICS_ENDPOINT= # Custom analytics endpoint
 ```
 
 ### Mobile Development
@@ -219,7 +222,7 @@ Four GitHub Actions workflows:
 - No emojis anywhere — all icons are SVG via react-native-svg for cross-platform consistency
 - Portuguese visual identity throughout
 - Reward animation: top-down camera, hands open a cord-tied sack to reveal shiny golden coins inside
-- All UI strings translatable via `useTranslation()` hook — supports 8 languages with English fallback
+- All UI strings translatable via `useTranslation()` hook — supports 15 L1 languages with English fallback
 
 ## License
 

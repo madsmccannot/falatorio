@@ -45,7 +45,14 @@
           "backgroundColor": "#059669"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "falatorio",
+          "project": "mobile"
+        }
+      ]
     ],
     "extra": {
       "eas": {

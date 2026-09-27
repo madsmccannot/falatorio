@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -10,6 +10,7 @@ import { useTranslation } from "@/lib/i18n";
 import { spacing, radii, typography } from "@falatorio/ui/tokens";
 import { SUPER_PRICING } from "@falatorio/core";
 import { setOnboardingComplete } from "@/lib/storage";
+import { trackOnboardingStep, trackScreenView } from "@/lib/analytics";
 
 type Plan = "free" | "super";
 
@@ -21,12 +22,18 @@ export default function PlanScreen() {
   const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const [selected, setSelected] = useState<Plan>("free");
 
+  useEffect(() => {
+    trackScreenView("onboarding_plan");
+  }, []);
+
   const handleSelect = (plan: Plan) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelected(plan);
   };
 
   const handleContinue = () => {
+    trackOnboardingStep("plan_selected", selected);
+    trackOnboardingStep("complete");
     setOnboardingComplete();
     if (selected === "super") {
       router.replace("/shop/super-detail");

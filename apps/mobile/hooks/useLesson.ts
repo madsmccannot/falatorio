@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { trpc } from "@/lib/trpc";
+import { trackExerciseAnswer, trackExerciseExplain } from "@/lib/analytics";
 
 export interface Exercise {
   id: string;
@@ -102,6 +103,7 @@ export function useLesson(lessonId?: string) {
     const exercise = state.exercises[state.currentIndex];
     if (!state.sessionId || !exercise) return null;
 
+    const answerStartMs = Date.now();
     setState((prev) => ({ ...prev, phase: "submitting" as const }));
 
     try {
@@ -110,6 +112,8 @@ export function useLesson(lessonId?: string) {
         exerciseId: exercise.id,
         answer,
       });
+
+      trackExerciseAnswer(exercise.type, result.correct, Date.now() - answerStartMs);
 
       setState((prev) => ({
         ...prev,
@@ -155,6 +159,8 @@ export function useLesson(lessonId?: string) {
         userAnswer: state.feedback.userAnswer,
         correctAnswer: state.feedback.correctAnswer ?? "",
       });
+
+      trackExerciseExplain(exercise.id, result.remaining);
 
       setState((prev) => ({
         ...prev,

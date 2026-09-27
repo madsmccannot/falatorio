@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,6 +9,7 @@ import { useTheme } from "@/lib/theme";
 import { onboardingStyles } from "@/lib/styles";
 import { useTranslation } from "@/lib/i18n";
 import { setString, KEYS } from "@/lib/storage";
+import { trackOnboardingStep, trackScreenView } from "@/lib/analytics";
 import { spacing, radii, typography } from "@falatorio/ui/tokens";
 
 const LEVEL_KEYS: Record<string, { label: string; desc: string }> = {
@@ -28,6 +29,10 @@ export default function SelectLevelScreen() {
   const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const [selected, setSelected] = useState<CEFRLevel | null>(null);
 
+  useEffect(() => {
+    trackScreenView("onboarding_select_level");
+  }, []);
+
   const handleSelect = (level: CEFRLevel) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelected(level);
@@ -36,6 +41,7 @@ export default function SelectLevelScreen() {
   const handleContinue = () => {
     if (!selected) return;
     setString(KEYS.SELECTED_LEVEL, selected);
+    trackOnboardingStep("level_selected", selected);
     if (selected === "A1") {
       router.push("/onboarding/plan");
     } else {

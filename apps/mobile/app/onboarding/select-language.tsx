@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { View, Text, Pressable, FlatList, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -11,6 +11,7 @@ import { onboardingStyles } from "@/lib/styles";
 import { useTranslation } from "@/lib/i18n";
 import { spacing } from "@falatorio/ui/tokens";
 import { setString, KEYS } from "@/lib/storage";
+import { trackOnboardingStep, trackScreenView } from "@/lib/analytics";
 
 const L1_LABELS: Record<L1Code, { name: string; native: string; flag: string }> = {
   en: { name: "English", native: "English", flag: "GB" },
@@ -43,9 +44,15 @@ export default function SelectLanguageScreen() {
     setSelected(code);
   };
 
+  useEffect(() => {
+    trackScreenView("onboarding_select_language");
+    trackOnboardingStep("start");
+  }, []);
+
   const handleContinue = () => {
     if (!selected) return;
     setString(KEYS.SELECTED_L1, selected);
+    trackOnboardingStep("l1_selected", selected);
     router.push("/onboarding/gdpr-consent");
   };
 

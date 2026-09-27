@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/Toast";
 import { GoldPrisms } from "@/components/icons";
 import { useTranslation } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
+import { trackPurchase, trackScreenView } from "@/lib/analytics";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type OuroPack = {
@@ -38,6 +39,10 @@ export default function OuroPacksScreen() {
   const { showToast } = useToast();
   const [purchasing, setPurchasing] = React.useState<string | null>(null);
 
+  React.useEffect(() => {
+    trackScreenView("shop_ouro_packs");
+  }, []);
+
   const handlePurchase = async (pack: OuroPack) => {
     try {
       setPurchasing(pack.id);
@@ -51,6 +56,7 @@ export default function OuroPacksScreen() {
         return;
       }
       await purchasePackage(pkg);
+      trackPurchase(pack.packageId, "money", pack.amount);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       showToast({ message: t("toast.ouro_added", { amount: pack.amount }), type: "success" });
     } catch (err: any) {

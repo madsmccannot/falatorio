@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,6 +9,7 @@ import { useTheme } from "@/lib/theme";
 import { onboardingStyles } from "@/lib/styles";
 import { useTranslation } from "@/lib/i18n";
 import { setString, KEYS } from "@/lib/storage";
+import { trackOnboardingStep, trackScreenView } from "@/lib/analytics";
 import { spacing } from "@falatorio/ui/tokens";
 
 const GOAL_KEYS: Record<UserGoal, { label: string; desc: string }> = {
@@ -28,6 +29,10 @@ export default function SelectGoalScreen() {
   const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const [selected, setSelected] = useState<UserGoal | null>(null);
 
+  useEffect(() => {
+    trackScreenView("onboarding_select_goal");
+  }, []);
+
   const handleSelect = (goal: UserGoal) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelected(goal);
@@ -36,6 +41,7 @@ export default function SelectGoalScreen() {
   const handleContinue = () => {
     if (!selected) return;
     setString(KEYS.SELECTED_GOAL, selected);
+    trackOnboardingStep("goal_selected", selected);
     router.push("/onboarding/select-level");
   };
 

@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { GoldPrisms, TimerIcon } from "@/components/icons";
 import { GaloCelebration } from "@/components/lesson/GaloCelebration";
 import { useTranslation } from "@/lib/i18n";
+import { trackScreenView } from "@/lib/analytics";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 function formatTime(seconds: number): string {
@@ -36,6 +37,7 @@ export default function LessonResultScreen() {
   const [contentVisible, setContentVisible] = React.useState(false);
 
   React.useEffect(() => {
+    trackScreenView("lesson_result");
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, []);
 

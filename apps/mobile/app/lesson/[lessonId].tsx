@@ -25,6 +25,7 @@ import { Loading } from "@/components/ui/Loading";
 import { Modal } from "@/components/ui/Modal";
 import { HeartIcon } from "@/components/icons";
 import { useTranslation } from "@/lib/i18n";
+import { trackLessonStart, trackLessonComplete, trackLessonQuit, trackScreenView } from "@/lib/analytics";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 export default function LessonScreen() {
@@ -57,6 +58,13 @@ export default function LessonScreen() {
   const [showQuit, setShowQuit] = React.useState(false);
   const [showOutOfHearts, setShowOutOfHearts] = React.useState(false);
 
+  useEffect(() => {
+    trackScreenView("lesson");
+    if (totalExercises > 0 && lessonId) {
+      trackLessonStart(lessonId, totalExercises);
+    }
+  }, [totalExercises]);
+
   useFocusEffect(
     useCallback(() => {
       const sub = BackHandler.addEventListener("hardwareBackPress", () => {
@@ -81,6 +89,9 @@ export default function LessonScreen() {
       if (!result) return;
 
       const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000);
+      const correctCount = results.filter((r) => r.correct).length;
+      const accuracy = totalExercises > 0 ? correctCount / totalExercises : 0;
+      trackLessonComplete(lessonId!, elapsed, result.xpEarned, result.ouroEarned, accuracy);
 
       router.replace({
         pathname: "/lesson/result",
@@ -207,7 +218,10 @@ export default function LessonScreen() {
         />
         <Button
           title={t("lesson.quit")}
-          onPress={() => router.back()}
+          onPress={() => {
+            trackLessonQuit(lessonId!, currentIndex, totalExercises);
+            router.back();
+          }}
           variant="danger"
           style={styles.modalButton}
         />

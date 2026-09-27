@@ -9,9 +9,13 @@ import { useTRPCClient } from "@/lib/trpc";
 import { ToastProvider } from "@/components/ui/Toast";
 import * as SecureStore from "expo-secure-store";
 import { applyThemePref } from "@/lib/theme";
+import { initSentry, identifyUser } from "@/lib/sentry";
+import { getString, KEYS } from "@/lib/storage";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 SplashScreen.preventAutoHideAsync();
 applyThemePref();
+initSentry();
 
 const CLERK_KEY = process.env["EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY"] ?? "";
 
@@ -42,13 +46,20 @@ function TRPCWrapper({ children }: { children: React.ReactNode }) {
 }
 
 function AuthInner() {
-  const { useAuth } = require("@clerk/clerk-expo");
+  const { useAuth, useUser } = require("@clerk/clerk-expo");
   const { isLoaded, isSignedIn } = useAuth();
+  const { user } = useUser();
   const bg = useStackBg();
 
   useEffect(() => {
     if (isLoaded) SplashScreen.hideAsync();
   }, [isLoaded]);
+
+  useEffect(() => {
+    if (user?.id) {
+      identifyUser(user.id, getString(KEYS.SELECTED_L1) ?? undefined);
+    }
+  }, [user?.id]);
 
   if (!isLoaded) return null;
 
@@ -134,14 +145,16 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={[styles.root, { backgroundColor: scheme === "dark" ? "#0C1524" : "#F8FAFC" }]}>
-      <SafeAreaProvider>
-        <TRPCWrapper>
-          <ToastProvider>
-            {CLERK_KEY ? <AuthenticatedNavigator /> : <PreviewNavigator />}
-            <StatusBar style="auto" />
-          </ToastProvider>
-        </TRPCWrapper>
-      </SafeAreaProvider>
+      <ErrorBoundary>
+        <SafeAreaProvider>
+          <TRPCWrapper>
+            <ToastProvider>
+              {CLERK_KEY ? <AuthenticatedNavigator /> : <PreviewNavigator />}
+              <StatusBar style="auto" />
+            </ToastProvider>
+          </TRPCWrapper>
+        </SafeAreaProvider>
+      </ErrorBoundary>
     </GestureHandlerRootView>
   );
 }
