@@ -11,12 +11,14 @@ import { trackScreenView, trackOnboardingStep } from "@/lib/analytics";
 import { spacing, typography } from "@falatorio/ui/tokens";
 import type { L1Code } from "@falatorio/core";
 
-type L1Group = "romance" | "cjk" | "rtl_adjacent" | "general";
+type L1Group = "romance" | "cjk" | "indic" | "rtl_adjacent" | "cyrillic" | "general";
 
 function getL1Group(l1: L1Code): L1Group {
   if (l1 === "es" || l1 === "fr") return "romance";
   if (l1 === "zh" || l1 === "ja" || l1 === "ko") return "cjk";
+  if (l1 === "hi" || l1 === "bn") return "indic";
   if (l1 === "ar" || l1 === "ur") return "rtl_adjacent";
+  if (l1 === "ru" || l1 === "uk") return "cyrillic";
   return "general";
 }
 
@@ -63,6 +65,24 @@ function getIntroContent(_l1: L1Code, group: L1Group, t: (k: any) => string): In
           },
         ],
       };
+    case "indic":
+      return {
+        titleKey: t("onboarding.l1_intro_indic_title"),
+        sections: [
+          {
+            heading: t("onboarding.l1_intro_indic_alphabet"),
+            body: t("onboarding.l1_intro_indic_alphabet_text"),
+          },
+          {
+            heading: t("onboarding.l1_intro_indic_sounds"),
+            body: t("onboarding.l1_intro_indic_sounds_text"),
+          },
+          {
+            heading: t("onboarding.l1_intro_indic_gender"),
+            body: t("onboarding.l1_intro_indic_gender_text"),
+          },
+        ],
+      };
     case "rtl_adjacent":
       return {
         titleKey: t("onboarding.l1_intro_rtl_title"),
@@ -78,6 +98,24 @@ function getIntroContent(_l1: L1Code, group: L1Group, t: (k: any) => string): In
           {
             heading: t("onboarding.l1_intro_rtl_gender"),
             body: t("onboarding.l1_intro_rtl_gender_text"),
+          },
+        ],
+      };
+    case "cyrillic":
+      return {
+        titleKey: t("onboarding.l1_intro_cyrillic_title"),
+        sections: [
+          {
+            heading: t("onboarding.l1_intro_cyrillic_alphabet"),
+            body: t("onboarding.l1_intro_cyrillic_alphabet_text"),
+          },
+          {
+            heading: t("onboarding.l1_intro_cyrillic_sounds"),
+            body: t("onboarding.l1_intro_cyrillic_sounds_text"),
+          },
+          {
+            heading: t("onboarding.l1_intro_cyrillic_grammar"),
+            body: t("onboarding.l1_intro_cyrillic_grammar_text"),
           },
         ],
       };
