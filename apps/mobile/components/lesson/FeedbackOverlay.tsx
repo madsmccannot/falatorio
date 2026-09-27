@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import Animated, { SlideInDown } from "react-native-reanimated";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import Animated, { SlideInDown, FadeIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
@@ -10,15 +10,32 @@ type PunctuationWarning = {
   message: string;
 };
 
+type ExplainState = {
+  loading: boolean;
+  explanation: string | null;
+  remaining: number | null;
+  error: string | null;
+};
+
 type Props = {
   correct: boolean;
   correctAnswer?: string;
   l1Tip?: string;
   warnings?: PunctuationWarning[];
+  explain: ExplainState;
   onContinue: () => void;
+  onExplain: () => void;
 };
 
-export function FeedbackOverlay({ correct, correctAnswer, l1Tip, warnings, onContinue }: Props) {
+export function FeedbackOverlay({
+  correct,
+  correctAnswer,
+  l1Tip,
+  warnings,
+  explain,
+  onContinue,
+  onExplain,
+}: Props) {
   React.useEffect(() => {
     if (correct) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -28,6 +45,7 @@ export function FeedbackOverlay({ correct, correctAnswer, l1Tip, warnings, onCon
   }, []);
 
   const hasWarnings = warnings && warnings.length > 0;
+  const showExplainButton = !explain.explanation && !explain.loading && explain.error !== "limit_reached";
 
   return (
     <Animated.View
@@ -35,11 +53,11 @@ export function FeedbackOverlay({ correct, correctAnswer, l1Tip, warnings, onCon
       style={[styles.container, correct ? (hasWarnings ? styles.correctWarning : styles.correct) : styles.wrong]}
     >
       <Text style={styles.title}>
-        {correct ? (hasWarnings ? "Almost perfect!" : "Correct!") : "Not quite"}
+        {correct ? (hasWarnings ? "Quase perfeito!" : "Correto!") : "Nao foi desta"}
       </Text>
 
       {!correct && correctAnswer && (
-        <Text style={styles.answer}>Correct answer: {correctAnswer}</Text>
+        <Text style={styles.answer}>Resposta correta: {correctAnswer}</Text>
       )}
 
       {hasWarnings && (
@@ -54,12 +72,49 @@ export function FeedbackOverlay({ correct, correctAnswer, l1Tip, warnings, onCon
         <Text style={styles.tip}>{l1Tip}</Text>
       )}
 
-      <Button
-        title="Continue"
-        onPress={onContinue}
-        variant="ghost"
-        style={styles.button}
-      />
+      {explain.loading && (
+        <Animated.View entering={FadeIn.duration(200)} style={styles.explainBox}>
+          <ActivityIndicator size="small" color={colors.primary[600]} />
+          <Text style={styles.explainLoading}>A explicar...</Text>
+        </Animated.View>
+      )}
+
+      {explain.explanation && (
+        <Animated.View entering={FadeIn.duration(300)} style={styles.explainBox}>
+          <Text style={styles.explainText}>{explain.explanation}</Text>
+          {explain.remaining !== null && (
+            <Text style={styles.explainRemaining}>
+              {explain.remaining} {explain.remaining === 1 ? "explicacao restante" : "explicacoes restantes"} hoje
+            </Text>
+          )}
+        </Animated.View>
+      )}
+
+      {explain.error === "limit_reached" && (
+        <Animated.View entering={FadeIn.duration(200)} style={styles.limitBox}>
+          <Text style={styles.limitText}>
+            Limite diario de explicacoes atingido. Atualiza para Super para mais!
+          </Text>
+        </Animated.View>
+      )}
+
+      <View style={styles.actions}>
+        {showExplainButton && (
+          <Button
+            title="Porquê?"
+            onPress={onExplain}
+            variant="outline"
+            size="sm"
+            style={styles.explainButton}
+          />
+        )}
+        <Button
+          title="Continuar"
+          onPress={onContinue}
+          variant="ghost"
+          style={styles.continueButton}
+        />
+      </View>
     </Animated.View>
   );
 }
@@ -108,7 +163,48 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     marginBottom: spacing.sm,
   },
-  button: {
-    alignSelf: "flex-end",
+  explainBox: {
+    backgroundColor: colors.neutral[50],
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    gap: spacing.xs,
+  },
+  explainLoading: {
+    fontSize: typography.sizes.sm,
+    color: colors.neutral[500],
+    textAlign: "center",
+  },
+  explainText: {
+    fontSize: typography.sizes.sm,
+    color: colors.neutral[800],
+    lineHeight: 20,
+  },
+  explainRemaining: {
+    fontSize: typography.sizes.xs,
+    color: colors.neutral[400],
+    marginTop: spacing.xs,
+  },
+  limitBox: {
+    backgroundColor: "#FEF3C7",
+    borderRadius: radii.md,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  limitText: {
+    fontSize: typography.sizes.sm,
+    color: "#92400E",
+    lineHeight: 18,
+  },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  explainButton: {
+    minWidth: 80,
+  },
+  continueButton: {
+    marginLeft: "auto",
   },
 });

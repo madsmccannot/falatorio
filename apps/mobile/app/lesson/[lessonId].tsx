@@ -1,27 +1,31 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   BackHandler,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import Animated, {
-  FadeIn,
   SlideInRight,
   SlideOutLeft,
 } from "react-native-reanimated";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLesson } from "@/hooks/useLesson";
 import { useHearts } from "@/hooks/useHearts";
+import { ExerciseRenderer } from "@/components/exercises/ExerciseRenderer";
+import { FeedbackOverlay } from "@/components/lesson/FeedbackOverlay";
+import { ProgressBar } from "@/components/lesson/ProgressBar";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { Modal } from "@/components/ui/Modal";
 import { HeartIcon } from "@/components/icons";
 import { useTranslation } from "@/lib/i18n";
-import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 export default function LessonScreen() {
   const { lessonId } = useLocalSearchParams<{ lessonId: string }>();
@@ -31,18 +35,23 @@ export default function LessonScreen() {
   const { hearts, unlimited, continueWithOuro } = useHearts();
 
   const {
-    state,
+    phase,
     currentExercise,
-    progress,
+    currentIndex,
     totalExercises,
-    selectedAnswer,
-    setSelectedAnswer,
-    submitCurrentAnswer,
-    isSubmitting,
     feedback,
+    explain,
+    submitAnswer,
+    isSubmitting,
+    requestExplanation,
     nextExercise,
+    isComplete,
     isStarting,
+    completeLesson,
+    isCompleting,
     error,
+    results,
+    startTimeRef,
   } = useLesson(lessonId!);
 
   const [showQuit, setShowQuit] = React.useState(false);
@@ -58,11 +67,41 @@ export default function LessonScreen() {
     }, [])
   );
 
-  React.useEffect(() => {
-    if (!unlimited && hearts <= 0 && state === "answering") {
+  useEffect(() => {
+    if (!unlimited && hearts <= 0 && phase === "answering") {
       setShowOutOfHearts(true);
     }
-  }, [hearts, unlimited, state]);
+  }, [hearts, unlimited, phase]);
+
+  useEffect(() => {
+    if (!isComplete) return;
+
+    (async () => {
+      const result = await completeLesson();
+      if (!result) return;
+
+      const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000);
+
+      router.replace({
+        pathname: "/lesson/result",
+        params: {
+          xpEarned: String(result.xpEarned),
+          ouroEarned: String(result.ouroEarned),
+          elapsedSeconds: String(elapsed),
+        },
+      });
+    })();
+  }, [isComplete]);
+
+  const handleAnswer = useCallback((answer: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    submitAnswer(answer);
+  }, [submitAnswer]);
+
+  const handleContinue = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    nextExercise();
+  }, [nextExercise]);
 
   if (isStarting) {
     return <Loading fullScreen message={t("lesson.preparing")} />;
@@ -83,12 +122,15 @@ export default function LessonScreen() {
     );
   }
 
-  if (state === "complete") {
-    return null;
+  if (isComplete || isCompleting) {
+    return <Loading fullScreen message={t("lesson.finishing")} />;
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <KeyboardAvoidingView
+      style={[styles.container, { paddingTop: insets.top }]}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <View style={styles.topBar}>
         <Button
           title="X"
@@ -96,14 +138,7 @@ export default function LessonScreen() {
           variant="ghost"
           size="sm"
         />
-        <View style={styles.progressBarOuter}>
-          <Animated.View
-            style={[
-              styles.progressBarInner,
-              { width: `${(progress / totalExercises) * 100}%` },
-            ]}
-          />
-        </View>
+        <ProgressBar current={currentIndex} total={totalExercises} />
         {!unlimited && (
           <View style={styles.heartsChip}>
             <HeartIcon size={16} />
@@ -122,111 +157,51 @@ export default function LessonScreen() {
           <Text style={styles.exerciseType}>
             {formatExerciseType(currentExercise.type, t)}
           </Text>
-          <Text style={styles.prompt}>
-            {currentExercise.prompt}
-          </Text>
 
-          {currentExercise.options && (
-            <View style={styles.options}>
-              {currentExercise.options.map((option: string, i: number) => {
-                const isSelected = selectedAnswer === option;
-                const isCorrect = feedback?.correctAnswer === option;
-                const isWrong = feedback && isSelected && !feedback.correct;
-
-                return (
-                  <Button
-                    key={`${currentExercise.id}-${i}`}
-                    title={option}
-                    onPress={() => {
-                      if (!feedback) {
-                        Haptics.selectionAsync();
-                        setSelectedAnswer(option);
-                      }
-                    }}
-                    variant={
-                      feedback
-                        ? isCorrect
-                          ? "primary"
-                          : isWrong
-                            ? "danger"
-                            : "outline"
-                        : isSelected
-                          ? "secondary"
-                          : "outline"
-                    }
-                    style={styles.optionButton}
-                    disabled={!!feedback}
-                  />
-                );
-              })}
-            </View>
-          )}
-
-          {!currentExercise.options && !feedback && (
-            <View style={styles.textInputArea}>
-              <Text style={styles.inputPlaceholder}>
-                Type your answer...
-              </Text>
-            </View>
-          )}
+          <ExerciseRenderer
+            exercise={{
+              id: currentExercise.id,
+              type: currentExercise.type,
+              prompt: currentExercise.prompt,
+              options: currentExercise.options,
+              pairs: currentExercise.pairs,
+              words: currentExercise.words,
+              sentence: currentExercise.sentence,
+              audioUrl: currentExercise.audioUrl ?? undefined,
+            }}
+            onAnswer={handleAnswer}
+            disabled={phase !== "answering"}
+          />
         </Animated.View>
       ) : (
         <Loading message="Loading exercise..." />
       )}
 
-      {feedback && (
-        <Animated.View
-          entering={FadeIn.duration(200)}
-          style={[
-            styles.feedbackBar,
-            feedback.correct ? styles.feedbackCorrect : styles.feedbackWrong,
-          ]}
-        >
-          <Text style={styles.feedbackTitle}>
-            {feedback.correct ? "Correct!" : "Not quite"}
-          </Text>
-          {!feedback.correct && feedback.correctAnswer && (
-            <Text style={styles.feedbackAnswer}>
-              Correct answer: {feedback.correctAnswer}
-            </Text>
-          )}
-          {feedback.l1Tip && (
-            <Text style={styles.feedbackTip}>{feedback.l1Tip}</Text>
-          )}
-          <Button
-            title="Continue"
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              nextExercise();
-            }}
-            variant="ghost"
-            style={styles.continueButton}
-          />
-        </Animated.View>
-      )}
-
-      {!feedback && selectedAnswer && (
-        <View style={styles.submitArea}>
-          <Button
-            title="Check"
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              submitCurrentAnswer();
-            }}
-            loading={isSubmitting}
-            size="lg"
-            style={styles.submitButton}
-          />
+      {isSubmitting && (
+        <View style={styles.submittingOverlay}>
+          <Loading message="" />
         </View>
       )}
 
+      {feedback && (
+        <FeedbackOverlay
+          correct={feedback.correct}
+          correctAnswer={feedback.correctAnswer}
+          l1Tip={feedback.l1Tip}
+          warnings={feedback.warnings}
+          explain={explain}
+          onContinue={handleContinue}
+          onExplain={requestExplanation}
+        />
+      )}
+
       <Modal visible={showQuit} onDismiss={() => setShowQuit(false)}>
-        <Text style={styles.modalTitle}>Quit lesson?</Text>
+        <Text style={styles.modalTitle}>{t("lesson.quit_title")}</Text>
         <Text style={styles.modalText}>
-          Your progress on this lesson won't be saved.
+          {t("lesson.quit_text")}
         </Text>
         <Button
-          title="Keep learning"
+          title={t("lesson.keep_learning")}
           onPress={() => setShowQuit(false)}
           style={styles.modalButton}
         />
@@ -258,19 +233,24 @@ export default function LessonScreen() {
           style={styles.modalButton}
         />
       </Modal>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 function formatExerciseType(type: string, t: (k: any) => string): string {
   const map: Record<string, string> = {
     translate: t("lesson.type_translate"),
+    translate_l1_to_pt: t("lesson.type_translate"),
+    translate_pt_to_l1: t("lesson.type_translate"),
     fill_blank: t("lesson.type_fill_blank"),
     listen_type: t("lesson.type_listen_type"),
+    listen_and_type: t("lesson.type_listen_type"),
     match_pairs: t("lesson.type_match_pairs"),
     pick_correct: t("lesson.type_pick_correct"),
     reorder: t("lesson.type_reorder"),
+    reorder_words: t("lesson.type_reorder"),
     speak: t("lesson.type_speak"),
+    speak_and_score: t("lesson.type_speak"),
   };
   return map[type] ?? type;
 }
@@ -292,18 +272,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     gap: spacing.sm,
   },
-  progressBarOuter: {
-    flex: 1,
-    height: 8,
-    backgroundColor: colors.neutral[200],
-    borderRadius: radii.full,
-    overflow: "hidden",
-  },
-  progressBarInner: {
-    height: "100%",
-    backgroundColor: colors.primary[500],
-    borderRadius: radii.full,
-  },
   heartsChip: {
     flexDirection: "row",
     alignItems: "center",
@@ -316,77 +284,22 @@ const styles = StyleSheet.create({
   },
   exerciseArea: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
   },
   exerciseType: {
-    fontSize: typography.sizes.lg,
-    fontWeight: "700",
-    color: colors.neutral[900],
-    marginBottom: spacing.lg,
-  },
-  prompt: {
-    fontSize: typography.sizes.xl,
-    fontWeight: "500",
-    color: colors.neutral[800],
-    lineHeight: 32,
-    marginBottom: spacing["2xl"],
-  },
-  options: {
-    gap: spacing.sm,
-  },
-  optionButton: {
-    width: "100%",
-  },
-  textInputArea: {
-    borderWidth: 2,
-    borderColor: colors.neutral[200],
-    borderRadius: radii.md,
-    padding: spacing.lg,
-    minHeight: 100,
-  },
-  inputPlaceholder: {
-    fontSize: typography.sizes.md,
-    color: colors.neutral[400],
-  },
-  feedbackBar: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xl,
-    borderTopLeftRadius: radii.lg,
-    borderTopRightRadius: radii.lg,
-  },
-  feedbackCorrect: {
-    backgroundColor: "#ECFDF5",
-  },
-  feedbackWrong: {
-    backgroundColor: "#FFF1F2",
-  },
-  feedbackTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: "700",
-    color: colors.neutral[900],
-    marginBottom: spacing.xs,
-  },
-  feedbackAnswer: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[700],
-    marginBottom: spacing.xs,
-  },
-  feedbackTip: {
-    fontSize: typography.sizes.sm,
-    color: colors.primary[700],
-    fontStyle: "italic",
-    marginBottom: spacing.sm,
-  },
-  continueButton: {
-    alignSelf: "flex-end",
-  },
-  submitArea: {
+    fontWeight: "600",
+    color: colors.neutral[500],
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingTop: spacing.sm,
   },
-  submitButton: {
-    width: "100%",
+  submittingOverlay: {
+    position: "absolute",
+    bottom: 100,
+    left: 0,
+    right: 0,
+    alignItems: "center",
   },
   errorTitle: {
     fontSize: typography.sizes.xl,

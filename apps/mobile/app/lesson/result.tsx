@@ -2,101 +2,92 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { GoldPrisms } from "@/components/icons";
+import { GoldPrisms, TimerIcon } from "@/components/icons";
+import { GaloCelebration } from "@/components/lesson/GaloCelebration";
 import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  if (m === 0) return `${s}s`;
+  return `${m}m ${s}s`;
+}
 
 export default function LessonResultScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{
-    score: string;
     xpEarned: string;
     ouroEarned: string;
-    totalExercises: string;
-    correctCount: string;
-    passed: string;
+    elapsedSeconds: string;
   }>();
 
   const { t } = useTranslation();
   const xpEarned = Number(params.xpEarned ?? 0);
   const ouroEarned = Number(params.ouroEarned ?? 0);
-  const totalExercises = Number(params.totalExercises ?? 0);
-  const correctCount = Number(params.correctCount ?? 0);
-  const passed = params.passed === "true";
-  const percentage = totalExercises > 0 ? Math.round((correctCount / totalExercises) * 100) : 0;
+  const elapsedSeconds = Number(params.elapsedSeconds ?? 0);
+
+  const [showCelebration, setShowCelebration] = React.useState(true);
+  const [contentVisible, setContentVisible] = React.useState(false);
 
   React.useEffect(() => {
-    if (passed) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } else {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, []);
+
+  const handleCelebrationFinish = React.useCallback(() => {
+    setShowCelebration(false);
+    setContentVisible(true);
   }, []);
 
   return (
-    <ScrollView
-      style={[styles.container, { paddingTop: insets.top }]}
-      contentContainerStyle={styles.scroll}
-    >
-      <Animated.View entering={ZoomIn.delay(200).duration(400)} style={styles.heroSection}>
-        <View style={[styles.scoreCircle, passed ? styles.scorePassed : styles.scoreFailed]}>
-          <Text style={styles.scoreNumber}>{percentage}%</Text>
-          <Text style={styles.scoreLabel}>
-            {passed ? t("result.passed") : t("result.try_again")}
-          </Text>
-        </View>
-      </Animated.View>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      {showCelebration && (
+        <GaloCelebration onFinish={handleCelebrationFinish} />
+      )}
 
-      <Animated.View entering={FadeInDown.delay(400).duration(300)}>
-        <Text style={styles.resultTitle}>
-          {passed ? t("result.complete_title") : t("result.almost_title")}
-        </Text>
-        <Text style={styles.resultSubtitle}>
-          {passed ? t("result.complete_text") : t("result.almost_text")}
-        </Text>
-      </Animated.View>
+      {contentVisible && (
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <Animated.View entering={FadeInDown.delay(100).duration(400)}>
+            <Text style={styles.resultTitle}>{t("result.complete_title")}</Text>
+            <Text style={styles.resultSubtitle}>{t("result.complete_text")}</Text>
+          </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(600).duration(300)} style={styles.statsRow}>
-        <Card style={styles.statCard}>
-          <Text style={styles.statValue}>{correctCount}/{totalExercises}</Text>
-          <Text style={styles.statLabel}>{t("result.correct")}</Text>
-        </Card>
-        <Card style={styles.statCard}>
-          <Text style={[styles.statValue, { color: colors.xp }]}>+{xpEarned}</Text>
-          <Text style={styles.statLabel}>XP</Text>
-        </Card>
-        <Card style={styles.statCard}>
-          <GoldPrisms size={20} />
-          <Text style={[styles.statValue, { color: colors.ouro }]}>+{ouroEarned}</Text>
-          <Text style={styles.statLabel}>{t("result.ouro")}</Text>
-        </Card>
-      </Animated.View>
+          <Animated.View entering={FadeInDown.delay(300).duration(300)} style={styles.statsRow}>
+            <Card style={styles.statCard}>
+              <TimerIcon size={20} />
+              <Text style={styles.statValue}>{formatTime(elapsedSeconds)}</Text>
+              <Text style={styles.statLabel}>{t("result.time")}</Text>
+            </Card>
+            <Card style={styles.statCard}>
+              <GoldPrisms size={20} />
+              <Text style={[styles.statValue, { color: colors.ouro }]}>+{ouroEarned}</Text>
+              <Text style={styles.statLabel}>{t("result.ouro")}</Text>
+            </Card>
+            <Card style={styles.statCard}>
+              <Text style={[styles.statValue, { color: colors.xp }]}>+{xpEarned}</Text>
+              <Text style={styles.statLabel}>XP</Text>
+            </Card>
+          </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(800).duration(300)} style={styles.actions}>
-        <Button
-          title={passed ? t("result.continue") : t("result.try_again")}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.replace("/tabs/learn");
-          }}
-          size="lg"
-          style={styles.primaryAction}
-        />
-        {passed && (
-          <Button
-            title={t("result.review_mistakes")}
-            onPress={() => router.replace("/tabs/practice")}
-            variant="outline"
-            style={styles.secondaryAction}
-          />
-        )}
-      </Animated.View>
-    </ScrollView>
+          <Animated.View entering={FadeInDown.delay(500).duration(300)} style={styles.actions}>
+            <Button
+              title={t("result.continue")}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.replace("/tabs/learn");
+              }}
+              size="lg"
+              style={styles.primaryAction}
+            />
+          </Animated.View>
+        </ScrollView>
+      )}
+    </View>
   );
 }
 
@@ -109,37 +100,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing["5xl"],
     alignItems: "center",
-  },
-  heroSection: {
-    paddingVertical: spacing["3xl"],
-    alignItems: "center",
-  },
-  scoreCircle: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 6,
-  },
-  scorePassed: {
-    borderColor: colors.success,
-    backgroundColor: "#ECFDF5",
-  },
-  scoreFailed: {
-    borderColor: colors.accent[400],
-    backgroundColor: "#FFF7ED",
-  },
-  scoreNumber: {
-    fontSize: 36,
-    fontWeight: "800",
-    color: colors.neutral[900],
-  },
-  scoreLabel: {
-    fontSize: typography.sizes.sm,
-    fontWeight: "600",
-    color: colors.neutral[600],
-    marginTop: 2,
+    paddingTop: spacing["3xl"],
   },
   resultTitle: {
     fontSize: typography.sizes["2xl"],
@@ -181,9 +142,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   primaryAction: {
-    width: "100%",
-  },
-  secondaryAction: {
     width: "100%",
   },
 });

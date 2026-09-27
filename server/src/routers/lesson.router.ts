@@ -113,14 +113,22 @@ export const lessonRouter = t.router({
 
       return {
         sessionId,
-        exercises: lessonExercises.map((e) => ({
-          id: e.id,
-          type: e.type,
-          prompt: e.prompt,
-          audioUrl: e.audioUrl,
-          audioNativeUrl: e.audioNativeUrl,
-          difficulty: e.difficulty,
-        })),
+        exercises: lessonExercises.map((e) => {
+          const p = e.prompt as Record<string, unknown> | string;
+          const text = typeof p === "string" ? p : (p.text as string ?? "");
+          return {
+            id: e.id,
+            type: e.type,
+            prompt: text,
+            options: typeof p === "object" ? (p.options as string[] | undefined) : undefined,
+            pairs: typeof p === "object" ? (p.pairs as Array<{ left: string; right: string }> | undefined) : undefined,
+            words: typeof p === "object" ? (p.words as string[] | undefined) : undefined,
+            sentence: typeof p === "object" ? (p.sentence as string | undefined) : undefined,
+            audioUrl: e.audioUrl,
+            audioNativeUrl: e.audioNativeUrl,
+            difficulty: e.difficulty,
+          };
+        }),
         hearts: user.hearts,
       };
     }),
