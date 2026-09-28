@@ -9,6 +9,9 @@ type EventName =
   | "onboarding_placement_complete"
   | "onboarding_plan_selected"
   | "onboarding_complete"
+  | "onboarding_account_created"
+  | "auth_sign_in"
+  | "auth_sign_up"
   | "lesson_start"
   | "lesson_complete"
   | "lesson_quit"
@@ -33,7 +36,17 @@ type EventName =
   | "profile_view"
   | "reference_view"
   | "settings_change"
-  | "error_boundary";
+  | "error_boundary"
+  | "funnel_first_lesson"
+  | "funnel_d1_return"
+  | "funnel_d7_return"
+  | "funnel_mastery_first_skill"
+  | "funnel_mastery_milestone"
+  | "funnel_cefr_level_up"
+  | "funnel_trial_start"
+  | "funnel_trial_convert"
+  | "funnel_placement_start"
+  | "funnel_placement_result";
 
 type EventProperties = Record<string, string | number | boolean | null>;
 
@@ -160,4 +173,40 @@ export function trackOnboardingStep(
 
 export function trackError(error: string, context?: string) {
   track("error_boundary", { error, context: context ?? "" });
+}
+
+export function trackFunnelFirstLesson(lessonId: string, elapsedSeconds: number) {
+  track("funnel_first_lesson", { lesson_id: lessonId, elapsed_seconds: elapsedSeconds });
+}
+
+export function trackFunnelReturn(day: "d1" | "d7") {
+  track(day === "d1" ? "funnel_d1_return" : "funnel_d7_return", {});
+}
+
+export function trackFunnelMasteryFirstSkill(skillCode: string) {
+  track("funnel_mastery_first_skill", { skill_code: skillCode });
+}
+
+export function trackFunnelMasteryMilestone(masteredCount: number) {
+  track("funnel_mastery_milestone", { mastered_count: masteredCount });
+}
+
+export function trackFunnelCEFRLevelUp(level: string, confidence: number) {
+  track("funnel_cefr_level_up", { level, confidence });
+}
+
+export function trackFunnelPlacementStart() {
+  track("funnel_placement_start", {});
+}
+
+export function trackFunnelPlacementResult(level: string, accuracy: number, questionsAnswered: number) {
+  track("funnel_placement_result", { level, accuracy, questions_answered: questionsAnswered });
+}
+
+export function trackFunnelTrialStart() {
+  track("funnel_trial_start", {});
+}
+
+export function trackFunnelTrialConvert(plan: string) {
+  track("funnel_trial_convert", { plan });
 }

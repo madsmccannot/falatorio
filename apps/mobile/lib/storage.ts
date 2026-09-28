@@ -82,6 +82,8 @@ const KEYS = {
   API_URL: "api_url",
   OFFLINE_SYNC_QUEUE: "offline_sync_queue",
   OFFLINE_LESSON_MANIFEST: "offline_lesson_manifest",
+  DISPLAY_NAME: "display_name",
+  USERNAME: "username",
 } as const;
 
 export { KEYS };
