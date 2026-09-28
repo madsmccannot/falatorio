@@ -21,6 +21,7 @@ import { heartsRouter } from "../routers/hearts.router.js";
 import { adsRouter } from "../routers/ads.router.js";
 import { masteryRouter } from "../routers/mastery.router.js";
 import { qualityRouter } from "../routers/quality.router.js";
+import { pipelineRouter } from "../routers/pipeline.router.js";
 
 export const appRouter = t.router({
   health: t.procedure.query(() => ({
@@ -41,6 +42,7 @@ export const appRouter = t.router({
   ads: adsRouter,
   mastery: masteryRouter,
   quality: qualityRouter,
+  pipeline: pipelineRouter,
 });
 
 export type AppRouter = typeof appRouter;

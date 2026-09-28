@@ -8,9 +8,9 @@
     "./client": "./src/client.ts"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.60.0",
     "@trpc/client": "^11.0.0",
     "@trpc/react-query": "^11.0.0",
-    "@tanstack/react-query": "^5.60.0",
     "superjson": "^2.2.0"
   },
   "devDependencies": {

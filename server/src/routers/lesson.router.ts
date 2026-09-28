@@ -1,19 +1,30 @@
 import { z } from "zod";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { users, exercises, userProgress, exerciseKnowledge, skillEvidence } from "@falatorio/db/schema";
+import {
+  users,
+  exercises,
+  userProgress,
+  exerciseKnowledge,
+  skillEvidence,
+  knowledgeItems,
+  skills,
+  skillMastery,
+  skillPrerequisites,
+} from "@falatorio/db/schema";
 import { LESSON, EXERCISE_COGNITIVE_MAP } from "@falatorio/core";
+import { runAdaptiveEngine, type AdaptiveEngineInput } from "@falatorio/core/lesson";
 import { scoreTextAnswer } from "@falatorio/core/scoring";
 import { scoreToRating } from "@falatorio/core/fsrs";
 import { schedule, createNewCard, type FSRSCard } from "@falatorio/core/fsrs";
 import { calculateXP } from "@falatorio/core/gamification";
 import { getLessonReward } from "@falatorio/core/economy";
-import type { ExerciseType, CognitiveLevel } from "@falatorio/core";
-import { knowledgeItems } from "@falatorio/db/schema";
+import type { ExerciseType, CognitiveLevel, CEFRLevel, MasteryScore, Skill } from "@falatorio/core";
 import { explainExerciseError } from "../services/llm.service.js";
 import { checkAndUnlockAchievements } from "../services/achievement-checker.service.js";
+import { recalculateMasteryForKnowledgeItems } from "../services/mastery-recalculator.service.js";
 import { EXPLAINS } from "@falatorio/core";
 
 function exerciseToCognitiveLevel(exerciseType: string): CognitiveLevel {
@@ -69,7 +80,103 @@ export const lessonRouter = t.router({
         });
       }
 
-      const lessonExercises = await ctx.db
+      const [userData] = await ctx.db
+        .select({ cefrLevel: users.cefrLevel })
+        .from(users)
+        .where(eq(users.id, ctx.user.userId))
+        .limit(1);
+
+      const allSkills = await ctx.db.select().from(skills);
+      const prereqs = await ctx.db.select().from(skillPrerequisites);
+      const userMasteryRows = await ctx.db
+        .select()
+        .from(skillMastery)
+        .where(eq(skillMastery.userId, ctx.user.userId));
+
+      const masteryScores: MasteryScore[] = userMasteryRows.map((m) => ({
+        userId: m.userId,
+        skillId: m.skillId,
+        mastery: m.mastery,
+        confidence: m.confidence,
+        totalEvidence: m.totalEvidence,
+        varietyScore: m.varietyScore,
+        productionScore: m.productionScore,
+        lastEvidenceAt: m.lastEvidenceAt,
+      }));
+
+      const fsrsDue = await ctx.db
+        .select({ knowledgeItemId: exerciseKnowledge.knowledgeItemId })
+        .from(userProgress)
+        .innerJoin(exercises, eq(userProgress.exerciseId, exercises.id))
+        .innerJoin(exerciseKnowledge, eq(exercises.id, exerciseKnowledge.exerciseId))
+        .where(
+          and(
+            eq(userProgress.userId, ctx.user.userId),
+            sql`${userProgress.nextReview} <= now()`,
+          ),
+        );
+
+      const fsrsDueKIIds = fsrsDue.map((r) => r.knowledgeItemId);
+      const fsrsDueSkillIds: string[] = [];
+      if (fsrsDueKIIds.length > 0) {
+        const kiSkills = await ctx.db
+          .select({ skillId: knowledgeItems.skillId })
+          .from(knowledgeItems)
+          .where(sql`${knowledgeItems.id} = ANY(${fsrsDueKIIds})`);
+        fsrsDueSkillIds.push(...new Set(kiSkills.map((r) => r.skillId)));
+      }
+
+      const recentErrors = await ctx.db
+        .select({
+          knowledgeItemId: skillEvidence.knowledgeItemId,
+          errorCount: sql<number>`count(*) filter (where ${skillEvidence.score} < 0.5)`.as("error_count"),
+          lastErrorAt: sql<Date>`max(${skillEvidence.createdAt})`.as("last_error"),
+        })
+        .from(skillEvidence)
+        .where(eq(skillEvidence.userId, ctx.user.userId))
+        .groupBy(skillEvidence.knowledgeItemId)
+        .having(sql`count(*) filter (where ${skillEvidence.score} < 0.5) > 0`);
+
+      const skillsTyped: Skill[] = allSkills.map((s) => ({
+        id: s.id,
+        code: s.code,
+        domain: s.domain as Skill["domain"],
+        name: s.name as Record<string, string>,
+        description: s.description as Record<string, string> | null,
+        cefrLevel: s.cefrLevel as CEFRLevel,
+        sortOrder: s.sortOrder,
+      }));
+
+      const engineInput: AdaptiveEngineInput = {
+        context: {
+          userId: ctx.user.userId,
+          l1: ctx.user.l1 as any,
+          currentCEFR: (userData?.cefrLevel ?? "A1") as CEFRLevel,
+          skillMastery: masteryScores,
+          recentErrors: recentErrors.map((e) => ({
+            knowledgeItemId: e.knowledgeItemId,
+            errorCount: Number(e.errorCount),
+            lastErrorAt: new Date(e.lastErrorAt),
+          })),
+          completedLessonIds: [],
+        },
+        allSkills: skillsTyped,
+        prerequisites: prereqs.map((p) => ({
+          skillId: p.skillId,
+          prerequisiteId: p.prerequisiteId,
+        })),
+        fsrsReviewDueSkillIds: fsrsDueSkillIds,
+      };
+
+      const engineOutput = runAdaptiveEngine(engineInput);
+
+      const recommendedSkillIds = new Set(
+        engineOutput.recommendations
+          .slice(0, LESSON.EXERCISES_PER_LESSON * 2)
+          .map((r) => r.skillId),
+      );
+
+      const allLessonExercises = await ctx.db
         .select()
         .from(exercises)
         .where(
@@ -77,15 +184,53 @@ export const lessonRouter = t.router({
             eq(exercises.lessonId, input.lessonId),
             eq(exercises.status, "live"),
           ),
-        )
-        .limit(LESSON.EXERCISES_PER_LESSON);
+        );
 
-      if (lessonExercises.length === 0) {
+      if (allLessonExercises.length === 0) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "No exercises found for this lesson",
         });
       }
+
+      const exerciseIds = allLessonExercises.map((e) => e.id);
+      const exKnowledgeLinks = exerciseIds.length > 0
+        ? await ctx.db
+            .select()
+            .from(exerciseKnowledge)
+            .where(sql`${exerciseKnowledge.exerciseId} = ANY(${exerciseIds})`)
+        : [];
+
+      const exerciseSkillMap = new Map<string, Set<string>>();
+      for (const link of exKnowledgeLinks) {
+        const kiRow = await ctx.db
+          .select({ skillId: knowledgeItems.skillId })
+          .from(knowledgeItems)
+          .where(eq(knowledgeItems.id, link.knowledgeItemId))
+          .limit(1);
+        if (kiRow[0]) {
+          const existing = exerciseSkillMap.get(link.exerciseId) ?? new Set();
+          existing.add(kiRow[0].skillId);
+          exerciseSkillMap.set(link.exerciseId, existing);
+        }
+      }
+
+      const prioritized: typeof allLessonExercises = [];
+      const rest: typeof allLessonExercises = [];
+
+      for (const ex of allLessonExercises) {
+        const exSkills = exerciseSkillMap.get(ex.id);
+        if (exSkills && [...exSkills].some((sid) => recommendedSkillIds.has(sid))) {
+          prioritized.push(ex);
+        } else {
+          rest.push(ex);
+        }
+      }
+
+      const lessonExercises = [
+        ...prioritized,
+        ...rest,
+      ].slice(0, LESSON.EXERCISES_PER_LESSON);
 
       const cognitiveLevels = lessonExercises.map((e) =>
         exerciseToCognitiveLevel(e.type),
@@ -115,15 +260,15 @@ export const lessonRouter = t.router({
         sessionId,
         exercises: lessonExercises.map((e) => {
           const p = e.prompt as Record<string, unknown> | string;
-          const text = typeof p === "string" ? p : (p.text as string ?? "");
+          const text = typeof p === "string" ? p : (p["text"] as string ?? "");
           return {
             id: e.id,
             type: e.type,
             prompt: text,
-            options: typeof p === "object" ? (p.options as string[] | undefined) : undefined,
-            pairs: typeof p === "object" ? (p.pairs as Array<{ left: string; right: string }> | undefined) : undefined,
-            words: typeof p === "object" ? (p.words as string[] | undefined) : undefined,
-            sentence: typeof p === "object" ? (p.sentence as string | undefined) : undefined,
+            options: typeof p === "object" ? (p["options"] as string[] | undefined) : undefined,
+            pairs: typeof p === "object" ? (p["pairs"] as Array<{ left: string; right: string }> | undefined) : undefined,
+            words: typeof p === "object" ? (p["words"] as string[] | undefined) : undefined,
+            sentence: typeof p === "object" ? (p["sentence"] as string | undefined) : undefined,
             audioUrl: e.audioUrl,
             audioNativeUrl: e.audioNativeUrl,
             difficulty: e.difficulty,
@@ -256,6 +401,12 @@ export const lessonRouter = t.router({
             score: result.score,
             exerciseType: exercise.type,
           })),
+        );
+
+        await recalculateMasteryForKnowledgeItems(
+          ctx.db,
+          ctx.user.userId,
+          linkedKIs.map((ki) => ki.knowledgeItemId),
         );
       }
 

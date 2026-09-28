@@ -2,6 +2,7 @@ import { z } from "zod";
 import { eq, and, sql, desc, count } from "drizzle-orm";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
+import { recalculateMasteryForKnowledgeItems } from "../services/mastery-recalculator.service.js";
 import {
   skills,
   knowledgeItems,
@@ -615,6 +616,12 @@ export const masteryRouter = t.router({
           exerciseType: input.exerciseType,
         })
         .returning({ id: skillEvidence.id });
+
+      await recalculateMasteryForKnowledgeItems(
+        ctx.db,
+        ctx.user.userId,
+        [input.knowledgeItemId],
+      );
 
       return { evidenceId: evidence?.id ?? null };
     }),

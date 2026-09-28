@@ -12,12 +12,10 @@ import {
   l1CulturalContent,
 } from "@falatorio/db/schema";
 import {
-  CEFR_LEVELS, L1_CODES, EXERCISE_TYPES, COGNITIVE_LEVELS,
-  type L1Code, type CEFRLevel, type ExerciseType, type CognitiveLevel,
+  L1_CODES,
+  type L1Code,
 } from "@falatorio/core";
-import { generateLesson, generateSingleExercise, generateFromKnowledgeItem } from "../services/content-generator.service.js";
 import { seedCourseStructure, seedAllPhase1Courses } from "../services/seed-content.service.js";
-import { skills, knowledgeItems, exerciseKnowledge } from "@falatorio/db/schema";
 
 export const contentRouter = t.router({
   getCourses: protectedProcedure.query(async ({ ctx }) => {
@@ -138,160 +136,6 @@ export const contentRouter = t.router({
         region: clip.region,
         speaker: clip.speaker,
         url: clip.url,
-      };
-    }),
-
-  generateLessonOnDemand: protectedProcedure
-    .input(
-      z.object({
-        lessonId: z.string().uuid(),
-        cefrLevel: z.enum(CEFR_LEVELS),
-        grammarFocus: z.array(z.string()).optional(),
-        vocabTopics: z.array(z.string()).optional(),
-        weaknesses: z.array(z.string()).optional(),
-        exerciseCount: z.number().int().min(5).max(25).optional(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const [lesson] = await ctx.db
-        .select()
-        .from(lessons)
-        .where(eq(lessons.id, input.lessonId))
-        .limit(1);
-
-      if (!lesson) throw new TRPCError({ code: "NOT_FOUND" });
-
-      const result = await generateLesson({
-        l1: ctx.user.l1 as L1Code,
-        cefrLevel: input.cefrLevel as CEFRLevel,
-        grammarFocus: input.grammarFocus ?? lesson.grammarFocus,
-        vocabTopics: input.vocabTopics ?? lesson.vocabTarget,
-        weaknesses: input.weaknesses ?? [],
-        exerciseCount: input.exerciseCount ?? 15,
-      });
-
-      for (const ex of result.exercises) {
-        await ctx.db.insert(exercises).values({
-          lessonId: input.lessonId,
-          type: ex.type as ExerciseType,
-          status: "live",
-          prompt: ex.prompt,
-          acceptedAnswers: ex.acceptedAnswers,
-          difficulty: ex.difficulty,
-          l1Tip: ex.l1Tip,
-        });
-      }
-
-      return {
-        exercisesGenerated: result.exercises.length,
-        grammarFocus: result.grammarFocus,
-        vocabTopics: result.vocabTopics,
-      };
-    }),
-
-  generateExercise: protectedProcedure
-    .input(
-      z.object({
-        type: z.enum(EXERCISE_TYPES),
-        cefrLevel: z.enum(CEFR_LEVELS),
-        topic: z.string().min(1).max(100),
-        weakness: z.string().optional(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const exercise = await generateSingleExercise({
-        l1: ctx.user.l1 as L1Code,
-        cefrLevel: input.cefrLevel as CEFRLevel,
-        type: input.type as ExerciseType,
-        topic: input.topic,
-        weakness: input.weakness,
-      });
-
-      return exercise;
-    }),
-
-  generateFromKnowledge: protectedProcedure
-    .input(
-      z.object({
-        knowledgeItemCode: z.string().min(1),
-        exerciseType: z.enum(EXERCISE_TYPES),
-        cognitiveLevel: z.enum(COGNITIVE_LEVELS),
-        difficulty: z.number().int().min(1).max(10).default(5),
-        avoidVocabulary: z.array(z.string()).optional(),
-        requireContext: z.string().optional(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const [ki] = await ctx.db
-        .select()
-        .from(knowledgeItems)
-        .where(eq(knowledgeItems.code, input.knowledgeItemCode))
-        .limit(1);
-
-      if (!ki) throw new TRPCError({ code: "NOT_FOUND", message: `KnowledgeItem ${input.knowledgeItemCode} not found` });
-
-      const [skill] = await ctx.db
-        .select()
-        .from(skills)
-        .where(eq(skills.id, ki.skillId))
-        .limit(1);
-
-      if (!skill) throw new TRPCError({ code: "NOT_FOUND", message: "Parent skill not found" });
-
-      const l1Notes = ki.l1Notes as Record<string, any> | null;
-      const l1Note = l1Notes?.[ctx.user.l1];
-      const l1NoteStr = typeof l1Note === "string"
-        ? l1Note
-        : typeof l1Note === "object" && l1Note?.reason
-          ? l1Note.reason
-          : undefined;
-
-      const exercise = await generateFromKnowledgeItem({
-        request: {
-          knowledgeItemCode: ki.code,
-          skillCode: skill.code,
-          cefrLevel: ki.cefrLevel as CEFRLevel,
-          l1: ctx.user.l1 as L1Code,
-          exerciseType: input.exerciseType as ExerciseType,
-          cognitiveLevel: input.cognitiveLevel as CognitiveLevel,
-          difficulty: input.difficulty,
-          constraints: {
-            avoidVocabulary: input.avoidVocabulary,
-            requireContext: input.requireContext,
-          },
-        },
-        rule: ki.rule,
-        examples: (ki.examples ?? []) as string[],
-        commonErrors: (ki.commonErrors ?? []) as string[],
-        l1Notes: l1NoteStr,
-      });
-
-      const [inserted] = await ctx.db
-        .insert(exercises)
-        .values({
-          lessonId: null as any,
-          type: exercise.type as ExerciseType,
-          status: "live",
-          prompt: exercise.prompt,
-          acceptedAnswers: exercise.acceptedAnswers,
-          difficulty: exercise.difficulty,
-          l1Tip: exercise.l1Tip,
-        })
-        .returning({ id: exercises.id });
-
-      if (inserted) {
-        await ctx.db.insert(exerciseKnowledge).values({
-          exerciseId: inserted.id,
-          knowledgeItemId: ki.id,
-          isPrimary: true,
-        });
-      }
-
-      return {
-        exercise,
-        exerciseId: inserted?.id ?? null,
-        knowledgeItemCode: ki.code,
-        skillCode: skill.code,
       };
     }),
 
