@@ -27,7 +27,7 @@ export const exerciseStatusEnum = pgEnum("exercise_status", [
 
 export const exercises = pgTable("exercises", {
   id: uuid("id").primaryKey().defaultRandom(),
-  lessonId: uuid("lesson_id").notNull().references(() => lessons.id, { onDelete: "cascade" }),
+  lessonId: uuid("lesson_id").references(() => lessons.id, { onDelete: "set null" }),
   type: exerciseTypeEnum("type").notNull(),
   prompt: jsonb("prompt").notNull(),
   acceptedAnswers: text("accepted_answers").array().notNull(),
