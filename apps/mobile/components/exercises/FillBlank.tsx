@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
+import { TappableText } from "./TappableText";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function FillBlank({ exercise, onAnswer, disabled }: ExerciseProps) {
@@ -22,7 +23,14 @@ export function FillBlank({ exercise, onAnswer, disabled }: ExerciseProps) {
       <View style={styles.sentenceContainer}>
         {parts.map((part, i) => (
           <React.Fragment key={i}>
-            <Text style={styles.sentencePart}>{part}</Text>
+            {part.trim().length > 0 && (
+              <TappableText
+                text={part}
+                direction="pt-to-l1"
+                newWords={exercise.newWords}
+                textStyle={styles.sentencePartText}
+              />
+            )}
             {i < parts.length - 1 && (
               <TextInput
                 style={styles.blankInput}
@@ -86,10 +94,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: spacing["2xl"],
   },
-  sentencePart: {
+  sentencePartText: {
     fontSize: typography.sizes.xl,
     fontWeight: "500",
-    color: colors.neutral[800],
     lineHeight: 36,
   },
   blankInput: {

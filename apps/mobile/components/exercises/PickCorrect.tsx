@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
+import { TappableText } from "./TappableText";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function PickCorrect({ exercise, onAnswer, disabled }: ExerciseProps) {
@@ -11,7 +12,15 @@ export function PickCorrect({ exercise, onAnswer, disabled }: ExerciseProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Pick the correct answer</Text>
-      <Text style={styles.prompt}>{exercise.prompt}</Text>
+
+      <View style={styles.promptWrap}>
+        <TappableText
+          text={exercise.prompt}
+          direction="pt-to-l1"
+          newWords={exercise.newWords}
+          textStyle={styles.promptText}
+        />
+      </View>
 
       <View style={styles.options}>
         {(exercise.options ?? []).map((option, i) => (
@@ -44,12 +53,13 @@ const styles = StyleSheet.create({
     color: colors.neutral[900],
     marginBottom: spacing.lg,
   },
-  prompt: {
+  promptWrap: {
+    marginBottom: spacing["2xl"],
+  },
+  promptText: {
     fontSize: typography.sizes.xl,
     fontWeight: "500",
-    color: colors.neutral[800],
     lineHeight: 32,
-    marginBottom: spacing["2xl"],
   },
   options: {
     gap: spacing.sm,

@@ -4,6 +4,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming } fr
 import * as Haptics from "expo-haptics";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
+import { TappableText } from "./TappableText";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function SpeakAndScore({ exercise, onAnswer, disabled }: ExerciseProps) {
@@ -38,7 +39,15 @@ export function SpeakAndScore({ exercise, onAnswer, disabled }: ExerciseProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Say this in Portuguese</Text>
-      <Text style={styles.prompt}>{exercise.prompt}</Text>
+
+      <View style={styles.promptWrap}>
+        <TappableText
+          text={exercise.prompt}
+          direction="pt-to-l1"
+          newWords={exercise.newWords}
+          textStyle={styles.promptText}
+        />
+      </View>
 
       <View style={styles.recordArea}>
         <Pressable onPress={handleToggle} disabled={disabled}>
@@ -68,13 +77,14 @@ const styles = StyleSheet.create({
     color: colors.neutral[900],
     marginBottom: spacing.lg,
   },
-  prompt: {
+  promptWrap: {
+    marginBottom: spacing["3xl"],
+    alignItems: "center",
+  },
+  promptText: {
     fontSize: typography.sizes.xl,
     fontWeight: "500",
-    color: colors.neutral[800],
     lineHeight: 32,
-    marginBottom: spacing["3xl"],
-    textAlign: "center",
   },
   recordArea: {
     flex: 1,

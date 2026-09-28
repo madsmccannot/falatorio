@@ -3,16 +3,24 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { WordTooltip } from "./WordTooltip";
+import { useWordTranslation } from "@/hooks/useWordTranslation";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 type MatchState = "idle" | "selected" | "matched" | "wrong";
 
 export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
   const pairs = exercise.pairs ?? [];
+  const { translate } = useWordTranslation();
   const [leftSelected, setLeftSelected] = React.useState<number | null>(null);
   const [rightSelected, setRightSelected] = React.useState<number | null>(null);
   const [matched, setMatched] = React.useState<Set<number>>(new Set());
   const [wrongPair, setWrongPair] = React.useState<[number, number] | null>(null);
+  const [tooltip, setTooltip] = React.useState<{
+    word: string;
+    translations: string[];
+    position: { x: number; y: number };
+  } | null>(null);
 
   const shuffledRight = React.useMemo(() => {
     const indices = pairs.map((_, i) => i);
@@ -48,6 +56,18 @@ export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
     }
   }, [leftSelected, rightSelected]);
 
+  const handleLongPress = (word: string, direction: "pt-to-l1" | "l1-to-pt", event: { nativeEvent: { pageX: number; pageY: number } }) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const translations = translate(word.toLowerCase(), direction);
+    if (translations.length > 0) {
+      setTooltip({
+        word: word.toLowerCase(),
+        translations,
+        position: { x: event.nativeEvent.pageX, y: event.nativeEvent.pageY },
+      });
+    }
+  };
+
   const getLeftState = (i: number): MatchState => {
     if (matched.has(i)) return "matched";
     if (wrongPair && wrongPair[0] === i) return "wrong";
@@ -75,6 +95,7 @@ export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
                 Haptics.selectionAsync();
                 setLeftSelected(i);
               }}
+              onLongPress={(e) => handleLongPress(pair.left, "pt-to-l1", e)}
               disabled={disabled || matched.has(i)}
             >
               <Animated.View
@@ -97,6 +118,7 @@ export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
                 Haptics.selectionAsync();
                 setRightSelected(origIdx);
               }}
+              onLongPress={(e) => handleLongPress(pairs[origIdx]?.right ?? "", "l1-to-pt", e)}
               disabled={disabled || matched.has(origIdx)}
             >
               <Animated.View
@@ -111,6 +133,16 @@ export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
           ))}
         </View>
       </View>
+
+      {tooltip && (
+        <WordTooltip
+          word={tooltip.word}
+          translations={tooltip.translations}
+          isNew={false}
+          position={tooltip.position}
+          onDismiss={() => setTooltip(null)}
+        />
+      )}
     </View>
   );
 }

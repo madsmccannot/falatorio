@@ -4,10 +4,13 @@ import Animated, { FadeIn, Layout } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { WordTooltip } from "./WordTooltip";
+import { useWordTranslation } from "@/hooks/useWordTranslation";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
   const words = exercise.words ?? exercise.prompt.split(" ");
+  const { translate } = useWordTranslation();
   const [selected, setSelected] = React.useState<number[]>([]);
   const [available, setAvailable] = React.useState<number[]>(
     () => {
@@ -19,6 +22,11 @@ export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
       return indices;
     }
   );
+  const [tooltip, setTooltip] = React.useState<{
+    word: string;
+    translations: string[];
+    position: { x: number; y: number };
+  } | null>(null);
 
   const addWord = (idx: number) => {
     if (disabled) return;
@@ -33,6 +41,18 @@ export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
     const idx = selected[pos]!;
     setSelected(selected.filter((_, i) => i !== pos));
     setAvailable([...available, idx]);
+  };
+
+  const handleLongPress = (word: string, event: { nativeEvent: { pageX: number; pageY: number } }) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const translations = translate(word.toLowerCase(), "pt-to-l1");
+    if (translations.length > 0) {
+      setTooltip({
+        word: word.toLowerCase(),
+        translations,
+        position: { x: event.nativeEvent.pageX, y: event.nativeEvent.pageY },
+      });
+    }
   };
 
   const handleSubmit = () => {
@@ -51,7 +71,11 @@ export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
         ) : (
           <View style={styles.wordRow}>
             {selected.map((idx, pos) => (
-              <Pressable key={`s-${idx}`} onPress={() => removeWord(pos)}>
+              <Pressable
+                key={`s-${idx}`}
+                onPress={() => removeWord(pos)}
+                onLongPress={(e) => handleLongPress(words[idx]!, e)}
+              >
                 <Animated.View
                   entering={FadeIn.duration(150)}
                   layout={Layout.springify()}
@@ -67,7 +91,11 @@ export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
 
       <View style={styles.wordBank}>
         {available.map((idx) => (
-          <Pressable key={`a-${idx}`} onPress={() => addWord(idx)}>
+          <Pressable
+            key={`a-${idx}`}
+            onPress={() => addWord(idx)}
+            onLongPress={(e) => handleLongPress(words[idx]!, e)}
+          >
             <Animated.View
               layout={Layout.springify()}
               style={styles.bankWord}
@@ -85,6 +113,16 @@ export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
         size="lg"
         style={styles.submit}
       />
+
+      {tooltip && (
+        <WordTooltip
+          word={tooltip.word}
+          translations={tooltip.translations}
+          isNew={false}
+          position={tooltip.position}
+          onDismiss={() => setTooltip(null)}
+        />
+      )}
     </View>
   );
 }

@@ -3,10 +3,13 @@ import { View, Text, TextInput, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { TappableText } from "./TappableText";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function TranslateExercise({ exercise, onAnswer, disabled }: ExerciseProps) {
   const [text, setText] = React.useState("");
+
+  const direction = exercise.type === "translate_l1_to_pt" ? "l1-to-pt" as const : "pt-to-l1" as const;
 
   const handleSubmit = () => {
     if (!text.trim()) return;
@@ -17,7 +20,15 @@ export function TranslateExercise({ exercise, onAnswer, disabled }: ExerciseProp
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Translate this sentence</Text>
-      <Text style={styles.prompt}>{exercise.prompt}</Text>
+
+      <View style={styles.promptWrap}>
+        <TappableText
+          text={exercise.prompt}
+          direction={direction}
+          newWords={exercise.newWords}
+          textStyle={styles.promptText}
+        />
+      </View>
 
       <TextInput
         style={styles.input}
@@ -53,12 +64,13 @@ const styles = StyleSheet.create({
     color: colors.neutral[900],
     marginBottom: spacing.lg,
   },
-  prompt: {
+  promptWrap: {
+    marginBottom: spacing["2xl"],
+  },
+  promptText: {
     fontSize: typography.sizes.xl,
     fontWeight: "500",
-    color: colors.neutral[800],
     lineHeight: 32,
-    marginBottom: spacing["2xl"],
   },
   input: {
     borderWidth: 2,

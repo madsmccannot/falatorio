@@ -18,6 +18,7 @@ export type ExerciseData = {
   words?: string[];
   audioUrl?: string;
   l1Tip?: string;
+  newWords?: string[];
 };
 
 export type ExerciseProps = {

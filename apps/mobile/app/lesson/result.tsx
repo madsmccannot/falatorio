@@ -9,7 +9,8 @@ import { Card } from "@/components/ui/Card";
 import { GoldPrisms, TimerIcon } from "@/components/icons";
 import { GaloCelebration } from "@/components/lesson/GaloCelebration";
 import { useTranslation } from "@/lib/i18n";
-import { trackScreenView } from "@/lib/analytics";
+import { trackScreenView, trackFunnelFirstLesson } from "@/lib/analytics";
+import { getString, setString } from "@/lib/storage";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 function formatTime(seconds: number): string {
@@ -39,6 +40,12 @@ export default function LessonResultScreen() {
   React.useEffect(() => {
     trackScreenView("lesson_result");
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+    const firstLessonKey = "falatorio_first_lesson_done" as any;
+    if (!getString(firstLessonKey)) {
+      trackFunnelFirstLesson("first", elapsedSeconds);
+      setString(firstLessonKey, new Date().toISOString());
+    }
   }, []);
 
   const handleCelebrationFinish = React.useCallback(() => {
