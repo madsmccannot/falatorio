@@ -1,15 +1,21 @@
-import PostHog from "posthog-react-native";
 import { getString, KEYS } from "./storage";
 
 const API_KEY = process.env["EXPO_PUBLIC_POSTHOG_API_KEY"] ?? "";
 const HOST = process.env["EXPO_PUBLIC_POSTHOG_HOST"] ?? "https://eu.i.posthog.com";
 
-let client: PostHog | null = null;
+let PostHogClass: any = null;
+try {
+  PostHogClass = require("posthog-react-native").PostHog;
+} catch {
+  // posthog-react-native unavailable in this environment
+}
+
+let client: any = null;
 
 export function initPostHog(): void {
-  if (!API_KEY || __DEV__) return;
+  if (!PostHogClass || !API_KEY || __DEV__) return;
 
-  client = new PostHog(API_KEY, {
+  client = new PostHogClass(API_KEY, {
     host: HOST,
     enableSessionReplay: false,
   });
@@ -43,7 +49,7 @@ export function reloadFeatureFlags(): void {
   client?.reloadFeatureFlags();
 }
 
-export function getPostHogClient(): PostHog | null {
+export function getPostHogClient(): any {
   return client;
 }
 
