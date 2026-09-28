@@ -43,7 +43,7 @@ falatorio/
 
 Every source language is a separate product. Each L1 profile contains phonetic transfer maps, grammar interference patterns, false friends, and cultural bridges. 15 profiles: en, es, fr, de, hi, ur, ar, bn, zh, ru, uk, tr, pl, ko, ja.
 
-Phase 1 languages (en, es, fr, hi, ur, ar, bn) have full production profiles: 15-40 false friends, 12-15 phonetic difficulties, 12-15 grammar gaps, 15-30 cognates, and 15-25 cultural references per language. Phase 2 languages (de, zh, ru, uk, tr, pl, ko, ja) have functional stubs.
+All 15 L1 profiles are fully expanded with false friends, phonetic difficulties, grammar gaps, cognates, and cultural references.
 
 ### Skill / Knowledge / Mastery Model
 
@@ -53,7 +53,7 @@ Mastery is calculated from 3 weighted signals: accuracy (recent performance, 50%
 
 KnowledgeItems carry 7 cognitive levels (recognition, comprehension, controlled production, transformation, translation, free production, communication) that specify which exercise types are appropriate. They also declare inter-knowledge relations (related, confusable_with, reinforces) for exercise generation and error prediction, and per-L1 difficulty metadata for personalized prioritisation.
 
-The mastery module (`packages/core/src/mastery/`) includes: QA validator (schema, graph integrity, linguistic completeness), prerequisite checker with topological sort, coverage metrics, exercise generation spec with alignment validation, adaptive engine types for the future selector, and a readiness checker that validates Definition of Done criteria and vertical slice completeness across 10 implementation phases. The taxonomy seed (192 Skills, 55 KnowledgeItems) has 7 complete vertical slices: PT.TENSES.PRESENT, PT.PREP.BASIC, PT.SYNTAX.DIRECT_OBJECT, PT.SYNTAX.SUB.CAUSAL, PT.SEM.ASPECT.HABITUAL, PT.DISCOURSE.COHESION.LEXICAL, PT.RHETORIC.METAPHOR.
+The mastery module (`packages/core/src/mastery/`) includes: QA validator (schema, graph integrity, linguistic completeness), prerequisite checker with topological sort, coverage metrics, exercise generation spec with alignment validation, adaptive engine types for the future selector, and a readiness checker that validates Definition of Done criteria and vertical slice completeness across 10 implementation phases. The taxonomy seed contains 192 Skills and 218 KnowledgeItems across 14 domain groups (PHON, MORPH, TENSES, DET, PRON, PREP, SYNTAX, SEM, DISCOURSE, ORTH, LEX, RHETORIC, VERBS, COMM). Every KI has shortExplanation, counterexamples, commonErrors, and per-L1 difficulty metadata for all 15 languages.
 
 The mastery logic is deterministic and auditable. AI does not drive the adaptive engine; it generates content for a structured exercise bank.
 
@@ -108,17 +108,17 @@ Pure business logic, zero dependencies on I/O or frameworks:
 - **Entitlements** — feature gates, heart system, access checks
 - **Gamification** — XP calculator, streak logic, league promotion, achievements
 - **Ads** — ad policy (GDPR, tier, cooldowns)
-- **L1 Profiles** — 15 language transfer profiles with cultural content (7 fully expanded)
+- **L1 Profiles** — 15 language transfer profiles with cultural content (all fully expanded)
 
 ### `packages/db` — 23 schema tables
 
 Users, courses, units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). Initial Drizzle migration generated.
 
-### `server` — 12 routers, 7 services, 6 jobs
+### `server` — 13 routers, 9 services, 6 jobs
 
-**Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads.
+**Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads, pipeline.
 
-**Services:** Whisper (transcription), Azure TTS, LLM (conversation tutor), content generator (dynamic lesson/exercise generation using L1 profiles), seed content (course structure seeding per L1), FCM push, R2 storage, IAP validation (Apple + Google), RevenueCat webhooks.
+**Services:** Whisper (transcription), Azure TTS, LLM (conversation tutor), content generator (dynamic lesson/exercise generation using L1 profiles), seed content (course structure seeding per L1), batch exercise pipeline (coverage gap detection, bulk generation with concurrency control), mastery recalculator (batch skill mastery recomputation), FCM push, R2 storage, IAP validation (Apple + Google), RevenueCat webhooks.
 
 **Jobs (BullMQ):** exercise generation (uses content-generator service), league reset, streak reminders, quality flagging, heart refill, subscription checks.
 
@@ -126,7 +126,7 @@ Users, courses, units, lessons, exercises, audio clips, user progress, streaks, 
 
 **Root:** `index.tsx` redirect gate (onboarding vs tabs based on MMKV state).
 
-**Onboarding:** language select, GDPR consent, goal, level, placement test, plan.
+**Onboarding:** welcome, sign-up/sign-in (email + Google SSO via Clerk), choose profile, language select, GDPR consent, goal, level, placement test, plan.
 
 **Tabs:** learn (course tree), practice (FSRS review queue), league (leaderboard), shop, profile.
 
@@ -136,7 +136,7 @@ Users, courses, units, lessons, exercises, audio clips, user progress, streaks, 
 
 **Shop:** Super subscription detail, crystal/ouro packs (RevenueCat IAP).
 
-**Components:** UI primitives (Button, Card, Modal, Toast, Loading), exercise renderers, lesson components (progress bar, heart indicator, feedback, PT-EU vs PT-BR toggle), audio (player, recorder, waveform), gamification (XP bar, streak badge, league card, achievement toast), paywall (out of hearts, mid-lesson, Super upsell, feature lock, ad-or-pay choice), shop (crystal balance, item card, IAP modal, chest offer, Super banner), ads (provider, banner, interstitial, reward), pronunciation (mouth diagram SVG, phoneme card with animation, L1-based pronunciation guide), SVG icon system (react-native-svg, no emojis).
+**Components:** UI primitives (Button, Card, Modal, Toast, Loading), exercise renderers, lesson components (progress bar, heart indicator, feedback, PT-EU vs PT-BR toggle), audio (player, recorder, waveform), gamification (XP bar, streak badge, league card, achievement toast), paywall (out of hearts, mid-lesson, Super upsell, feature lock, ad-or-pay choice), shop (crystal balance, item card, IAP modal, chest offer, Super banner), ads (provider, banner, interstitial, reward), pronunciation (mouth diagram SVG, phoneme card with animation, L1-based pronunciation guide), tappable text with word tooltips (170+ words, 15 L1s, gender pair display for adjectives/gendered nouns), retention tracker (session/streak analytics), SVG icon system (react-native-svg, no emojis).
 
 ### `cms` — 8 collections
 
