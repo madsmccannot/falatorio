@@ -13,6 +13,7 @@ import { initSentry, identifyUser } from "@/lib/sentry";
 import { initPostHog, identifyPostHogUser } from "@/lib/posthog";
 import { getString, KEYS } from "@/lib/storage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { checkRetentionMilestones } from "@/lib/retention-tracker";
 
 SplashScreen.preventAutoHideAsync();
 applyThemePref();
@@ -49,7 +50,7 @@ function TRPCWrapper({ children }: { children: React.ReactNode }) {
 
 function AuthInner() {
   const { useAuth, useUser } = require("@clerk/clerk-expo");
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded } = useAuth();
   const { user } = useUser();
   const bg = useStackBg();
 
@@ -61,6 +62,7 @@ function AuthInner() {
     if (user?.id) {
       identifyUser(user.id, getString(KEYS.SELECTED_L1) ?? undefined);
       identifyPostHogUser(user.id);
+      checkRetentionMilestones();
     }
   }, [user?.id]);
 
@@ -74,26 +76,22 @@ function AuthInner() {
         animation: "slide_from_right",
       }}
     >
-      {!isSignedIn ? (
-        <Stack.Screen name="onboarding" />
-      ) : (
-        <>
-          <Stack.Screen name="tabs" />
-          <Stack.Screen
-            name="lesson"
-            options={{ gestureEnabled: false, animation: "slide_from_bottom" }}
-          />
-          <Stack.Screen name="conversation" />
-          <Stack.Screen
-            name="shop"
-            options={{ animation: "slide_from_bottom" }}
-          />
-          <Stack.Screen
-            name="settings"
-            options={{ animation: "slide_from_right" }}
-          />
-        </>
-      )}
+      <Stack.Screen name="index" />
+      <Stack.Screen name="onboarding" />
+      <Stack.Screen name="tabs" />
+      <Stack.Screen
+        name="lesson"
+        options={{ gestureEnabled: false, animation: "slide_from_bottom" }}
+      />
+      <Stack.Screen name="conversation" />
+      <Stack.Screen
+        name="shop"
+        options={{ animation: "slide_from_bottom" }}
+      />
+      <Stack.Screen
+        name="settings"
+        options={{ animation: "slide_from_right" }}
+      />
     </Stack>
   );
 }
