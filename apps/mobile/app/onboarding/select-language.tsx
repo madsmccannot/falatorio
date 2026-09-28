@@ -53,7 +53,7 @@ export default function SelectLanguageScreen() {
     if (!selected) return;
     setString(KEYS.SELECTED_L1, selected);
     trackOnboardingStep("l1_selected", selected);
-    router.push("/onboarding/gdpr-consent");
+    router.push("/onboarding/choose-profile");
   };
 
   return (

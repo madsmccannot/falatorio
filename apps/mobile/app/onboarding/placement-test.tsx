@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -16,6 +16,7 @@ import {
   type PlacementQuestion,
 } from "@falatorio/core/lesson";
 import { getString, setString, KEYS } from "@/lib/storage";
+import { trackFunnelPlacementStart, trackFunnelPlacementResult, trackScreenView } from "@/lib/analytics";
 import type { L1Code } from "@falatorio/core";
 
 type DisplayQuestion = PlacementQuestion & {
@@ -54,6 +55,11 @@ export default function PlacementTestScreen() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
 
+  useEffect(() => {
+    trackScreenView("placement_test");
+    trackFunnelPlacementStart();
+  }, []);
+
   const totalQuestions = SAMPLE_QUESTIONS.length - startIndex;
   const question = SAMPLE_QUESTIONS[currentIndex];
   const answeredCount = currentIndex - startIndex;
@@ -87,6 +93,7 @@ export default function PlacementTestScreen() {
     }
     const result = getPlacementResult(state);
     setString(KEYS.PLACEMENT_LEVEL, result.cefrLevel);
+    trackFunnelPlacementResult(result.cefrLevel, result.accuracy, result.questionsAnswered);
 
     return (
       <View style={[shared.screen, local.resultContainer, { paddingTop: insets.top + spacing["5xl"] }]}>

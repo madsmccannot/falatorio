@@ -9,8 +9,9 @@ import { onboardingStyles } from "@/lib/styles";
 import { useTranslation } from "@/lib/i18n";
 import { spacing, radii, typography } from "@falatorio/ui/tokens";
 import { SUPER_PRICING } from "@falatorio/core";
-import { setOnboardingComplete } from "@/lib/storage";
-import { trackOnboardingStep, trackScreenView } from "@/lib/analytics";
+import { setOnboardingComplete, getString, KEYS } from "@/lib/storage";
+import { trpc } from "@/lib/trpc";
+import { trackOnboardingStep, trackScreenView, trackFunnelTrialStart } from "@/lib/analytics";
 
 type Plan = "free" | "super";
 
@@ -21,6 +22,7 @@ export default function PlanScreen() {
   const { t } = useTranslation();
   const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const [selected, setSelected] = useState<Plan>("free");
+  const registerMutation = trpc.auth.register.useMutation();
 
   useEffect(() => {
     trackScreenView("onboarding_plan");
@@ -31,11 +33,36 @@ export default function PlanScreen() {
     setSelected(plan);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     trackOnboardingStep("plan_selected", selected);
+
+    try {
+      const { useUser } = require("@clerk/clerk-expo");
+      const { user } = useUser();
+
+      if (user) {
+        const email =
+          user.primaryEmailAddress?.emailAddress ??
+          user.emailAddresses?.[0]?.emailAddress ??
+          "";
+
+        await registerMutation.mutateAsync({
+          clerkId: user.id,
+          email,
+          name: getString(KEYS.DISPLAY_NAME) ?? user.firstName ?? "User",
+          username: getString(KEYS.USERNAME) ?? user.id.slice(0, 20),
+          l1: (getString(KEYS.SELECTED_L1) ?? "en") as any,
+          goal: (getString(KEYS.SELECTED_GOAL) ?? undefined) as any,
+        });
+      }
+    } catch {
+      // Registration may have already happened or Clerk unavailable
+    }
+
     trackOnboardingStep("complete");
     setOnboardingComplete();
     if (selected === "super") {
+      trackFunnelTrialStart();
       router.replace("/shop/super-detail");
     } else {
       router.replace("/tabs/learn");
