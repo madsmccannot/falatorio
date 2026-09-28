@@ -1,11 +1,17 @@
-import React from "react";
+import React, { Suspense } from "react";
+import { ActivityIndicator } from "react-native";
 import { TranslateExercise } from "./TranslateExercise";
 import { FillBlank } from "./FillBlank";
-import { ListenAndType } from "./ListenAndType";
 import { MatchPairs } from "./MatchPairs";
 import { PickCorrect } from "./PickCorrect";
 import { ReorderWords } from "./ReorderWords";
-import { SpeakAndScore } from "./SpeakAndScore";
+
+const ListenAndType = React.lazy(() =>
+  import("./ListenAndType").then((m) => ({ default: m.ListenAndType }))
+);
+const SpeakAndScore = React.lazy(() =>
+  import("./SpeakAndScore").then((m) => ({ default: m.SpeakAndScore }))
+);
 
 export type ExerciseData = {
   id: string;
@@ -49,5 +55,9 @@ export function ExerciseRenderer({ exercise, onAnswer, disabled }: ExerciseProps
     return <PickCorrect exercise={exercise} onAnswer={onAnswer} disabled={disabled} />;
   }
 
-  return <Component exercise={exercise} onAnswer={onAnswer} disabled={disabled} />;
+  return (
+    <Suspense fallback={<ActivityIndicator size="large" />}>
+      <Component exercise={exercise} onAnswer={onAnswer} disabled={disabled} />
+    </Suspense>
+  );
 }
