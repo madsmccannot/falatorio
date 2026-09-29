@@ -4,7 +4,7 @@ const FREE_FEATURES = [
   "Repetição espaçada (FSRS)",
   "5 vidas (recarregam a cada 4h)",
   "Ligas semanais e conquistas",
-  "Loja de cristais",
+  "Loja de ouro",
 ];
 
 const SUPER_FEATURES = [

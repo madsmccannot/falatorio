@@ -1,6 +1,6 @@
 # Falatório
 
-A language learning app built exclusively for **European Portuguese (PT-PT)**. Mobile-first, designed for immigrants in Portugal — including Hindi, Bengali, and Urdu speakers since lately there has been an increasing number of immigranats from the locations where these languages are spoken. The learning path adapts based on the learner's native language (L1), with personalized phonetic guides, false friend warnings, and culturally relevant scenarios.
+A language learning app built exclusively for **European Portuguese (PT-PT)**. Mobile-first, designed for immigrants in Portugal — including Hindi, Bengali, and Urdu speakers since there has been an increasing number of immigrants from the locations where these languages are spoken. The learning path adapts based on the learner's native language (L1), with personalized phonetic guides, false friend warnings, and culturally relevant scenarios.
 
 ## Architecture
 
@@ -26,7 +26,7 @@ falatorio/
 |-------|-----------|
 | Mobile | React Native 0.86, Expo SDK 57, expo-router, Reanimated 4.5, Gesture Handler |
 | Server | Fastify 5, tRPC 11, superjson |
-| Database | PostgreSQL (Neon), Drizzle ORM, 26 tables + 3 enums |
+| Database | PostgreSQL (Neon), Drizzle ORM, 26 tables + 4 enums |
 | Cache/Queue | Redis (ioredis), BullMQ (6 queues) |
 | Auth | Clerk (JWT, cached in Redis) — optional, app runs in preview mode without it |
 | CMS | Payload CMS v3, PostgreSQL adapter, R2 storage |
@@ -53,7 +53,7 @@ Mastery is calculated from 3 weighted signals: accuracy (recent performance, 50%
 
 KnowledgeItems carry 7 cognitive levels (recognition, comprehension, controlled production, transformation, translation, free production, communication) that specify which exercise types are appropriate. They also declare inter-knowledge relations (related, confusable_with, reinforces) for exercise generation and error prediction, and per-L1 difficulty metadata for personalized prioritisation.
 
-The mastery module (`packages/core/src/mastery/`) includes: QA validator (schema, graph integrity, linguistic completeness), prerequisite checker with topological sort, coverage metrics, exercise generation spec with alignment validation, adaptive engine types for the future selector, and a readiness checker that validates Definition of Done criteria and vertical slice completeness across 10 implementation phases. The taxonomy seed contains 192 Skills and 218 KnowledgeItems across 14 domain groups (PHON, MORPH, TENSES, DET, PRON, PREP, SYNTAX, SEM, DISCOURSE, ORTH, LEX, RHETORIC, VERBS, COMM). Every KI has shortExplanation, counterexamples, commonErrors, and per-L1 difficulty metadata for all 15 languages.
+The mastery module (`packages/core/src/mastery/`) includes: QA validator (schema, graph integrity, linguistic completeness), prerequisite checker with topological sort, coverage metrics, exercise generation spec with alignment validation, adaptive engine types for the future selector, and a readiness checker that validates Definition of Done criteria and vertical slice completeness across 10 implementation phases. The taxonomy seed contains 272 Skills and 310 KnowledgeItems across 10 domain groups (phonetics, morphology, tenses_moods, determiners, pronouns, prepositions, syntax, lexicon, pragmatics, orthography). Every KI has shortExplanation, counterexamples, commonErrors, and per-L1 difficulty metadata for all 15 languages.
 
 The mastery logic is deterministic and auditable. AI does not drive the adaptive engine; it generates content for a structured exercise bank.
 
@@ -90,6 +90,14 @@ Text scoring uses Levenshtein distance with PT-EU phonetic normalization. Speech
 
 All user-facing strings are translatable via the `useTranslation()` hook (`apps/mobile/lib/i18n.ts`). The system reads the user's selected L1 from MMKV storage and resolves strings through a fallback chain: `L1 dictionary -> English -> raw key`. English is the source of truth; Portuguese (PT-PT) has full coverage with proper diacritics. All 15 L1 languages have full key parity across the entire app: Phase 1 (es, fr, hi, ur, ar, bn) and Phase 2 (de, zh, ru, uk, tr, pl, ko, ja). The placement test questions (prompts and options) are fully translated in all 15 languages with no English fallback.
 
+### Mastery Dashboard
+
+The profile screen includes a mastery dashboard showing the user's estimated CEFR level with confidence percentage, domain breakdown (strong areas, areas to improve, not yet assessed), and a disclaimer that the estimate is based on practice, not a certification. The dashboard queries `mastery.getCEFREstimate` which aggregates skill mastery across all domains and CEFR levels. All labels are translated in 15 languages.
+
+### Launch Metrics
+
+Full funnel tracking via PostHog and custom analytics: onboarding completion, placement test (start/result with level and accuracy), first lesson (with elapsed time), D1/D7 retention, mastery milestones (first skill mastered, mastery count), CEFR level progression (with confidence), trial start, and trial-to-Super conversion.
+
 ### Onboarding Gate
 
 Fresh installs always land on the onboarding flow: welcome -> select-language -> choose-profile -> select-goal -> daily-goal -> select-level -> placement-test -> plan -> tabs. The root `app/index.tsx` uses Expo Router's `<Redirect>` pattern to check MMKV for onboarding completion state and route accordingly. In preview mode (no Clerk key), this is the sole entry gate. In authenticated mode, Clerk's `isSignedIn` state drives navigation. Back gesture is disabled on welcome, placement test, and plan screens to prevent accidental exits.
@@ -103,10 +111,10 @@ Pure business logic, zero dependencies on I/O or frameworks:
 - **FSRS** — scheduler, rating, card state machine
 - **Scoring** — text scorer, speech scorer, PT-EU phonetic rules
 - **Lesson** — session state, adaptive exercise selector, placement test
-- **Mastery** — evidence recorder, mastery calculator (accuracy/variety/production weights), CEFR estimator with confidence scores, QA validator, prerequisite checker, coverage metrics, exercise generation spec, adaptive engine types
+- **Mastery** — evidence recorder, mastery calculator (accuracy/variety/production weights), CEFR estimator with confidence scores and domain breakdown (strong/weak/unevaluated), QA validator, prerequisite checker, coverage metrics, exercise generation spec, adaptive engine types
 - **Economy** — currency ops, earn/spend rules, shop catalog, IAP tiers
 - **Entitlements** — feature gates, heart system, access checks
-- **Gamification** — XP calculator, streak logic, league promotion, achievements
+- **Gamification** — XP calculator, streak logic, league promotion, 42 achievements (including 19 competence badges tied to real mastery evidence)
 - **Ads** — ad policy (GDPR, tier, cooldowns)
 - **L1 Profiles** — 15 language transfer profiles with cultural content (all fully expanded)
 
@@ -114,15 +122,15 @@ Pure business logic, zero dependencies on I/O or frameworks:
 
 Users, courses, units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). Initial Drizzle migration generated.
 
-### `server` — 13 routers, 9 services, 6 jobs
+### `server` — 14 routers, 11 services, 6 jobs
 
-**Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads, pipeline.
+**Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads, pipeline, mastery.
 
-**Services:** Whisper (transcription), Azure TTS, LLM (conversation tutor), content generator (dynamic lesson/exercise generation using L1 profiles), seed content (course structure seeding per L1), batch exercise pipeline (coverage gap detection, bulk generation with concurrency control), mastery recalculator (batch skill mastery recomputation), FCM push, R2 storage, IAP validation (Apple + Google), RevenueCat webhooks.
+**Services:** Whisper (transcription), Azure TTS, LLM (conversation tutor), content generator (dynamic lesson/exercise generation using L1 profiles), seed content (course structure seeding per L1), batch exercise pipeline (coverage gap detection, bulk generation with concurrency control), mastery recalculator (batch skill mastery recomputation), achievement checker (competence badge evaluation), FCM push, R2 storage, IAP validation (Apple + Google), RevenueCat webhooks.
 
 **Jobs (BullMQ):** exercise generation (uses content-generator service), league reset, streak reminders, quality flagging, heart refill, subscription checks.
 
-### `apps/mobile` — 26 screens, 41 components, 8 hooks
+### `apps/mobile` — 26 screens, 42 components, 8 hooks
 
 **Root:** `index.tsx` redirect gate (onboarding vs tabs based on MMKV state).
 
@@ -134,13 +142,13 @@ Users, courses, units, lessons, exercises, audio clips, user progress, streaks, 
 
 **Conversation:** scenario picker, chat with AI-powered PT-EU tutor with error extraction.
 
-**Shop:** Super subscription detail, crystal/ouro packs (RevenueCat IAP).
+**Shop:** Super subscription detail, ouro packs (RevenueCat IAP).
 
-**Components:** UI primitives (Button, Card, Modal, Toast, Loading), exercise renderers, lesson components (progress bar, heart indicator, feedback, PT-EU vs PT-BR toggle), audio (player, recorder, waveform), gamification (XP bar, streak badge, league card, achievement toast), paywall (out of hearts, mid-lesson, Super upsell, feature lock, ad-or-pay choice), shop (crystal balance, item card, IAP modal, chest offer, Super banner), ads (provider, banner, interstitial, reward), pronunciation (mouth diagram SVG, phoneme card with animation, L1-based pronunciation guide), tappable text with word tooltips (170+ words, 15 L1s, gender pair display for adjectives/gendered nouns), retention tracker (session/streak analytics), SVG icon system (react-native-svg, no emojis).
+**Components:** UI primitives (Button, Card, Modal, Toast, Loading), exercise renderers, lesson components (progress bar, heart indicator, feedback, PT-EU vs PT-BR toggle), audio (player, recorder, waveform), gamification (XP bar, streak badge, league card, achievement toast, mastery dashboard with CEFR estimate, confidence bar, domain breakdown), paywall (out of hearts, mid-lesson, Super upsell, feature lock, ad-or-pay choice), shop (ouro balance, item card, IAP modal, chest offer, Super banner), ads (provider, banner, interstitial, reward), pronunciation (mouth diagram SVG, phoneme card with animation, L1-based pronunciation guide), tappable text with word tooltips (170+ words, 15 L1s, gender pair display for adjectives/gendered nouns), retention tracker (session/streak analytics), SVG icon system (react-native-svg, no emojis).
 
-### `cms` — 8 collections
+### `cms` — 8 collections, 35 prompt templates
 
-Courses, Units, Lessons, Exercises (with drafts/review/live workflow), Vocabulary, Audio Clips (with R2 upload), L1 Cultural Content, Review Queue. Hooks auto-publish and auto-reject exercises through the review pipeline.
+Courses, Units, Lessons, Exercises (with drafts/review/live workflow), Vocabulary, Audio Clips (with R2 upload), L1 Cultural Content, Review Queue. Hooks auto-publish and auto-reject exercises through the review pipeline. 35 prompt templates for dynamic exercise generation (10 base types + 25 L1-specific overrides).
 
 ## Getting Started
 

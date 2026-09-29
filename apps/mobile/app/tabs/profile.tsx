@@ -8,6 +8,7 @@ import { useEntitlements } from "@/hooks/useEntitlements";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { StarIcon, FlameIcon, TrophyIcon, MedalIcon, GearIcon, CheckIcon } from "@/components/icons";
+import { MasteryDashboard } from "@/components/gamification/MasteryDashboard";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
 import { getString, setString, KEYS } from "@/lib/storage";
@@ -54,6 +55,7 @@ export default function ProfileScreen() {
   const theme = useTheme();
   const profile = trpc.user.getProfile.useQuery();
   const achievements = trpc.gamification.getAchievements.useQuery();
+  const cefrEstimate = trpc.mastery.getCEFREstimate.useQuery();
   const { t } = useTranslation();
   const { currentDays, longestDays } = useStreak();
   const { isSuper } = useEntitlements();
@@ -158,6 +160,16 @@ export default function ProfileScreen() {
             <Text style={[styles.statLabel, { color: theme.textMuted }]}>{t("profile.medals")}</Text>
           </View>
         </View>
+
+        {cefrEstimate.data && (
+          <MasteryDashboard
+            level={cefrEstimate.data.level}
+            confidence={cefrEstimate.data.confidence}
+            strongDomains={cefrEstimate.data.strongDomains}
+            weakDomains={cefrEstimate.data.weakDomains}
+            unevaluatedDomains={cefrEstimate.data.unevaluatedDomains}
+          />
+        )}
 
         <View style={[styles.settingsCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
           <Pressable style={styles.settingsRow} onPress={() => setShowL1Picker(true)}>

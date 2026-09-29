@@ -34,7 +34,7 @@ export default function DashboardPage() {
           { label: "Streak", value: "0 dias", color: "#F97316" },
           { label: "XP total", value: "0", color: "#F59E0B" },
           { label: "Nivel CEFR", value: "A1", color: "#059669" },
-          { label: "Cristais", value: "0", color: "#7C3AED" },
+          { label: "Ouro", value: "0", color: "#F59E0B" },
         ].map((stat) => (
           <div
             key={stat.label}
