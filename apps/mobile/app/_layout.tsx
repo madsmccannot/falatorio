@@ -49,7 +49,7 @@ function TRPCWrapper({ children }: { children: React.ReactNode }) {
 }
 
 function AuthInner() {
-  const { useAuth, useUser } = require("@clerk/clerk-expo");
+  const { useAuth, useUser } = require("@clerk/expo");
   const { isLoaded } = useAuth();
   const { user } = useUser();
   const bg = useStackBg();
@@ -77,6 +77,7 @@ function AuthInner() {
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name="sso-callback" options={{ animation: "none" }} />
       <Stack.Screen name="onboarding" />
       <Stack.Screen name="tabs" />
       <Stack.Screen
@@ -93,16 +94,6 @@ function AuthInner() {
         options={{ animation: "slide_from_right" }}
       />
     </Stack>
-  );
-}
-
-function AuthenticatedNavigator() {
-  const { ClerkProvider } = require("@clerk/clerk-expo");
-
-  return (
-    <ClerkProvider publishableKey={CLERK_KEY} tokenCache={tokenCache}>
-      <AuthInner />
-    </ClerkProvider>
   );
 }
 
@@ -122,6 +113,7 @@ function PreviewNavigator() {
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name="sso-callback" options={{ animation: "none" }} />
       <Stack.Screen name="tabs" />
       <Stack.Screen name="onboarding" />
       <Stack.Screen
@@ -141,7 +133,7 @@ function PreviewNavigator() {
   );
 }
 
-export default function RootLayout() {
+function AppShell({ children }: { children: React.ReactNode }) {
   const scheme = useColorScheme();
 
   return (
@@ -150,13 +142,32 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <TRPCWrapper>
             <ToastProvider>
-              {CLERK_KEY ? <AuthenticatedNavigator /> : <PreviewNavigator />}
+              {children}
               <StatusBar style="auto" />
             </ToastProvider>
           </TRPCWrapper>
         </SafeAreaProvider>
       </ErrorBoundary>
     </GestureHandlerRootView>
+  );
+}
+
+export default function RootLayout() {
+  if (CLERK_KEY) {
+    const { ClerkProvider } = require("@clerk/expo");
+    return (
+      <ClerkProvider publishableKey={CLERK_KEY} tokenCache={tokenCache}>
+        <AppShell>
+          <AuthInner />
+        </AppShell>
+      </ClerkProvider>
+    );
+  }
+
+  return (
+    <AppShell>
+      <PreviewNavigator />
+    </AppShell>
   );
 }
 

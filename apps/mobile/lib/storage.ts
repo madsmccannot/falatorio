@@ -84,6 +84,7 @@ const KEYS = {
   OFFLINE_LESSON_MANIFEST: "offline_lesson_manifest",
   DISPLAY_NAME: "display_name",
   USERNAME: "username",
+  DAILY_GOAL: "daily_goal",
 } as const;
 
 export { KEYS };

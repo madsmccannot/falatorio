@@ -3,16 +3,11 @@ import { hasCompletedOnboarding } from "@/lib/storage";
 
 const CLERK_KEY = process.env["EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY"] ?? "";
 
-export default function Index() {
-  let isSignedIn = false;
+function AuthIndex() {
+  const { useAuth } = require("@clerk/expo");
+  const { isSignedIn } = useAuth();
 
-  if (CLERK_KEY) {
-    const { useAuth } = require("@clerk/clerk-expo");
-    const auth = useAuth();
-    isSignedIn = auth.isSignedIn === true;
-  }
-
-  if (!isSignedIn) {
+  if (isSignedIn !== true) {
     return <Redirect href="/onboarding/welcome" />;
   }
 
@@ -21,4 +16,15 @@ export default function Index() {
   }
 
   return <Redirect href="/tabs/learn" />;
+}
+
+function PreviewIndex() {
+  if (!hasCompletedOnboarding()) {
+    return <Redirect href="/onboarding/select-language" />;
+  }
+  return <Redirect href="/tabs/learn" />;
+}
+
+export default function Index() {
+  return CLERK_KEY ? <AuthIndex /> : <PreviewIndex />;
 }

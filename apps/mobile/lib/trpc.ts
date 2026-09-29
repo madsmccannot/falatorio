@@ -11,7 +11,7 @@ export function useTRPCClient() {
   let getToken: () => Promise<string | null> = () => Promise.resolve(null);
 
   if (HAS_CLERK) {
-    const { useAuth } = require("@clerk/clerk-expo");
+    const { useAuth } = require("@clerk/expo");
     const auth = useAuth();
     getToken = auth.getToken;
   }

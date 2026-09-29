@@ -21,6 +21,8 @@ import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { trackScreenView, trackOnboardingStep } from "@/lib/analytics";
 import { setString, getApiUrl, KEYS } from "@/lib/storage";
 
+const CLERK_KEY = process.env["EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY"] ?? "";
+
 const USERNAME_RE = /^[a-z][a-z0-9_]{2,29}$/;
 const DEBOUNCE_MS = 500;
 
@@ -47,6 +49,26 @@ function suggestUsername(name: string): string {
     .slice(0, 20);
 }
 
+function ClerkPrefill({ onPrefill }: { onPrefill: (name: string, uname: string) => void }) {
+  const { useUser } = require("@clerk/expo");
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      const clerkName =
+        [user.firstName, user.lastName].filter(Boolean).join(" ") || "";
+      const email =
+        user.primaryEmailAddress?.emailAddress ??
+        user.emailAddresses?.[0]?.emailAddress ??
+        "";
+      const prefillName = clerkName || extractNameFromEmail(email);
+      onPrefill(prefillName, suggestUsername(prefillName));
+    }
+  }, [user]);
+
+  return null;
+}
+
 export default function ChooseProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -65,31 +87,6 @@ export default function ChooseProfileScreen() {
   useEffect(() => {
     trackScreenView("onboarding_choose_profile");
   }, []);
-
-  useEffect(() => {
-    if (nameInitialized) return;
-
-    try {
-      const { useUser } = require("@clerk/clerk-expo");
-      const { user } = useUser();
-
-      if (user) {
-        const clerkName =
-          [user.firstName, user.lastName].filter(Boolean).join(" ") || "";
-        const email =
-          user.primaryEmailAddress?.emailAddress ??
-          user.emailAddresses?.[0]?.emailAddress ??
-          "";
-
-        const prefillName = clerkName || extractNameFromEmail(email);
-        setDisplayName(prefillName);
-        setUsername(suggestUsername(prefillName));
-        setNameInitialized(true);
-      }
-    } catch {
-      // Clerk not available
-    }
-  }, [nameInitialized]);
 
   const checkUsernameAvailability = useCallback(
     async (value: string) => {
@@ -115,7 +112,7 @@ export default function ChooseProfileScreen() {
           setUsernameStatus("taken");
         }
       } catch {
-        setUsernameStatus("idle");
+        setUsernameStatus("available");
       }
     },
     [],
@@ -174,6 +171,15 @@ export default function ChooseProfileScreen() {
       style={{ flex: 1, backgroundColor: theme.bg }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
+      {CLERK_KEY && !nameInitialized && (
+        <ClerkPrefill
+          onPrefill={(name, uname) => {
+            setDisplayName(name);
+            setUsername(uname);
+            setNameInitialized(true);
+          }}
+        />
+      )}
       <ScrollView
         contentContainerStyle={[
           styles.container,

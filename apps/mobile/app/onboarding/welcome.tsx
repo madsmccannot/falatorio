@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import * as WebBrowser from "expo-web-browser";
+import { makeRedirectUri } from "expo-auth-session";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { GoldPrisms } from "@/components/icons";
@@ -22,6 +23,9 @@ export default function WelcomeScreen() {
   const { t } = useTranslation();
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  const { useSSO } = require("@clerk/expo");
+  const { startSSOFlow } = useSSO();
+
   useEffect(() => {
     trackScreenView("welcome");
   }, []);
@@ -31,11 +35,9 @@ export default function WelcomeScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     try {
-      const { useSSO } = require("@clerk/clerk-expo");
-      const { startSSOFlow } = useSSO();
-
       const { createdSessionId, setActive, signUp } = await startSSOFlow({
         strategy: "oauth_google",
+        redirectUrl: makeRedirectUri({ path: "sso-callback", preferLocalhost: true }),
       });
 
       if (createdSessionId && setActive) {
@@ -56,7 +58,7 @@ export default function WelcomeScreen() {
     } finally {
       setGoogleLoading(false);
     }
-  }, []);
+  }, [startSSOFlow]);
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.bg }]}>

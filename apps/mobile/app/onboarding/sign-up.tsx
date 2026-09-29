@@ -12,6 +12,7 @@ import {
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
+import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Button } from "@/components/ui/Button";
@@ -31,6 +32,10 @@ export default function SignUpScreen() {
   const { t } = useTranslation();
   const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
 
+  const { useSSO, useSignUp } = require("@clerk/expo");
+  const { startSSOFlow } = useSSO();
+  const { signUp, setActive } = useSignUp();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,15 +54,13 @@ export default function SignUpScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     try {
-      const { useSSO } = require("@clerk/clerk-expo");
-      const { startSSOFlow } = useSSO();
-
-      const { createdSessionId, setActive } = await startSSOFlow({
+      const { createdSessionId, setActive: setActiveSession } = await startSSOFlow({
         strategy: "oauth_google",
+        redirectUrl: makeRedirectUri({ path: "sso-callback", preferLocalhost: true }),
       });
 
-      if (createdSessionId && setActive) {
-        await setActive({ session: createdSessionId });
+      if (createdSessionId && setActiveSession) {
+        await setActiveSession({ session: createdSessionId });
         captureEvent("auth_sign_up", { method: "google" });
         trackOnboardingStep("account_created");
         router.replace("/onboarding/select-language");
@@ -70,7 +73,7 @@ export default function SignUpScreen() {
     } finally {
       setGoogleLoading(false);
     }
-  }, []);
+  }, [startSSOFlow]);
 
   const handleSignUp = useCallback(async () => {
     if (!isValid) return;
@@ -79,9 +82,6 @@ export default function SignUpScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     try {
-      const { useSignUp } = require("@clerk/clerk-expo");
-      const { signUp, setActive } = useSignUp();
-
       await signUp.create({
         emailAddress: email.trim(),
         password,
@@ -107,7 +107,7 @@ export default function SignUpScreen() {
     } finally {
       setLoading(false);
     }
-  }, [email, password, isValid]);
+  }, [email, password, isValid, signUp, setActive]);
 
   return (
     <KeyboardAvoidingView

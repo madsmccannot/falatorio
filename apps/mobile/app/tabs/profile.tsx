@@ -10,21 +10,26 @@ import { Loading } from "@/components/ui/Loading";
 import { StarIcon, FlameIcon, TrophyIcon, MedalIcon, GearIcon, CheckIcon } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
-import { getString, setString } from "@/lib/storage";
+import { getString, setString, KEYS } from "@/lib/storage";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import Svg, { Path } from "react-native-svg";
 
 const L1_OPTIONS = [
-  { code: "hi", label: "Hindi", native: "हिन्दी" },
-  { code: "bn", label: "Bengali", native: "বাংলা" },
-  { code: "ur", label: "Urdu", native: "اردو" },
-  { code: "en", label: "English", native: "English" },
-  { code: "fr", label: "Français", native: "Français" },
-  { code: "es", label: "Español", native: "Español" },
-  { code: "zh", label: "Chinese", native: "中文" },
   { code: "ar", label: "Arabic", native: "العربية" },
-  { code: "ne", label: "Nepali", native: "नेपाली" },
-  { code: "ro", label: "Română", native: "Română" },
+  { code: "bn", label: "Bengali", native: "বাংলা" },
+  { code: "en", label: "English", native: "English" },
+  { code: "fr", label: "French", native: "Français" },
+  { code: "de", label: "German", native: "Deutsch" },
+  { code: "hi", label: "Hindi", native: "हिन्दी" },
+  { code: "ja", label: "Japanese", native: "日本語" },
+  { code: "ko", label: "Korean", native: "한국어" },
+  { code: "zh", label: "Mandarin Chinese", native: "中文" },
+  { code: "pl", label: "Polish", native: "Polski" },
+  { code: "ru", label: "Russian", native: "Русский" },
+  { code: "es", label: "Spanish", native: "Español" },
+  { code: "tr", label: "Turkish", native: "Türkçe" },
+  { code: "uk", label: "Ukrainian", native: "Українська" },
+  { code: "ur", label: "Urdu", native: "اردو" },
 ];
 
 const GOAL_OPTIONS = [
@@ -57,7 +62,7 @@ export default function ProfileScreen() {
   const HAS_CLERK = !!process.env["EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY"];
   let signOut: (() => void) | null = null;
   if (HAS_CLERK) {
-    const { useAuth } = require("@clerk/clerk-expo");
+    const { useAuth } = require("@clerk/expo");
     const auth = useAuth();
     signOut = () => auth.signOut();
   }
@@ -67,7 +72,7 @@ export default function ProfileScreen() {
   );
   const [dailyGoal, setDailyGoal] = useState(() => {
     const stored = getString("daily_goal");
-    return stored ? parseInt(stored, 10) : (user?.dailyGoalMin ?? 15);
+    return stored ? parseInt(stored, 10) : (user?.dailyGoalMin ?? null);
   });
   const [showL1Picker, setShowL1Picker] = useState(false);
   const [showGoalPicker, setShowGoalPicker] = useState(false);
@@ -114,7 +119,7 @@ export default function ProfileScreen() {
           <View style={styles.badges}>
             <View style={[styles.levelBadge, { backgroundColor: theme.bgAccent, borderColor: theme.borderAccent }]}>
               <Text style={[styles.levelText, { color: colors.primary[theme.isDark ? 400 : 700] }]}>
-                {user?.cefrLevel ?? "A1"}
+                {user?.cefrLevel ?? getString(KEYS.PLACEMENT_LEVEL) ?? getString(KEYS.SELECTED_LEVEL) ?? "A1"}
               </Text>
             </View>
             {isSuper && (
@@ -168,7 +173,7 @@ export default function ProfileScreen() {
           <Pressable style={styles.settingsRow} onPress={() => setShowGoalPicker(true)}>
             <Text style={[styles.settingsLabel, { color: theme.textSecondary }]}>{t("profile.daily_goal")}</Text>
             <View style={styles.settingsRight}>
-              <Text style={[styles.settingsValue, { color: theme.text }]}>{dailyGoal} min</Text>
+              <Text style={[styles.settingsValue, { color: theme.text }]}>{dailyGoal != null ? `${dailyGoal} min` : t("profile.choose")}</Text>
               <ChevronRight color={theme.textMuted} />
             </View>
           </Pressable>
@@ -287,7 +292,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scroll: {
-    paddingBottom: spacing["5xl"],
+    paddingBottom: 120,
   },
   profileHeader: {
     alignItems: "center",

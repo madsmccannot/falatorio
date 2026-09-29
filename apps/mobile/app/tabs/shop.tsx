@@ -136,7 +136,7 @@ export default function ShopScreen() {
       )}
 
       <Text style={[styles.sectionTitle, { color: theme.textSecondary, marginTop: spacing.lg }]}>
-        OURO
+        {t("ouro.section")}
       </Text>
       <Pressable
         onPress={() => router.push("/shop/ouro-packs")}
@@ -146,7 +146,7 @@ export default function ShopScreen() {
         <View style={styles.ouroCardInfo}>
           <Text style={[styles.ouroCardTitle, { color: theme.text }]}>{t("ouro.title")}</Text>
           <Text style={[styles.ouroCardDesc, { color: theme.textMuted }]}>
-            Get more ouro to unlock items
+            {t("ouro.desc")}
           </Text>
         </View>
         <Text style={[styles.ouroArrow, { color: theme.textMuted }]}>&rsaquo;</Text>

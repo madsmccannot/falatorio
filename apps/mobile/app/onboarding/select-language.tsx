@@ -14,21 +14,21 @@ import { setString, KEYS } from "@/lib/storage";
 import { trackOnboardingStep, trackScreenView } from "@/lib/analytics";
 
 const L1_LABELS: Record<L1Code, { name: string; native: string; flag: string }> = {
-  en: { name: "English", native: "English", flag: "GB" },
-  es: { name: "Spanish", native: "Español", flag: "ES" },
-  fr: { name: "French", native: "Français", flag: "FR" },
-  hi: { name: "Hindi", native: "हिन्दी", flag: "IN" },
-  ur: { name: "Urdu", native: "اردو", flag: "PK" },
   ar: { name: "Arabic", native: "العربية", flag: "SA" },
   bn: { name: "Bengali", native: "বাংলা", flag: "BD" },
+  en: { name: "English", native: "English", flag: "GB" },
+  fr: { name: "French", native: "Français", flag: "FR" },
   de: { name: "German", native: "Deutsch", flag: "DE" },
-  zh: { name: "Chinese", native: "中文", flag: "CN" },
-  ru: { name: "Russian", native: "Русский", flag: "RU" },
-  uk: { name: "Ukrainian", native: "Українська", flag: "UA" },
-  tr: { name: "Turkish", native: "Türkçe", flag: "TR" },
-  pl: { name: "Polish", native: "Polski", flag: "PL" },
-  ko: { name: "Korean", native: "한국어", flag: "KR" },
+  hi: { name: "Hindi", native: "हिन्दी", flag: "IN" },
   ja: { name: "Japanese", native: "日本語", flag: "JP" },
+  ko: { name: "Korean", native: "한국어", flag: "KR" },
+  zh: { name: "Mandarin Chinese", native: "中文", flag: "CN" },
+  pl: { name: "Polish", native: "Polski", flag: "PL" },
+  ru: { name: "Russian", native: "Русский", flag: "RU" },
+  es: { name: "Spanish", native: "Español", flag: "ES" },
+  tr: { name: "Turkish", native: "Türkçe", flag: "TR" },
+  uk: { name: "Ukrainian", native: "Українська", flag: "UA" },
+  ur: { name: "Urdu", native: "اردو", flag: "PK" },
 };
 
 export default function SelectLanguageScreen() {
@@ -64,7 +64,7 @@ export default function SelectLanguageScreen() {
       </Text>
 
       <FlatList
-        data={[...L1_CODES]}
+        data={[...L1_CODES].sort((a, b) => L1_LABELS[a].name.localeCompare(L1_LABELS[b].name))}
         keyExtractor={(item) => item}
         contentContainerStyle={local.list}
         renderItem={({ item: code }) => {

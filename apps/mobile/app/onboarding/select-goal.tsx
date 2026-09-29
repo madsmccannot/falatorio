@@ -42,7 +42,7 @@ export default function SelectGoalScreen() {
     if (!selected) return;
     setString(KEYS.SELECTED_GOAL, selected);
     trackOnboardingStep("goal_selected", selected);
-    router.push("/onboarding/select-level");
+    router.push("/onboarding/daily-goal");
   };
 
   return (

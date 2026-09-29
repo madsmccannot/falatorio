@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -13,7 +13,20 @@ import { setOnboardingComplete, getString, KEYS } from "@/lib/storage";
 import { trpc } from "@/lib/trpc";
 import { trackOnboardingStep, trackScreenView, trackFunnelTrialStart } from "@/lib/analytics";
 
+const CLERK_KEY = process.env["EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY"] ?? "";
+
 type Plan = "free" | "super";
+
+function CaptureClerkUser({ userRef }: { userRef: React.MutableRefObject<any> }) {
+  const { useUser } = require("@clerk/expo");
+  const { user } = useUser();
+
+  useEffect(() => {
+    userRef.current = user ?? null;
+  }, [user]);
+
+  return null;
+}
 
 export default function PlanScreen() {
   const router = useRouter();
@@ -23,6 +36,7 @@ export default function PlanScreen() {
   const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const [selected, setSelected] = useState<Plan>("free");
   const registerMutation = trpc.auth.register.useMutation();
+  const clerkUserRef = useRef<any>(null);
 
   useEffect(() => {
     trackScreenView("onboarding_plan");
@@ -36,11 +50,9 @@ export default function PlanScreen() {
   const handleContinue = async () => {
     trackOnboardingStep("plan_selected", selected);
 
-    try {
-      const { useUser } = require("@clerk/clerk-expo");
-      const { user } = useUser();
-
-      if (user) {
+    const user = clerkUserRef.current;
+    if (user) {
+      try {
         const email =
           user.primaryEmailAddress?.emailAddress ??
           user.emailAddresses?.[0]?.emailAddress ??
@@ -54,9 +66,9 @@ export default function PlanScreen() {
           l1: (getString(KEYS.SELECTED_L1) ?? "en") as any,
           goal: (getString(KEYS.SELECTED_GOAL) ?? undefined) as any,
         });
+      } catch {
+        // Registration may have already happened or server unavailable
       }
-    } catch {
-      // Registration may have already happened or Clerk unavailable
     }
 
     trackOnboardingStep("complete");
@@ -71,6 +83,7 @@ export default function PlanScreen() {
 
   return (
     <View style={[shared.screen, { paddingTop: insets.top + spacing.xl }]}>
+      {CLERK_KEY && <CaptureClerkUser userRef={clerkUserRef} />}
       <ScrollView contentContainerStyle={{ paddingBottom: spacing.xl }}>
         <Text style={shared.title}>{t("onboarding.plan_title")}</Text>
         <Text style={shared.subtitle}>

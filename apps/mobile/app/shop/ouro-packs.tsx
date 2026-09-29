@@ -1,11 +1,10 @@
 import React from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { purchasePackage, getOfferings, type PurchasesPackage } from "@/lib/revenuecat";
 import { useOuro } from "@/hooks/useOuro";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { GoldPrisms } from "@/components/icons";
@@ -82,28 +81,27 @@ export default function OuroPacksScreen() {
       <FlatList
         data={PACKS}
         keyExtractor={(item) => item.id}
+        numColumns={2}
         contentContainerStyle={styles.list}
+        columnWrapperStyle={styles.row}
         renderItem={({ item: pack }) => (
-          <Card elevated style={styles.packCard}>
-            <View style={styles.packTop}>
-              <GoldPrisms size={40} />
-              <Text style={styles.packAmount}>{pack.amount.toLocaleString()}</Text>
-              <Text style={[styles.packName, { color: theme.textSecondary }]}>{pack.name}</Text>
-              {pack.bonus && (
-                <View style={[styles.bonusBadge, { backgroundColor: theme.bgAccent }]}>
-                  <Text style={[styles.bonusText, { color: theme.isDark ? colors.primary[400] : colors.primary[700] }]}>{pack.bonus}</Text>
-                </View>
-              )}
+          <Pressable
+            style={[styles.packCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
+            onPress={() => handlePurchase(pack)}
+            disabled={!!purchasing}
+          >
+            <GoldPrisms size={32} />
+            <Text style={styles.packAmount}>{pack.amount.toLocaleString()}</Text>
+            <Text style={[styles.packName, { color: theme.textSecondary }]}>{pack.name}</Text>
+            {pack.bonus && (
+              <View style={[styles.bonusBadge, { backgroundColor: theme.bgAccent }]}>
+                <Text style={[styles.bonusText, { color: theme.isDark ? colors.primary[400] : colors.primary[700] }]}>{pack.bonus}</Text>
+              </View>
+            )}
+            <View style={[styles.priceTag, { backgroundColor: colors.primary[600] }]}>
+              <Text style={styles.priceText}>{pack.priceLabel}</Text>
             </View>
-            <Button
-              title={pack.priceLabel}
-              onPress={() => handlePurchase(pack)}
-              loading={purchasing === pack.id}
-              disabled={!!purchasing}
-              size="lg"
-              style={styles.buyButton}
-            />
-          </Card>
+          </Pressable>
         )}
       />
     </View>
@@ -139,39 +137,50 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   list: {
-    padding: spacing.lg,
+    padding: spacing.md,
     paddingBottom: spacing["5xl"],
   },
-  packCard: {
-    marginBottom: spacing.md,
-    alignItems: "center",
-    padding: spacing.xl,
+  row: {
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  packTop: {
+  packCard: {
+    flex: 1,
     alignItems: "center",
-    marginBottom: spacing.lg,
+    padding: spacing.lg,
+    borderRadius: radii.lg,
+    borderWidth: 1,
   },
   packAmount: {
-    fontSize: 36,
+    fontSize: typography.sizes["2xl"],
     fontWeight: "800",
     color: colors.ouro,
-  },
-  packName: {
-    fontSize: typography.sizes.md,
-    fontWeight: "600",
     marginTop: spacing.xs,
   },
+  packName: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "600",
+    marginTop: 2,
+  },
   bonusBadge: {
-    marginTop: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
+    marginTop: spacing.xs,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 1,
     borderRadius: radii.sm,
   },
   bonusText: {
-    fontSize: typography.sizes.xs,
+    fontSize: 10,
     fontWeight: "700",
   },
-  buyButton: {
-    width: "100%",
+  priceTag: {
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.md,
+  },
+  priceText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "700",
+    color: "#FFFFFF",
   },
 });

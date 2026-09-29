@@ -88,11 +88,11 @@ Text scoring uses Levenshtein distance with PT-EU phonetic normalization. Speech
 
 ### Internationalization (i18n)
 
-All user-facing strings are translatable via the `useTranslation()` hook (`apps/mobile/lib/i18n.ts`). The system reads the user's selected L1 from MMKV storage and resolves strings through a fallback chain: `L1 dictionary -> English -> raw key`. English is the source of truth (225 keys); Portuguese (PT-PT) has full coverage with proper diacritics. All 15 L1 languages have full 225-key parity: Phase 1 (es, fr, hi, ur, ar, bn) and Phase 2 (de, zh, ru, uk, tr, pl, ko, ja).
+All user-facing strings are translatable via the `useTranslation()` hook (`apps/mobile/lib/i18n.ts`). The system reads the user's selected L1 from MMKV storage and resolves strings through a fallback chain: `L1 dictionary -> English -> raw key`. English is the source of truth; Portuguese (PT-PT) has full coverage with proper diacritics. All 15 L1 languages have full key parity across the entire app: Phase 1 (es, fr, hi, ur, ar, bn) and Phase 2 (de, zh, ru, uk, tr, pl, ko, ja). The placement test questions (prompts and options) are fully translated in all 15 languages with no English fallback.
 
 ### Onboarding Gate
 
-Fresh installs always land on the onboarding flow. The root `app/index.tsx` uses Expo Router's `<Redirect>` pattern to check MMKV for onboarding completion state and route accordingly. In preview mode (no Clerk key), this is the sole entry gate. In authenticated mode, Clerk's `isSignedIn` state drives navigation.
+Fresh installs always land on the onboarding flow: welcome -> select-language -> choose-profile -> select-goal -> daily-goal -> select-level -> placement-test -> plan -> tabs. The root `app/index.tsx` uses Expo Router's `<Redirect>` pattern to check MMKV for onboarding completion state and route accordingly. In preview mode (no Clerk key), this is the sole entry gate. In authenticated mode, Clerk's `isSignedIn` state drives navigation. Back gesture is disabled on welcome, placement test, and plan screens to prevent accidental exits.
 
 ## Package Breakdown
 
@@ -126,7 +126,7 @@ Users, courses, units, lessons, exercises, audio clips, user progress, streaks, 
 
 **Root:** `index.tsx` redirect gate (onboarding vs tabs based on MMKV state).
 
-**Onboarding:** welcome, sign-up/sign-in (email + Google SSO via Clerk), choose profile, language select, GDPR consent, goal, level, placement test, plan.
+**Onboarding:** welcome, sign-up/sign-in (email + Google SSO via Clerk), choose profile, language select, GDPR consent, goal, daily goal, level, placement test (10 questions, all 15 L1s, no early termination), plan.
 
 **Tabs:** learn (course tree), practice (FSRS review queue), league (leaderboard), shop, profile.
 

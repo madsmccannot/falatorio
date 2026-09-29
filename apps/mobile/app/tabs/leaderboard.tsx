@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, FlatList, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { trpc } from "@/lib/trpc";
 import { Loading } from "@/components/ui/Loading";
@@ -10,15 +10,25 @@ import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { LEAGUE } from "@falatorio/core";
 import Svg, { Path } from "react-native-svg";
 
-const LEAGUE_TIERS: { nameKey: TKey; color: string }[] = [
-  { nameKey: "leaderboard.tier_bronze", color: "#CD7F32" },
-  { nameKey: "leaderboard.tier_silver", color: "#C0C0C0" },
-  { nameKey: "leaderboard.tier_gold", color: "#FFD700" },
-  { nameKey: "leaderboard.tier_sapphire", color: "#0EA5E9" },
-  { nameKey: "leaderboard.tier_ruby", color: "#EF4444" },
-  { nameKey: "leaderboard.tier_emerald", color: "#10B981" },
-  { nameKey: "leaderboard.tier_diamond", color: "#A78BFA" },
+const LEAGUE_TIERS: { nameKey: TKey; color: string; accent: string }[] = [
+  { nameKey: "leaderboard.tier_bronze", color: "#CD7F32", accent: "#8B5E23" },
+  { nameKey: "leaderboard.tier_silver", color: "#C0C0C0", accent: "#808080" },
+  { nameKey: "leaderboard.tier_gold", color: "#FFD700", accent: "#B8960F" },
+  { nameKey: "leaderboard.tier_sapphire", color: "#0EA5E9", accent: "#0369A1" },
+  { nameKey: "leaderboard.tier_ruby", color: "#EF4444", accent: "#B91C1C" },
+  { nameKey: "leaderboard.tier_emerald", color: "#10B981", accent: "#047857" },
+  { nameKey: "leaderboard.tier_diamond", color: "#A78BFA", accent: "#6D28D9" },
 ];
+
+function ShieldIcon({ size = 24, color, accent }: { size?: number; color: string; accent: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 2L4 6v5c0 5.25 3.4 10.15 8 11.3 4.6-1.15 8-6.05 8-11.3V6l-8-4z" fill={color} />
+      <Path d="M12 2L4 6v5c0 5.25 3.4 10.15 8 11.3V2z" fill={accent} opacity={0.3} />
+      <Path d="M10 13l2 2 4-4" stroke="#FFF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
 
 function LockIcon({ size = 16, color = "#64748B" }: { size?: number; color?: string }) {
   return (
@@ -51,7 +61,7 @@ export default function LeaderboardScreen() {
       {leaderboard.isLoading ? (
         <Loading message={t("leaderboard.loading")} />
       ) : !data || data.entries.length === 0 ? (
-        <View style={styles.emptyContainer}>
+        <ScrollView contentContainerStyle={styles.emptyContainer}>
           <View style={[styles.emptyCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
             <TrophyIcon size={40} color={colors.xp} />
             <Text style={[styles.emptyTitle, { color: theme.text }]}>
@@ -67,7 +77,7 @@ export default function LeaderboardScreen() {
             {LEAGUE_TIERS.map((tier, i) => (
               <View key={tier.nameKey}>
                 <View style={styles.tierRow}>
-                  <View style={[styles.tierDot, { backgroundColor: tier.color }]} />
+                  <ShieldIcon size={28} color={tier.color} accent={tier.accent} />
                   <Text style={[styles.tierName, { color: theme.text }]}>{t(tier.nameKey)}</Text>
                   {i > 0 && <LockIcon size={16} color={theme.textMuted} />}
                   {i === 0 && (
@@ -92,7 +102,7 @@ export default function LeaderboardScreen() {
               </Text>
             </View>
           </View>
-        </View>
+        </ScrollView>
       ) : (
         <FlatList
           data={data.entries}
@@ -249,10 +259,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     gap: spacing.md,
   },
-  tierDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+  tierShield: {
+    width: 28,
+    height: 28,
   },
   tierName: {
     flex: 1,
@@ -265,7 +274,7 @@ const styles = StyleSheet.create({
   },
   tierDivider: {
     height: 1,
-    marginLeft: spacing.lg + 12 + spacing.md,
+    marginLeft: spacing.lg + 28 + spacing.md,
   },
   infoCard: {
     flexDirection: "row",
