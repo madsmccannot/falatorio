@@ -653,4 +653,29 @@ export const masteryRouter = t.router({
       cefrLevel: s.cefrLevel,
     }));
   }),
+
+  recordVocabLookup: protectedProcedure
+    .input(
+      z.object({
+        knowledgeItemCode: z.string().min(1).max(128),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const [ki] = await ctx.db
+        .select({ id: knowledgeItems.id })
+        .from(knowledgeItems)
+        .where(eq(knowledgeItems.code, input.knowledgeItemCode))
+        .limit(1);
+
+      if (!ki) return { recorded: false };
+
+      await ctx.db.insert(skillEvidence).values({
+        userId: ctx.user.userId,
+        knowledgeItemId: ki.id,
+        score: 0.5,
+        exerciseType: "vocab_lookup",
+      });
+
+      return { recorded: true };
+    }),
 });

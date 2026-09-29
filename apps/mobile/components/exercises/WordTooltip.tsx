@@ -12,6 +12,7 @@ interface WordTooltipProps {
   position: { x: number; y: number };
   onDismiss: () => void;
   genderHint?: string | null;
+  knowledgeItemCode?: string;
 }
 
 const TOOLTIP_WIDTH = 200;

@@ -14,7 +14,28 @@ export interface GrammarError {
   userSaid: string;
   correct: string;
   explanation: string;
+  knowledgeItemCode?: string;
 }
+
+const ERROR_TYPE_TO_KI: Record<string, string> = {
+  "gender_agreement": "PT.MORPH.GENDER.RULES",
+  "number_agreement": "PT.MORPH.NUMBER.RULES",
+  "verb_conjugation": "PT.TENSES.PRESENT.REGULAR",
+  "ser_estar": "PT.TENSES.SER_ESTAR.CONTRAST",
+  "article_usage": "PT.DET.ARTICLES.DEFINITE.USAGE",
+  "preposition": "PT.PREP.BASIC.CORE_SET",
+  "pronoun_placement": "PT.PRON.PERSONAL.CLITIC_PLACEMENT.RULES",
+  "subjunctive": "PT.TENSES.SUBJUNCTIVE_PRESENT.FORMATION",
+  "word_order": "PT.SYNTAX.WORD_ORDER.SVO",
+  "negation": "PT.ADV.NEGATION.NAO_NUNCA",
+  "accent_missing": "PT.ORTH.ACCENTS.BASIC.RULES",
+  "false_friend": "PT.LEX.FALSE_FRIENDS.COMMON",
+  "por_para": "PT.PREP.POR_PARA.DISTINCTION",
+  "reflexive": "PT.PRON.REFLEXIVE.USAGE",
+  "comparative": "PT.ADJ.DEGREE.COMPARATIVE_SUPERLATIVE",
+  "conditional": "PT.CONJ.CONDITIONAL.SE",
+  "conjunction": "PT.CONJ.CAUSAL.PORQUE_COMO",
+};
 
 interface TutorReply {
   content: string;
@@ -137,11 +158,13 @@ function extractErrors(text: string): GrammarError[] {
     const explainMatch = inner.match(/explanation:\s*(.+)/);
 
     if (typeMatch && userMatch && correctMatch && explainMatch) {
+      const errorType = typeMatch[1]!.trim();
       errors.push({
-        type: typeMatch[1]!.trim(),
+        type: errorType,
         userSaid: userMatch[1]!.trim(),
         correct: correctMatch[1]!.trim(),
         explanation: explainMatch[1]!.trim(),
+        knowledgeItemCode: ERROR_TYPE_TO_KI[errorType],
       });
     }
   }

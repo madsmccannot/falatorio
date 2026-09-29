@@ -5,6 +5,8 @@ export interface PlacementQuestion {
   id: string;
   difficulty: number;
   cefrTarget: CEFRLevel;
+  knowledgeItemCode?: string;
+  skillCode?: string;
 }
 
 export interface PlacementState {
@@ -25,6 +27,14 @@ export interface PlacementResult {
   ability: number;
   questionsAnswered: number;
   accuracy: number;
+  knowledgeEvidence: PlacementKnowledgeEvidence[];
+}
+
+export interface PlacementKnowledgeEvidence {
+  knowledgeItemCode: string;
+  skillCode: string;
+  correct: boolean;
+  difficulty: number;
 }
 
 const L1_STARTING_ABILITY: Partial<Record<L1Code, number>> = {
@@ -124,10 +134,26 @@ export function getPlacementResult(state: PlacementState): PlacementResult {
   else if (ability < 5) cefrLevel = "C1";
   else cefrLevel = "C2";
 
+  const knowledgeEvidence: PlacementKnowledgeEvidence[] = state.responses
+    .filter((r) => {
+      const q = state.questions.find((q) => q.id === r.questionId);
+      return q?.knowledgeItemCode && q?.skillCode;
+    })
+    .map((r) => {
+      const q = state.questions.find((q) => q.id === r.questionId)!;
+      return {
+        knowledgeItemCode: q.knowledgeItemCode!,
+        skillCode: q.skillCode!,
+        correct: r.correct,
+        difficulty: r.difficulty,
+      };
+    });
+
   return {
     cefrLevel,
     ability,
     questionsAnswered: state.responses.length,
     accuracy,
+    knowledgeEvidence,
   };
 }

@@ -1,39 +1,112 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet, Modal } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
-import Animated, { FadeIn } from "react-native-reanimated";
+import { useState, useMemo, useCallback } from "react";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
+import type { TKey } from "@/lib/i18n";
 import { Loading } from "@/components/ui/Loading";
 import { Card } from "@/components/ui/Card";
 import { getString, KEYS } from "@/lib/storage";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { SKILL_DOMAINS } from "@falatorio/core";
+import { getProfile } from "@falatorio/core/l1-profiles";
+import type { L1Code } from "@falatorio/core";
+import { PronunciationGuide } from "@/components/pronunciation";
 import Svg, { Path } from "react-native-svg";
 
 const NON_LATIN_L1S = new Set(["hi", "bn", "ur", "ar", "zh", "ru", "uk", "ko", "ja"]);
 
-const ALPHABET_GROUPS = [
-  { id: "vowels", letters: ["A", "E", "I", "O", "U"], label: "Vogais" },
-  { id: "accented", letters: ["A/E/O", "A/E/O", "A/O", "A", "C"], diacritics: ["´", "^", "~", "`", "¸"], label: "Acentos e sinais" },
-  { id: "consonants_1", letters: ["B", "C", "D", "F", "G"], label: "Consoantes I" },
-  { id: "consonants_2", letters: ["H", "J", "K", "L", "M"], label: "Consoantes II" },
-  { id: "consonants_3", letters: ["N", "P", "Q", "R", "S"], label: "Consoantes III" },
-  { id: "consonants_4", letters: ["T", "V", "W", "X", "Z"], label: "Consoantes IV" },
-  { id: "digraphs", letters: ["LH", "NH", "CH", "RR", "SS"], label: "Digrafos" },
+interface LetterEntry {
+  letter: string;
+  word: string;
+  ipa: string;
+}
+
+const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] = [
+  {
+    id: "vowels", label: "Vogais",
+    entries: [
+      { letter: "A", word: "agua", ipa: "/a/" },
+      { letter: "E", word: "escola", ipa: "/e/, /ɛ/" },
+      { letter: "I", word: "ilha", ipa: "/i/" },
+      { letter: "O", word: "olho", ipa: "/o/, /ɔ/" },
+      { letter: "U", word: "uva", ipa: "/u/" },
+    ],
+  },
+  {
+    id: "accented", label: "Acentos e sinais",
+    entries: [
+      { letter: "A", word: "agua (aguda)", ipa: "/a/" },
+      { letter: "A", word: "lama (circunflexo)", ipa: "/ɐ/" },
+      { letter: "A", word: "la (til)", ipa: "/ɐ̃/" },
+      { letter: "C", word: "cacao (cedilha)", ipa: "/s/" },
+    ],
+  },
+  {
+    id: "consonants_1", label: "Consoantes I",
+    entries: [
+      { letter: "B", word: "bola", ipa: "/b/" },
+      { letter: "C", word: "casa", ipa: "/k/" },
+      { letter: "D", word: "dado", ipa: "/d/" },
+      { letter: "F", word: "faca", ipa: "/f/" },
+      { letter: "G", word: "gato", ipa: "/g/" },
+    ],
+  },
+  {
+    id: "consonants_2", label: "Consoantes II",
+    entries: [
+      { letter: "H", word: "hora (mudo)", ipa: "—" },
+      { letter: "J", word: "janela", ipa: "/ʒ/" },
+      { letter: "K", word: "kiwi", ipa: "/k/" },
+      { letter: "L", word: "lua", ipa: "/l/" },
+      { letter: "M", word: "mesa", ipa: "/m/" },
+    ],
+  },
+  {
+    id: "consonants_3", label: "Consoantes III",
+    entries: [
+      { letter: "N", word: "navio", ipa: "/n/" },
+      { letter: "P", word: "pato", ipa: "/p/" },
+      { letter: "Q", word: "queijo", ipa: "/k/" },
+      { letter: "R", word: "rio", ipa: "/ʁ/" },
+      { letter: "S", word: "sapo", ipa: "/s/" },
+    ],
+  },
+  {
+    id: "consonants_4", label: "Consoantes IV",
+    entries: [
+      { letter: "T", word: "tomate", ipa: "/t/" },
+      { letter: "V", word: "vento", ipa: "/v/" },
+      { letter: "W", word: "web", ipa: "/w/" },
+      { letter: "X", word: "xadrez", ipa: "/ʃ/" },
+      { letter: "Z", word: "zebra", ipa: "/z/" },
+    ],
+  },
+  {
+    id: "digraphs", label: "Digrafos",
+    entries: [
+      { letter: "LH", word: "olho", ipa: "/ʎ/" },
+      { letter: "NH", word: "vinho", ipa: "/ɲ/" },
+      { letter: "CH", word: "chave", ipa: "/ʃ/" },
+      { letter: "RR", word: "carro", ipa: "/ʁ/" },
+      { letter: "SS", word: "passo", ipa: "/s/" },
+    ],
+  },
 ];
 
 const DOMAIN_LABELS: Record<string, Record<string, string>> = {
-  phonetics: { en: "Phonetics", pt: "Fonética" },
+  phonetics: { en: "Phonetics", pt: "Fonetica" },
   morphology: { en: "Morphology", pt: "Morfologia" },
   tenses_moods: { en: "Tenses & Moods", pt: "Tempos e modos" },
   determiners: { en: "Determiners", pt: "Determinantes" },
   pronouns: { en: "Pronouns", pt: "Pronomes" },
-  prepositions: { en: "Prepositions", pt: "Preposições" },
+  prepositions: { en: "Prepositions", pt: "Preposicoes" },
   syntax: { en: "Syntax", pt: "Sintaxe" },
-  lexicon: { en: "Vocabulary", pt: "Vocabulário" },
-  pragmatics: { en: "Pragmatics", pt: "Pragmática" },
+  lexicon: { en: "Vocabulary", pt: "Vocabulario" },
+  pragmatics: { en: "Pragmatics", pt: "Pragmatica" },
   orthography: { en: "Spelling", pt: "Ortografia" },
 };
 
@@ -54,10 +127,142 @@ function ProgressBar({ progress, color }: { progress: number; color: string }) {
   );
 }
 
+function AlphabetExerciseModal({
+  visible,
+  group,
+  onClose,
+  onComplete,
+  theme,
+  t,
+}: {
+  visible: boolean;
+  group: typeof ALPHABET_GROUPS[number] | null;
+  onClose: () => void;
+  onComplete: (groupId: string) => void;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: TKey) => string;
+}) {
+  const [step, setStep] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [showResult, setShowResult] = useState(false);
+
+  if (!group) return null;
+
+  const sessionEntries = group.entries.slice(0, 4);
+  const current = sessionEntries[step];
+  if (!current) return null;
+
+  const distractors = useMemo(() => {
+    const all = ALPHABET_GROUPS.flatMap((g) => g.entries.map((e) => e.letter));
+    const unique = [...new Set(all)].filter((l) => l !== current.letter);
+    const shuffled = unique.sort(() => Math.random() - 0.5).slice(0, 3);
+    const options = [...shuffled, current.letter].sort(() => Math.random() - 0.5);
+    return options;
+  }, [current.letter, step]);
+
+  const handleSelect = (letter: string) => {
+    setSelected(letter);
+    setShowResult(true);
+    if (letter === current.letter) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
+  };
+
+  const handleNext = () => {
+    setSelected(null);
+    setShowResult(false);
+    if (step + 1 >= sessionEntries.length) {
+      onComplete(group.id);
+      onClose();
+      setStep(0);
+    } else {
+      setStep(step + 1);
+    }
+  };
+
+  const handleClose = () => {
+    setStep(0);
+    setSelected(null);
+    setShowResult(false);
+    onClose();
+  };
+
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={handleClose}>
+      <View style={[styles.modalContainer, { backgroundColor: theme.bg }]}>
+        <View style={styles.modalHeader}>
+          <ProgressBar progress={(step + 1) / sessionEntries.length} color={colors.primary[500]} />
+          <Text style={[styles.modalStep, { color: theme.textSecondary }]}>
+            {step + 1} / {sessionEntries.length}
+          </Text>
+        </View>
+
+        <View style={styles.modalBody}>
+          <Animated.View entering={FadeInDown.duration(300)} key={step}>
+            <Text style={[styles.modalQuestion, { color: theme.text }]}>
+              {t("reference.word_example")}:
+            </Text>
+            <Text style={[styles.modalWord, { color: colors.primary[600] }]}>
+              {current.word}
+            </Text>
+            <Text style={[styles.modalIpa, { color: theme.textMuted }]}>
+              {current.ipa}
+            </Text>
+
+            <Text style={[styles.modalInstruction, { color: theme.textSecondary }]}>
+              {t("reference.letter_tap")}
+            </Text>
+
+            <View style={styles.optionsGrid}>
+              {distractors.map((letter) => {
+                const isSelected = selected === letter;
+                const isCorrect = letter === current.letter;
+                let bgColor = theme.bgCard;
+                let borderCol = theme.border;
+                if (showResult && isSelected && isCorrect) {
+                  bgColor = "#D1FAE5";
+                  borderCol = "#059669";
+                } else if (showResult && isSelected && !isCorrect) {
+                  bgColor = "#FEE2E2";
+                  borderCol = "#DC2626";
+                } else if (showResult && isCorrect) {
+                  bgColor = "#D1FAE5";
+                  borderCol = "#059669";
+                }
+                return (
+                  <Pressable
+                    key={letter}
+                    onPress={() => !showResult && handleSelect(letter)}
+                    style={[styles.optionButton, { backgroundColor: bgColor, borderColor: borderCol }]}
+                  >
+                    <Text style={[styles.optionLetter, { color: theme.text }]}>{letter}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </Animated.View>
+
+          {showResult && (
+            <Animated.View entering={FadeIn.duration(200)}>
+              <Pressable onPress={handleNext} style={[styles.nextButton, { backgroundColor: colors.primary[500] }]}>
+                <Text style={styles.nextButtonText}>
+                  {step + 1 >= sessionEntries.length ? t("reference.complete") : t("reference.next")}
+                </Text>
+              </Pressable>
+            </Animated.View>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 export default function ReferenceScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const { t, lang } = useTranslation();
+  const { t, l1: lang } = useTranslation();
   const l1 = getString(KEYS.SELECTED_L1) ?? "en";
   const isNonLatin = NON_LATIN_L1S.has(l1);
 
@@ -67,6 +272,17 @@ export default function ReferenceScreen() {
 
   const [expandedDomain, setExpandedDomain] = useState<string | null>(null);
   const [alphabetProgress, setAlphabetProgress] = useState<Record<string, number>>({});
+  const [exerciseGroup, setExerciseGroup] = useState<typeof ALPHABET_GROUPS[number] | null>(null);
+
+  const profile = useMemo(() => {
+    try {
+      return getProfile(l1 as L1Code);
+    } catch {
+      return null;
+    }
+  }, [l1]);
+
+  const phoneticDifficulties = profile?.transfer?.phoneticDifficulties ?? [];
 
   const groupedGlossary = (glossary.data ?? []).reduce<Record<string, typeof glossary.data>>((acc, ki) => {
     const domain = ki.domain;
@@ -78,6 +294,14 @@ export default function ReferenceScreen() {
   const toggleDomain = (domain: string) => {
     setExpandedDomain((prev) => (prev === domain ? null : domain));
   };
+
+  const handleExerciseComplete = useCallback((groupId: string) => {
+    setAlphabetProgress((prev) => ({
+      ...prev,
+      [groupId]: Math.min((prev[groupId] ?? 0) + 0.25, 1),
+    }));
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, []);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
@@ -103,19 +327,20 @@ export default function ReferenceScreen() {
                     key={group.id}
                     style={[styles.alphabetCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
                     onPress={() => {
-                      setAlphabetProgress((prev) => ({
-                        ...prev,
-                        [group.id]: Math.min((prev[group.id] ?? 0) + 0.2, 1),
-                      }));
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setExerciseGroup(group);
                     }}
                   >
                     <Text style={[styles.alphabetLetters, { color: theme.text }]}>
-                      {group.letters.slice(0, 3).join(" ")}
+                      {group.entries.slice(0, 3).map((e) => e.letter).join(" ")}
                     </Text>
                     <Text style={[styles.alphabetLabel, { color: theme.textMuted }]}>
                       {group.label}
                     </Text>
                     <ProgressBar progress={progress} color={colors.primary[500]} />
+                    <Text style={[styles.practiceLabel, { color: colors.primary[500] }]}>
+                      {t("reference.practice")}
+                    </Text>
                   </Pressable>
                 );
               })}
@@ -123,7 +348,22 @@ export default function ReferenceScreen() {
           </Animated.View>
         )}
 
-        <Text style={[styles.sectionTitle, { color: theme.textSecondary, marginTop: isNonLatin ? spacing.xl : 0 }]}>
+        {phoneticDifficulties.length > 0 && (
+          <Animated.View entering={FadeIn.duration(300)}>
+            <Text style={[styles.sectionTitle, { color: theme.textSecondary, marginTop: isNonLatin ? spacing.xl : 0 }]}>
+              {t("reference.phonetics_title")}
+            </Text>
+            <Text style={[styles.sectionSubtitle, { color: theme.textMuted }]}>
+              {t("reference.phonetics_desc")}
+            </Text>
+            <PronunciationGuide
+              difficulties={phoneticDifficulties}
+              l1Name={profile?.name ?? l1}
+            />
+          </Animated.View>
+        )}
+
+        <Text style={[styles.sectionTitle, { color: theme.textSecondary, marginTop: spacing.xl }]}>
           {t("reference.glossary_title")}
         </Text>
         <Text style={[styles.sectionSubtitle, { color: theme.textMuted }]}>
@@ -211,6 +451,15 @@ export default function ReferenceScreen() {
           })
         )}
       </ScrollView>
+
+      <AlphabetExerciseModal
+        visible={!!exerciseGroup}
+        group={exerciseGroup}
+        onClose={() => setExerciseGroup(null)}
+        onComplete={handleExerciseComplete}
+        theme={theme}
+        t={t}
+      />
     </View>
   );
 }
@@ -279,6 +528,12 @@ const styles = StyleSheet.create({
   alphabetLabel: {
     fontSize: typography.sizes.xs,
     marginBottom: spacing.sm,
+  },
+  practiceLabel: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "600",
+    marginTop: spacing.sm,
+    textAlign: "center",
   },
   progressTrack: {
     height: 4,
@@ -377,6 +632,77 @@ const styles = StyleSheet.create({
   },
   kiLevelText: {
     fontSize: 10,
+    fontWeight: "700",
+  },
+  modalContainer: {
+    flex: 1,
+    paddingTop: spacing["2xl"],
+  },
+  modalHeader: {
+    paddingHorizontal: spacing.xl,
+    marginBottom: spacing.xl,
+  },
+  modalStep: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "600",
+    textAlign: "center",
+    marginTop: spacing.sm,
+  },
+  modalBody: {
+    flex: 1,
+    paddingHorizontal: spacing.xl,
+    justifyContent: "center",
+  },
+  modalQuestion: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: spacing.sm,
+  },
+  modalWord: {
+    fontSize: typography.sizes["3xl"],
+    fontWeight: "800",
+    textAlign: "center",
+    marginBottom: spacing.xs,
+  },
+  modalIpa: {
+    fontSize: typography.sizes.md,
+    textAlign: "center",
+    marginBottom: spacing["2xl"],
+    fontFamily: typography.mono?.fontFamily,
+  },
+  modalInstruction: {
+    fontSize: typography.sizes.sm,
+    textAlign: "center",
+    marginBottom: spacing.lg,
+  },
+  optionsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: spacing.md,
+  },
+  optionButton: {
+    width: 72,
+    height: 72,
+    borderRadius: radii.lg,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  optionLetter: {
+    fontSize: typography.sizes.xl,
+    fontWeight: "700",
+  },
+  nextButton: {
+    marginTop: spacing["2xl"],
+    paddingVertical: spacing.md,
+    borderRadius: radii.lg,
+    alignItems: "center",
+  },
+  nextButtonText: {
+    color: "#FFFFFF",
+    fontSize: typography.sizes.md,
     fontWeight: "700",
   },
 });

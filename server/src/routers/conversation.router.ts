@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { conversationSessions } from "@falatorio/db/schema";
+import { conversationSessions, skillEvidence, knowledgeItems } from "@falatorio/db/schema";
 import { EXPLAINS } from "@falatorio/core";
 import { chatWithTutor, explainGrammarError } from "../services/llm.service.js";
 
@@ -80,6 +80,31 @@ export const conversationRouter = t.router({
             : session.errorsExtracted,
         })
         .where(eq(conversationSessions.id, input.sessionId));
+
+      const kiCodes = reply.errors
+        .map((e) => e.knowledgeItemCode)
+        .filter((c): c is string => !!c);
+
+      if (kiCodes.length > 0) {
+        const kis = await ctx.db
+          .select({ id: knowledgeItems.id, code: knowledgeItems.code })
+          .from(knowledgeItems);
+        const kiMap = new Map(kis.map((k) => [k.code, k.id]));
+
+        const evidenceRows = kiCodes
+          .map((code) => kiMap.get(code))
+          .filter((id): id is string => !!id)
+          .map((kiId) => ({
+            userId: ctx.user.userId,
+            knowledgeItemId: kiId,
+            score: 0.0,
+            exerciseType: "conversation",
+          }));
+
+        if (evidenceRows.length > 0) {
+          await ctx.db.insert(skillEvidence).values(evidenceRows);
+        }
+      }
 
       return {
         reply: reply.content,

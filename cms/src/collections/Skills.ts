@@ -87,5 +87,23 @@ export const Skills: CollectionConfig = {
         description: "Number of KnowledgeItems (computed)",
       },
     },
+    {
+      name: "exerciseCount",
+      type: "number",
+      admin: {
+        readOnly: true,
+        position: "sidebar",
+        description: "Number of exercises linked via KnowledgeItems (computed)",
+      },
+    },
+    {
+      name: "lessonCount",
+      type: "number",
+      admin: {
+        readOnly: true,
+        position: "sidebar",
+        description: "Number of lessons linked to this skill (computed)",
+      },
+    },
   ],
 };

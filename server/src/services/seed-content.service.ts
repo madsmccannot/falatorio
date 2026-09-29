@@ -1,5 +1,6 @@
 import type { Database } from "@falatorio/db/client";
-import { courses, units, lessons } from "@falatorio/db/schema";
+import { courses, units, lessons, lessonSkills, skills } from "@falatorio/db/schema";
+
 import { L1_PHASE_1, type L1Code, type CEFRLevel } from "@falatorio/core";
 import { getProfile } from "@falatorio/core/l1-profiles";
 
@@ -9,7 +10,83 @@ export interface UnitDef {
   description: string;
   grammarFocus: string[];
   vocabTarget: string[];
+  skillCodes?: string[];
 }
+
+const GRAMMAR_TO_SKILLS: Record<string, string[]> = {
+  "ser present": ["PT.TENSES.PRESENT", "PT.TENSES.SER_ESTAR"],
+  "articles": ["PT.DET.ARTICLES.DEFINITE", "PT.DET.ARTICLES.INDEFINITE"],
+  "cardinal numbers": ["PT.ADJ.NUMERAL"],
+  "ordinal numbers": ["PT.ADJ.NUMERAL"],
+  "possessives": ["PT.DET.POSSESSIVE", "PT.PRON.POSSESSIVE"],
+  "gender agreement": ["PT.MORPH.GENDER", "PT.MORPH.AGREEMENT", "PT.ADJ.AGREEMENT"],
+  "querer present": ["PT.TENSES.PRESENT"],
+  "partitive": ["PT.DET.ARTICLES.INDEFINITE"],
+  "estar present": ["PT.TENSES.PRESENT", "PT.TENSES.SER_ESTAR"],
+  "prepositions em/de": ["PT.PREP.BASIC", "PT.PREP.DE_POSSESSION", "PT.PREP.CONTRACTIONS"],
+  "ter present": ["PT.TENSES.PRESENT", "PT.TENSES.TER_HAVER"],
+  "doer": ["PT.PRON.PERSONAL.SUBJECT"],
+  "ir present": ["PT.TENSES.PRESENT"],
+  "imperative basic": ["PT.TENSES.IMPERATIVE"],
+  "poder present": ["PT.TENSES.PRESENT"],
+  "demonstratives": ["PT.DET.DEMONSTRATIVE", "PT.PRON.DEMONSTRATIVE.BASIC"],
+  "reflexive verbs": ["PT.PRON.REFLEXIVE"],
+  "frequency adverbs": ["PT.ADV.TIME"],
+  "fazer weather": ["PT.TENSES.PRESENT"],
+  "comparative": ["PT.ADJ.DEGREE"],
+  "preterite regular": ["PT.TENSES.PRETERITE_PERFECT"],
+  "porque/por que": ["PT.CONJ.CAUSAL", "PT.ADV.INTERROGATIVE"],
+  "preterite irregular": ["PT.TENSES.PRETERITE_PERFECT"],
+  "prepositions para/a": ["PT.PREP.POR_PARA", "PT.PREP.A_MOVEMENT"],
+  "gostar de": ["PT.PREP.DE_POSSESSION"],
+  "imperfect introduction": ["PT.TENSES.IMPERFECT"],
+  "imperfect regular": ["PT.TENSES.IMPERFECT"],
+  "object pronouns direct": ["PT.PRON.PERSONAL.DIRECT_OBJECT"],
+  "imperfect irregular": ["PT.TENSES.IMPERFECT"],
+  "subjunctive present intro": ["PT.TENSES.SUBJUNCTIVE_PRESENT"],
+  "preterite vs imperfect": ["PT.TENSES.PRETERITE_PERFECT", "PT.TENSES.IMPERFECT"],
+  "indirect objects": ["PT.PRON.PERSONAL.INDIRECT_OBJECT", "PT.SYNTAX.INDIRECT_OBJECT"],
+  "subjunctive present": ["PT.TENSES.SUBJUNCTIVE_PRESENT"],
+  "conjunctions": ["PT.CONJ.COPULATIVE", "PT.CONJ.ADVERSATIVE", "PT.CONJ.CAUSAL"],
+  "passive voice": ["PT.SYNTAX.PASSIVE_AGENT"],
+  "reported speech intro": ["PT.SYNTAX.SUB.COMPLETIVE", "PT.CONJ.COMPLETIVE"],
+  "relative pronouns": ["PT.PRON.RELATIVE", "PT.DET.RELATIVE"],
+  "subjunctive with emotions": ["PT.TENSES.SUBJUNCTIVE_PRESENT"],
+  "conditional": ["PT.TENSES.CONDITIONAL"],
+  "por/para distinction": ["PT.PREP.POR_PARA"],
+  "future subjunctive": ["PT.TENSES.SUBJUNCTIVE_FUTURE"],
+  "personal infinitive": ["PT.TENSES.PERSONAL_INFINITIVE"],
+  "imperfect subjunctive": ["PT.TENSES.SUBJUNCTIVE_IMPERFECT"],
+  "conditional sentences": ["PT.CONJ.CONDITIONAL", "PT.SYNTAX.SUB.CONDITIONAL"],
+  "compound tenses intro": ["PT.TENSES.COMPOUND_PAST"],
+  "gerund vs infinitive": ["PT.TENSES.GERUND"],
+  "subjunctive with doubt": ["PT.TENSES.SUBJUNCTIVE_PRESENT", "PT.ADV.DOUBT"],
+  "pronoun placement": ["PT.PRON.PERSONAL.CLITIC_PLACEMENT"],
+  "pluperfect subjunctive": ["PT.TENSES.PLUPERFECT"],
+  "complex conditionals": ["PT.CONJ.CONDITIONAL", "PT.SYNTAX.SUB.CONDITIONAL"],
+  "future perfect": ["PT.TENSES.COMPOUND_PAST", "PT.TENSES.FUTURE"],
+  "formal register": ["PT.LEX.REGISTER.FORMAL"],
+  "subjunctive in relative clauses": ["PT.TENSES.SUBJUNCTIVE_PRESENT", "PT.PRON.RELATIVE"],
+  "passive se": ["PT.SYNTAX.PASSIVE_AGENT"],
+  "literary tenses": ["PT.TENSES.PLUPERFECT"],
+  "mesoclisis": ["PT.PRON.PERSONAL.CLITIC_PLACEMENT", "PT.PRON.MESOCLISIS"],
+  "compound subjunctive": ["PT.TENSES.SUBJUNCTIVE_IMPERFECT", "PT.TENSES.COMPOUND_PAST"],
+  "abstract nominalization": ["PT.MORPH.DERIVATION.SUFFIX"],
+  "narrative tenses": ["PT.TENSES.PRETERITE_PERFECT", "PT.TENSES.IMPERFECT", "PT.TENSES.PLUPERFECT"],
+  "discourse connectors": ["PT.ADV.CONNECTIVE", "PT.CONJ.CONCLUSIVE"],
+  "idiomatic usage": ["PT.LEX.REGISTER.FORMAL", "PT.LEX.IDIOMS.ADVANCED"],
+  "register variation": ["PT.LEX.REGISTER.FORMAL", "PT.LEX.COLLOCATIONS.SPECIALIZED"],
+  "formal subjunctive": ["PT.TENSES.SUBJUNCTIVE_FUTURE", "PT.TENSES.COMPOUND_SUBJUNCTIVE"],
+  "impersonal constructions": ["PT.SYNTAX.SUBJECT", "PT.SYNTAX.TOPICALIZATION"],
+  "stylistic devices": ["PT.RHETORIC.ADVANCED_ANALYSIS"],
+  "archaic forms": ["PT.LEX.ETYMOLOGY", "PT.TENSES.LITERARY_PLUPERFECT", "PT.SYNTAX.ARCHAIC_FORMS"],
+  "advanced connectors": ["PT.ADV.CONNECTIVE", "PT.CONJ.CONCESSIVE", "PT.CONJ.CONSECUTIVE"],
+  "subjunctive nuances": ["PT.TENSES.SUBJUNCTIVE_PRESENT", "PT.TENSES.SUBJUNCTIVE_IMPERFECT", "PT.TENSES.COMPOUND_SUBJUNCTIVE"],
+  "all tenses review": ["PT.TENSES.PRESENT", "PT.TENSES.PRETERITE_PERFECT", "PT.TENSES.IMPERFECT"],
+  "regional variation": ["PT.SYNTAX.STYLISTIC_VARIATION", "PT.DISCOURSE.DIALECTAL_AWARENESS", "PT.PHON.DIALECTAL_VARIATION"],
+  "stylistic choices": ["PT.DISCOURSE.STYLISTICS", "PT.DISCOURSE.LITERARY_ANALYSIS"],
+  "creative grammar": ["PT.SYNTAX.STYLISTIC_VARIATION", "PT.LEX.CREATIVE_NEOLOGY", "PT.SYNTAX.ARCHAIC_FORMS"],
+};
 
 export const COURSE_UNITS: Record<CEFRLevel, UnitDef[]> = {
   A1: [
@@ -107,14 +184,42 @@ export async function seedCourseStructure(
 
       unitCount++;
 
+      const skillCodes = new Set<string>();
+      for (const gf of unitDef.grammarFocus) {
+        const mapped = GRAMMAR_TO_SKILLS[gf];
+        if (mapped) mapped.forEach((c) => skillCodes.add(c));
+      }
+
+      let resolvedSkillIds: { id: string; code: string; isPrimary: boolean }[] = [];
+      if (skillCodes.size > 0) {
+        const allSkills = await db
+          .select({ id: skills.id, code: skills.code })
+          .from(skills);
+        const firstGf = unitDef.grammarFocus[0];
+        const primaryCodes = new Set(GRAMMAR_TO_SKILLS[firstGf ?? ""] ?? []);
+        resolvedSkillIds = allSkills
+          .filter((s) => skillCodes.has(s.code))
+          .map((s) => ({ ...s, isPrimary: primaryCodes.has(s.code) }));
+      }
+
       const lessonsPerUnit = level === "C2" ? 5 : level === "C1" ? 6 : 8;
       for (let lIdx = 0; lIdx < lessonsPerUnit; lIdx++) {
-        await db.insert(lessons).values({
+        const [lesson] = await db.insert(lessons).values({
           unitId: unit!.id,
           sortOrder: lIdx,
           grammarFocus: unitDef.grammarFocus,
           vocabTarget: unitDef.vocabTarget,
-        });
+        }).returning({ id: lessons.id });
+
+        if (resolvedSkillIds.length > 0 && lesson) {
+          await db.insert(lessonSkills).values(
+            resolvedSkillIds.map((s) => ({
+              lessonId: lesson.id,
+              skillId: s.id,
+              isPrimary: s.isPrimary,
+            })),
+          );
+        }
         lessonCount++;
       }
     }

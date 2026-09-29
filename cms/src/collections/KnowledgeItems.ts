@@ -149,6 +149,15 @@ export const KnowledgeItems: CollectionConfig = {
       },
     },
     {
+      name: "exerciseCount",
+      type: "number",
+      admin: {
+        readOnly: true,
+        position: "sidebar",
+        description: "Number of exercises linked to this KI (computed)",
+      },
+    },
+    {
       name: "status",
       type: "select",
       required: true,

@@ -482,6 +482,178 @@ export const SKILLS: SkillSeed[] = [
 
   // B2
   skill("PT.VERBS.TRANSITIVITY.PREDICATIVE", "tenses_moods", "B2", "Verbos transitivos-predicativos", "Predicative transitive verbs", ["PT.VERBS.TRANSITIVITY.DIRECT", "PT.SYNTAX.PREDICATIVE_DO"]),
+
+  // =========================================================================
+  // NOUNS — PT.NOUNS.*
+  // =========================================================================
+
+  // A1
+  skill("PT.NOUNS.PROPER", "lexicon", "A1", "Nomes próprios", "Proper nouns"),
+  skill("PT.NOUNS.COMMON", "lexicon", "A1", "Nomes comuns", "Common nouns"),
+
+  // A2
+  skill("PT.NOUNS.COLLECTIVE", "lexicon", "A2", "Nomes coletivos", "Collective nouns", ["PT.NOUNS.COMMON"]),
+
+  // =========================================================================
+  // ADJECTIVES — PT.ADJ.*
+  // =========================================================================
+
+  // A1
+  skill("PT.ADJ.QUALIFYING", "lexicon", "A1", "Adjetivos qualificativos", "Qualifying adjectives"),
+
+  // A2
+  skill("PT.ADJ.NUMERAL", "lexicon", "A2", "Adjetivos numerais", "Numeral adjectives"),
+  skill("PT.ADJ.AGREEMENT", "morphology", "A2", "Concordância do adjetivo", "Adjective agreement", ["PT.ADJ.QUALIFYING", "PT.MORPH.GENDER", "PT.MORPH.NUMBER"]),
+
+  // B1
+  skill("PT.ADJ.POSITION", "syntax", "B1", "Posição do adjetivo", "Adjective position", ["PT.ADJ.QUALIFYING"]),
+  skill("PT.ADJ.DEGREE", "morphology", "B1", "Graus do adjetivo", "Adjective degree", ["PT.ADJ.QUALIFYING"]),
+
+  // =========================================================================
+  // ADVERBS — PT.ADV.*
+  // =========================================================================
+
+  // A1
+  skill("PT.ADV.NEGATION", "lexicon", "A1", "Advérbios de negação", "Negation adverbs"),
+  skill("PT.ADV.AFFIRMATION", "lexicon", "A1", "Advérbios de afirmação", "Affirmation adverbs"),
+
+  // A2
+  skill("PT.ADV.TIME", "lexicon", "A2", "Advérbios de tempo", "Time adverbs"),
+  skill("PT.ADV.PLACE", "lexicon", "A2", "Advérbios de lugar", "Place adverbs"),
+  skill("PT.ADV.MANNER", "lexicon", "A2", "Advérbios de modo", "Manner adverbs"),
+  skill("PT.ADV.QUANTITY", "lexicon", "A2", "Advérbios de quantidade e grau", "Quantity and degree adverbs"),
+
+  // B1
+  skill("PT.ADV.INTERROGATIVE", "lexicon", "B1", "Advérbios interrogativos", "Interrogative adverbs"),
+  skill("PT.ADV.INCLUSION_EXCLUSION", "lexicon", "B1", "Advérbios de inclusão e exclusão", "Inclusion and exclusion adverbs"),
+  skill("PT.ADV.DOUBT", "lexicon", "B1", "Advérbios de dúvida", "Doubt adverbs"),
+
+  // B2
+  skill("PT.ADV.CONNECTIVE", "lexicon", "B2", "Advérbios conectivos", "Connective adverbs", ["PT.SYNTAX.COORD.COPULATIVE"]),
+  skill("PT.ADV.RELATIVE", "lexicon", "B2", "Advérbios relativos", "Relative adverbs", ["PT.SYNTAX.SUB.RELATIVE.RESTRICTIVE"]),
+  skill("PT.ADV.FOCUS", "lexicon", "B2", "Advérbios de foco e realce", "Focus adverbs"),
+
+  // =========================================================================
+  // CONJUNCTIONS — PT.CONJ.*
+  // =========================================================================
+
+  // A1
+  skill("PT.CONJ.COPULATIVE", "syntax", "A1", "Conjunções copulativas", "Copulative conjunctions"),
+  skill("PT.CONJ.ADVERSATIVE", "syntax", "A1", "Conjunções adversativas", "Adversative conjunctions"),
+
+  // A2
+  skill("PT.CONJ.DISJUNCTIVE", "syntax", "A2", "Conjunções disjuntivas", "Disjunctive conjunctions"),
+  skill("PT.CONJ.CAUSAL", "syntax", "A2", "Conjunções causais", "Causal conjunctions"),
+  skill("PT.CONJ.TEMPORAL", "syntax", "A2", "Conjunções temporais", "Temporal conjunctions"),
+
+  // B1
+  skill("PT.CONJ.CONCLUSIVE", "syntax", "B1", "Conjunções conclusivas", "Conclusive conjunctions"),
+  skill("PT.CONJ.EXPLICATIVE", "syntax", "B1", "Conjunções explicativas", "Explicative conjunctions"),
+  skill("PT.CONJ.CONDITIONAL", "syntax", "B1", "Conjunções condicionais", "Conditional conjunctions"),
+  skill("PT.CONJ.FINAL", "syntax", "B1", "Conjunções finais", "Final conjunctions"),
+  skill("PT.CONJ.COMPLETIVE", "syntax", "B1", "Conjunções completivas", "Completive conjunctions"),
+
+  // B2
+  skill("PT.CONJ.CONSECUTIVE", "syntax", "B2", "Conjunções consecutivas", "Consecutive conjunctions", ["PT.CONJ.CAUSAL"]),
+  skill("PT.CONJ.CONCESSIVE", "syntax", "B2", "Conjunções concessivas", "Concessive conjunctions", ["PT.CONJ.ADVERSATIVE"]),
+  skill("PT.CONJ.COMPARATIVE", "syntax", "B2", "Conjunções comparativas", "Comparative conjunctions"),
+
+  // =========================================================================
+  // QUANTIFIERS — PT.QUANT.*
+  // =========================================================================
+
+  // A2
+  skill("PT.QUANT.BASIC", "determiners", "A2", "Quantificadores básicos", "Basic quantifiers", ["PT.DET.INDEFINITE"]),
+
+  // B1
+  skill("PT.QUANT.UNIVERSAL_EXISTENTIAL", "determiners", "B1", "Quantificadores universais e existenciais", "Universal and existential quantifiers", ["PT.QUANT.BASIC"]),
+
+  // =========================================================================
+  // INTERJECTIONS — PT.INTERJ.*
+  // =========================================================================
+
+  // A2
+  skill("PT.INTERJ.BASIC", "lexicon", "A2", "Interjeições", "Interjections"),
+
+  // =========================================================================
+  // RHETORIC GAP — PT.RHETORIC.ADJECTIVATION
+  // =========================================================================
+
+  // B2
+  skill("PT.RHETORIC.ADJECTIVATION", "lexicon", "B2", "Adjetivação", "Adjectivation", ["PT.ADJ.QUALIFYING"]),
+
+  // =========================================================================
+  // DISCOURSE GAPS — COHERENCE subtypes + INTERTEXTUALITY subtypes
+  // =========================================================================
+
+  // B2
+  skill("PT.DISCOURSE.COHERENCE.RELEVANCE", "pragmatics", "B2", "Coerência: relevância", "Coherence: relevance", ["PT.DISCOURSE.COHERENCE.LOGICAL"]),
+  skill("PT.DISCOURSE.COHERENCE.NON_CONTRADICTION", "pragmatics", "B2", "Coerência: não contradição", "Coherence: non-contradiction", ["PT.DISCOURSE.COHERENCE.LOGICAL"]),
+  skill("PT.DISCOURSE.COHERENCE.NON_REDUNDANCY", "pragmatics", "B2", "Coerência: não redundância", "Coherence: non-redundancy", ["PT.DISCOURSE.COHERENCE.LOGICAL"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.CITATION", "pragmatics", "B2", "Citação", "Citation", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.EPIGRAPH", "pragmatics", "B2", "Epígrafe", "Epigraph", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.ALLUSION", "pragmatics", "B2", "Alusão", "Allusion", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.PARAPHRASE", "pragmatics", "B2", "Paráfrase", "Paraphrase", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.PARODY", "pragmatics", "B2", "Paródia", "Parody", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.CREATIVE_IMITATION", "pragmatics", "B2", "Imitação criativa", "Creative imitation", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+
+  // =========================================================================
+  // C1 SKILLS
+  // =========================================================================
+
+  skill("PT.RHETORIC.ADVANCED_ANALYSIS", "lexicon", "C1", "Análise avançada de recursos expressivos", "Advanced analysis of expressive resources", ["PT.RHETORIC.METAPHOR", "PT.RHETORIC.METONYMY", "PT.RHETORIC.IRONY"]),
+  skill("PT.DISCOURSE.ARGUMENTATION.ADVANCED", "pragmatics", "C1", "Argumentação avançada", "Advanced argumentation", ["PT.COMM.OPINION_TEXT", "PT.DISCOURSE.COHERENCE.LOGICAL"]),
+  skill("PT.SEM.MODALITY.ADVANCED", "syntax", "C1", "Modalidade avançada", "Advanced modality", ["PT.SEM.MODALITY.EPISTEMIC", "PT.SEM.MODALITY.DEONTIC"]),
+  skill("PT.SYNTAX.SUBORDINATION.ADVANCED", "syntax", "C1", "Subordinação avançada e orações reduzidas", "Advanced subordination and reduced clauses", ["PT.SYNTAX.SUB.CONCESSIVE", "PT.SYNTAX.SUB.CONDITIONAL"]),
+  skill("PT.PHON.PROSODY.ADVANCED", "phonetics", "C1", "Prosódia avançada", "Advanced prosody", ["PT.PHON.RHYTHM"]),
+  skill("PT.DISCOURSE.TEXT_TYPES.ADVANCED", "pragmatics", "C1", "Tipologias textuais avançadas", "Advanced text types", ["PT.DISCOURSE.TEXT_SEQUENCE.ARGUMENTATIVE"]),
+  skill("PT.LEX.REGISTER.FORMAL", "lexicon", "C1", "Registo formal e literário", "Formal and literary register", ["PT.LEX.REGISTER"]),
+  skill("PT.MORPH.WORD_FORMATION.ADVANCED", "morphology", "C1", "Formação de palavras avançada", "Advanced word formation", ["PT.MORPH.DERIVATION.PARASYNTHESIS", "PT.MORPH.COMPOSITION"]),
+
+  // --- C1: Tenses ---
+  skill("PT.TENSES.COMPOUND_SUBJUNCTIVE", "tenses_moods", "C1", "Conjuntivo composto", "Compound subjunctive", ["PT.TENSES.SUBJUNCTIVE_PRESENT", "PT.TENSES.COMPOUND_PAST"]),
+  skill("PT.TENSES.LITERARY_PLUPERFECT", "tenses_moods", "C1", "Mais-que-perfeito simples", "Simple pluperfect (literary)", ["PT.TENSES.PLUPERFECT"]),
+
+  // --- C1: Pronouns ---
+  skill("PT.PRON.MESOCLISIS", "pronouns", "C1", "Mesóclise", "Mesoclisis", ["PT.PRON.PERSONAL.CLITIC_PLACEMENT", "PT.TENSES.FUTURE", "PT.TENSES.CONDITIONAL"]),
+  skill("PT.PRON.CLITIC.ADVANCED_COMBINATIONS", "pronouns", "C1", "Combinações clíticas complexas", "Complex clitic combinations", ["PT.PRON.PERSONAL.COMBINED"]),
+
+  // --- C1: Syntax ---
+  skill("PT.SYNTAX.TOPICALIZATION", "syntax", "C1", "Topicalização e deslocação", "Topicalization and dislocation", ["PT.SYNTAX.WORD_ORDER", "PT.SYNTAX.SUBJECT"]),
+  skill("PT.SYNTAX.CLEFT", "syntax", "C1", "Construções clivadas", "Cleft constructions", ["PT.SYNTAX.TOPICALIZATION"]),
+  skill("PT.SYNTAX.ELLIPSIS", "syntax", "C1", "Elipse sintática", "Syntactic ellipsis", ["PT.SYNTAX.COORD.COPULATIVE"]),
+
+  // --- C1: Discourse ---
+  skill("PT.DISCOURSE.HEDGING", "pragmatics", "C1", "Atenuação e mitigação", "Hedging and mitigation", ["PT.SEM.MODALITY.EPISTEMIC", "PT.DISCOURSE.POLITENESS"]),
+  skill("PT.DISCOURSE.SPEECH_ACTS.INDIRECT", "pragmatics", "C1", "Atos de fala indiretos", "Indirect speech acts", ["PT.DISCOURSE.SPEECH.INDIRECT"]),
+  skill("PT.DISCOURSE.ACADEMIC_WRITING", "pragmatics", "C1", "Escrita académica", "Academic writing", ["PT.COMM.EXPOSITION", "PT.DISCOURSE.COHERENCE.LOGICAL"]),
+
+  // --- C1: Lexicon ---
+  skill("PT.LEX.IDIOMS.ADVANCED", "lexicon", "C1", "Expressões idiomáticas avançadas", "Advanced idiomatic expressions", ["PT.LEX.COLLOCATION"]),
+  skill("PT.LEX.COLLOCATIONS.SPECIALIZED", "lexicon", "C1", "Colocações especializadas", "Specialized collocations", ["PT.LEX.COLLOCATION", "PT.LEX.REGISTER"]),
+
+  // --- C1: Prepositions ---
+  skill("PT.PREP.LITERARY_REGENCY", "prepositions", "C1", "Regência preposicional literária", "Literary prepositional regency", ["PT.PREP.ADVANCED_USAGE"]),
+
+  // --- C1: Orthography ---
+  skill("PT.ORTH.STYLISTIC_PUNCTUATION", "orthography", "C1", "Pontuação expressiva e estilística", "Expressive and stylistic punctuation", ["PT.ORTH.PUNCTUATION"]),
+
+  // =========================================================================
+  // C2 SKILLS
+  // =========================================================================
+
+  skill("PT.DISCOURSE.STYLISTICS", "pragmatics", "C2", "Estilística e efeitos discursivos", "Stylistics and discourse effects", ["PT.RHETORIC.ADVANCED_ANALYSIS", "PT.DISCOURSE.ARGUMENTATION.ADVANCED"]),
+  skill("PT.SEM.PRAGMATIC_INFERENCE", "syntax", "C2", "Inferência pragmática e implicaturas", "Pragmatic inference and implicature", ["PT.SEM.MODALITY.ADVANCED"]),
+  skill("PT.LEX.ETYMOLOGY", "lexicon", "C2", "Etimologia e evolução lexical", "Etymology and lexical evolution", ["PT.LEX.ARCHAISM_NEOLOGISM", "PT.PHON.HISTORICAL"]),
+  skill("PT.SYNTAX.STYLISTIC_VARIATION", "syntax", "C2", "Variação sintática estilística", "Stylistic syntactic variation", ["PT.SYNTAX.SUBORDINATION.ADVANCED"]),
+  skill("PT.DISCOURSE.DIALECTAL_AWARENESS", "pragmatics", "C2", "Variação dialetal lusófona", "Lusophone dialectal variation", ["PT.LEX.REGISTER.FORMAL", "PT.DISCOURSE.TEXT_TYPES.ADVANCED"]),
+  skill("PT.LEX.HUMOR_WORDPLAY", "lexicon", "C2", "Humor, ironia e jogo de palavras", "Humor, irony and wordplay", ["PT.RHETORIC.IRONY", "PT.LEX.IDIOMS.ADVANCED"]),
+  skill("PT.DISCOURSE.LITERARY_ANALYSIS", "pragmatics", "C2", "Análise literária avançada", "Advanced literary analysis", ["PT.RHETORIC.ADVANCED_ANALYSIS", "PT.DISCOURSE.STYLISTICS"]),
+  skill("PT.PHON.DIALECTAL_VARIATION", "phonetics", "C2", "Variação fonética dialetal", "Dialectal phonetic variation", ["PT.PHON.PROSODY.ADVANCED", "PT.PHON.HISTORICAL"]),
+  skill("PT.SYNTAX.ARCHAIC_FORMS", "syntax", "C2", "Construções sintáticas arcaicas", "Archaic syntactic constructions", ["PT.SYNTAX.STYLISTIC_VARIATION", "PT.TENSES.LITERARY_PLUPERFECT"]),
+  skill("PT.LEX.CREATIVE_NEOLOGY", "lexicon", "C2", "Neologia e uso criativo", "Neology and creative usage", ["PT.LEX.ETYMOLOGY", "PT.MORPH.WORD_FORMATION.ADVANCED"]),
+  skill("PT.DISCOURSE.TRANSLATION_CONTRASTIVE", "pragmatics", "C2", "Consciência tradutológica contrastiva", "Contrastive translation awareness", ["PT.DISCOURSE.DIALECTAL_AWARENESS"]),
+  skill("PT.ORTH.HISTORICAL_CONVENTIONS", "orthography", "C2", "Convenções ortográficas históricas", "Historical orthographic conventions", ["PT.ORTH.SPELLING_REFORM"]),
 ];
 
 // ===========================================================================
@@ -491,6 +663,67 @@ export const SKILLS: SkillSeed[] = [
 const DEFAULT_CRITERIA = { minAccuracy: 0.80, minVariety: 0.50, minReps: 5 };
 const SPEECH_CRITERIA = { minAccuracy: 0.75, minVariety: 0.40, minReps: 8 };
 const PRODUCTION_CRITERIA = { minAccuracy: 0.80, minVariety: 0.60, minReps: 6 };
+const RECOGNITION_CRITERIA = { minAccuracy: 0.85, minVariety: 0.40, minReps: 4 };
+
+function l1WordClass(ptSpecific: string): Record<string, L1DifficultyEntry> {
+  return {
+    en: { difficulty: "medium", reason: `O inglês tem um sistema diferente: ${ptSpecific}` },
+    es: { difficulty: "low", reason: "O espanhol tem uma classe equivalente com funcionamento semelhante." },
+    fr: { difficulty: "low", reason: "O francês tem uma classe equivalente com funcionamento semelhante." },
+    hi: { difficulty: "high", reason: `O hindi estrutura esta classe de forma diferente: ${ptSpecific}` },
+    ur: { difficulty: "high", reason: `O urdu estrutura esta classe de forma diferente: ${ptSpecific}` },
+    ar: { difficulty: "high", reason: `O árabe tem um sistema morfológico muito diferente: ${ptSpecific}` },
+    bn: { difficulty: "high", reason: `O bengali estrutura esta classe de forma diferente: ${ptSpecific}` },
+    de: { difficulty: "medium", reason: `O alemão tem semelhanças mas com diferenças: ${ptSpecific}` },
+    zh: { difficulty: "high", reason: `O mandarim não tem morfologia flexional: ${ptSpecific}` },
+    ru: { difficulty: "medium", reason: `O russo tem um sistema semelhante mas com diferenças: ${ptSpecific}` },
+    uk: { difficulty: "medium", reason: `O ucraniano tem um sistema semelhante mas com diferenças: ${ptSpecific}` },
+    tr: { difficulty: "high", reason: `O turco é aglutinante e estrutura de forma diferente: ${ptSpecific}` },
+    pl: { difficulty: "medium", reason: `O polaco tem um sistema semelhante mas com diferenças: ${ptSpecific}` },
+    ko: { difficulty: "high", reason: `O coreano é aglutinante e estrutura de forma diferente: ${ptSpecific}` },
+    ja: { difficulty: "high", reason: `O japonês estrutura esta classe de forma diferente: ${ptSpecific}` },
+  };
+}
+
+function l1Rhetoric(concept: string): Record<string, L1DifficultyEntry> {
+  return {
+    en: { difficulty: "low", reason: `O inglês ensina ${concept} com terminologia semelhante.` },
+    es: { difficulty: "low", reason: `O espanhol ensina ${concept} com terminologia semelhante.` },
+    fr: { difficulty: "low", reason: `O francês ensina ${concept} com terminologia semelhante.` },
+    hi: { difficulty: "medium", reason: `A tradição literária hindi aborda ${concept} com perspetiva diferente.` },
+    ur: { difficulty: "medium", reason: `A tradição literária urdu aborda ${concept} com perspetiva diferente.` },
+    ar: { difficulty: "medium", reason: `A retórica árabe (balāgha) tem conceitos semelhantes mas com outra taxonomia.` },
+    bn: { difficulty: "medium", reason: `A tradição literária bengali aborda ${concept} com perspetiva diferente.` },
+    de: { difficulty: "low", reason: `O alemão ensina ${concept} (Stilmittel) com terminologia semelhante.` },
+    zh: { difficulty: "medium", reason: `A tradição retórica chinesa aborda ${concept} com perspetiva diferente.` },
+    ru: { difficulty: "low", reason: `O russo ensina ${concept} com terminologia semelhante.` },
+    uk: { difficulty: "low", reason: `O ucraniano ensina ${concept} com terminologia semelhante.` },
+    tr: { difficulty: "medium", reason: `A tradição literária turca aborda ${concept} com perspetiva diferente.` },
+    pl: { difficulty: "low", reason: `O polaco ensina ${concept} com terminologia semelhante.` },
+    ko: { difficulty: "medium", reason: `A tradição literária coreana aborda ${concept} com perspetiva diferente.` },
+    ja: { difficulty: "medium", reason: `A tradição literária japonesa aborda ${concept} com perspetiva diferente.` },
+  };
+}
+
+function l1Discourse(concept: string): Record<string, L1DifficultyEntry> {
+  return {
+    en: { difficulty: "low", reason: `O inglês trabalha ${concept} em linguística textual.` },
+    es: { difficulty: "low", reason: `O espanhol trabalha ${concept} em linguística textual.` },
+    fr: { difficulty: "low", reason: `O francês trabalha ${concept} em linguística textual.` },
+    hi: { difficulty: "medium", reason: `A tradição académica hindi aborda ${concept} de forma diferente.` },
+    ur: { difficulty: "medium", reason: `A tradição académica urdu aborda ${concept} de forma diferente.` },
+    ar: { difficulty: "medium", reason: `A tradição retórica árabe aborda ${concept} de forma diferente.` },
+    bn: { difficulty: "medium", reason: `A tradição académica bengali aborda ${concept} de forma diferente.` },
+    de: { difficulty: "low", reason: `O alemão trabalha ${concept} (Textwissenschaft) de forma semelhante.` },
+    zh: { difficulty: "medium", reason: `A tradição chinesa aborda ${concept} de forma diferente.` },
+    ru: { difficulty: "low", reason: `O russo trabalha ${concept} em linguística textual.` },
+    uk: { difficulty: "low", reason: `O ucraniano trabalha ${concept} em linguística textual.` },
+    tr: { difficulty: "medium", reason: `A tradição turca aborda ${concept} de forma diferente.` },
+    pl: { difficulty: "low", reason: `O polaco trabalha ${concept} em linguística textual.` },
+    ko: { difficulty: "medium", reason: `A tradição coreana aborda ${concept} de forma diferente.` },
+    ja: { difficulty: "medium", reason: `A tradição japonesa aborda ${concept} de forma diferente.` },
+  };
+}
 
 export const KNOWLEDGE_ITEMS: KnowledgeItemSeed[] = [
 
@@ -6715,6 +6948,1202 @@ export const KNOWLEDGE_ITEMS: KnowledgeItemSeed[] = [
         ko: { difficulty: "medium", reason: "A tradição retórica coreana estrutura a argumentação de forma diferente." },
         ja: { difficulty: "medium", reason: "A tradição retórica japonesa estrutura a argumentação de forma diferente." },
       },
+    },
+  ),
+
+  // =========================================================================
+  // NOUNS KIs
+  // =========================================================================
+
+  ki("PT.NOUNS.PROPER.RULES", "PT.NOUNS.PROPER", "A1",
+    "Os nomes próprios designam entidades únicas e escrevem-se com maiúscula inicial: pessoas, lugares, instituições.",
+    ["Lisboa", "Portugal", "o João", "a Maria", "o Tejo"],
+    {
+      shortExplanation: "Nomes próprios referem-se a entidades específicas e únicas, distinguindo-se dos comuns pela maiúscula.",
+      counterexamples: ["mesa (nome comum)", "cidade (nome comum, genérico)"],
+      commonErrors: ["Não usar maiúscula em nomes próprios", "Usar maiúscula em nomes comuns"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      l1Difficulty: l1WordClass("maiúsculas em nomes próprios"),
+    },
+  ),
+  ki("PT.NOUNS.COMMON.CONCRETE_ABSTRACT", "PT.NOUNS.COMMON", "A1",
+    "Os nomes comuns podem ser concretos (designam entidades perceptíveis) ou abstratos (designam qualidades, estados, ações).",
+    ["mesa (concreto)", "cão (concreto)", "felicidade (abstrato)", "coragem (abstrato)"],
+    {
+      shortExplanation: "Nomes comuns concretos referem entidades que podemos ver, tocar ou sentir; abstratos referem ideias, sentimentos ou qualidades.",
+      counterexamples: ["Lisboa (nome próprio, não comum)"],
+      commonErrors: ["Confundir nomes abstratos com adjetivos: 'beleza' vs 'belo'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("distinção concreto/abstrato"),
+    },
+  ),
+  ki("PT.NOUNS.COLLECTIVE.USAGE", "PT.NOUNS.COLLECTIVE", "A2",
+    "Os nomes coletivos designam, no singular, um conjunto de seres ou coisas: rebanho, alcateia, turma, arquipélago.",
+    ["O rebanho atravessou o campo.", "A alcateia caçava à noite.", "A turma tinha trinta alunos."],
+    {
+      shortExplanation: "Um nome coletivo usa-se no singular para referir um grupo: 'rebanho' = muitas ovelhas.",
+      counterexamples: ["ovelhas (plural comum, não coletivo)"],
+      commonErrors: ["Usar o plural do coletivo desnecessariamente: *'os rebanhos de ovelha' quando se refere a um só grupo"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("nomes coletivos específicos de PT-EU"),
+    },
+  ),
+
+  // =========================================================================
+  // ADJECTIVES KIs
+  // =========================================================================
+
+  ki("PT.ADJ.QUALIFYING.BASIC", "PT.ADJ.QUALIFYING", "A1",
+    "O adjetivo qualificativo atribui uma qualidade ou propriedade ao nome: bonito, grande, interessante.",
+    ["A casa é bonita.", "O livro interessante.", "Uma pessoa simpática."],
+    {
+      shortExplanation: "Adjetivos qualificativos descrevem como algo é — qualidades, características, estados.",
+      counterexamples: ["três (numeral, não qualificativo)", "este (determinante, não adjetivo)"],
+      commonErrors: ["Confundir adjetivos com advérbios: *'Ela canta bonito' em vez de 'Ela canta bem'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("concordância obrigatória em género e número"),
+    },
+  ),
+  ki("PT.ADJ.NUMERAL.TYPES", "PT.ADJ.NUMERAL", "A2",
+    "Os adjetivos numerais indicam quantidade precisa (cardinais: um, dois) ou ordem (ordinais: primeiro, segundo).",
+    ["Tenho dois irmãos.", "O terceiro andar.", "A segunda tentativa."],
+    {
+      shortExplanation: "Numerais cardinais indicam 'quantos' (um, dois, três); ordinais indicam 'em que posição' (primeiro, segundo, terceiro).",
+      counterexamples: ["muitos (quantificador indefinido, não numeral)"],
+      commonErrors: ["Confundir ordinais com cardinais: *'o capítulo dois' em vez de 'o segundo capítulo'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("ordinais em PT têm género: primeiro/primeira"),
+    },
+  ),
+  ki("PT.ADJ.AGREEMENT.RULES", "PT.ADJ.AGREEMENT", "A2",
+    "O adjetivo concorda em género e número com o nome: 'gato bonito' → 'gata bonita' → 'gatos bonitos'.",
+    ["A menina alta.", "Os meninos altos.", "As casas brancas."],
+    {
+      shortExplanation: "Em PT, o adjetivo muda para concordar com o nome em género (masculino/feminino) e número (singular/plural).",
+      counterexamples: ["Em inglês, 'big' não muda: 'big house', 'big houses'."],
+      commonErrors: ["Não flexionar: *'A casa é bonito'", "Erro no feminino irregular: *'a professora é cruelo'"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("concordância obrigatória em género e número"),
+    },
+  ),
+  ki("PT.ADJ.POSITION.ANTE_POST", "PT.ADJ.POSITION", "B1",
+    "Em PT-EU, o adjetivo geralmente vem após o nome (posição pós-nominal), mas pode antecedê-lo com mudança de significado: 'um grande homem' ≠ 'um homem grande'.",
+    ["um grande amigo (bom amigo)", "um amigo grande (de tamanho grande)", "certo dia (determinado dia)", "dia certo (dia correto)"],
+    {
+      shortExplanation: "A posição do adjetivo em PT pode alterar o significado: antes do nome é mais subjetivo/figurado; depois é mais objetivo/literal.",
+      counterexamples: ["Em inglês, o adjetivo vem sempre antes: 'a big man'."],
+      commonErrors: ["Colocar sempre o adjetivo antes do nome por influência do inglês"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("posição muda o significado em certos adjetivos"),
+    },
+  ),
+  ki("PT.ADJ.DEGREE.COMPARATIVE_SUPERLATIVE", "PT.ADJ.DEGREE", "B1",
+    "O adjetivo pode variar em grau: comparativo (mais/menos/tão...como) e superlativo (o mais... / -íssimo).",
+    ["A Maria é mais alta do que o Pedro.", "Este é o livro mais interessante.", "O café está quentíssimo."],
+    {
+      shortExplanation: "O grau mostra intensidade: comparativo compara duas coisas; superlativo indica o extremo da qualidade.",
+      counterexamples: ["bom → melhor (irregular, não *'mais bom')"],
+      commonErrors: ["Usar formas regulares para irregulares: *'mais bom' em vez de 'melhor'", "*'mais grande' em vez de 'maior'"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation", "translation"],
+      l1Difficulty: l1WordClass("formas sintéticas irregulares: melhor, pior, maior, menor"),
+    },
+  ),
+
+  // =========================================================================
+  // ADVERBS KIs
+  // =========================================================================
+
+  ki("PT.ADV.NEGATION.NAO_NUNCA", "PT.ADV.NEGATION", "A1",
+    "Os advérbios de negação indicam que algo não acontece: não, nunca, jamais, nem, tampouco.",
+    ["Não quero.", "Nunca fui a Paris.", "Nem ele nem ela vieram."],
+    {
+      shortExplanation: "'Não' é o advérbio de negação principal em PT; 'nunca' e 'jamais' negam no tempo.",
+      counterexamples: ["'Nenhum' é pronome/determinante indefinido, não advérbio."],
+      commonErrors: ["Dupla negação errada: *'Não quero nada não' (em PT-EU, a dupla negação é normativa: 'Não quero nada')"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("dupla negação é normativa em PT-EU"),
+    },
+  ),
+  ki("PT.ADV.AFFIRMATION.SIM_CLARO", "PT.ADV.AFFIRMATION", "A1",
+    "Os advérbios de afirmação confirmam: sim, certamente, realmente, efetivamente, claro, pois.",
+    ["Sim, vou.", "Certamente que ajudo.", "Realmente é verdade."],
+    {
+      shortExplanation: "'Sim' é a afirmação base; 'pois' (PT-EU) e 'certamente' reforçam.",
+      counterexamples: ["'Talvez' é de dúvida, não de afirmação."],
+      commonErrors: ["Usar 'si' (espanhol) em vez de 'sim'"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      l1Difficulty: l1WordClass("'pois' como afirmação é específico de PT-EU"),
+    },
+  ),
+  ki("PT.ADV.TIME.BASIC_SET", "PT.ADV.TIME", "A2",
+    "Os advérbios de tempo situam a ação no tempo: hoje, ontem, amanhã, agora, sempre, ainda, já, depois, antes, cedo, tarde.",
+    ["Ontem fui ao cinema.", "Agora estou a trabalhar.", "Já comi."],
+    {
+      shortExplanation: "Advérbios de tempo respondem a 'quando?': hoje, ontem, amanhã, agora, já, ainda, depois, antes.",
+      counterexamples: ["'aqui' é de lugar, não de tempo."],
+      commonErrors: ["Confundir 'já' (ação completa) com 'ainda' (ação em curso): 'Já comi' vs 'Ainda não comi'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "translation"],
+      l1Difficulty: l1WordClass("'já' e 'ainda' têm correspondências complexas em várias L1s"),
+    },
+  ),
+  ki("PT.ADV.PLACE.BASIC_SET", "PT.ADV.PLACE", "A2",
+    "Os advérbios de lugar situam no espaço: aqui, ali, acolá, cá, lá, dentro, fora, perto, longe, acima, abaixo.",
+    ["Estou aqui.", "Ele mora longe.", "Vem cá."],
+    {
+      shortExplanation: "Advérbios de lugar respondem a 'onde?': sistema tripartido PT-EU (aqui/aí/ali) vs bipartido (here/there).",
+      counterexamples: ["'agora' é de tempo, não de lugar."],
+      commonErrors: ["Não distinguir cá/aqui e lá/ali (cá/lá = movimento, aqui/ali = posição estática)"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "translation"],
+      l1Difficulty: l1WordClass("sistema tripartido cá/aí/lá com valor deítico"),
+    },
+  ),
+  ki("PT.ADV.MANNER.MENTE", "PT.ADV.MANNER", "A2",
+    "Os advérbios de modo indicam como se faz algo, muitos formados com '-mente': rapidamente, facilmente, bem, mal, assim.",
+    ["Ele fala bem.", "Correu rapidamente.", "Fez assim."],
+    {
+      shortExplanation: "Advérbios de modo respondem a 'como?'. Muitos formam-se juntando '-mente' ao feminino do adjetivo: rápida + mente.",
+      counterexamples: ["'muito' é de quantidade, não de modo."],
+      commonErrors: ["Formar a partir do masculino: *'rapidomente' em vez de 'rapidamente'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("formação em -mente a partir do feminino do adjetivo"),
+    },
+  ),
+  ki("PT.ADV.QUANTITY.MUITO_POUCO", "PT.ADV.QUANTITY", "A2",
+    "Os advérbios de quantidade indicam intensidade ou grau: muito, pouco, bastante, demasiado, mais, menos, tão.",
+    ["Ele come muito.", "É bastante alto.", "Está demasiado quente."],
+    {
+      shortExplanation: "Advérbios de quantidade respondem a 'quanto?' e modificam verbos, adjetivos ou outros advérbios sem concordar.",
+      counterexamples: ["'muitas' (flexionado) é determinante, não advérbio: 'muitas casas'."],
+      commonErrors: ["Flexionar o advérbio: *'Elas correm muitas' em vez de 'Elas correm muito'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("advérbios de quantidade são invariáveis, diferente dos determinantes"),
+    },
+  ),
+  ki("PT.ADV.INTERROGATIVE.USAGE", "PT.ADV.INTERROGATIVE", "B1",
+    "Os advérbios interrogativos introduzem perguntas: onde?, quando?, como?, porquê?, quanto?.",
+    ["Onde moras?", "Quando chegas?", "Como se faz?", "Porquê?"],
+    {
+      shortExplanation: "Cada advérbio interrogativo corresponde a um tipo de informação: onde (lugar), quando (tempo), como (modo), porquê (causa).",
+      counterexamples: ["'que' e 'qual' são pronomes interrogativos, não advérbios."],
+      commonErrors: ["Confundir 'porquê' (pergunta) com 'porque' (resposta)", "Usar 'por que' separado incorretamente"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "translation"],
+      l1Difficulty: l1WordClass("porquê/porque/por que — distinção ortográfica"),
+    },
+  ),
+  ki("PT.ADV.INCLUSION_EXCLUSION.SET", "PT.ADV.INCLUSION_EXCLUSION", "B1",
+    "Advérbios de inclusão acrescentam: também, até, inclusive. Advérbios de exclusão restringem: só, apenas, exceto, senão.",
+    ["Também quero ir.", "Só tenho dois.", "Até o professor riu.", "Apenas faltou ele."],
+    {
+      shortExplanation: "Inclusão (também, até, inclusive) soma; exclusão (só, apenas, senão, exceto) restringe.",
+      counterexamples: ["'somente' = sinónimo de 'apenas' (exclusão)."],
+      commonErrors: ["Posição de 'só': 'Eu só quero água' (apenas) vs 'Eu estou só' (sozinho — adjetivo)"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("'só' pode ser advérbio (apenas) ou adjetivo (sozinho)"),
+    },
+  ),
+  ki("PT.ADV.DOUBT.TALVEZ_QUICA", "PT.ADV.DOUBT", "B1",
+    "Os advérbios de dúvida expressam incerteza: talvez, possivelmente, provavelmente, quiçá, porventura.",
+    ["Talvez vá.", "Possivelmente chove.", "Quiçá tenhamos sorte."],
+    {
+      shortExplanation: "'Talvez' e 'quiçá' pedem conjuntivo; 'possivelmente' e 'provavelmente' usam-se com indicativo.",
+      counterexamples: ["'certamente' é de afirmação, não de dúvida."],
+      commonErrors: ["Usar indicativo com 'talvez': *'Talvez vou' em vez de 'Talvez vá'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("'talvez' exige conjuntivo, uma regra rara noutras línguas"),
+    },
+  ),
+  ki("PT.ADV.CONNECTIVE.USAGE", "PT.ADV.CONNECTIVE", "B2",
+    "Os advérbios conectivos ligam frases, dando coesão: porém, contudo, todavia, portanto, consequentemente, aliás, logo.",
+    ["Estudou muito; portanto, passou.", "Não gosta de café; contudo, bebe-o todas as manhãs."],
+    {
+      shortExplanation: "Advérbios conectivos funcionam como articuladores do discurso, ligando ideias entre frases independentes.",
+      counterexamples: ["'mas' é conjunção adversativa, não advérbio conectivo (embora com função semelhante)."],
+      commonErrors: ["Confundir com conjunções: 'porém' e 'contudo' não são conjunções, são advérbios (podem mudar de posição na frase)"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "free_production"],
+      l1Difficulty: l1WordClass("a distinção entre conjunção e advérbio conectivo é subtil"),
+    },
+  ),
+  ki("PT.ADV.RELATIVE.ONDE_COMO", "PT.ADV.RELATIVE", "B2",
+    "Os advérbios relativos introduzem orações subordinadas adjetivas: onde, como, quando.",
+    ["A cidade onde nasci.", "A forma como fala.", "O dia quando tudo mudou."],
+    {
+      shortExplanation: "Advérbios relativos ligam orações, referindo-se a um antecedente de lugar (onde), modo (como) ou tempo (quando).",
+      counterexamples: ["'que' é pronome relativo, não advérbio."],
+      commonErrors: ["Usar 'aonde' sem verbo de movimento: *'A cidade aonde nasci' em vez de 'A cidade onde nasci'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("distinção onde/aonde (posição vs movimento)"),
+    },
+  ),
+  ki("PT.ADV.FOCUS.SET", "PT.ADV.FOCUS", "B2",
+    "Os advérbios de foco realçam ou delimitam parte da frase: exatamente, precisamente, justamente, sobretudo, principalmente.",
+    ["Exatamente isso!", "Sobretudo em Lisboa.", "Principalmente no inverno."],
+    {
+      shortExplanation: "Advérbios de foco destacam ou restringem o elemento que modificam sem alterar o valor de verdade da frase.",
+      counterexamples: ["'muito' intensifica mas não focaliza."],
+      commonErrors: ["Posição inadequada: o advérbio de foco deve estar junto ao elemento que focaliza"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("posição do advérbio de foco altera a interpretação"),
+    },
+  ),
+
+  // =========================================================================
+  // CONJUNCTIONS KIs
+  // =========================================================================
+
+  ki("PT.CONJ.COPULATIVE.E_NEM", "PT.CONJ.COPULATIVE", "A1",
+    "As conjunções copulativas ligam elementos com valor de adição: e, nem, não só...mas também.",
+    ["Comprei pão e leite.", "Nem come nem bebe.", "Não só estuda mas também trabalha."],
+    {
+      shortExplanation: "'E' é a conjunção copulativa principal; 'nem' é a negativa; 'não só...mas também' é correlativa.",
+      counterexamples: ["'mas' é adversativa, não copulativa."],
+      commonErrors: ["Usar 'e' em vez de 'nem' na negação: *'Não come e não bebe'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("correlativas (não só...mas também) são específicas"),
+    },
+  ),
+  ki("PT.CONJ.ADVERSATIVE.MAS_POREM", "PT.CONJ.ADVERSATIVE", "A1",
+    "As conjunções adversativas introduzem oposição ou contraste: mas, porém, contudo, todavia, no entanto.",
+    ["Estudou, mas não passou.", "É difícil, porém possível."],
+    {
+      shortExplanation: "'Mas' é informal; 'porém', 'contudo', 'todavia', 'no entanto' são mais formais.",
+      counterexamples: ["'e' é copulativa, não adversativa."],
+      commonErrors: ["Usar 'pero' (espanhol) em vez de 'mas'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("vários sinónimos com registos diferentes"),
+    },
+  ),
+  ki("PT.CONJ.DISJUNCTIVE.OU", "PT.CONJ.DISJUNCTIVE", "A2",
+    "As conjunções disjuntivas apresentam alternativas: ou, ou...ou, quer...quer, seja...seja.",
+    ["Queres café ou chá?", "Ou vais ou ficas.", "Quer chova quer faça sol."],
+    {
+      shortExplanation: "'Ou' apresenta alternativa; 'quer...quer' e 'seja...seja' são correlativas com valor distributivo.",
+      counterexamples: ["'e' une, não apresenta alternativa."],
+      commonErrors: ["Confundir 'ou' exclusivo e inclusivo"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("correlativas quer...quer são específicas de PT"),
+    },
+  ),
+  ki("PT.CONJ.CAUSAL.PORQUE_COMO", "PT.CONJ.CAUSAL", "A2",
+    "As conjunções causais explicam a causa: porque, como, já que, uma vez que, visto que, dado que.",
+    ["Não fui porque estava doente.", "Como chovia, ficámos em casa.", "Visto que já é tarde, vamos embora."],
+    {
+      shortExplanation: "'Porque' é a mais comum; 'como' inicia a frase; 'visto que', 'uma vez que' são mais formais.",
+      counterexamples: ["'portanto' é conclusiva, não causal."],
+      commonErrors: ["Confundir 'porque' (causal) com 'porquê' (interrogativo)"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("distinção porque/porquê/por que"),
+    },
+  ),
+  ki("PT.CONJ.TEMPORAL.QUANDO_ENQUANTO", "PT.CONJ.TEMPORAL", "A2",
+    "As conjunções temporais situam no tempo: quando, enquanto, antes que, depois que, até que, desde que, assim que, logo que.",
+    ["Quando cheguei, ele já tinha saído.", "Enquanto eu cozinhava, ela lia.", "Assim que soube, telefonou."],
+    {
+      shortExplanation: "'Quando' é geral; 'enquanto' indica simultaneidade; 'antes que' e 'até que' pedem conjuntivo.",
+      counterexamples: ["'porque' é causal, não temporal."],
+      commonErrors: ["Não usar conjuntivo com 'antes que': *'antes que ele chega' em vez de 'antes que ele chegue'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("'antes que' e 'até que' exigem conjuntivo"),
+    },
+  ),
+  ki("PT.CONJ.CONCLUSIVE.PORTANTO", "PT.CONJ.CONCLUSIVE", "B1",
+    "As conjunções conclusivas introduzem uma conclusão: portanto, logo, por isso, por conseguinte, assim, então.",
+    ["Estudou muito, portanto passou.", "Chove, logo leva guarda-chuva.", "Por conseguinte, a medida foi aprovada."],
+    {
+      shortExplanation: "'Portanto' e 'logo' são as mais comuns; 'por conseguinte' é mais formal.",
+      counterexamples: ["'porque' é causal (introduz a causa, não a consequência)."],
+      commonErrors: ["Confundir 'logo' (conclusiva) com 'logo' (advérbio de tempo = depois)"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "free_production"],
+      l1Difficulty: l1WordClass("'logo' tem duplo valor: conclusivo e temporal"),
+    },
+  ),
+  ki("PT.CONJ.EXPLICATIVE.POIS_QUE", "PT.CONJ.EXPLICATIVE", "B1",
+    "As conjunções explicativas justificam uma afirmação anterior: pois, que, porquanto.",
+    ["Vem cá, que preciso de ajuda.", "Fica atento, pois o teste é amanhã."],
+    {
+      shortExplanation: "Explicativas justificam o que se disse antes; causais explicam a causa do facto.",
+      counterexamples: ["'porque' introduz a causa do facto, não a justificação da afirmação."],
+      commonErrors: ["Confundir 'pois' explicativo com 'pois' de afirmação (PT-EU coloquial)"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("distinção subtil entre explicativa e causal"),
+    },
+  ),
+  ki("PT.CONJ.CONDITIONAL.SE", "PT.CONJ.CONDITIONAL", "B1",
+    "As conjunções condicionais expressam uma condição: se, caso, desde que, a não ser que, a menos que, contanto que.",
+    ["Se chover, fico em casa.", "Caso venhas, avisa.", "A menos que estude, não passa."],
+    {
+      shortExplanation: "'Se' é a mais comum; 'caso', 'a não ser que' e 'a menos que' pedem conjuntivo.",
+      counterexamples: ["'quando' é temporal, não condicional (embora possa implicar condição)."],
+      commonErrors: ["Usar indicativo com 'caso': *'Caso tu vais' em vez de 'Caso tu vás'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("modo verbal varia conforme a conjunção condicional"),
+    },
+  ),
+  ki("PT.CONJ.FINAL.PARA_QUE", "PT.CONJ.FINAL", "B1",
+    "As conjunções finais expressam finalidade: para que, a fim de que, de modo que (= para que).",
+    ["Estudou para que passasse.", "Falo devagar a fim de que entendam.", "Saiu cedo de modo que chegasse a tempo."],
+    {
+      shortExplanation: "Conjunções finais expressam objetivo e exigem sempre conjuntivo.",
+      counterexamples: ["'para' + infinitivo não é conjunção: 'Estudou para passar.'"],
+      commonErrors: ["Usar indicativo: *'para que ele passa' em vez de 'para que ele passe'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("conjuntivo obrigatório com conjunções finais"),
+    },
+  ),
+  ki("PT.CONJ.COMPLETIVE.QUE", "PT.CONJ.COMPLETIVE", "B1",
+    "As conjunções completivas introduzem orações que completam o sentido do verbo: que, se.",
+    ["Espero que venhas.", "Sei que estás certo.", "Perguntou se queríamos ir."],
+    {
+      shortExplanation: "'Que' completa verbos de opinião, emoção, vontade; 'se' completa verbos de dúvida e pergunta indireta.",
+      counterexamples: ["'que' relativo: 'O livro que li' (pronome, não conjunção)."],
+      commonErrors: ["Omitir 'que': *'Quero venhas' em vez de 'Quero que venhas'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("'que' completivo vs 'que' relativo — funções diferentes"),
+    },
+  ),
+  ki("PT.CONJ.CONSECUTIVE.TAO_QUE", "PT.CONJ.CONSECUTIVE", "B2",
+    "As conjunções consecutivas expressam a consequência: que (precedido de tão, tal, tanto), de modo que, de forma que.",
+    ["Estava tão cansado que adormeceu.", "Choveu tanto que o rio transbordou.", "Falou de tal forma que convenceu todos."],
+    {
+      shortExplanation: "Consecutivas mostram o resultado: a 1.a frase tem intensificador (tão/tanto/tal), a 2.a tem a consequência.",
+      counterexamples: ["'porque' dá a causa, não a consequência."],
+      commonErrors: ["Omitir o intensificador: *'Estava cansado que adormeceu' (falta 'tão')"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("correlação obrigatória entre intensificador e 'que'"),
+    },
+  ),
+  ki("PT.CONJ.CONCESSIVE.EMBORA", "PT.CONJ.CONCESSIVE", "B2",
+    "As conjunções concessivas expressam uma concessão/obstáculo que não impede: embora, apesar de que, ainda que, se bem que, mesmo que.",
+    ["Embora esteja cansado, vou sair.", "Mesmo que chova, vamos.", "Apesar de ser difícil, conseguiu."],
+    {
+      shortExplanation: "Concessivas apresentam um obstáculo que não impede a ação. 'Embora', 'mesmo que', 'ainda que' pedem conjuntivo.",
+      counterexamples: ["'mas' é adversativa coordenativa; 'embora' é concessiva subordinativa."],
+      commonErrors: ["Usar indicativo com 'embora': *'Embora está' em vez de 'Embora esteja'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("conjuntivo obrigatório com 'embora' e outras concessivas"),
+    },
+  ),
+  ki("PT.CONJ.COMPARATIVE.COMO_QUE", "PT.CONJ.COMPARATIVE", "B2",
+    "As conjunções comparativas estabelecem comparação: como, assim como, tal como, (mais/menos/tão)...do que, que nem.",
+    ["É tão alto como o pai.", "Come mais do que eu.", "Trabalha como se não houvesse amanhã."],
+    {
+      shortExplanation: "Comparativas estabelecem paralelo entre dois elementos: igualdade (como, tal como), superioridade/inferioridade (mais/menos...do que).",
+      counterexamples: ["'mas' opõe; 'como' compara."],
+      commonErrors: ["Omitir 'do' em comparações de superioridade: *'mais alto que' em vez de 'mais alto do que' (PT-EU prefere 'do que')"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("PT-EU prefere 'do que' onde PT-BR usa 'que' na comparação"),
+    },
+  ),
+
+  // =========================================================================
+  // QUANTIFIERS KIs
+  // =========================================================================
+
+  ki("PT.QUANT.BASIC.USAGE", "PT.QUANT.BASIC", "A2",
+    "Os quantificadores indicam quantidade sem especificar exatamente: todo, cada, algum, nenhum, vários, ambos, bastante.",
+    ["Todos os alunos passaram.", "Cada pessoa traz o seu.", "Nenhum problema."],
+    {
+      shortExplanation: "Quantificadores são determinantes que indicam quantidade — universais (todo, cada), existenciais (algum), negativos (nenhum).",
+      counterexamples: ["'dois' é numeral, não quantificador indefinido."],
+      commonErrors: ["Esquecer a concordância: *'todo os dias' em vez de 'todos os dias'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("concordância e posição de quantificadores"),
+    },
+  ),
+  ki("PT.QUANT.UNIVERSAL_EXISTENTIAL.DISTINCTION", "PT.QUANT.UNIVERSAL_EXISTENTIAL", "B1",
+    "Quantificadores universais referem a totalidade (todo, cada, ambos, qualquer); existenciais referem parte (algum, certo, vários).",
+    ["Qualquer pessoa sabe.", "Algum dia voltarei.", "Ambos concordaram.", "Vários alunos faltaram."],
+    {
+      shortExplanation: "Universal = todos os membros do conjunto; existencial = pelo menos um ou alguns membros.",
+      counterexamples: ["'nenhum' é negação, não universal nem existencial."],
+      commonErrors: ["Confundir 'qualquer' (universal) com 'algum' (existencial): 'Qualquer livro serve' ≠ 'Algum livro chegou'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("distinção semântica entre universal e existencial"),
+    },
+  ),
+
+  // =========================================================================
+  // INTERJECTIONS KIs
+  // =========================================================================
+
+  ki("PT.INTERJ.BASIC.TYPES", "PT.INTERJ.BASIC", "A2",
+    "As interjeições expressam emoções ou reações: Olá!, Ai!, Ufa!, Oxalá!, Bolas!, Atenção!, Eh pá!",
+    ["Ai, que dor!", "Ufa, consegui!", "Olá, tudo bem?", "Eh pá, que surpresa!"],
+    {
+      shortExplanation: "Interjeições são palavras ou expressões invariáveis que exprimem emoção, surpresa, dor, alívio, etc.",
+      counterexamples: ["'Sim' é advérbio de afirmação, não interjeição."],
+      commonErrors: ["Usar interjeições brasileiras ('opa', 'caramba') em vez de PT-EU ('eh pá', 'bolas')"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      l1Difficulty: l1WordClass("interjeições PT-EU específicas: 'eh pá', 'bolas', 'chiça'"),
+    },
+  ),
+
+  // =========================================================================
+  // RHETORIC: ADJECTIVATION KI
+  // =========================================================================
+
+  ki("PT.RHETORIC.ADJECTIVATION.EFFECT", "PT.RHETORIC.ADJECTIVATION", "B2",
+    "A adjetivação como recurso expressivo consiste no uso acumulado ou expressivo de adjetivos para criar efeitos de sentido: caracterização vívida, subjetividade, intensificação.",
+    ["'as águas claras, frescas, cristalinas' (acumulação descritiva)", "'o doce e melancólico crepúsculo' (subjetividade)"],
+    {
+      shortExplanation: "A adjetivação expressiva vai além da descrição factual: acumula, seleciona e posiciona adjetivos para criar atmosfera, emoção ou juízo.",
+      counterexamples: ["'A casa é grande.' — adjetivo descritivo simples, sem valor expressivo especial."],
+      commonErrors: ["Confundir adjetivação expressiva com simples presença de adjetivos"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "free_production"],
+      confusableWith: ["PT.RHETORIC.ENUMERATION.RULES"],
+      l1Difficulty: l1Rhetoric("adjetivação expressiva"),
+    },
+  ),
+
+  // =========================================================================
+  // DISCOURSE: COHERENCE subtypes KIs
+  // =========================================================================
+
+  ki("PT.DISCOURSE.COHERENCE.RELEVANCE.RULES", "PT.DISCOURSE.COHERENCE.RELEVANCE", "B2",
+    "A relevância exige que todas as informações de um texto contribuam para o tema e sejam pertinentes para o propósito comunicativo.",
+    ["'Portugal é um país europeu. A capital é Lisboa.' — relevante", "'Portugal é um país europeu. Os gatos são bonitos.' — irrelevante"],
+    {
+      shortExplanation: "Cada frase de um texto deve contribuir para o tema; informação irrelevante quebra a coerência.",
+      counterexamples: ["Uma digressão intencional (com marcação textual) não é irrelevância."],
+      commonErrors: ["Inserir informação sem ligação ao tema por associação livre de ideias"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1Discourse("relevância textual"),
+    },
+  ),
+  ki("PT.DISCOURSE.COHERENCE.NON_CONTRADICTION.RULES", "PT.DISCOURSE.COHERENCE.NON_CONTRADICTION", "B2",
+    "A não contradição exige que as informações de um texto não se contradigam entre si nem contradigam o conhecimento do mundo.",
+    ["'Ele saiu às 8h e chegou às 9h.' — coerente", "'Ele saiu às 8h mas nunca saiu de casa.' — contraditório"],
+    {
+      shortExplanation: "Um texto coerente não pode afirmar e negar a mesma coisa, nem violar pressupostos do mundo real.",
+      counterexamples: ["Contradições intencionais em textos literários (paradoxo, ironia)."],
+      commonErrors: ["Contradizer informação dada anteriormente sem intenção retórica"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1Discourse("não contradição"),
+    },
+  ),
+  ki("PT.DISCOURSE.COHERENCE.NON_REDUNDANCY.RULES", "PT.DISCOURSE.COHERENCE.NON_REDUNDANCY", "B2",
+    "A não redundância exige que o texto não repita informação desnecessariamente sem acrescentar significado novo.",
+    ["'Saiu de casa e foi embora. Saiu.' — redundante", "'Saiu de casa e dirigiu-se ao trabalho.' — progressão"],
+    {
+      shortExplanation: "Um texto coerente avança; repetição sem novo significado é redundância e enfraquece a coerência.",
+      counterexamples: ["A repetição intencional (anáfora retórica, reforço argumentativo) não é redundância."],
+      commonErrors: ["Repetir a mesma ideia com palavras diferentes sem acrescentar informação"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1Discourse("não redundância"),
+    },
+  ),
+
+  // =========================================================================
+  // DISCOURSE: INTERTEXTUALITY subtypes KIs
+  // =========================================================================
+
+  ki("PT.DISCOURSE.INTERTEXTUALITY.CITATION.USAGE", "PT.DISCOURSE.INTERTEXTUALITY.CITATION", "B2",
+    "A citação é a reprodução literal de parte de outro texto, geralmente entre aspas e com indicação da fonte.",
+    ["Como disse Pessoa, 'O poeta é um fingidor.'", "Segundo a Constituição, 'todos os cidadãos têm a mesma dignidade social'."],
+    {
+      shortExplanation: "Citar é transcrever literalmente, com aspas e referência à fonte original.",
+      counterexamples: ["A paráfrase reformula sem reproduzir literalmente."],
+      commonErrors: ["Citar sem aspas ou sem indicar a fonte"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      confusableWith: ["PT.DISCOURSE.INTERTEXTUALITY.PARAPHRASE.USAGE"],
+      l1Difficulty: l1Discourse("citação"),
+    },
+  ),
+  ki("PT.DISCOURSE.INTERTEXTUALITY.EPIGRAPH.USAGE", "PT.DISCOURSE.INTERTEXTUALITY.EPIGRAPH", "B2",
+    "A epígrafe é uma citação colocada no início de um texto ou capítulo que antecipa ou ilumina o seu sentido.",
+    ["Um romance que abre com um verso de Camões como epígrafe.", "Uma dissertação com epígrafe de Einstein."],
+    {
+      shortExplanation: "A epígrafe é uma citação que abre o texto e sugere o tema, o tom ou a perspetiva que se vai desenvolver.",
+      counterexamples: ["Uma citação no meio do texto não é epígrafe."],
+      commonErrors: ["Confundir epígrafe com dedicatória"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      l1Difficulty: l1Discourse("epígrafe"),
+    },
+  ),
+  ki("PT.DISCOURSE.INTERTEXTUALITY.ALLUSION.USAGE", "PT.DISCOURSE.INTERTEXTUALITY.ALLUSION", "B2",
+    "A alusão é uma referência indireta a outro texto, facto ou figura sem o citar explicitamente.",
+    ["'Navegou por mares nunca dantes navegados' — alusão a Camões.", "'Ser ou não ser, eis a questão' usado em contexto diferente — alusão a Shakespeare."],
+    {
+      shortExplanation: "Alusão evoca outro texto sem o transcrever; o leitor precisa de reconhecer a referência.",
+      counterexamples: ["A citação é explícita; a alusão é implícita."],
+      commonErrors: ["Confundir alusão com citação", "Fazer alusão que o público não reconhece"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      confusableWith: ["PT.DISCOURSE.INTERTEXTUALITY.CITATION.USAGE"],
+      l1Difficulty: l1Discourse("alusão literária"),
+    },
+  ),
+  ki("PT.DISCOURSE.INTERTEXTUALITY.PARAPHRASE.USAGE", "PT.DISCOURSE.INTERTEXTUALITY.PARAPHRASE", "B2",
+    "A paráfrase reformula as ideias de outro texto com palavras próprias, mantendo o sentido original.",
+    ["Texto original: 'O poeta é um fingidor.' Paráfrase: 'Pessoa defende que o poeta finge emoções na escrita.'"],
+    {
+      shortExplanation: "Parafrasear é reescrever as ideias de outro autor sem copiar as palavras; mantém-se o sentido, muda-se a forma.",
+      counterexamples: ["A citação mantém as palavras originais; a paráfrase muda-as."],
+      commonErrors: ["Parafrasear demasiado perto do original (plágio)", "Alterar o sentido ao parafrasear"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      confusableWith: ["PT.DISCOURSE.INTERTEXTUALITY.CITATION.USAGE"],
+      l1Difficulty: l1Discourse("paráfrase"),
+    },
+  ),
+  ki("PT.DISCOURSE.INTERTEXTUALITY.PARODY.USAGE", "PT.DISCOURSE.INTERTEXTUALITY.PARODY", "B2",
+    "A paródia imita um texto ou estilo com intenção humorística, crítica ou satírica, subvertendo o original.",
+    ["Uma versão cómica de 'Os Lusíadas' que satiriza a sociedade atual.", "Um poema que imita o estilo de Camões para efeito humorístico."],
+    {
+      shortExplanation: "A paródia reconhece e subverte o texto original; o humor nasce da distância entre original e imitação.",
+      counterexamples: ["A imitação criativa (pastiche) é homenagem, não subversão."],
+      commonErrors: ["Confundir paródia com imitação criativa (pastiche)"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      confusableWith: ["PT.DISCOURSE.INTERTEXTUALITY.CREATIVE_IMITATION.USAGE"],
+      l1Difficulty: l1Discourse("paródia"),
+    },
+  ),
+  ki("PT.DISCOURSE.INTERTEXTUALITY.CREATIVE_IMITATION.USAGE", "PT.DISCOURSE.INTERTEXTUALITY.CREATIVE_IMITATION", "B2",
+    "A imitação criativa (pastiche) reproduz o estilo de outro autor como homenagem ou exercício, sem intenção satírica.",
+    ["Um texto que imita o estilo de Eça de Queiroz para praticar a narrativa realista.", "Um poema à maneira de Florbela Espanca."],
+    {
+      shortExplanation: "A imitação criativa reproduz um estilo admirado como forma de aprendizagem ou homenagem, sem subversão.",
+      counterexamples: ["A paródia subverte com humor; a imitação criativa homenageia."],
+      commonErrors: ["Confundir com paródia (a imitação criativa não tem intenção satírica)"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      confusableWith: ["PT.DISCOURSE.INTERTEXTUALITY.PARODY.USAGE"],
+      l1Difficulty: l1Discourse("imitação criativa (pastiche)"),
+    },
+  ),
+
+  // =========================================================================
+  // C1 KIs
+  // =========================================================================
+
+  ki("PT.RHETORIC.ADVANCED_ANALYSIS.COMBINED", "PT.RHETORIC.ADVANCED_ANALYSIS", "C1",
+    "A análise avançada combina identificação, interpretação e avaliação do efeito de múltiplos recursos expressivos em contexto.",
+    ["'As ondas bravas e furiosas devoravam a praia.' — personificação + adjetivação + metáfora + hipérbole"],
+    {
+      shortExplanation: "Em textos reais, os recursos expressivos combinam-se; a análise avançada identifica a interação entre eles e o efeito conjunto.",
+      counterexamples: ["Identificar recursos isoladamente sem ver a interação."],
+      commonErrors: ["Listar recursos sem interpretar o efeito combinado"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "free_production"],
+      l1Difficulty: l1Rhetoric("análise combinada de recursos expressivos"),
+    },
+  ),
+  ki("PT.DISCOURSE.ARGUMENTATION.ADVANCED.STRATEGY", "PT.DISCOURSE.ARGUMENTATION.ADVANCED", "C1",
+    "A argumentação avançada utiliza estratégias complexas: concessão, refutação, contra-argumentação, argumento de autoridade, reductio ad absurdum.",
+    ["'Embora se possa argumentar que..., a verdade é que...' — concessão seguida de refutação"],
+    {
+      shortExplanation: "A argumentação avançada não se limita a defender uma posição; antecipa objeções, concede pontos e refuta sistematicamente.",
+      counterexamples: ["Argumentação simplista: 'Eu acho que sim porque é bom.'"],
+      commonErrors: ["Não distinguir concessão de contradição", "Omitir a contra-argumentação"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "free_production", "communication"],
+      l1Difficulty: l1Discourse("argumentação avançada"),
+    },
+  ),
+  ki("PT.SEM.MODALITY.ADVANCED.COMBINED", "PT.SEM.MODALITY.ADVANCED", "C1",
+    "A modalidade avançada analisa como diferentes marcadores modais (verbos, advérbios, tempos, modos) interagem na mesma estrutura.",
+    ["'Deveria provavelmente ter sido mais cuidadoso.' — deôntico (deveria) + epistémico (provavelmente) + aspetual (ter sido)"],
+    {
+      shortExplanation: "Numa frase real, vários valores modais combinam-se; a análise avançada identifica cada camada e o efeito resultante.",
+      counterexamples: ["Modalidade simples: 'Deves estudar.' (apenas deôntico)."],
+      commonErrors: ["Atribuir apenas um valor modal quando há sobreposição"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1Discourse("sobreposição de valores modais"),
+    },
+  ),
+  ki("PT.SYNTAX.SUBORDINATION.ADVANCED.REDUCED", "PT.SYNTAX.SUBORDINATION.ADVANCED", "C1",
+    "As orações reduzidas omitem o conector e usam formas não finitas: infinitivo, gerúndio ou particípio.",
+    ["Ao chegar a casa, descansou. (= Quando chegou...)", "Sendo tarde, saímos. (= Como era tarde...)", "Terminado o trabalho, foi-se embora."],
+    {
+      shortExplanation: "Orações subordinadas podem ser reduzidas (sem conjunção) usando infinitivo, gerúndio ou particípio, tornando o texto mais conciso.",
+      counterexamples: ["'Quando chegou a casa, descansou.' — subordinada desenvolvida (com conjunção)."],
+      commonErrors: ["Não reconhecer que uma oração reduzida é subordinada", "Confundir gerúndio subordinativo com gerúndio contínuo"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("orações reduzidas de infinitivo, gerúndio e particípio"),
+    },
+  ),
+  ki("PT.PHON.PROSODY.ADVANCED.PATTERNS", "PT.PHON.PROSODY.ADVANCED", "C1",
+    "A prosódia avançada abrange padrões entoacionais complexos: ênfase contrastiva, ironia, hesitação, foco informacional.",
+    ["'EU é que fiz.' (ênfase contrastiva no sujeito)", "'Claro que foi ótimo...' (ironia com entoação descendente)"],
+    {
+      shortExplanation: "A entoação em PT-EU transmite informação pragmática: contraste, ironia, surpresa, dúvida — para além do significado literal.",
+      counterexamples: ["Entoação neutra declarativa (sem efeito pragmático especial)."],
+      commonErrors: ["Não usar ênfase contrastiva quando necessário", "Não reconhecer ironia pela entoação"],
+      criteria: SPEECH_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "communication"],
+      l1Difficulty: l1WordClass("padrões entoacionais específicos de PT-EU para ironia e contraste"),
+    },
+  ),
+  ki("PT.DISCOURSE.TEXT_TYPES.ADVANCED.HYBRID", "PT.DISCOURSE.TEXT_TYPES.ADVANCED", "C1",
+    "Os textos complexos combinam múltiplas sequências textuais: um artigo de opinião pode ter narração, descrição e argumentação.",
+    ["Um editorial que narra um evento, descreve o contexto e argumenta uma posição."],
+    {
+      shortExplanation: "Textos reais raramente seguem uma única tipologia; a análise avançada identifica e avalia a alternância de sequências.",
+      counterexamples: ["Um exercício de gramática que pede apenas uma sequência textual."],
+      commonErrors: ["Classificar um texto complexo numa única tipologia"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "free_production"],
+      l1Difficulty: l1Discourse("textos com sequências híbridas"),
+    },
+  ),
+  ki("PT.LEX.REGISTER.FORMAL.DISTINCTIONS", "PT.LEX.REGISTER.FORMAL", "C1",
+    "O registo formal e literário em PT-EU usa vocabulário elevado, construções sintáticas complexas, e evita coloquialismos.",
+    ["'Importa salientar que...' (formal)", "'Ó pá, olha...' (coloquial)", "'Outrossim convém referir...' (muito formal/jurídico)"],
+    {
+      shortExplanation: "O registo formal distingue-se pelo vocabulário (importar, salientar, referir), pela sintaxe (passivas, inversões) e pela ausência de marcas orais.",
+      counterexamples: ["'Eh pá, que fixe!' — coloquial, informal."],
+      commonErrors: ["Misturar registos numa mesma produção formal", "Usar vocabulário PT-BR em contexto formal PT-EU"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "free_production"],
+      l1Difficulty: l1WordClass("registo formal PT-EU com vocabulário e construções específicas"),
+    },
+  ),
+  ki("PT.MORPH.WORD_FORMATION.ADVANCED.PRODUCTIVE", "PT.MORPH.WORD_FORMATION.ADVANCED", "C1",
+    "A formação de palavras avançada inclui processos produtivos criativos: neologismos por derivação, composição erudita (greco-latina), e truncação.",
+    ["biodiversidade (composição erudita: bio + diversidade)", "euroceticismo (neo + composição)", "prof (truncação de professor)"],
+    {
+      shortExplanation: "Processos avançados criam palavras novas: composição erudita (raízes greco-latinas), truncação, acronímia, e derivação por analogia.",
+      counterexamples: ["'casas' (simples pluralização, não formação de nova palavra)."],
+      commonErrors: ["Não reconhecer raízes eruditas: 'hidro-' (água), 'filo-' (amor)"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("composição erudita com raízes greco-latinas"),
+    },
+  ),
+
+  // --- New C1 KIs: Tenses ---
+  ki("PT.TENSES.COMPOUND_SUBJUNCTIVE.FORMATION", "PT.TENSES.COMPOUND_SUBJUNCTIVE", "C1",
+    "O conjuntivo composto forma-se com o conjuntivo presente de 'ter' + particípio passado: tenha feito, tenhas ido.",
+    ["Espero que tenhas gostado.", "Duvido que ele tenha chegado a tempo.", "É possível que tenham decidido sem nós."],
+    {
+      shortExplanation: "Para falar de ações passadas em contextos de dúvida, desejo ou emoção, usa-se 'tenha/tenhas/... + particípio'.",
+      counterexamples: ["'Espero que gostes.' — conjuntivo simples (presente, não passado)."],
+      commonErrors: ["Confundir com indicativo composto: 'tenho feito' (habitual) vs 'tenha feito' (dúvida/desejo)"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      relatedTo: ["PT.TENSES.SUBJUNCTIVE_PRESENT.RULES"],
+      l1Difficulty: l1WordClass("conjuntivo composto com auxiliar 'ter' no conjuntivo"),
+    },
+  ),
+  ki("PT.TENSES.COMPOUND_SUBJUNCTIVE.CONTEXTS", "PT.TENSES.COMPOUND_SUBJUNCTIVE", "C1",
+    "O conjuntivo composto usa-se para ações concluídas antes do momento de referência em contextos de dúvida, desejo, concessão e condição.",
+    ["Embora tenha chovido, saímos. (concessão passada)", "Lamento que não tenhas podido vir. (emoção sobre passado)", "Caso tenham terminado, avisem-me. (condição passada)"],
+    {
+      shortExplanation: "É o conjuntivo dos factos passados: quando se quer expressar incerteza, emoção ou concessão sobre algo que já aconteceu.",
+      counterexamples: ["'Embora chova' — conjuntivo simples (ação simultânea, não passada)."],
+      commonErrors: ["Usar indicativo em vez de conjuntivo após 'embora': *'Embora choveu'"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "transformation", "free_production"],
+      confusableWith: ["PT.TENSES.SUBJUNCTIVE_PRESENT.RULES"],
+      l1Difficulty: l1WordClass("distinção entre conjuntivo simples e composto para referência temporal"),
+    },
+  ),
+  ki("PT.TENSES.LITERARY_PLUPERFECT.FORM", "PT.TENSES.LITERARY_PLUPERFECT", "C1",
+    "O mais-que-perfeito simples do indicativo forma-se com o radical do perfeito + -ra: fizera, dissera, fora, viera.",
+    ["Ele fizera o trabalho antes de sair.", "Nunca vira tal coisa.", "Fora ele quem a encontrara."],
+    {
+      shortExplanation: "Esta forma verbal arcaica usa-se na literatura e no discurso formal; na fala corrente substitui-se por 'tinha feito'.",
+      counterexamples: ["'Ele tinha feito o trabalho.' — mais-que-perfeito composto (forma corrente)."],
+      commonErrors: ["Confundir com imperfeito do conjuntivo: 'fizera' (indicativo literário) vs 'fizesse' (conjuntivo)"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "transformation"],
+      confusableWith: ["PT.TENSES.SUBJUNCTIVE_IMPERFECT.RULES"],
+      l1Difficulty: l1WordClass("mais-que-perfeito simples em -ra, forma literária"),
+    },
+  ),
+  ki("PT.TENSES.LITERARY_PLUPERFECT.NARRATIVE", "PT.TENSES.LITERARY_PLUPERFECT", "C1",
+    "Na narrativa literária, o mais-que-perfeito simples marca anterioridade em relação a outro evento passado, sem auxiliar.",
+    ["Quando chegou, o comboio já partira.", "Lembrou-se do que lhe dissera o avô.", "Reconheceu a casa onde vivera em criança."],
+    {
+      shortExplanation: "Em textos literários, 'partira' substitui 'tinha partido' para criar um registo mais elevado e um ritmo mais conciso.",
+      counterexamples: ["'Quando chegou, o comboio já tinha partido.' — mesmo significado, registo corrente."],
+      commonErrors: ["Usar esta forma na fala corrente (soa arcaica/afetada)", "Não reconhecer a forma ao ler Eça de Queirós ou Saramago"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "translation"],
+      l1Difficulty: l1WordClass("mais-que-perfeito simples como marca narrativa literária"),
+    },
+  ),
+
+  // --- New C1 KIs: Pronouns ---
+  ki("PT.PRON.MESOCLISIS.RULES", "PT.PRON.MESOCLISIS", "C1",
+    "A mesóclise coloca o pronome no meio do verbo no futuro ou condicional: fá-lo-ei, dir-lhe-ia. Só ocorre quando não há fator de próclise.",
+    ["Fá-lo-ei amanhã. (= Eu farei isso)", "Dir-lhe-ia a verdade. (= Eu diria a ele/ela)", "Dar-nos-ão uma resposta. (= Eles darão a nós)"],
+    {
+      shortExplanation: "Quando o verbo está no futuro ou condicional e não há palavra que 'puxe' o pronome para antes (como 'não', 'que'), o clítico vai para o meio do verbo.",
+      counterexamples: ["'Não lhe direi.' — com 'não', há próclise, não mesóclise.", "'Eu fá-lo-ei' é raro na fala corrente; usa-se 'eu vou fazê-lo'."],
+      commonErrors: ["Usar mesóclise na fala corrente (soa pedante)", "Esquecer que fatores de próclise anulam a mesóclise"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      relatedTo: ["PT.PRON.PERSONAL.CLITIC_PLACEMENT.ENCLISIS"],
+      l1Difficulty: l1WordClass("mesóclise, fenómeno exclusivo do português"),
+    },
+  ),
+  ki("PT.PRON.CLITIC.ADVANCED_COMBINATIONS.CLUSTERS", "PT.PRON.CLITIC.ADVANCED_COMBINATIONS", "C1",
+    "Em combinações de dois clíticos (dativo + acusativo), formam-se contrações: me + o = mo, lhe + o = lho, nos + os = no-los.",
+    ["Deu-mo ontem. (= deu-me + o)", "Ela disse-lho. (= disse-lhe + o)", "Trouxeram-no-los. (= trouxeram-nos + os)"],
+    {
+      shortExplanation: "Quando dois pronomes átonos se juntam, contraem-se: 'me+o=mo', 'lhe+o=lho', 'nos+os=no-los'. Na fala corrente usam-se cada vez menos.",
+      counterexamples: ["'Deu-me isso.' — apenas um clítico, sem contração."],
+      commonErrors: ["Não reconhecer 'lho' como contração de 'lhe+o'", "Confundir 'mo' (me+o) com possessivo 'meu'"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "transformation"],
+      l1Difficulty: l1WordClass("contrações de clíticos dativos + acusativos"),
+    },
+  ),
+
+  // --- New C1 KIs: Syntax ---
+  ki("PT.SYNTAX.TOPICALIZATION.FRONTING", "PT.SYNTAX.TOPICALIZATION", "C1",
+    "A topicalização desloca um constituinte para o início da frase para lhe dar destaque informacional, com ou sem retoma pronominal.",
+    ["Este livro, já o li. (com retoma pronominal)", "De gramática, percebo eu. (sem retoma)", "Ao Pedro, deram-lhe o prémio. (deslocação à esquerda)"],
+    {
+      shortExplanation: "Para destacar um elemento da frase, move-se para o início. Se for complemento direto, normalmente retoma-se com um pronome.",
+      counterexamples: ["'Eu já li este livro.' — ordem canónica SVO, sem topicalização."],
+      commonErrors: ["Topicalizar sem retoma pronominal quando necessário", "Confundir topicalização com sujeito (o elemento deslocado não é sujeito)"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("topicalização com deslocação à esquerda e retoma pronominal"),
+    },
+  ),
+  ki("PT.SYNTAX.CLEFT.TYPES", "PT.SYNTAX.CLEFT", "C1",
+    "As construções clivadas destacam um constituinte usando 'é...que/quem': 'Foi o João que fez.' Existem clivadas, pseudo-clivadas e clivadas invertidas.",
+    ["Foi o João que ganhou. (clivada canónica)", "Quem ganhou foi o João. (pseudo-clivada)", "O João é que ganhou. (clivada invertida, muito frequente em PT-EU)"],
+    {
+      shortExplanation: "As clivadas servem para focalizar: 'Foi X que...' destaca X. Em PT-EU, a clivada invertida 'X é que...' é extremamente comum na fala.",
+      counterexamples: ["'O João ganhou.' — sem clivagem, sem foco especial."],
+      commonErrors: ["Não reconhecer 'é que' como marca de clivagem em PT-EU", "Confundir 'é que' com conjunção explicativa"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      relatedTo: ["PT.SYNTAX.TOPICALIZATION.FRONTING"],
+      l1Difficulty: l1WordClass("clivadas com 'é...que' e 'é que', muito frequentes em PT-EU"),
+    },
+  ),
+  ki("PT.SYNTAX.CLEFT.PSEUDO_CLEFT", "PT.SYNTAX.CLEFT", "C1",
+    "A pseudo-clivada inverte a estrutura: 'O que quero é descansar.' / 'Quem fez isso foi ela.' O elemento focalizado fica no final.",
+    ["O que preciso é de tempo.", "Quem me disse foi a Maria.", "O que aconteceu foi que choveu."],
+    {
+      shortExplanation: "Nas pseudo-clivadas, o foco vai para o final da frase, criando suspense informacional: 'O que... é...'.",
+      counterexamples: ["'Preciso de tempo.' — sem pseudo-clivagem."],
+      commonErrors: ["Confundir pseudo-clivada com oração relativa livre"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      confusableWith: ["PT.SYNTAX.CLEFT.TYPES"],
+      l1Difficulty: l1WordClass("pseudo-clivadas com 'O que...é...'"),
+    },
+  ),
+  ki("PT.SYNTAX.ELLIPSIS.TYPES", "PT.SYNTAX.ELLIPSIS", "C1",
+    "A elipse omite elementos recuperáveis pelo contexto: elipse do verbo ('Ele foi; ela, não.'), do sujeito (sujeito nulo), ou do predicado.",
+    ["O João trouxe vinho; a Maria, queijo. (elipse do verbo 'trouxe')", "Vais ao cinema? — Vou. (elipse do complemento)", "Uns gostaram; outros, nem por isso. (elipse verbal)"],
+    {
+      shortExplanation: "Omitir o que já se sabe pelo contexto torna o discurso mais económico e natural. O PT-EU usa a elipse extensivamente.",
+      counterexamples: ["'O João trouxe vinho e a Maria trouxe queijo.' — sem elipse, mais pesado."],
+      commonErrors: ["Fazer elipses ambíguas onde o elemento omitido não é recuperável"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "transformation"],
+      l1Difficulty: l1WordClass("elipses verbais e nominais em estruturas coordenadas"),
+    },
+  ),
+
+  // --- New C1 KIs: Discourse ---
+  ki("PT.DISCOURSE.HEDGING.STRATEGIES", "PT.DISCOURSE.HEDGING", "C1",
+    "A atenuação usa marcadores linguísticos para reduzir a força de uma asserção: 'parece-me que', 'talvez', condicional, diminutivos, impessoalização.",
+    ["Parece-me que poderia haver um erro. (epistémico + condicional)", "Se calhar, seria melhor reconsiderar. (advérbio + condicional)", "Não seria possível enviar até sexta? (pergunta negativa como pedido atenuado)"],
+    {
+      shortExplanation: "A atenuação protege a face do interlocutor e reduz o compromisso do falante; é essencial na comunicação formal e cortês em PT-EU.",
+      counterexamples: ["'Há um erro. Envie até sexta.' — direto, sem atenuação."],
+      commonErrors: ["Ser demasiado direto em contextos formais PT-EU", "Acumular atenuadores a ponto de parecer inseguro"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "free_production", "communication"],
+      relatedTo: ["PT.SEM.MODALITY.ADVANCED.COMBINED"],
+      l1Difficulty: l1Discourse("estratégias de atenuação e mitigação em PT-EU"),
+    },
+  ),
+  ki("PT.DISCOURSE.HEDGING.POLITENESS_FORMS", "PT.DISCOURSE.HEDGING", "C1",
+    "Em PT-EU, a cortesia formal usa o condicional ('Poderia...?'), o imperfeito de cortesia ('Queria um café'), e formas indiretas.",
+    ["Queria um café, se faz favor. (imperfeito de cortesia)", "Importar-se-ia de fechar a janela? (condicional formal)", "Não me seria possível ver o relatório? (negativa + condicional)"],
+    {
+      shortExplanation: "O imperfeito de cortesia é uma marca característica do PT-EU: 'Queria' em vez de 'Quero' suaviza o pedido.",
+      counterexamples: ["'Dá-me um café.' — imperativo direto, informal."],
+      commonErrors: ["Usar 'eu quero' em contextos onde 'queria' é esperado em PT-EU", "Confundir imperfeito de cortesia com referência ao passado"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "communication"],
+      l1Difficulty: l1WordClass("imperfeito de cortesia e formas indiretas de pedido em PT-EU"),
+    },
+  ),
+  ki("PT.DISCOURSE.SPEECH_ACTS.INDIRECT.STRATEGIES", "PT.DISCOURSE.SPEECH_ACTS.INDIRECT", "C1",
+    "Os atos de fala indiretos realizam uma função diferente da forma gramatical: uma pergunta que é um pedido, uma afirmação que é uma ordem.",
+    ["'Não achas que está frio aqui?' — pedido para fechar a janela.", "'Seria bom terminar isto hoje.' — ordem atenuada.", "'Eu cá não faria isso...' — conselho indireto."],
+    {
+      shortExplanation: "Em PT-EU, muitas ordens, pedidos e críticas são formulados indiretamente para preservar a cortesia; compreendê-los exige competência pragmática.",
+      counterexamples: ["'Fecha a janela.' — ato direto, forma e função coincidem."],
+      commonErrors: ["Interpretar literalmente um ato indireto", "Ser demasiado direto em PT-EU quando uma forma indireta é esperada"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "communication"],
+      l1Difficulty: l1Discourse("atos de fala indiretos e convenções pragmáticas em PT-EU"),
+    },
+  ),
+  ki("PT.DISCOURSE.ACADEMIC_WRITING.CONVENTIONS", "PT.DISCOURSE.ACADEMIC_WRITING", "C1",
+    "A escrita académica em PT-EU segue convenções específicas: impessoalização (passiva, sujeito indeterminado), conectores formais, citação, e estrutura IMRAD.",
+    ["Verifica-se que... (impessoalização com 'se')", "Segundo Mateus et al. (2003), ... (citação académica)", "No entanto, importa referir que... (conector formal + atenuação)"],
+    {
+      shortExplanation: "O texto académico PT-EU evita a 1.a pessoa, usa conectores formais e impessoaliza com construções passivas ou com 'se'.",
+      counterexamples: ["'Eu acho que isto é verdade.' — informal, subjetivo."],
+      commonErrors: ["Usar 1.a pessoa do singular em textos académicos PT-EU", "Usar conectores informais: 'por isso' em vez de 'por conseguinte'"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "free_production"],
+      l1Difficulty: l1Discourse("convenções de escrita académica PT-EU"),
+    },
+  ),
+
+  // --- New C1 KIs: Lexicon ---
+  ki("PT.LEX.IDIOMS.ADVANCED.PT_EU", "PT.LEX.IDIOMS.ADVANCED", "C1",
+    "As expressões idiomáticas avançadas do PT-EU são opacas (o significado não se deduz das palavras) e culturalmente específicas.",
+    ["Estar-se nas tintas (= não se importar)", "Dar o litro (= esforçar-se ao máximo)", "Ficar a ver navios (= ser deixado à espera)", "Ir com os porcos (= morrer, coloquial)"],
+    {
+      shortExplanation: "Estas expressões são intraduziveis e frequentes na fala corrente; é preciso aprendê-las como blocos.",
+      counterexamples: ["'Estar cansado' — expressão transparente, não idiomática."],
+      commonErrors: ["Traduzir literalmente de outra língua", "Confundir expressões PT-EU com equivalentes PT-BR: 'ficar a ver navios' vs 'ficar chupando o dedo'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "communication"],
+      l1Difficulty: l1WordClass("expressões idiomáticas opacas e culturalmente específicas de PT-EU"),
+    },
+  ),
+  ki("PT.LEX.IDIOMS.ADVANCED.PROVERBS", "PT.LEX.IDIOMS.ADVANCED", "C1",
+    "Os provérbios portugueses condensam sabedoria popular e são usados frequentemente na argumentação e no discurso corrente.",
+    ["Quem não tem cão, caça com gato. (= adaptar-se às circunstâncias)", "Água mole em pedra dura, tanto bate até que fura. (= persistência)", "Grão a grão, enche a galinha o papo. (= pouco a pouco)"],
+    {
+      shortExplanation: "Os provérbios são usados em conversação e argumentação como autoridade popular; são frequentes em PT-EU.",
+      counterexamples: ["'Trabalha muito.' — afirmação direta, sem recurso a provérbio."],
+      commonErrors: ["Usar provérbios de PT-BR em contexto PT-EU", "Modificar a forma fixa do provérbio"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "communication"],
+      l1Difficulty: l1Rhetoric("provérbios portugueses e sabedoria popular"),
+    },
+  ),
+  ki("PT.LEX.COLLOCATIONS.SPECIALIZED.PATTERNS", "PT.LEX.COLLOCATIONS.SPECIALIZED", "C1",
+    "As colocações especializadas são combinações fixas de palavras em registos técnicos: 'proferir uma sentença', 'interpor recurso', 'aferir resultados'.",
+    ["Proferir uma sentença (jurídico)", "Aferir resultados (académico)", "Dar entrada no hospital (médico)", "Levantar uma hipótese (académico)"],
+    {
+      shortExplanation: "Cada área profissional tem colocações próprias que um falante competente reconhece e usa; são diferentes de combinações livres.",
+      counterexamples: ["'Dizer uma sentença' — combinação livre, aceitável mas menos técnica que 'proferir'."],
+      commonErrors: ["Usar verbos genéricos ('fazer', 'dizer') em vez de colocações técnicas", "Transferir colocações de outra língua: *'tomar uma decisão' é correto, mas *'tomar um exame' não"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("colocações especializadas em registos técnicos de PT-EU"),
+    },
+  ),
+
+  // --- New C1 KIs: Prepositions ---
+  ki("PT.PREP.LITERARY_REGENCY.PATTERNS", "PT.PREP.LITERARY_REGENCY", "C1",
+    "A regência preposicional literária usa preposições arcaicas ou inesperadas que diferem do uso corrente: 'obstar a' em vez de 'impedir', 'anuir a' em vez de 'concordar com'.",
+    ["Tal facto não obsta a que prossigamos. (obstar a)", "O juiz anuiu ao pedido. (anuir a)", "Atentemos na seguinte questão. (atentar em, não 'atentar a')"],
+    {
+      shortExplanation: "Verbos formais e literários têm regências preposicionais que diferem dos verbos equivalentes correntes; são essenciais para a leitura de textos formais.",
+      counterexamples: ["'Concordou com o pedido.' — regência corrente, transparente."],
+      commonErrors: ["Usar a preposição do verbo equivalente corrente: *'anuir com' em vez de 'anuir a'"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      l1Difficulty: l1WordClass("regência preposicional de verbos formais e literários"),
+    },
+  ),
+
+  // --- New C1 KIs: Orthography ---
+  ki("PT.ORTH.STYLISTIC_PUNCTUATION.EFFECTS", "PT.ORTH.STYLISTIC_PUNCTUATION", "C1",
+    "A pontuação estilística usa travessão, ponto e vírgula, reticências e dois pontos para efeitos rítmicos e expressivos, para além das regras normativas.",
+    ["'Veio — e foi-se embora.' (travessão para dramatizar)", "'Esperou; esperou; ninguém veio.' (ponto e vírgula para ritmo)", "'Abriu a porta e...' (reticências para suspense)"],
+    {
+      shortExplanation: "A pontuação não serve apenas para separar frases; os escritores usam-na como instrumento expressivo para criar ritmo, pausa, ênfase e suspense.",
+      counterexamples: ["'Veio e foi-se embora.' — pontuação normativa, sem efeito estilístico."],
+      commonErrors: ["Usar reticências em excesso no texto formal", "Não reconhecer o travessão como marca estilística em Saramago"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "free_production"],
+      l1Difficulty: l1WordClass("pontuação como instrumento expressivo em textos literários"),
+    },
+  ),
+
+  // --- Extra C1 KIs for existing Skills ---
+  ki("PT.RHETORIC.ADVANCED_ANALYSIS.LITERARY_CONTEXT", "PT.RHETORIC.ADVANCED_ANALYSIS", "C1",
+    "A análise de recursos expressivos em contexto literário considera o género, a época, o movimento e a intenção do autor.",
+    ["A metáfora 'mar salgado' em Pessoa não é mera comparação — evoca a identidade portuguesa.", "A ironia em Eça de Queirós funciona como crítica social, não apenas como humor."],
+    {
+      shortExplanation: "Um recurso expressivo muda de significado conforme o contexto: uma metáfora romântica funciona diferente de uma metáfora realista.",
+      counterexamples: ["Analisar 'mar salgado' apenas como 'água com sal' (interpretação literal)."],
+      commonErrors: ["Isolar o recurso do contexto literário e histórico", "Aplicar categorias de um movimento literário a outro"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["comprehension", "free_production", "communication"],
+      l1Difficulty: l1Rhetoric("análise contextualizada de recursos expressivos na literatura portuguesa"),
+    },
+  ),
+  ki("PT.DISCOURSE.ARGUMENTATION.ADVANCED.FALLACIES", "PT.DISCOURSE.ARGUMENTATION.ADVANCED", "C1",
+    "A argumentação avançada inclui reconhecer e evitar falácias: ad hominem, falsa dicotomia, apelo à emoção, generalização abusiva.",
+    ["'Ele não percebe porque não é cientista.' — ad hominem.", "'Ou apoias tudo ou és contra nós.' — falsa dicotomia.", "'Milhões de pessoas não podem estar erradas.' — apelo à maioria."],
+    {
+      shortExplanation: "Uma falácia é um argumento que parece válido mas tem um erro lógico; reconhecê-las é essencial para o debate formal e a análise crítica.",
+      counterexamples: ["'Os dados mostram que X causa Y.' — argumento baseado em evidência, não falácia."],
+      commonErrors: ["Usar apelos à emoção como argumento principal", "Não reconhecer falácias em textos de opinião"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "free_production"],
+      l1Difficulty: l1Discourse("falácias argumentativas e pensamento crítico"),
+    },
+  ),
+  ki("PT.SYNTAX.SUBORDINATION.ADVANCED.NOMINAL", "PT.SYNTAX.SUBORDINATION.ADVANCED", "C1",
+    "As orações subordinadas substantivas reduzidas usam infinitivo flexionado: 'É importante fazermos isso.' / 'Pedi-lhes para virem.'",
+    ["É essencial compreendermos o problema. (= que compreendamos)", "Convém ficarmos atentos. (= que fiquemos)", "Basta dizermos a verdade. (= que digamos)"],
+    {
+      shortExplanation: "Em PT-EU, as completivas podem ser reduzidas com infinitivo pessoal, o que é mais natural e frequente que as formas desenvolvidas em muitos contextos.",
+      counterexamples: ["'É essencial que compreendamos o problema.' — forma desenvolvida (também correta mas mais pesada)."],
+      commonErrors: ["Usar infinitivo impessoal quando o sujeito da subordinada difere: *'É importante fazer' (quem?)"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "transformation"],
+      relatedTo: ["PT.SYNTAX.SUBORDINATION.ADVANCED.REDUCED"],
+      l1Difficulty: l1WordClass("orações substantivas reduzidas com infinitivo pessoal"),
+    },
+  ),
+
+  // =========================================================================
+  // C2 KIs
+  // =========================================================================
+
+  ki("PT.DISCOURSE.STYLISTICS.EFFECTS", "PT.DISCOURSE.STYLISTICS", "C2",
+    "A estilística analisa como as escolhas linguísticas (léxico, sintaxe, fonética, retórica) criam efeitos estéticos e comunicativos em textos literários e não literários.",
+    ["A escolha de frases curtas num momento de tensão narrativa para criar ritmo.", "O uso de léxico arcaico para evocar um período histórico."],
+    {
+      shortExplanation: "A estilística vai além da gramática descritiva: analisa por que razão o autor escolheu determinada forma linguística e que efeito isso produz no leitor.",
+      counterexamples: ["Análise gramatical pura: 'Esta frase tem sujeito e predicado.'"],
+      commonErrors: ["Confundir análise estilística com paráfrase do conteúdo"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["comprehension", "free_production", "communication"],
+      l1Difficulty: l1Discourse("análise estilística"),
+    },
+  ),
+  ki("PT.SEM.PRAGMATIC_INFERENCE.IMPLICATURE", "PT.SEM.PRAGMATIC_INFERENCE", "C2",
+    "As implicaturas conversacionais permitem comunicar mais do que o dito literalmente, segundo as máximas de Grice (quantidade, qualidade, relação, modo).",
+    ["'Tens horas?' — implicatura: pedir para dizer as horas (não pergunta sobre posse).", "'O café está bom.' (dito com ironia) — implicatura: o café é mau."],
+    {
+      shortExplanation: "As implicaturas são significados que não estão nas palavras mas que o ouvinte infere a partir do contexto e das expectativas conversacionais.",
+      counterexamples: ["'São 15 horas.' — significado literal, sem implicatura."],
+      commonErrors: ["Interpretar tudo literalmente sem considerar o contexto", "Atribuir implicaturas inexistentes"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "communication"],
+      l1Difficulty: l1Discourse("implicaturas conversacionais"),
+    },
+  ),
+  ki("PT.LEX.ETYMOLOGY.EVOLUTION", "PT.LEX.ETYMOLOGY", "C2",
+    "A etimologia estuda a origem e evolução das palavras: do latim ao PT-EU, incluindo influências árabes, germânicas e de outras línguas.",
+    ["'aldeia' — do árabe 'ad-dayʿa'", "'guerra' — do germânico 'werra'", "'olho' — do latim 'oculum'"],
+    {
+      shortExplanation: "Conhecer a etimologia ajuda a compreender a ortografia, o significado e as relações entre palavras do PT-EU.",
+      counterexamples: ["Etimologia popular (falsa etimologia): 'gringo' não vem de 'green go'."],
+      commonErrors: ["Atribuir etimologias falsas baseadas em semelhança superficial"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      l1Difficulty: l1WordClass("influências árabes, germânicas e latinas no PT"),
+    },
+  ),
+  ki("PT.SYNTAX.STYLISTIC_VARIATION.EFFECTS", "PT.SYNTAX.STYLISTIC_VARIATION", "C2",
+    "A variação sintática estilística usa alterações de ordem (hipérbato), omissões (elipse) e repetições estruturais (paralelismo) para efeitos expressivos.",
+    ["'De longe vinha o som.' (hipérbato: complemento anteposto)", "'Ele come; ela, não.' (elipse do verbo)"],
+    {
+      shortExplanation: "A sintaxe pode ser manipulada para efeitos estéticos: inversões criam ênfase, elipses criam ritmo, paralelismos criam equilíbrio.",
+      counterexamples: ["Ordem canónica SVO sem efeito estilístico: 'O João comeu a sopa.'"],
+      commonErrors: ["Usar inversões sem propósito comunicativo, criando confusão em vez de efeito"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production", "free_production"],
+      l1Difficulty: l1WordClass("manipulação da ordem sintática para efeitos estilísticos"),
+    },
+  ),
+
+  // --- New C2 KIs ---
+  ki("PT.DISCOURSE.DIALECTAL_AWARENESS.LUSOPHONE", "PT.DISCOURSE.DIALECTAL_AWARENESS", "C2",
+    "O português tem variedades nacionais (PT-EU, PT-BR, PALOP) com diferenças sistemáticas em fonética, léxico, sintaxe e pragmática.",
+    ["PT-EU: 'autocarro', 'telemóvel', 'pequeno-almoço' vs PT-BR: 'ônibus', 'celular', 'café da manhã'", "PT-EU: colocação enclítica ('dou-te'), PT-BR: proclítica ('te dou')", "PT Angola: 'bué' (= muito), empréstimos do kimbundu."],
+    {
+      shortExplanation: "Um falante C2 reconhece e compreende as diferenças entre variedades do português sem confundir registos.",
+      counterexamples: ["Tratar todas as variedades como 'incorretas' face ao PT-EU."],
+      commonErrors: ["Misturar vocabulário PT-BR com PT-EU sem consciência", "Não reconhecer pronúncia de Moçambique ou Angola"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "communication"],
+      l1Difficulty: l1Discourse("variação dialetal no espaço lusófono"),
+    },
+  ),
+  ki("PT.DISCOURSE.DIALECTAL_AWARENESS.PT_EU_REGIONAL", "PT.DISCOURSE.DIALECTAL_AWARENESS", "C2",
+    "Dentro de PT-EU, existem diferenças regionais: dialetos setentrionais (v/b, ditongos), centro-meridionais (redução extrema), insulares (Açores, Madeira).",
+    ["Norte: 'vinho' [ˈbiɲu] com b/v não distinguidos.", "Açores: vogais mais abertas, entoação distinta.", "Alentejo: ditongação de vogais tónicas: 'pé' → [pɛj]."],
+    {
+      shortExplanation: "Mesmo dentro de Portugal, há variação regional significativa; um falante C2 reconhece as principais marcas dialetais.",
+      counterexamples: ["Falar de 'sotaque de Lisboa' como se fosse o único padrão PT-EU."],
+      commonErrors: ["Não reconhecer a não-distinção b/v no Norte como variante regional e não como erro"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      l1Difficulty: l1WordClass("variação dialetal dentro de Portugal continental e insular"),
+    },
+  ),
+  ki("PT.LEX.HUMOR_WORDPLAY.TECHNIQUES", "PT.LEX.HUMOR_WORDPLAY", "C2",
+    "O humor verbal em PT usa trocadilhos (homonímia, polissemia), duplo sentido, calão expressivo, ironia e referências culturais partilhadas.",
+    ["'O que é um ponto no meio do mar? — Um pontinho de vista.' (trocadilho com polissemia de 'ponto')", "'Ele é tão simpático... que até assusta.' (ironia com suspensão)", "'Estar de pedra e cal' usado literalmente sobre um pedreiro (reativação de expressão idiomática)."],
+    {
+      shortExplanation: "O humor português explora a polissemia, os duplos sentidos e as referências culturais; compreendê-lo é uma marca de domínio nativo.",
+      counterexamples: ["Humor slapstick físico — não depende da competência linguística."],
+      commonErrors: ["Não perceber trocadilhos por desconhecimento de polissemia", "Traduzir piadas literalmente de outra língua"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "communication"],
+      l1Difficulty: l1Rhetoric("humor verbal, trocadilhos e duplo sentido em PT-EU"),
+    },
+  ),
+  ki("PT.DISCOURSE.LITERARY_ANALYSIS.METHODS", "PT.DISCOURSE.LITERARY_ANALYSIS", "C2",
+    "A análise literária avançada cruza recursos estilísticos, contexto histórico-cultural, intertextualidade e ideologia para interpretar textos em profundidade.",
+    ["Ler 'Memorial do Convento' cruzando a paródia histórica de Saramago com a crítica ao poder.", "Analisar a heteronímia de Pessoa como projeto filosófico, não apenas literário."],
+    {
+      shortExplanation: "A análise literária C2 não se limita a identificar recursos: interpreta a obra no seu contexto e na rede intertextual da literatura portuguesa.",
+      counterexamples: ["'Este poema tem uma metáfora na linha 3.' — análise superficial, nível B2."],
+      commonErrors: ["Aplicar categorias de análise de uma tradição literária estrangeira sem adaptação"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["comprehension", "free_production"],
+      l1Difficulty: l1Discourse("análise literária contextualizada da literatura portuguesa"),
+    },
+  ),
+  ki("PT.PHON.DIALECTAL_VARIATION.PT_EU_REGIONS", "PT.PHON.DIALECTAL_VARIATION", "C2",
+    "As variações fonéticas regionais de PT-EU incluem: não-distinção b/v (Norte), ditongação (Alentejo), africação de /tʃ/ (Madeira), realização de /s/ (Norte vs Sul).",
+    ["Norte: /s/ apical [s̺] vs Sul/Lisboa: /s/ predorsal [s̻].", "Norte: 'vaca' e 'baca' pronunciados [ˈbakɐ].", "Alentejo: 'pé' → [pɛj] com ditongação."],
+    {
+      shortExplanation: "Portugal tem diversidade fonética significativa; reconhecê-la é parte do domínio C2 e evita interpretar variação regional como erro.",
+      counterexamples: ["Pronúncia padrão de Lisboa sem marcas regionais."],
+      commonErrors: ["Classificar pronúncia nortenha como 'erro'", "Não reconhecer a origem geográfica de um falante pelas marcas fonéticas"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      l1Difficulty: l1WordClass("variação fonética regional dentro de PT-EU"),
+    },
+  ),
+  ki("PT.SYNTAX.ARCHAIC_FORMS.PATTERNS", "PT.SYNTAX.ARCHAIC_FORMS", "C2",
+    "Construções sintáticas arcaicas aparecem na literatura clássica: infinitivo flexionado em posições inesperadas, ênclise obrigatória, pronomes oblíquos átonos em posição arcaica.",
+    ["'Mandou-lhos dar.' (ênclise com 'lhos', arcaico)", "'Pera se salvarem' (= 'para se salvarem', preposição arcaica 'pera')", "'Assi o quis Deus.' (= 'assim o quis Deus')"],
+    {
+      shortExplanation: "Para ler Camões, Gil Vicente ou textos até ao séc. XVIII, é preciso reconhecer formas sintáticas que já não se usam.",
+      counterexamples: ["'Mandou dar-lhos.' — forma moderna equivalente."],
+      commonErrors: ["Não reconhecer 'pera' como forma arcaica de 'para'", "Interpretar ênclise arcaica como erro"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "translation"],
+      l1Difficulty: l1WordClass("construções sintáticas arcaicas do português clássico"),
+    },
+  ),
+  ki("PT.LEX.CREATIVE_NEOLOGY.PROCESSES", "PT.LEX.CREATIVE_NEOLOGY", "C2",
+    "A neologia criativa inventa palavras novas por analogia, cruzamento (blend), remotivação de étimos, ou subversão morfológica intencional.",
+    ["'internetês' (internet + sufixo -ês, por analogia com 'português')", "'eurodeputado' (composição neoclássica produtiva)", "'desamar' (derivação por prefixação criativa de Mia Couto)"],
+    {
+      shortExplanation: "A criação de palavras novas revela domínio dos processos morfológicos e capacidade de inovar dentro do sistema da língua.",
+      counterexamples: ["'computador' — neologismo já integrado, já não sentido como novo."],
+      commonErrors: ["Criar neologismos que violam as regras morfológicas do PT", "Não reconhecer a neologia criativa de autores como Mia Couto ou Valter Hugo Mãe"],
+      criteria: PRODUCTION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "free_production"],
+      relatedTo: ["PT.MORPH.WORD_FORMATION.ADVANCED.PRODUCTIVE"],
+      l1Difficulty: l1WordClass("neologia criativa e subversão morfológica intencional"),
+    },
+  ),
+  ki("PT.DISCOURSE.TRANSLATION_CONTRASTIVE.STRATEGIES", "PT.DISCOURSE.TRANSLATION_CONTRASTIVE", "C2",
+    "A consciência tradutológica reconhece que estruturas de uma língua não se transferem automaticamente: falsos amigos gramaticais, diferenças de regência, e interferências pragmáticas.",
+    ["EN 'I miss you' → PT 'Tenho saudades tuas' (não *'Eu sinto falta de ti', que é PT-BR).", "EN 'make a decision' → PT 'tomar uma decisão' (não *'fazer uma decisão').", "FR 'Il fait beau' → PT 'Está bom tempo' (não *'Ele faz bonito')."],
+    {
+      shortExplanation: "Um falante C2 reconhece onde a L1 interfere e sabe que a tradução literal raramente funciona para estruturas idiomáticas.",
+      counterexamples: ["'mesa' = 'table' — tradução direta e correta."],
+      commonErrors: ["Traduzir literalmente colocações da L1", "Transferir regência preposicional da L1 para PT"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["comprehension", "controlled_production", "translation", "communication"],
+      l1Difficulty: l1WordClass("interferências entre L1 e PT em estruturas não literalmente traduziveis"),
+    },
+  ),
+  ki("PT.ORTH.HISTORICAL_CONVENTIONS.EVOLUTION", "PT.ORTH.HISTORICAL_CONVENTIONS", "C2",
+    "A ortografia portuguesa evoluiu: antes de 1911 escrevia-se 'pharmacia', 'theatro', 'rhythmo'; o AO de 1990 eliminou consoantes mudas em PT-EU.",
+    ["'pharmacia' → 'farmácia' (reforma de 1911)", "'acção' → 'ação' (AO90, PT-EU)", "'baptismo' → 'batismo' (AO90)", "'facto' mantém-se em PT-EU (consoante pronunciada)."],
+    {
+      shortExplanation: "Conhecer a evolução ortográfica permite ler textos antigos e compreender as polémicas do AO90.",
+      counterexamples: ["Textos atuais já seguem o AO90 em Portugal (na maioria dos contextos)."],
+      commonErrors: ["Aplicar AO90 a consoantes que se pronunciam em PT-EU: *'fato' por 'facto'", "Não reconhecer grafias pré-1911 em textos históricos"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      l1Difficulty: l1WordClass("evolução da ortografia portuguesa e reformas ortográficas"),
+    },
+  ),
+
+  // --- Extra C2 KIs for existing Skills ---
+  ki("PT.DISCOURSE.STYLISTICS.AUTHORIAL_VOICE", "PT.DISCOURSE.STYLISTICS", "C2",
+    "A voz autoral é o conjunto de marcas linguísticas que identificam o estilo individual de um escritor: léxico, ritmo frásico, pontuação, registo.",
+    ["Saramago: frases longas sem pontuação convencional, fluxo de consciência.", "Pessoa/Álvaro de Campos: verso livre, exclamações, ritmo futurista.", "Agualusa: léxico angolano com sintaxe europeia."],
+    {
+      shortExplanation: "Reconhecer a voz autoral é distinguir um autor pelo estilo, não pelo conteúdo: 'isto soa a Saramago' pela ausência de pontuação e ritmo narrativo.",
+      counterexamples: ["Um relatório técnico — sem voz autoral individual."],
+      commonErrors: ["Confundir estilo de época com estilo individual"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["comprehension", "free_production"],
+      l1Difficulty: l1Discourse("identificação da voz autoral na literatura portuguesa"),
+    },
+  ),
+  ki("PT.SEM.PRAGMATIC_INFERENCE.PRESUPPOSITION", "PT.SEM.PRAGMATIC_INFERENCE", "C2",
+    "As pressuposições são informações que o falante toma como verdadeiras e partilhadas: 'Deixou de fumar' pressupõe que fumava.",
+    ["'O João voltou a mentir.' — pressupõe que já mentiu antes.", "'A Maria lamentou que chovesse.' — pressupõe que choveu.", "'Quando terminares, avisa.' — pressupõe que vais terminar."],
+    {
+      shortExplanation: "As pressuposições são gatilhadas por certos verbos (deixar de, voltar a, lamentar), construções temporais e definidos; manipulá-las é uma ferramenta retórica.",
+      counterexamples: ["'Chove.' — asserção sem pressuposição."],
+      commonErrors: ["Não detetar pressuposições escondidas em perguntas manipuladoras: 'Quando deixou de bater na mulher?'"],
+      criteria: DEFAULT_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension", "controlled_production"],
+      confusableWith: ["PT.SEM.PRAGMATIC_INFERENCE.IMPLICATURE"],
+      l1Difficulty: l1Discourse("pressuposições e gatilhos pressuposicionais"),
+    },
+  ),
+  ki("PT.LEX.ETYMOLOGY.LATIN_LAYERS", "PT.LEX.ETYMOLOGY", "C2",
+    "O léxico português tem camadas latinas: palavras patrimoniais (evolução fonética completa), semi-eruditas e eruditas (mantidas próximas do latim).",
+    ["CLAMARE → 'chamar' (patrimonial) vs 'clamar' (erudita) vs 'reclamar' (semi-erudita)", "PLENUM → 'cheio' (patrimonial) vs 'pleno' (erudita)", "ARTICULUM → 'artelho' (patrimonial) vs 'artículo' (erudita)"],
+    {
+      shortExplanation: "A mesma raiz latina pode ter dado duas ou três palavras em PT, com significados e registos diferentes: a patrimonial é popular, a erudita é formal.",
+      counterexamples: ["'computador' — empréstimo moderno, não latim patrimonial."],
+      commonErrors: ["Não perceber que 'cheio' e 'pleno' vêm da mesma raiz", "Confundir camadas etimológicas com empréstimos recentes"],
+      criteria: RECOGNITION_CRITERIA,
+      exerciseTypes: ["recognition", "comprehension"],
+      relatedTo: ["PT.LEX.ETYMOLOGY.EVOLUTION"],
+      l1Difficulty: l1WordClass("camadas etimológicas latinas no léxico português"),
     },
   ),
 ];
