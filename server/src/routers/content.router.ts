@@ -5,6 +5,7 @@ import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
 import {
   courses,
+  sections,
   units,
   lessons,
   exercises,
@@ -34,13 +35,36 @@ export const contentRouter = t.router({
     }));
   }),
 
-  getUnits: protectedProcedure
+  getSections: protectedProcedure
     .input(z.object({ courseId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       const rows = await ctx.db
         .select()
+        .from(sections)
+        .where(eq(sections.courseId, input.courseId))
+        .orderBy(sections.sortOrder);
+
+      return rows.map((s) => ({
+        id: s.id,
+        title: s.title,
+        description: s.description,
+        sectionType: s.sectionType,
+        cefrMin: s.cefrMin,
+        cefrMax: s.cefrMax,
+        lessonsPerUnitStart: s.lessonsPerUnitStart,
+        lessonsPerUnitEnd: s.lessonsPerUnitEnd,
+        sortOrder: s.sortOrder,
+        active: s.active,
+      }));
+    }),
+
+  getUnits: protectedProcedure
+    .input(z.object({ sectionId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const rows = await ctx.db
+        .select()
         .from(units)
-        .where(eq(units.courseId, input.courseId))
+        .where(eq(units.sectionId, input.sectionId))
         .orderBy(units.sortOrder);
 
       return rows.map((u) => ({

@@ -7,6 +7,7 @@ import {
   exercises,
   lessons,
   units,
+  sections,
 } from "@falatorio/db/schema";
 
 export const progressRouter = t.router({
@@ -47,67 +48,93 @@ export const progressRouter = t.router({
   getOverview: protectedProcedure
     .input(z.object({ courseId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
-      const courseUnits = await ctx.db
+      const courseSections = await ctx.db
         .select({
-          unitId: units.id,
-          unitTitle: units.title,
-          unitTheme: units.theme,
-          sortOrder: units.sortOrder,
+          sectionId: sections.id,
+          sectionTitle: sections.title,
+          sectionType: sections.sectionType,
+          cefrMin: sections.cefrMin,
+          cefrMax: sections.cefrMax,
+          sortOrder: sections.sortOrder,
         })
-        .from(units)
-        .where(eq(units.courseId, input.courseId))
-        .orderBy(units.sortOrder);
+        .from(sections)
+        .where(eq(sections.courseId, input.courseId))
+        .orderBy(sections.sortOrder);
 
       const result = [];
-      for (const unit of courseUnits) {
-        const unitLessons = await ctx.db
+      for (const section of courseSections) {
+        const sectionUnits = await ctx.db
           .select({
-            lessonId: lessons.id,
-            sortOrder: lessons.sortOrder,
-            grammarFocus: lessons.grammarFocus,
+            unitId: units.id,
+            unitTitle: units.title,
+            unitTheme: units.theme,
+            sortOrder: units.sortOrder,
           })
-          .from(lessons)
-          .where(eq(lessons.unitId, unit.unitId))
-          .orderBy(lessons.sortOrder);
+          .from(units)
+          .where(eq(units.sectionId, section.sectionId))
+          .orderBy(units.sortOrder);
 
-        const lessonProgress = [];
-        for (const lesson of unitLessons) {
-          const [totalRow] = await ctx.db
-            .select({ c: count() })
-            .from(exercises)
-            .where(
-              and(
-                eq(exercises.lessonId, lesson.lessonId),
-                eq(exercises.status, "live"),
-              ),
-            );
+        const unitResults = [];
+        for (const unit of sectionUnits) {
+          const unitLessons = await ctx.db
+            .select({
+              lessonId: lessons.id,
+              sortOrder: lessons.sortOrder,
+              grammarFocus: lessons.grammarFocus,
+            })
+            .from(lessons)
+            .where(eq(lessons.unitId, unit.unitId))
+            .orderBy(lessons.sortOrder);
 
-          const [doneRow] = await ctx.db
-            .select({ c: count() })
-            .from(userProgress)
-            .innerJoin(exercises, eq(userProgress.exerciseId, exercises.id))
-            .where(
-              and(
-                eq(exercises.lessonId, lesson.lessonId),
-                eq(userProgress.userId, ctx.user.userId),
-              ),
-            );
+          const lessonProgress = [];
+          for (const lesson of unitLessons) {
+            const [totalRow] = await ctx.db
+              .select({ c: count() })
+              .from(exercises)
+              .where(
+                and(
+                  eq(exercises.lessonId, lesson.lessonId),
+                  eq(exercises.status, "live"),
+                ),
+              );
 
-          lessonProgress.push({
-            lessonId: lesson.lessonId,
-            sortOrder: lesson.sortOrder,
-            grammarFocus: lesson.grammarFocus,
-            totalExercises: totalRow?.c ?? 0,
-            completedExercises: doneRow?.c ?? 0,
+            const [doneRow] = await ctx.db
+              .select({ c: count() })
+              .from(userProgress)
+              .innerJoin(exercises, eq(userProgress.exerciseId, exercises.id))
+              .where(
+                and(
+                  eq(exercises.lessonId, lesson.lessonId),
+                  eq(userProgress.userId, ctx.user.userId),
+                ),
+              );
+
+            lessonProgress.push({
+              lessonId: lesson.lessonId,
+              sortOrder: lesson.sortOrder,
+              grammarFocus: lesson.grammarFocus,
+              totalExercises: totalRow?.c ?? 0,
+              completedExercises: doneRow?.c ?? 0,
+            });
+          }
+
+          unitResults.push({
+            unitId: unit.unitId,
+            title: unit.unitTitle,
+            theme: unit.unitTheme,
+            sortOrder: unit.sortOrder,
+            lessons: lessonProgress,
           });
         }
 
         result.push({
-          unitId: unit.unitId,
-          title: unit.unitTitle,
-          theme: unit.unitTheme,
-          sortOrder: unit.sortOrder,
-          lessons: lessonProgress,
+          sectionId: section.sectionId,
+          title: section.sectionTitle,
+          sectionType: section.sectionType,
+          cefrMin: section.cefrMin,
+          cefrMax: section.cefrMax,
+          sortOrder: section.sortOrder,
+          units: unitResults,
         });
       }
 

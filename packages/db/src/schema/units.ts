@@ -6,11 +6,11 @@ import {
   varchar,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { courses } from "./courses";
+import { sections } from "./sections";
 
 export const units = pgTable("units", {
   id: uuid("id").primaryKey().defaultRandom(),
-  courseId: uuid("course_id").notNull().references(() => courses.id, { onDelete: "cascade" }),
+  sectionId: uuid("section_id").notNull().references(() => sections.id, { onDelete: "cascade" }),
   sortOrder: integer("sort_order").notNull(),
   title: jsonb("title").notNull().$type<Record<string, string>>(),
   theme: varchar("theme", { length: 255 }).notNull(),

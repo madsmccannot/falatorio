@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   users,
   courses,
+  sections,
   units,
   lessons,
   exercises,
@@ -46,13 +47,21 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 }));
 
 export const coursesRelations = relations(courses, ({ many }) => ({
+  sections: many(sections),
+}));
+
+export const sectionsRelations = relations(sections, ({ one, many }) => ({
+  course: one(courses, {
+    fields: [sections.courseId],
+    references: [courses.id],
+  }),
   units: many(units),
 }));
 
 export const unitsRelations = relations(units, ({ one, many }) => ({
-  course: one(courses, {
-    fields: [units.courseId],
-    references: [courses.id],
+  section: one(sections, {
+    fields: [units.sectionId],
+    references: [sections.id],
   }),
   lessons: many(lessons),
 }));

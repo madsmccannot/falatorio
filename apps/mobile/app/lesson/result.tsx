@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { GoldPrisms, TimerIcon } from "@/components/icons";
 import { GaloCelebration } from "@/components/lesson/GaloCelebration";
+import { PastelNataCelebration } from "@/components/lesson/PastelNataCelebration";
 import { useTranslation } from "@/lib/i18n";
 import { trackScreenView, trackFunnelFirstLesson } from "@/lib/analytics";
 import { getString, setString } from "@/lib/storage";
@@ -36,6 +37,7 @@ export default function LessonResultScreen() {
 
   const [showCelebration, setShowCelebration] = React.useState(true);
   const [contentVisible, setContentVisible] = React.useState(false);
+  const celebrationType = React.useMemo(() => (Math.random() < 0.5 ? "galo" : "pastel"), []);
 
   React.useEffect(() => {
     trackScreenView("lesson_result");
@@ -55,9 +57,12 @@ export default function LessonResultScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {showCelebration && (
-        <GaloCelebration onFinish={handleCelebrationFinish} />
-      )}
+      {showCelebration &&
+        (celebrationType === "galo" ? (
+          <GaloCelebration onFinish={handleCelebrationFinish} />
+        ) : (
+          <PastelNataCelebration onFinish={handleCelebrationFinish} />
+        ))}
 
       {contentVisible && (
         <ScrollView contentContainerStyle={styles.scroll}>

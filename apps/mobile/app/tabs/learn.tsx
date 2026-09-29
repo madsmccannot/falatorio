@@ -1,5 +1,5 @@
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
@@ -7,43 +7,159 @@ import { useHearts } from "@/hooks/useHearts";
 import { useStreak } from "@/hooks/useStreak";
 import { useOuro } from "@/hooks/useOuro";
 import { Loading } from "@/components/ui/Loading";
-import { HeartIcon, StreakIcon, GoldPrisms, BookIcon } from "@/components/icons";
+import { HeartIcon, StreakIcon, GoldPrisms, BookIcon, ChevronRightIcon } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 export default function LearnScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ courseId?: string; sectionId?: string }>();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const { hearts, unlimited } = useHearts();
   const { currentDays } = useStreak();
   const { balance } = useOuro();
   const { t } = useTranslation();
-  const courses = trpc.content.getCourses.useQuery();
+
+  const courses = trpc.content.getCourses.useQuery(undefined, {
+    enabled: !params.courseId,
+  });
+  const sectionList = trpc.content.getSections.useQuery(
+    { courseId: params.courseId! },
+    { enabled: !!params.courseId && !params.sectionId },
+  );
+  const unitList = trpc.content.getUnits.useQuery(
+    { sectionId: params.sectionId! },
+    { enabled: !!params.sectionId },
+  );
+
+  const renderHeader = () => (
+    <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }]}>
+      <Text style={[styles.greeting, { color: theme.text }]}>{t("learn.title")}</Text>
+      <View style={styles.statsRow}>
+        <View style={[styles.stat, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+          <HeartIcon size={16} />
+          <Text style={[styles.statValue, { color: colors.heart }]}>
+            {unlimited ? "∞" : hearts}
+          </Text>
+        </View>
+        <View style={[styles.stat, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+          <StreakIcon size={16} color={colors.streak} />
+          <Text style={[styles.statValue, { color: colors.streak }]}>{currentDays}</Text>
+        </View>
+        <View style={[styles.stat, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+          <GoldPrisms size={16} />
+          <Text style={[styles.statValue, { color: colors.ouro }]}>{balance}</Text>
+        </View>
+      </View>
+    </View>
+  );
+
+  const renderEmpty = () => (
+    <View style={styles.empty}>
+      <View style={[styles.emptyIcon, { backgroundColor: theme.bgCard }]}>
+        <BookIcon size={48} color={theme.textMuted} />
+      </View>
+      <Text style={[styles.emptyTitle, { color: theme.text }]}>{t("learn.empty_title")}</Text>
+      <Text style={[styles.emptyText, { color: theme.textMuted }]}>{t("learn.empty_text")}</Text>
+    </View>
+  );
+
+  if (params.sectionId) {
+    const isLoading = unitList.isLoading;
+    const data = unitList.data ?? [];
+
+    return (
+      <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
+        {renderHeader()}
+        {isLoading ? (
+          <Loading message={t("learn.loading")} />
+        ) : (
+          <FlatList
+            data={data}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+            renderItem={({ item: unit }) => (
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push(`/tabs/learn?unitId=${unit.id}`);
+                }}
+              >
+                <View style={[styles.courseCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                  <View style={styles.courseInfo}>
+                    <Text style={[styles.courseTitle, { color: theme.text }]}>
+                      {(unit.title as Record<string, string>)["pt"] ?? unit.theme}
+                    </Text>
+                    {unit.description && (
+                      <Text style={[styles.courseLevel, { color: theme.textMuted }]} numberOfLines={1}>
+                        {(unit.description as Record<string, string>)["pt"] ?? ""}
+                      </Text>
+                    )}
+                  </View>
+                  <ChevronRightIcon size={20} color={theme.textMuted} />
+                </View>
+              </Pressable>
+            )}
+            ListEmptyComponent={renderEmpty()}
+          />
+        )}
+      </View>
+    );
+  }
+
+  if (params.courseId) {
+    const isLoading = sectionList.isLoading;
+    const data = sectionList.data ?? [];
+
+    return (
+      <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
+        {renderHeader()}
+        {isLoading ? (
+          <Loading message={t("learn.loading")} />
+        ) : (
+          <FlatList
+            data={data}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+            renderItem={({ item: section }) => (
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push(`/tabs/learn?courseId=${params.courseId}&sectionId=${section.id}`);
+                }}
+              >
+                <View style={[styles.sectionCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                  <View style={styles.sectionBadge}>
+                    <Text style={styles.sectionBadgeText}>
+                      {section.cefrMin}{section.cefrMax !== section.cefrMin ? `-${section.cefrMax}` : ""}
+                    </Text>
+                  </View>
+                  <View style={styles.courseInfo}>
+                    <Text style={[styles.courseTitle, { color: theme.text }]}>
+                      {(section.title as Record<string, string>)["pt"] ?? ""}
+                    </Text>
+                    {section.description && (
+                      <Text style={[styles.courseLevel, { color: theme.textMuted }]} numberOfLines={2}>
+                        {(section.description as Record<string, string>)["pt"] ?? ""}
+                      </Text>
+                    )}
+                  </View>
+                  <ChevronRightIcon size={20} color={theme.textMuted} />
+                </View>
+              </Pressable>
+            )}
+            ListEmptyComponent={renderEmpty()}
+          />
+        )}
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
-      <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomColor: theme.border }]}>
-        <Text style={[styles.greeting, { color: theme.text }]}>{t("learn.title")}</Text>
-        <View style={styles.statsRow}>
-          <View style={[styles.stat, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-            <HeartIcon size={16} />
-            <Text style={[styles.statValue, { color: colors.heart }]}>
-              {unlimited ? "∞" : hearts}
-            </Text>
-          </View>
-          <View style={[styles.stat, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-            <StreakIcon size={16} color={colors.streak} />
-            <Text style={[styles.statValue, { color: colors.streak }]}>{currentDays}</Text>
-          </View>
-          <View style={[styles.stat, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-            <GoldPrisms size={16} />
-            <Text style={[styles.statValue, { color: colors.ouro }]}>{balance}</Text>
-          </View>
-        </View>
-      </View>
-
+      {renderHeader()}
       {courses.isLoading ? (
         <Loading message={t("learn.loading")} />
       ) : (
@@ -73,19 +189,7 @@ export default function LearnScreen() {
               </View>
             </Pressable>
           )}
-          ListEmptyComponent={
-            <View style={styles.empty}>
-              <View style={[styles.emptyIcon, { backgroundColor: theme.bgCard }]}>
-                <BookIcon size={48} color={theme.textMuted} />
-              </View>
-              <Text style={[styles.emptyTitle, { color: theme.text }]}>
-                {t("learn.empty_title")}
-              </Text>
-              <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-                {t("learn.empty_text")}
-              </Text>
-            </View>
-          }
+          ListEmptyComponent={renderEmpty()}
         />
       )}
     </View>
@@ -136,6 +240,28 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     marginBottom: spacing.md,
     borderWidth: 1,
+  },
+  sectionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: spacing.lg,
+    borderRadius: radii.lg,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    gap: spacing.md,
+  },
+  sectionBadge: {
+    backgroundColor: colors.primary[500],
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.sm,
+    minWidth: 48,
+    alignItems: "center",
+  },
+  sectionBadgeText: {
+    color: "#fff",
+    fontSize: typography.sizes.xs,
+    fontWeight: "700",
   },
   courseIcon: {
     width: 48,

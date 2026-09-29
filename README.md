@@ -26,7 +26,7 @@ falatorio/
 |-------|-----------|
 | Mobile | React Native 0.86, Expo SDK 57, expo-router, Reanimated 4.5, Gesture Handler |
 | Server | Fastify 5, tRPC 11, superjson |
-| Database | PostgreSQL (Neon), Drizzle ORM, 26 tables + 4 enums |
+| Database | PostgreSQL (Neon), Drizzle ORM, 27 tables + 5 enums |
 | Cache/Queue | Redis (ioredis), BullMQ (6 queues) |
 | Auth | Clerk (JWT, cached in Redis) — optional, app runs in preview mode without it |
 | CMS | Payload CMS v3, PostgreSQL adapter, R2 storage |
@@ -56,6 +56,29 @@ KnowledgeItems carry 7 cognitive levels (recognition, comprehension, controlled 
 The mastery module (`packages/core/src/mastery/`) includes: QA validator (schema, graph integrity, linguistic completeness), prerequisite checker with topological sort, coverage metrics, exercise generation spec with alignment validation, adaptive engine types for the future selector, and a readiness checker that validates Definition of Done criteria and vertical slice completeness across 10 implementation phases. The taxonomy seed contains 272 Skills and 310 KnowledgeItems across 10 domain groups (phonetics, morphology, tenses_moods, determiners, pronouns, prepositions, syntax, lexicon, pragmatics, orthography). Every KI has shortExplanation, counterexamples, commonErrors, and per-L1 difficulty metadata for all 15 languages.
 
 The mastery logic is deterministic and auditable. AI does not drive the adaptive engine; it generates content for a structured exercise bank.
+
+### Content Hierarchy
+
+The learning path follows a 5-level hierarchy modelled after Duolingo:
+
+```
+Course  (1 per L1 language)
+  └── Section  (1-4 numbered + Daily Refresh)
+        └── Unit  (variable per section)
+              └── Lesson  (variable per section: 5-7)
+                    └── Exercise  (dynamically generated)
+```
+
+Sections group units by difficulty band with intentional CEFR overlap at transitions. Lesson count per unit interpolates within each section -- starting higher and decreasing as exercises become denser and harder:
+
+| Section | CEFR | Units | Lessons/Unit | Pattern |
+|---------|------|-------|-------------|---------|
+| S1 Basico | A1-A2 | 10 | 5 -> 6 | Ramp up for beginners |
+| S2 Principiante | A2-B1 | 30 | 7 -> 6 | Fewer lessons, more exercises |
+| S3 Intermedio | B2-C1 | 40 | 8 -> 6 | Same progression |
+| S4 Avancado | C1-C2 | 50 | 9 -> 7 | Densest exercises |
+
+Total: 130 units, ~930 lessons. The Daily Refresh section provides adaptive review of previously learned material (always present, not directly accessible). Unit topics are defined in the pedagogical roadmap.
 
 ### Dynamic Content Generation
 
@@ -118,9 +141,9 @@ Pure business logic, zero dependencies on I/O or frameworks:
 - **Ads** — ad policy (GDPR, tier, cooldowns)
 - **L1 Profiles** — 15 language transfer profiles with cultural content (all fully expanded)
 
-### `packages/db` — 23 schema tables
+### `packages/db` — 24 schema tables
 
-Users, courses, units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). Initial Drizzle migration generated.
+Users, courses, sections (numbered + daily refresh, between course and unit), units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). Initial Drizzle migration generated.
 
 ### `server` — 14 routers, 11 services, 6 jobs
 
