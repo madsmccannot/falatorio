@@ -161,8 +161,6 @@ const en = {
   "scenarios.limit": "3 free error reviews / day",
   "scenarios.unlock": "Reach {{level}} to unlock",
 
-  "ouro.title": "Gold Packs",
-  "ouro.back": "Back",
   "ouro.section": "OURO",
   "ouro.desc": "Get more ouro to unlock items",
 
@@ -627,8 +625,6 @@ const es: Record<string, string> = {
   "scenarios.limit": "3 revisiones de errores gratis / día",
   "scenarios.unlock": "Alcanza {{level}} para desbloquear",
 
-  "ouro.title": "Paquetes de ouro",
-  "ouro.back": "Volver",
   "ouro.section": "OURO",
   "ouro.desc": "Consigue más ouro para desbloquear artículos",
 
@@ -960,8 +956,6 @@ const fr: Record<string, string> = {
   "scenarios.limit": "3 révisions d'erreurs gratuites / jour",
   "scenarios.unlock": "Atteins {{level}} pour débloquer",
 
-  "ouro.title": "Packs d'ouro",
-  "ouro.back": "Retour",
   "ouro.section": "OURO",
   "ouro.desc": "Obtiens plus d'ouro pour débloquer des articles",
 
@@ -1289,8 +1283,6 @@ const hi: Record<string, string> = {
   "scenarios.limit": "3 मुफ़्त त्रुटि समीक्षा / दिन",
   "scenarios.unlock": "अनलॉक करने के लिए {{level}} तक पहुँचें",
 
-  "ouro.title": "Ouro पैक",
-  "ouro.back": "वापस",
   "ouro.section": "OURO",
   "ouro.desc": "आइटम अनलॉक करने के लिए और ouro पाएं",
 
@@ -1618,8 +1610,6 @@ const ur: Record<string, string> = {
   "scenarios.limit": "3 مفت غلطی کے جائزے / دن",
   "scenarios.unlock": "ان لاک کرنے کے لیے {{level}} تک پہنچیں",
 
-  "ouro.title": "Ouro پیکز",
-  "ouro.back": "واپس",
   "ouro.section": "OURO",
   "ouro.desc": "آئٹمز انلاک کرنه که لیے مزید ouro حاصل کریں",
 
@@ -1947,8 +1937,6 @@ const ar: Record<string, string> = {
   "scenarios.limit": "3 مراجعات أخطاء مجانية / يوم",
   "scenarios.unlock": "الوصول إلى {{level}} للفتح",
 
-  "ouro.title": "حزم Ouro",
-  "ouro.back": "رجوع",
   "ouro.section": "OURO",
   "ouro.desc": "احصل على المزيد من ouro لفتح العناصر",
 
@@ -2276,8 +2264,6 @@ const bn: Record<string, string> = {
   "scenarios.limit": "৩টি বিনামূল্যে ত্রুটি পর্যালোচনা / দিন",
   "scenarios.unlock": "আনলক করতে {{level}}-এ পৌঁছান",
 
-  "ouro.title": "Ouro প্যাক",
-  "ouro.back": "ফিরে যান",
   "ouro.section": "OURO",
   "ouro.desc": "আইটেম আনলক করতে আরও ouro পান",
 
@@ -2484,8 +2470,6 @@ const pt: Record<string, string> = {
   "scenarios.limit": "3 revisões de erros grátis / dia",
   "scenarios.unlock": "Alcança {{level}} para desbloquear",
 
-  "ouro.title": "Pacotes de ouro",
-  "ouro.back": "Voltar",
   "ouro.section": "OURO",
   "ouro.desc": "Obtém mais ouro para desbloquear itens",
 
@@ -2814,8 +2798,6 @@ const de: Record<string, string> = {
   "scenarios.limit": "3 kostenlose Fehlerüberprüfungen / Tag",
   "scenarios.unlock": "Erreiche {{level}} zum Freischalten",
 
-  "ouro.title": "Ouro-Pakete",
-  "ouro.back": "Zurück",
   "ouro.section": "OURO",
   "ouro.desc": "Hole dir mehr Ouro, um Artikel freizuschalten",
 
@@ -3142,8 +3124,6 @@ const zh: Record<string, string> = {
   "scenarios.limit": "每天3次免费错误分析",
   "scenarios.unlock": "达到{{level}}解锁",
 
-  "ouro.title": "Ouro套餐",
-  "ouro.back": "返回",
   "ouro.section": "OURO",
   "ouro.desc": "获取更多ouro解锁物品",
 
@@ -3470,8 +3450,6 @@ const ru: Record<string, string> = {
   "scenarios.limit": "3 бесплатных разбора ошибок / день",
   "scenarios.unlock": "Достигни {{level}} для разблокировки",
 
-  "ouro.title": "Наборы Ouro",
-  "ouro.back": "Назад",
   "ouro.section": "OURO",
   "ouro.desc": "Получи больше ouro для разблокировки предметов",
 
@@ -3798,8 +3776,6 @@ const uk: Record<string, string> = {
   "scenarios.limit": "3 безкоштовних аналізи помилок / день",
   "scenarios.unlock": "Досягни {{level}} для розблокування",
 
-  "ouro.title": "Набори Ouro",
-  "ouro.back": "Назад",
   "ouro.section": "OURO",
   "ouro.desc": "Отримай більше ouro для розблокування предметів",
 
@@ -4126,8 +4102,6 @@ const tr: Record<string, string> = {
   "scenarios.limit": "Günde 3 ücretsiz hata analizi",
   "scenarios.unlock": "Açmak için {{level}} seviyesine ulaş",
 
-  "ouro.title": "Ouro Paketleri",
-  "ouro.back": "Geri",
   "ouro.section": "OURO",
   "ouro.desc": "Öğeleri açmak için daha fazla ouro kazan",
 
@@ -4454,8 +4428,6 @@ const pl: Record<string, string> = {
   "scenarios.limit": "3 darmowe analizy błędów / dzień",
   "scenarios.unlock": "Osiągnij {{level}}, żeby odblokować",
 
-  "ouro.title": "Pakiety Ouro",
-  "ouro.back": "Wróć",
   "ouro.section": "OURO",
   "ouro.desc": "Zdobyądź więcej ouro, aby odblokować przedmioty",
 
@@ -4782,8 +4754,6 @@ const ko: Record<string, string> = {
   "scenarios.limit": "매일 3회 무료 오류 분석",
   "scenarios.unlock": "{{level}}에 도달하면 잠금 해제",
 
-  "ouro.title": "Ouro 패키지",
-  "ouro.back": "뒤로",
   "ouro.section": "OURO",
   "ouro.desc": "아이템을 잠금 해제하려면 더 많은 ouro를 획득하세요",
 
@@ -5110,8 +5080,6 @@ const ja: Record<string, string> = {
   "scenarios.limit": "1日3回無料エラー分析",
   "scenarios.unlock": "ロック解除するには{{level}}に到達",
 
-  "ouro.title": "Ouroパック",
-  "ouro.back": "戻る",
   "ouro.section": "OURO",
   "ouro.desc": "アイテムを解除するためにもっとouroを獲得しよう",
 
