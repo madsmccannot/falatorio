@@ -22,6 +22,7 @@ import { adsRouter } from "../routers/ads.router.js";
 import { masteryRouter } from "../routers/mastery.router.js";
 import { qualityRouter } from "../routers/quality.router.js";
 import { pipelineRouter } from "../routers/pipeline.router.js";
+import { analyticsRouter } from "../routers/analytics.router.js";
 
 export const appRouter = t.router({
   health: t.procedure.query(() => ({
@@ -43,6 +44,7 @@ export const appRouter = t.router({
   mastery: masteryRouter,
   quality: qualityRouter,
   pipeline: pipelineRouter,
+  analytics: analyticsRouter,
 });
 
 export type AppRouter = typeof appRouter;

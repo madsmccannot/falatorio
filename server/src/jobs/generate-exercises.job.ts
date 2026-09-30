@@ -1,7 +1,7 @@
 import type { Job } from "bullmq";
 import type { Database } from "@falatorio/db/client";
-import { eq } from "drizzle-orm";
-import { lessons, exercises } from "@falatorio/db/schema";
+import { eq, sql } from "drizzle-orm";
+import { lessons, exercises, lessonSkills, knowledgeItems, exerciseKnowledge } from "@falatorio/db/schema";
 import type { CEFRLevel, ExerciseType, L1Code } from "@falatorio/core";
 import { generateLesson } from "../services/content-generator.service.js";
 
@@ -40,16 +40,48 @@ export async function processGenerateExercises(
     exerciseCount: count,
   });
 
+  const lessonSkillRows = await db
+    .select({ skillId: lessonSkills.skillId })
+    .from(lessonSkills)
+    .where(eq(lessonSkills.lessonId, lessonId));
+
+  const skillIds = lessonSkillRows.map((r) => r.skillId);
+
+  const lessonKIs = skillIds.length > 0
+    ? await db
+        .select({ id: knowledgeItems.id, skillId: knowledgeItems.skillId })
+        .from(knowledgeItems)
+        .where(sql`${knowledgeItems.skillId} = ANY(${skillIds})`)
+    : [];
+
   for (const ex of result.exercises) {
-    await db.insert(exercises).values({
-      lessonId,
-      type: ex.type as ExerciseType,
-      status: "review",
-      prompt: ex.prompt,
-      acceptedAnswers: ex.acceptedAnswers,
-      difficulty: ex.difficulty,
-      l1Tip: ex.l1Tip,
-    });
+    const [inserted] = await db
+      .insert(exercises)
+      .values({
+        lessonId,
+        type: ex.type as ExerciseType,
+        status: "review",
+        prompt: ex.prompt,
+        acceptedAnswers: ex.acceptedAnswers,
+        difficulty: ex.difficulty,
+        l1Tip: ex.l1Tip,
+      })
+      .returning({ id: exercises.id });
+
+    if (inserted && lessonKIs.length > 0) {
+      const primaryKI = lessonKIs[0]!;
+      await db
+        .insert(exerciseKnowledge)
+        .values({ exerciseId: inserted.id, knowledgeItemId: primaryKI.id, isPrimary: true })
+        .onConflictDoNothing();
+
+      for (const ki of lessonKIs.slice(1)) {
+        await db
+          .insert(exerciseKnowledge)
+          .values({ exerciseId: inserted.id, knowledgeItemId: ki.id, isPrimary: false })
+          .onConflictDoNothing();
+      }
+    }
   }
 
   await job.updateProgress(100);
