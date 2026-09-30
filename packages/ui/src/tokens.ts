@@ -44,6 +44,18 @@ export const colors = {
   warning: "#D97706",
   error: "#DC2626",
   info: "#0369A1",
+  unitColors: [
+    "#FF4B4B",
+    "#1CB0F6",
+    "#CE82FF",
+    "#FF9600",
+    "#2B70C9",
+    "#58CC02",
+    "#FF86D0",
+    "#00CD9C",
+    "#FFD700",
+    "#E05D5D",
+  ] as readonly string[],
 } as const;
 
 export const spacing = {

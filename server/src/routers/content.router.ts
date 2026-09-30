@@ -95,6 +95,47 @@ export const contentRouter = t.router({
       }));
     }),
 
+  getSectionMap: protectedProcedure
+    .input(z.object({ sectionId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const unitRows = await ctx.db
+        .select()
+        .from(units)
+        .where(eq(units.sectionId, input.sectionId))
+        .orderBy(units.sortOrder);
+
+      const unitIds = unitRows.map((u) => u.id);
+      const lessonRows = unitIds.length > 0
+        ? await ctx.db
+            .select()
+            .from(lessons)
+            .where(sql`${lessons.unitId} = ANY(${unitIds})`)
+            .orderBy(lessons.unitId, lessons.sortOrder)
+        : [];
+
+      const lessonsByUnit = new Map<string, typeof lessonRows>();
+      for (const l of lessonRows) {
+        const arr = lessonsByUnit.get(l.unitId) ?? [];
+        arr.push(l);
+        lessonsByUnit.set(l.unitId, arr);
+      }
+
+      return unitRows.map((u, idx) => ({
+        id: u.id,
+        title: u.title,
+        theme: u.theme,
+        description: u.description,
+        sortOrder: u.sortOrder,
+        colorIndex: idx,
+        lessons: (lessonsByUnit.get(u.id) ?? []).map((l) => ({
+          id: l.id,
+          sortOrder: l.sortOrder,
+          nodeType: l.nodeType,
+          rewardConfig: l.rewardConfig,
+        })),
+      }));
+    }),
+
   getExercise: protectedProcedure
     .input(z.object({ exerciseId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
