@@ -14,6 +14,7 @@ import {
   skillMastery,
   skillPrerequisites,
   lessons,
+  lessonCompletions,
   transactions,
 } from "@falatorio/db/schema";
 import { LESSON, EXERCISE_COGNITIVE_MAP, PRACTICE, DAILY_REFRESH } from "@falatorio/core";
@@ -582,6 +583,42 @@ export const lessonRouter = t.router({
           updatedAt: new Date(),
         })
         .where(eq(users.id, ctx.user.userId));
+
+      if (passed && !isPractice) {
+        const [existing] = await ctx.db
+          .select()
+          .from(lessonCompletions)
+          .where(
+            and(
+              eq(lessonCompletions.userId, ctx.user.userId),
+              eq(lessonCompletions.lessonId, session.lessonId),
+            ),
+          )
+          .limit(1);
+
+        if (existing) {
+          await ctx.db
+            .update(lessonCompletions)
+            .set({
+              bestAccuracy: Math.max(existing.bestAccuracy, accuracy),
+              attempts: existing.attempts + 1,
+              lastCompletedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(lessonCompletions.userId, ctx.user.userId),
+                eq(lessonCompletions.lessonId, session.lessonId),
+              ),
+            );
+        } else {
+          await ctx.db.insert(lessonCompletions).values({
+            userId: ctx.user.userId,
+            lessonId: session.lessonId,
+            bestAccuracy: accuracy,
+            attempts: 1,
+          });
+        }
+      }
 
       await ctx.redis.del(`session:${input.sessionId}`);
 

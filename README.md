@@ -159,9 +159,9 @@ Pure business logic, zero dependencies on I/O or frameworks:
 - **Ads** — ad policy (GDPR, tier, cooldowns)
 - **L1 Profiles** — 15 language transfer profiles with cultural content (all fully expanded)
 
-### `packages/db` — 27 schema tables
+### `packages/db` — 28 schema tables
 
-Users, courses, sections (numbered + daily refresh, between course and unit), units, lessons (with node_type: lesson/chest and optional rewardConfig for chests), exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). 3 Drizzle migrations: initial schema, knowledge graph + skills, chest node_type enum + reward_config.
+Users, courses, sections (numbered + daily refresh, between course and unit), units, lessons (with node_type: lesson/chest and optional rewardConfig for chests), exercises, audio clips, user progress, lesson completions (gating: tracks per-user lesson completion with best accuracy and attempt count), streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). 4 Drizzle migrations: initial schema, knowledge graph + skills, chest node_type enum + reward_config, lesson completions.
 
 ### `server` — 16 routers, 13 services, 7 jobs
 
@@ -177,7 +177,7 @@ Users, courses, sections (numbered + daily refresh, between course and unit), un
 
 **Onboarding:** welcome, sign-up/sign-in (email + Google SSO via Clerk), choose profile, language select, GDPR consent, goal, daily goal, level, placement test (10 questions, all 15 L1s, no early termination), plan.
 
-**Tabs:** learn (course tree), practice (FSRS review queue), league (leaderboard), shop, profile.
+**Tabs:** learn (Duolingo-style winding path with lesson-to-lesson gating, section cards with progress bars, Daily Refresh locked banner), practice (FSRS review queue), league (leaderboard), shop, profile.
 
 **Lesson flow:** exercise screen with 8 exercise types (translate, fill blank, listen & type, match pairs, pick correct, reorder words, speak & score), feedback overlay, result screen, chest opening screen (Reanimated shake + reward reveal animation). Practice modes (review, mistakes, daily refresh) use the same exercise flow via `usePracticeSession` hook.
 

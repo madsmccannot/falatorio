@@ -56,6 +56,12 @@ export const colors = {
     "#FFD700",
     "#E05D5D",
   ] as readonly string[],
+  sectionColors: [
+    "#58CC02",
+    "#1CB0F6",
+    "#FF9600",
+    "#CE82FF",
+  ] as readonly string[],
 } as const;
 
 export const spacing = {

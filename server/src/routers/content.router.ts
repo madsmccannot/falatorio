@@ -11,6 +11,7 @@ import {
   exercises,
   audioClips,
   l1CulturalContent,
+  lessonCompletions,
 } from "@falatorio/db/schema";
 import {
   L1_CODES,
@@ -44,18 +45,75 @@ export const contentRouter = t.router({
         .where(eq(sections.courseId, input.courseId))
         .orderBy(sections.sortOrder);
 
-      return rows.map((s) => ({
-        id: s.id,
-        title: s.title,
-        description: s.description,
-        sectionType: s.sectionType,
-        cefrMin: s.cefrMin,
-        cefrMax: s.cefrMax,
-        lessonsPerUnitStart: s.lessonsPerUnitStart,
-        lessonsPerUnitEnd: s.lessonsPerUnitEnd,
-        sortOrder: s.sortOrder,
-        active: s.active,
-      }));
+      const sectionIds = rows.map((s) => s.id);
+      const unitCounts = sectionIds.length > 0
+        ? await ctx.db
+            .select({
+              sectionId: units.sectionId,
+              count: sql<number>`count(*)::int`.as("count"),
+            })
+            .from(units)
+            .where(sql`${units.sectionId} = ANY(${sectionIds})`)
+            .groupBy(units.sectionId)
+        : [];
+
+      const countMap = new Map(unitCounts.map((u) => [u.sectionId, u.count]));
+
+      const lessonCounts = sectionIds.length > 0
+        ? await ctx.db
+            .select({
+              sectionId: units.sectionId,
+              totalLessons: sql<number>`count(${lessons.id})::int`.as("total_lessons"),
+            })
+            .from(units)
+            .innerJoin(lessons, eq(lessons.unitId, units.id))
+            .where(sql`${units.sectionId} = ANY(${sectionIds})`)
+            .groupBy(units.sectionId)
+        : [];
+      const lessonCountMap = new Map(lessonCounts.map((r) => [r.sectionId, r.totalLessons]));
+
+      const completionCounts = sectionIds.length > 0
+        ? await ctx.db
+            .select({
+              sectionId: units.sectionId,
+              completedLessons: sql<number>`count(${lessonCompletions.lessonId})::int`.as("completed_lessons"),
+            })
+            .from(units)
+            .innerJoin(lessons, eq(lessons.unitId, units.id))
+            .innerJoin(lessonCompletions, sql`${lessonCompletions.lessonId} = ${lessons.id} AND ${lessonCompletions.userId} = ${ctx.user.userId}`)
+            .where(sql`${units.sectionId} = ANY(${sectionIds})`)
+            .groupBy(units.sectionId)
+        : [];
+      const completionMap = new Map(completionCounts.map((r) => [r.sectionId, r.completedLessons]));
+
+      let runningUnit = 1;
+      return rows.map((s) => {
+        const unitCount = countMap.get(s.id) ?? 0;
+        const unitStart = runningUnit;
+        const unitEnd = runningUnit + unitCount - 1;
+        runningUnit += unitCount;
+
+        const totalLessons = lessonCountMap.get(s.id) ?? 0;
+        const completedLessons = completionMap.get(s.id) ?? 0;
+
+        return {
+          id: s.id,
+          title: s.title,
+          description: s.description,
+          sectionType: s.sectionType,
+          cefrMin: s.cefrMin,
+          cefrMax: s.cefrMax,
+          lessonsPerUnitStart: s.lessonsPerUnitStart,
+          lessonsPerUnitEnd: s.lessonsPerUnitEnd,
+          sortOrder: s.sortOrder,
+          active: s.active,
+          unitCount,
+          unitStart,
+          unitEnd,
+          totalLessons,
+          completedLessons,
+        };
+      });
     }),
 
   getUnits: protectedProcedure
@@ -113,6 +171,17 @@ export const contentRouter = t.router({
             .orderBy(lessons.unitId, lessons.sortOrder)
         : [];
 
+      const allLessonIds = lessonRows.map((l) => l.id);
+      const completedRows = allLessonIds.length > 0
+        ? await ctx.db
+            .select({ lessonId: lessonCompletions.lessonId })
+            .from(lessonCompletions)
+            .where(
+              sql`${lessonCompletions.userId} = ${ctx.user.userId} AND ${lessonCompletions.lessonId} = ANY(${allLessonIds})`,
+            )
+        : [];
+      const completedSet = new Set(completedRows.map((c) => c.lessonId));
+
       const lessonsByUnit = new Map<string, typeof lessonRows>();
       for (const l of lessonRows) {
         const arr = lessonsByUnit.get(l.unitId) ?? [];
@@ -132,8 +201,41 @@ export const contentRouter = t.router({
           sortOrder: l.sortOrder,
           nodeType: l.nodeType,
           rewardConfig: l.rewardConfig,
+          completed: completedSet.has(l.id),
         })),
       }));
+    }),
+
+  getSectionProgress: protectedProcedure
+    .input(z.object({ sectionId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const unitRows = await ctx.db
+        .select({ id: units.id })
+        .from(units)
+        .where(eq(units.sectionId, input.sectionId));
+
+      const unitIds = unitRows.map((u) => u.id);
+      if (unitIds.length === 0) return { completedLessonIds: new Array<string>(), totalLessons: 0 };
+
+      const allLessons = await ctx.db
+        .select({ id: lessons.id })
+        .from(lessons)
+        .where(sql`${lessons.unitId} = ANY(${unitIds})`);
+
+      const lessonIds = allLessons.map((l) => l.id);
+      if (lessonIds.length === 0) return { completedLessonIds: [], totalLessons: 0 };
+
+      const completed = await ctx.db
+        .select({ lessonId: lessonCompletions.lessonId })
+        .from(lessonCompletions)
+        .where(
+          sql`${lessonCompletions.userId} = ${ctx.user.userId} AND ${lessonCompletions.lessonId} = ANY(${lessonIds})`,
+        );
+
+      return {
+        completedLessonIds: completed.map((c) => c.lessonId),
+        totalLessons: lessonIds.length,
+      };
     }),
 
   getExercise: protectedProcedure

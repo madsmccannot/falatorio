@@ -15,6 +15,8 @@ import {
   ChestIcon,
   StarIcon,
   BoltIcon,
+  LockIcon,
+  CheckIcon,
   ChevronRightIcon,
 } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
@@ -43,6 +45,7 @@ type LessonNode = {
   sortOrder: number;
   nodeType: "lesson" | "chest";
   rewardConfig: { type: string; amount: number } | null;
+  completed: boolean;
 };
 
 type UnitWithLessons = {
@@ -60,6 +63,7 @@ function LessonPathNode({
   index,
   totalInUnit,
   unitColor,
+  locked,
   theme,
   t,
   onPress,
@@ -68,6 +72,7 @@ function LessonPathNode({
   index: number;
   totalInUnit: number;
   unitColor: string;
+  locked: boolean;
   theme: ReturnType<typeof import("@/lib/theme").useTheme>;
   t: (key: import("@/lib/i18n").TKey) => string;
   onPress: () => void;
@@ -75,37 +80,46 @@ function LessonPathNode({
   const isChest = node.nodeType === "chest";
   const nodeX = getNodeX(index);
   const isLast = index === totalInUnit - 1 && !isChest;
+  const isCompleted = node.completed;
 
   let lessonNum = 0;
   if (!isChest) {
     lessonNum = index + 1;
   }
 
+  const bgColor = locked
+    ? colors.neutral[300]
+    : isChest
+      ? colors.ouro
+      : isCompleted
+        ? unitColor
+        : unitColor;
+  const borderColor = locked ? colors.neutral[400] : bgColor;
+  const opacity = locked ? 0.5 : 1;
+
   return (
     <View style={styles.nodeRow}>
       <Pressable
         onPress={() => {
+          if (locked) return;
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           onPress();
         }}
-        style={[styles.nodeWrapper, { left: nodeX }]}
+        style={[styles.nodeWrapper, { left: nodeX, opacity }]}
       >
         <View
           style={[
             styles.nodeCircle,
-            {
-              backgroundColor: unitColor,
-              borderColor: unitColor,
-            },
-            isChest && {
-              backgroundColor: colors.ouro,
-              borderColor: colors.ouro,
-            },
+            { backgroundColor: bgColor, borderColor },
           ]}
         >
           <View style={styles.nodeInnerShadow}>
-            {isChest ? (
+            {locked ? (
+              <LockIcon size={22} color="#FFFFFF" />
+            ) : isChest ? (
               <ChestIcon size={28} />
+            ) : isCompleted ? (
+              <CheckIcon size={24} color="#FFFFFF" />
             ) : index === 0 || isLast ? (
               <StarIcon size={24} color="#FFFFFF" />
             ) : lessonNum % 3 === 0 ? (
@@ -207,103 +221,215 @@ export default function LearnScreen() {
             contentContainerStyle={[styles.pathContainer, { paddingBottom: insets.bottom + 100 }]}
             showsVerticalScrollIndicator={false}
           >
-            {unitsData.map((unit) => {
-              const unitColor = getUnitColor(unit.colorIndex);
-              const unitTitle = (unit.title as Record<string, string>)["pt"] ?? unit.theme;
+            {(() => {
+              let prevUnitLastCompleted = true;
+              return unitsData.map((unit) => {
+                const unitColor = getUnitColor(unit.colorIndex);
+                const unitTitle = (unit.title as Record<string, string>)["pt"] ?? unit.theme;
+                const unitLocked = !prevUnitLastCompleted && unit.colorIndex > 0;
 
-              return (
-                <View key={unit.id}>
-                  {/* Unit banner */}
-                  <View style={[styles.unitBanner, { backgroundColor: unitColor }]}>
-                    <View style={styles.unitBannerContent}>
-                      <Text style={styles.unitBannerLabel}>
-                        UNIDADE {unit.sortOrder + 1}
-                      </Text>
-                      <Text style={styles.unitBannerTitle} numberOfLines={2}>
-                        {unitTitle}
-                      </Text>
+                const rendered = (
+                  <View key={unit.id}>
+                    <View style={[styles.unitBanner, { backgroundColor: unitLocked ? colors.neutral[400] : unitColor, opacity: unitLocked ? 0.5 : 1 }]}>
+                      <View style={styles.unitBannerContent}>
+                        <Text style={styles.unitBannerLabel}>
+                          UNIDADE {unit.sortOrder + 1}
+                        </Text>
+                        <Text style={styles.unitBannerTitle} numberOfLines={2}>
+                          {unitTitle}
+                        </Text>
+                      </View>
+                      <View style={styles.unitBannerIcon}>
+                        {unitLocked ? (
+                          <LockIcon size={20} color="#FFFFFF" />
+                        ) : (
+                          <BookIcon size={20} color="#FFFFFF" />
+                        )}
+                      </View>
                     </View>
-                    <View style={styles.unitBannerIcon}>
-                      <BookIcon size={20} color="#FFFFFF" />
-                    </View>
+
+                    {unit.lessons.map((lesson, lIdx) => {
+                      const prevCompleted = lIdx === 0
+                        ? prevUnitLastCompleted
+                        : unit.lessons[lIdx - 1]!.completed;
+                      const isLocked = unitLocked || (lIdx > 0 && !prevCompleted);
+
+                      return (
+                        <LessonPathNode
+                          key={lesson.id}
+                          node={lesson}
+                          index={lIdx}
+                          totalInUnit={unit.lessons.length}
+                          unitColor={unitColor}
+                          locked={isLocked}
+                          theme={theme}
+                          t={t}
+                          onPress={() => {
+                            if (lesson.nodeType === "chest") {
+                              router.push(`/lesson/chest?lessonId=${lesson.id}`);
+                            } else {
+                              router.push(`/lesson/${lesson.id}`);
+                            }
+                          }}
+                        />
+                      );
+                    })}
+
+                    <View style={styles.unitSpacer} />
                   </View>
+                );
 
-                  {/* Lesson nodes path */}
-                  {unit.lessons.map((lesson, lIdx) => (
-                    <LessonPathNode
-                      key={lesson.id}
-                      node={lesson}
-                      index={lIdx}
-                      totalInUnit={unit.lessons.length}
-                      unitColor={unitColor}
-                      theme={theme}
-                      t={t}
-                      onPress={() => {
-                        if (lesson.nodeType === "chest") {
-                          router.push(`/lesson/chest?lessonId=${lesson.id}`);
-                        } else {
-                          router.push(`/lesson/${lesson.id}`);
-                        }
-                      }}
-                    />
-                  ))}
+                const lastLesson = unit.lessons[unit.lessons.length - 1];
+                prevUnitLastCompleted = lastLesson ? lastLesson.completed : true;
 
-                  {/* Spacer between units */}
-                  <View style={styles.unitSpacer} />
+                return rendered;
+              });
+            })()}
+
+            {/* Daily Refresh -- always last, always locked */}
+            <View style={styles.dailyRefreshBanner}>
+              <View style={[styles.unitBanner, { backgroundColor: colors.neutral[400], opacity: 0.5 }]}>
+                <View style={styles.unitBannerContent}>
+                  <Text style={styles.unitBannerLabel}>
+                    {t("learn.daily_refresh").toUpperCase()}
+                  </Text>
+                  <Text style={styles.unitBannerTitle} numberOfLines={2}>
+                    {t("learn.daily_refresh")}
+                  </Text>
                 </View>
-              );
-            })}
+                <View style={styles.unitBannerIcon}>
+                  <LockIcon size={20} color="#FFFFFF" />
+                </View>
+              </View>
+              <Text style={[styles.dailyRefreshLocked, { color: theme.textMuted }]}>
+                {t("learn.daily_refresh_locked")}
+              </Text>
+            </View>
           </ScrollView>
         )}
       </View>
     );
   }
 
-  // ── Course selected: show sections ──
+  // ── Course selected: show sections (Duolingo-style large cards) ──
   if (params.courseId) {
     const isLoading = sectionList.isLoading;
     const data = sectionList.data ?? [];
+    const numbered = data.filter((s) => s.sectionType !== "daily_refresh");
+    const dailyRefresh = data.find((s) => s.sectionType === "daily_refresh");
 
     return (
       <View style={[styles.container, { backgroundColor: theme.bg }]}>
         {renderTopBar()}
+        <View style={[styles.sectionHeaderBar, { borderBottomColor: theme.border }]}>
+          <Pressable onPress={() => router.setParams({ courseId: undefined })} hitSlop={12}>
+            <Text style={[styles.backArrow, { color: theme.textMuted }]}>{"←"}</Text>
+          </Pressable>
+          <Text style={[styles.sectionHeaderTitle, { color: theme.text }]} numberOfLines={1}>
+            {t("learn.section")}
+          </Text>
+        </View>
         {isLoading ? (
           <Loading message={t("learn.loading")} />
         ) : (
           <ScrollView
-            contentContainerStyle={styles.list}
+            contentContainerStyle={styles.sectionListContainer}
             showsVerticalScrollIndicator={false}
           >
-            {data.length === 0 && renderEmpty()}
-            {data.filter((s) => s.sectionType !== "daily_refresh").map((section, idx) => (
-              <Pressable
-                key={section.id}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  const title = (section.title as Record<string, string>)["pt"] ?? "";
-                  router.push(`/tabs/learn?sectionId=${section.id}&sectionTitle=${encodeURIComponent(title)}`);
-                }}
-              >
-                <View style={[styles.sectionCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-                  <View style={[styles.sectionBadge, { backgroundColor: getUnitColor(idx) }]}>
-                    <Text style={styles.sectionBadgeText}>
-                      {section.cefrMin}{section.cefrMax !== section.cefrMin ? `-${section.cefrMax}` : ""}
-                    </Text>
-                  </View>
-                  <View style={styles.sectionInfo}>
-                    <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                      {(section.title as Record<string, string>)["pt"] ?? ""}
-                    </Text>
-                    {section.description && (
-                      <Text style={[styles.sectionDesc, { color: theme.textMuted }]} numberOfLines={2}>
-                        {(section.description as Record<string, string>)["pt"] ?? ""}
+            {numbered.length === 0 && renderEmpty()}
+            {numbered.map((section, idx) => {
+              const sectionColor = colors.sectionColors[idx % colors.sectionColors.length]!;
+              const title = (section.title as Record<string, string>)["pt"] ?? "";
+              const isFirst = idx === 0;
+              const unitRange = section.unitCount > 0
+                ? `${section.unitStart}–${section.unitEnd}`
+                : "";
+              const progressPct = section.totalLessons > 0
+                ? Math.round((section.completedLessons / section.totalLessons) * 100)
+                : 0;
+
+              return (
+                <Pressable
+                  key={section.id}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push(`/tabs/learn?sectionId=${section.id}&sectionTitle=${encodeURIComponent(title)}`);
+                  }}
+                >
+                  <View style={[styles.sectionLargeCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                    {/* Colored top area */}
+                    <View style={[styles.sectionColorBlock, { backgroundColor: sectionColor }]}>
+                      <View style={styles.sectionColorContent}>
+                        <View style={styles.sectionIconCircle}>
+                          <BookIcon size={32} color="#FFFFFF" />
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* Info area */}
+                    <View style={styles.sectionCardBody}>
+                      <Text style={[styles.sectionLargeLabel, { color: theme.textMuted }]}>
+                        {t("learn.section").toUpperCase()} {idx + 1}
                       </Text>
-                    )}
+                      <Text style={[styles.sectionLargeTitle, { color: theme.text }]} numberOfLines={2}>
+                        {title}
+                      </Text>
+
+                      {/* Unit range + CEFR badge row */}
+                      <View style={styles.sectionMetaRow}>
+                        {unitRange ? (
+                          <View style={[styles.sectionUnitBadge, { backgroundColor: sectionColor + "20" }]}>
+                            <Text style={[styles.sectionUnitBadgeText, { color: sectionColor }]}>
+                              {section.unitCount === 1 ? `1 unidade` : `Unidades ${unitRange}`}
+                            </Text>
+                          </View>
+                        ) : null}
+                        <View style={[styles.sectionCefrBadge, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                          <Text style={[styles.sectionCefrText, { color: theme.textMuted }]}>
+                            {section.cefrMin}{section.cefrMax !== section.cefrMin ? `–${section.cefrMax}` : ""}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <View style={[styles.sectionProgressTrack, { backgroundColor: theme.border }]}>
+                        <View style={[styles.sectionProgressFill, { backgroundColor: sectionColor, width: `${progressPct}%` as any }]} />
+                      </View>
+
+                      {/* Skip link for sections beyond current */}
+                      {!isFirst && (
+                        <Text style={[styles.sectionSkipLink, { color: sectionColor }]}>
+                          {t("learn.skip_here")}
+                        </Text>
+                      )}
+                    </View>
                   </View>
-                  <ChevronRightIcon size={20} color={theme.textMuted} />
+                </Pressable>
+              );
+            })}
+
+            {/* Daily Refresh card */}
+            {dailyRefresh && (
+              <View style={[styles.sectionLargeCard, { backgroundColor: theme.bgCard, borderColor: theme.border, opacity: 0.55 }]}>
+                <View style={[styles.sectionColorBlock, { backgroundColor: colors.neutral[400] }]}>
+                  <View style={styles.sectionColorContent}>
+                    <View style={styles.sectionIconCircle}>
+                      <LockIcon size={32} color="#FFFFFF" />
+                    </View>
+                  </View>
                 </View>
-              </Pressable>
-            ))}
+                <View style={styles.sectionCardBody}>
+                  <Text style={[styles.sectionLargeLabel, { color: theme.textMuted }]}>
+                    {t("learn.daily_refresh").toUpperCase()}
+                  </Text>
+                  <Text style={[styles.sectionLargeTitle, { color: theme.textMuted }]}>
+                    {t("learn.daily_refresh")}
+                  </Text>
+                  <Text style={[styles.sectionLockedText, { color: theme.textMuted }]}>
+                    {t("learn.daily_refresh_locked")}
+                  </Text>
+                </View>
+              </View>
+            )}
           </ScrollView>
         )}
       </View>
@@ -472,27 +598,103 @@ const styles = StyleSheet.create({
     height: spacing["2xl"],
   },
 
-  // ── Section cards ──
-  sectionCard: {
+  // ── Daily Refresh ──
+  dailyRefreshBanner: {
+    marginTop: spacing.lg,
+  },
+  dailyRefreshLocked: {
+    fontSize: typography.sizes.sm,
+    textAlign: "center",
+    marginTop: spacing.sm,
+    lineHeight: 18,
+  },
+
+  // ── Section list ──
+  sectionListContainer: {
+    padding: spacing.lg,
+    paddingBottom: spacing["5xl"],
+    gap: spacing.lg,
+  },
+  sectionLargeCard: {
+    borderRadius: radii.xl,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  sectionColorBlock: {
+    height: 120,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sectionColorContent: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionCardBody: {
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  sectionLargeLabel: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+  },
+  sectionLargeTitle: {
+    fontSize: typography.sizes.xl,
+    fontWeight: "800",
+    lineHeight: 26,
+  },
+  sectionMetaRow: {
     flexDirection: "row",
     alignItems: "center",
-    padding: spacing.lg,
-    borderRadius: radii.lg,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    gap: spacing.md,
+    gap: spacing.sm,
+    flexWrap: "wrap",
   },
-  sectionBadge: {
+  sectionUnitBadge: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.full,
+  },
+  sectionUnitBadgeText: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "700",
+  },
+  sectionCefrBadge: {
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: radii.sm,
-    minWidth: 48,
-    alignItems: "center",
+    borderWidth: 1,
   },
-  sectionBadgeText: {
-    color: "#FFFFFF",
+  sectionCefrText: {
     fontSize: typography.sizes.xs,
+    fontWeight: "600",
+  },
+  sectionProgressTrack: {
+    height: 8,
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  sectionProgressFill: {
+    height: "100%",
+    borderRadius: 4,
+  },
+  sectionSkipLink: {
+    fontSize: typography.sizes.sm,
     fontWeight: "700",
+    letterSpacing: 0.5,
+    textAlign: "center",
+    paddingTop: spacing.xs,
+  },
+  sectionLockedText: {
+    fontSize: typography.sizes.sm,
+    lineHeight: 18,
   },
   sectionInfo: {
     flex: 1,
