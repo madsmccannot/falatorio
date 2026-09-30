@@ -13,6 +13,8 @@ import {
   skills,
   skillMastery,
   skillPrerequisites,
+  lessons,
+  transactions,
 } from "@falatorio/db/schema";
 import { LESSON, EXERCISE_COGNITIVE_MAP, PRACTICE } from "@falatorio/core";
 import { runAdaptiveEngine, type AdaptiveEngineInput } from "@falatorio/core/lesson";
@@ -900,5 +902,58 @@ export const lessonRouter = t.router({
         knowledgeItemCode: ki?.code ?? null,
         errorCount,
       };
+    }),
+
+  openChest: protectedProcedure
+    .input(z.object({ lessonId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const [node] = await ctx.db
+        .select()
+        .from(lessons)
+        .where(eq(lessons.id, input.lessonId))
+        .limit(1);
+
+      if (!node || node.nodeType !== "chest") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "NOT_A_CHEST" });
+      }
+
+      const openedKey = `chest:${ctx.user.userId}:${input.lessonId}`;
+      const alreadyOpened = await ctx.redis.get(openedKey);
+      if (alreadyOpened) {
+        return JSON.parse(alreadyOpened) as { type: string; amount: number; alreadyOpened: true };
+      }
+
+      const reward = node.rewardConfig as { type: string; amount: number } | null;
+      if (!reward) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "CHEST_NO_REWARD" });
+      }
+
+      if (reward.type === "ouro") {
+        await ctx.db.insert(transactions).values({
+          userId: ctx.user.userId,
+          type: "earn",
+          amount: reward.amount,
+          reason: "chest_reward",
+        });
+      } else if (reward.type === "xp_boost") {
+        await ctx.redis.set(
+          `xpboost:${ctx.user.userId}`,
+          "1",
+          "EX",
+          reward.amount * 60,
+        );
+      } else if (reward.type === "streak_freeze") {
+        await ctx.redis.set(
+          `streakfreeze:${ctx.user.userId}`,
+          String(reward.amount),
+          "EX",
+          86400,
+        );
+      }
+
+      const result = { ...reward, alreadyOpened: false };
+      await ctx.redis.set(openedKey, JSON.stringify(result), "EX", 86400 * 30);
+
+      return result;
     }),
 });

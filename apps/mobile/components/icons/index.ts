@@ -25,6 +25,7 @@ export { GearIcon } from "./GearIcon";
 export { UserIcon } from "./UserIcon";
 export { AppIcon } from "./AppIcon";
 export { CheckIcon } from "./CheckIcon";
+export { ChestIcon } from "./ChestIcon";
 export { ChevronRightIcon } from "./ChevronRightIcon";
 export { FlagIcon } from "./FlagIcon";
 export { ReferenceIcon } from "./ReferenceIcon";

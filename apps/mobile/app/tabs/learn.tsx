@@ -7,14 +7,14 @@ import { useHearts } from "@/hooks/useHearts";
 import { useStreak } from "@/hooks/useStreak";
 import { useOuro } from "@/hooks/useOuro";
 import { Loading } from "@/components/ui/Loading";
-import { HeartIcon, StreakIcon, GoldPrisms, BookIcon, ChevronRightIcon } from "@/components/icons";
+import { HeartIcon, StreakIcon, GoldPrisms, BookIcon, ChevronRightIcon, ChestIcon, StarIcon } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 export default function LearnScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ courseId?: string; sectionId?: string }>();
+  const params = useLocalSearchParams<{ courseId?: string; sectionId?: string; unitId?: string }>();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const { hearts, unlimited } = useHearts();
@@ -23,15 +23,19 @@ export default function LearnScreen() {
   const { t } = useTranslation();
 
   const courses = trpc.content.getCourses.useQuery(undefined, {
-    enabled: !params.courseId,
+    enabled: !params.courseId && !params.unitId,
   });
   const sectionList = trpc.content.getSections.useQuery(
     { courseId: params.courseId! },
-    { enabled: !!params.courseId && !params.sectionId },
+    { enabled: !!params.courseId && !params.sectionId && !params.unitId },
   );
   const unitList = trpc.content.getUnits.useQuery(
     { sectionId: params.sectionId! },
-    { enabled: !!params.sectionId },
+    { enabled: !!params.sectionId && !params.unitId },
+  );
+  const lessonList = trpc.content.getLessons.useQuery(
+    { unitId: params.unitId! },
+    { enabled: !!params.unitId },
   );
 
   const renderHeader = () => (
@@ -65,6 +69,89 @@ export default function LearnScreen() {
       <Text style={[styles.emptyText, { color: theme.textMuted }]}>{t("learn.empty_text")}</Text>
     </View>
   );
+
+  if (params.unitId) {
+    const isLoading = lessonList.isLoading;
+    const data = lessonList.data ?? [];
+
+    return (
+      <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
+        {renderHeader()}
+        {isLoading ? (
+          <Loading message={t("learn.loading")} />
+        ) : (
+          <FlatList
+            data={data}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+            renderItem={({ item: node, index }) => {
+              const isChest = node.nodeType === "chest";
+              const isLast = index === data.length - 1;
+
+              return (
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    if (isChest) {
+                      router.push(`/lesson/chest?lessonId=${node.id}`);
+                    } else {
+                      router.push(`/lesson/${node.id}`);
+                    }
+                  }}
+                >
+                  <View style={[
+                    styles.lessonNode,
+                    { backgroundColor: theme.bgCard, borderColor: isChest ? colors.ouro : theme.border },
+                    isChest && styles.chestNode,
+                  ]}>
+                    <View style={[
+                      styles.lessonIcon,
+                      { backgroundColor: isChest ? colors.ouro + "20" : colors.primary[500] + "20" },
+                    ]}>
+                      {isChest ? (
+                        <ChestIcon size={24} />
+                      ) : isLast ? (
+                        <StarIcon size={20} color={colors.primary[500]} />
+                      ) : (
+                        <BookIcon size={20} color={colors.primary[500]} />
+                      )}
+                    </View>
+                    <View style={styles.courseInfo}>
+                      <Text style={[styles.lessonTitle, { color: theme.text }]}>
+                        {isChest
+                          ? t("learn.chest")
+                          : isLast
+                            ? t("learn.recap")
+                            : `${t("learn.lesson")} ${index + 1 - data.slice(0, index).filter((n) => n.nodeType === "chest").length}`}
+                      </Text>
+                      {isChest && node.rewardConfig && (
+                        <Text style={[styles.courseLevel, { color: colors.ouro }]}>
+                          {(node.rewardConfig as { type: string; amount: number }).type === "ouro"
+                            ? `${(node.rewardConfig as { type: string; amount: number }).amount} ouro`
+                            : (node.rewardConfig as { type: string; amount: number }).type === "xp_boost"
+                              ? t("learn.xp_boost")
+                              : (node.rewardConfig as { type: string; amount: number }).type === "streak_freeze"
+                                ? t("learn.streak_freeze")
+                                : t("learn.super_days")}
+                        </Text>
+                      )}
+                      {!isChest && isLast && (
+                        <Text style={[styles.courseLevel, { color: theme.textMuted }]}>
+                          {t("learn.recap_desc")}
+                        </Text>
+                      )}
+                    </View>
+                    <ChevronRightIcon size={20} color={theme.textMuted} />
+                  </View>
+                </Pressable>
+              );
+            }}
+            ListEmptyComponent={renderEmpty()}
+          />
+        )}
+      </View>
+    );
+  }
 
   if (params.sectionId) {
     const isLoading = unitList.isLoading;
@@ -305,5 +392,28 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.md,
     textAlign: "center",
     lineHeight: 22,
+  },
+  lessonNode: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: spacing.lg,
+    borderRadius: radii.lg,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    gap: spacing.md,
+  },
+  chestNode: {
+    borderWidth: 2,
+  },
+  lessonIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  lessonTitle: {
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
   },
 });
