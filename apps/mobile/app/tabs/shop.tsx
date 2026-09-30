@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -8,12 +7,11 @@ import { useOuro } from "@/hooks/useOuro";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { Loading } from "@/components/ui/Loading";
 import { GoldPrisms, CrownIcon, HeartIcon, FlameIcon, ShieldIcon, TimerIcon } from "@/components/icons";
+import { OuroBalance } from "@/components/shop/OuroBalance";
+import { OuroPacks } from "@/components/shop/OuroPacks";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
 import type { TKey } from "@/lib/i18n";
-import { purchasePackage, getOfferings, type PurchasesPackage } from "@/lib/revenuecat";
-import { useToast } from "@/components/ui/Toast";
-import { trackPurchase } from "@/lib/analytics";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 const PREVIEW_ITEMS: { id: string; nameKey: TKey; descKey: TKey | null; price: number; icon: string; color: string }[] = [
@@ -21,21 +19,6 @@ const PREVIEW_ITEMS: { id: string; nameKey: TKey; descKey: TKey | null; price: n
   { id: "streak_freeze", nameKey: "shop.streak_freeze", descKey: null, price: 200, icon: "shield", color: colors.info },
   { id: "double_xp", nameKey: "shop.double_xp", descKey: null, price: 500, icon: "flame", color: colors.xp },
   { id: "timer_boost", nameKey: "shop.timer_boost", descKey: null, price: 150, icon: "timer", color: colors.streak },
-];
-
-type OuroPack = {
-  id: string;
-  name: string;
-  amount: number;
-  priceLabel: string;
-  bonus?: string;
-  packageId: string;
-};
-
-const OURO_PACKS: OuroPack[] = [
-  { id: "medium", name: "Bolsa", amount: 1200, priceLabel: "€3.99", bonus: "+200", packageId: "ouro_1200" },
-  { id: "large", name: "Cofre", amount: 3000, priceLabel: "€7.99", bonus: "+500", packageId: "ouro_3000" },
-  { id: "vault", name: "Tesouro", amount: 8000, priceLabel: "€17.99", bonus: "+2000", packageId: "ouro_8000" },
 ];
 
 function ItemIcon({ type, size, color }: { type: string; size: number; color: string }) {
@@ -55,37 +38,9 @@ export default function ShopScreen() {
   const { t } = useTranslation();
   const { balance } = useOuro();
   const { isSuper } = useEntitlements();
-  const { showToast } = useToast();
   const items = trpc.shop.listItems.useQuery();
   const purchaseMutation = trpc.shop.purchaseWithOuro.useMutation();
   const utils = trpc.useUtils();
-  const [purchasingOuro, setPurchasingOuro] = React.useState<string | null>(null);
-
-  const handleOuroPurchase = async (pack: OuroPack) => {
-    try {
-      setPurchasingOuro(pack.id);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      const packages = await getOfferings();
-      const pkg = packages.find(
-        (p: PurchasesPackage) => p.identifier === pack.packageId
-      );
-      if (!pkg) {
-        showToast({ message: t("toast.pack_unavailable"), type: "error" });
-        return;
-      }
-      await purchasePackage(pkg);
-      trackPurchase(pack.packageId, "money", pack.amount);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      showToast({ message: t("toast.ouro_added", { amount: pack.amount }), type: "success" });
-      await utils.economy.getBalance.invalidate();
-    } catch (err: any) {
-      if (!err?.userCancelled) {
-        showToast({ message: t("toast.purchase_failed"), type: "error" });
-      }
-    } finally {
-      setPurchasingOuro(null);
-    }
-  };
 
   const handlePurchase = async (itemId: string) => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -102,10 +57,7 @@ export default function ShopScreen() {
     >
       <View style={styles.header}>
         <Text style={[styles.title, { color: theme.text }]}>{t("shop.title")}</Text>
-        <View style={[styles.balanceChip, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-          <GoldPrisms size={16} />
-          <Text style={[styles.balanceValue, { color: colors.ouro }]}>{balance}</Text>
-        </View>
+        <OuroBalance />
       </View>
 
       {!isSuper && (
@@ -182,34 +134,7 @@ export default function ShopScreen() {
         </View>
       )}
 
-      <Text style={[styles.sectionTitle, { color: theme.textSecondary, marginTop: spacing.lg }]}>
-        {t("ouro.section")}
-      </Text>
-      <Text style={[styles.ouroDesc, { color: theme.textMuted }]}>
-        {t("ouro.desc")}
-      </Text>
-      <View style={styles.ouroGrid}>
-        {OURO_PACKS.map((pack) => (
-          <Pressable
-            key={pack.id}
-            onPress={() => handleOuroPurchase(pack)}
-            disabled={!!purchasingOuro}
-            style={[styles.ouroPackCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
-          >
-            <GoldPrisms size={24} />
-            <Text style={styles.ouroPackAmount}>{pack.amount.toLocaleString()}</Text>
-            <Text style={[styles.ouroPackName, { color: theme.textSecondary }]}>{pack.name}</Text>
-            {pack.bonus && (
-              <View style={[styles.ouroPackBonusBadge, { backgroundColor: theme.bgAccent }]}>
-                <Text style={[styles.ouroPackBonusText, { color: theme.isDark ? colors.primary[400] : colors.primary[700] }]}>{pack.bonus}</Text>
-              </View>
-            )}
-            <View style={[styles.ouroPackPrice, { backgroundColor: colors.primary[600] }]}>
-              <Text style={styles.ouroPackPriceText}>{pack.priceLabel}</Text>
-            </View>
-          </Pressable>
-        ))}
-      </View>
+      <OuroPacks />
     </ScrollView>
   );
 }
@@ -228,19 +153,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: typography.sizes["2xl"],
-    fontWeight: "700",
-  },
-  balanceChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.full,
-    gap: spacing.xs,
-    borderWidth: 1,
-  },
-  balanceValue: {
-    fontSize: typography.sizes.md,
     fontWeight: "700",
   },
   superBanner: {
@@ -346,56 +258,5 @@ const styles = StyleSheet.create({
   buyPillText: {
     fontSize: typography.sizes.sm,
     fontWeight: "700",
-  },
-  ouroDesc: {
-    fontSize: typography.sizes.sm,
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    marginLeft: spacing.xs,
-  },
-  ouroGrid: {
-    flexDirection: "row",
-    paddingHorizontal: spacing.lg,
-    gap: spacing.sm,
-  },
-  ouroPackCard: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-  },
-  ouroPackAmount: {
-    fontSize: typography.sizes.lg,
-    fontWeight: "800",
-    color: colors.ouro,
-    marginTop: spacing.xs,
-  },
-  ouroPackName: {
-    fontSize: typography.sizes.xs,
-    fontWeight: "600",
-    marginTop: 2,
-  },
-  ouroPackBonusBadge: {
-    marginTop: spacing.xs,
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 1,
-    borderRadius: radii.sm,
-  },
-  ouroPackBonusText: {
-    fontSize: 10,
-    fontWeight: "700",
-  },
-  ouroPackPrice: {
-    marginTop: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radii.md,
-  },
-  ouroPackPriceText: {
-    fontSize: typography.sizes.sm,
-    fontWeight: "700",
-    color: "#FFFFFF",
   },
 });
