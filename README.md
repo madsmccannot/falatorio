@@ -26,7 +26,7 @@ falatorio/
 |-------|-----------|
 | Mobile | React Native 0.86, Expo SDK 57, expo-router, Reanimated 4.5, Gesture Handler |
 | Server | Fastify 5, tRPC 11, superjson |
-| Database | PostgreSQL (Neon), Drizzle ORM, 27 tables + 5 enums |
+| Database | PostgreSQL (Neon), Drizzle ORM, 27 tables + 6 enums |
 | Cache/Queue | Redis (ioredis), BullMQ (6 queues) |
 | Auth | Clerk (JWT, cached in Redis) — optional, app runs in preview mode without it |
 | CMS | Payload CMS v3, PostgreSQL adapter, R2 storage |
@@ -78,7 +78,11 @@ Sections group units by difficulty band with intentional CEFR overlap at transit
 | S3 Intermedio | B2-C1 | 40 | 8 -> 6 | 1-2 | Conversation, work, culture |
 | S4 Avancado | C1-C2 | 50 | 9 -> 7 | 2 | Nuance, register, mastery |
 
-Total: 130 units, ~930 slots (lessons + chests). Chest rewards cycle through ouro, XP boosts, streak freezes, and occasional Super days. The Daily Refresh section provides adaptive review of previously learned material (always present, not directly accessible).
+Total: 130 units, ~930 slots (lessons + chests). Chest rewards cycle through ouro, XP boosts, streak freezes, and occasional Super days.
+
+### Daily Refresh
+
+Not a linear section — a parallel review layer that picks the optimal exercise mix for each user based on their current state. The `daily-refresh.service.ts` engine scores candidates from 3 sources with weighted priorities: FSRS-due items (45%, urgency by overdue days, stability penalty), low-mastery skills (30%, deficit below 0.6 threshold), and recent errors (25%, recency-weighted by severity). Exercises are interleaved across sources for variety. Session size adjusts by time of day (morning cap: 10 exercises, default: 15). A 4-hour Redis cooldown prevents overuse. Completes like any practice session (0.5x XP multiplier, no ouro, FSRS updates, skill evidence recording).
 
 Unit themes follow a communicative progression: S1 covers survival ("Cafe, por favor!"), S2 covers autonomous daily life ("Casa, renda e senhorio"), S3 covers conversation and society ("Argumentar e defender uma ideia"), S4 covers advanced mastery ("Portugues sem legendas"). Grammar is embedded in communicative objectives, never exposed as unit titles.
 
@@ -157,13 +161,13 @@ Pure business logic, zero dependencies on I/O or frameworks:
 
 ### `packages/db` — 27 schema tables
 
-Users, courses, sections (numbered + daily refresh, between course and unit), units, lessons (with node_type: lesson/chest and optional rewardConfig for chests), exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). Initial Drizzle migration generated.
+Users, courses, sections (numbered + daily refresh, between course and unit), units, lessons (with node_type: lesson/chest and optional rewardConfig for chests), exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). 3 Drizzle migrations: initial schema, knowledge graph + skills, chest node_type enum + reward_config.
 
-### `server` — 16 routers, 12 services, 7 jobs
+### `server` — 16 routers, 13 services, 7 jobs
 
 **Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads, pipeline, mastery, quality, analytics.
 
-**Services:** Whisper (transcription), Azure TTS, LLM (conversation tutor), content generator (dynamic lesson/exercise generation with inline glossary and gender pairs using L1 profiles), seed content (course structure seeding per L1), batch exercise pipeline (coverage gap detection, bulk generation with concurrency control, auto-links exercises to KnowledgeItems), mastery recalculator (batch skill mastery recomputation), achievement checker (competence badge evaluation), retention metrics (D1/D7/D30 cohort retention, mastery progression, DAU/WAU/MAU engagement), FCM push, R2 storage, IAP validation (Apple + Google), RevenueCat webhooks.
+**Services:** Whisper (transcription), Azure TTS, LLM (conversation tutor), content generator (dynamic lesson/exercise generation with inline glossary and gender pairs using L1 profiles), seed content (course structure seeding per L1), batch exercise pipeline (coverage gap detection, bulk generation with concurrency control, auto-links exercises to KnowledgeItems), mastery recalculator (batch skill mastery recomputation), achievement checker (competence badge evaluation), retention metrics (D1/D7/D30 cohort retention, mastery progression, DAU/WAU/MAU engagement), daily refresh (adaptive review session builder — picks exercises from 3 weighted sources: FSRS due items 45%, low mastery skills 30%, recent errors 25%; adjusts session size by time of day; 4h cooldown between sessions), FCM push, R2 storage, IAP validation (Apple + Google), RevenueCat webhooks.
 
 **Jobs (BullMQ):** exercise generation (uses content-generator service, auto-links to KnowledgeItems via lesson skills), league reset, streak reminders, quality flagging, heart refill, subscription checks, content sync.
 
@@ -175,7 +179,7 @@ Users, courses, sections (numbered + daily refresh, between course and unit), un
 
 **Tabs:** learn (course tree), practice (FSRS review queue), league (leaderboard), shop, profile.
 
-**Lesson flow:** exercise screen with 8 exercise types (translate, fill blank, listen & type, match pairs, pick correct, reorder words, speak & score), feedback overlay, result screen. Practice modes (review, mistakes) use the same exercise flow via `usePracticeSession` hook.
+**Lesson flow:** exercise screen with 8 exercise types (translate, fill blank, listen & type, match pairs, pick correct, reorder words, speak & score), feedback overlay, result screen, chest opening screen (Reanimated shake + reward reveal animation). Practice modes (review, mistakes, daily refresh) use the same exercise flow via `usePracticeSession` hook.
 
 **Conversation:** scenario picker, chat with AI-powered PT-EU tutor with error extraction.
 

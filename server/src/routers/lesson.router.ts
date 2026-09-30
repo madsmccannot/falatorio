@@ -16,7 +16,7 @@ import {
   lessons,
   transactions,
 } from "@falatorio/db/schema";
-import { LESSON, EXERCISE_COGNITIVE_MAP, PRACTICE } from "@falatorio/core";
+import { LESSON, EXERCISE_COGNITIVE_MAP, PRACTICE, DAILY_REFRESH } from "@falatorio/core";
 import { runAdaptiveEngine, type AdaptiveEngineInput } from "@falatorio/core/lesson";
 import { scoreTextAnswer } from "@falatorio/core/scoring";
 import { scoreToRating } from "@falatorio/core/fsrs";
@@ -27,6 +27,7 @@ import type { ExerciseType, CognitiveLevel, CEFRLevel, MasteryScore, Skill } fro
 import { explainExerciseError } from "../services/llm.service.js";
 import { checkAndUnlockAchievements } from "../services/achievement-checker.service.js";
 import { recalculateMasteryForKnowledgeItems } from "../services/mastery-recalculator.service.js";
+import { buildDailyRefreshSession } from "../services/daily-refresh.service.js";
 import { EXPLAINS } from "@falatorio/core";
 
 function exerciseToCognitiveLevel(exerciseType: string): CognitiveLevel {
@@ -51,7 +52,7 @@ function highestCognitiveLevel(levels: CognitiveLevel[]): CognitiveLevel {
   return order[maxIdx]!;
 }
 
-type SessionType = "lesson" | "review" | "mistakes";
+type SessionType = "lesson" | "review" | "mistakes" | "daily_refresh";
 
 interface LessonSession {
   userId: string;
@@ -547,7 +548,7 @@ export const lessonRouter = t.router({
 
       const passed = accuracy >= LESSON.PASS_THRESHOLD;
 
-      const isPractice = session.sessionType === "review" || session.sessionType === "mistakes";
+      const isPractice = session.sessionType === "review" || session.sessionType === "mistakes" || session.sessionType === "daily_refresh";
       const xpMultiplier = isPractice ? PRACTICE.REVIEW_XP_MULTIPLIER : 1;
       const finalXp = Math.round(xpResult.total * xpMultiplier);
 
@@ -901,6 +902,109 @@ export const lessonRouter = t.router({
         remaining: Math.max(0, limit - current),
         knowledgeItemCode: ki?.code ?? null,
         errorCount,
+      };
+    }),
+
+  startDailyRefresh: protectedProcedure
+    .input(
+      z.object({
+        timezoneOffsetMinutes: z.number().int().min(-720).max(840).default(0),
+      }).optional(),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const cooldownKey = `dailyrefresh:${ctx.user.userId}`;
+      const lastRun = await ctx.redis.get(cooldownKey);
+      if (lastRun) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "daily_refresh_cooldown",
+        });
+      }
+
+      const [user] = await ctx.db
+        .select({ hearts: users.hearts, tier: users.tier })
+        .from(users)
+        .where(eq(users.id, ctx.user.userId))
+        .limit(1);
+
+      if (!user) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const refreshResult = await buildDailyRefreshSession(
+        ctx.db,
+        ctx.user.userId,
+        input?.timezoneOffsetMinutes ?? 0,
+      );
+
+      if (refreshResult.exerciseIds.length === 0) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "no_refresh_exercises",
+        });
+      }
+
+      const exerciseRows = await ctx.db
+        .select()
+        .from(exercises)
+        .where(
+          and(
+            sql`${exercises.id} = ANY(${refreshResult.exerciseIds})`,
+            eq(exercises.status, "live"),
+          ),
+        );
+
+      const exerciseMap = new Map(exerciseRows.map((e) => [e.id, e]));
+      const ordered = refreshResult.exerciseIds
+        .map((id) => exerciseMap.get(id))
+        .filter((e): e is typeof exerciseRows[number] => !!e);
+
+      if (ordered.length === 0) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "no_refresh_exercises",
+        });
+      }
+
+      const cognitiveLevels = ordered.map((e) =>
+        exerciseToCognitiveLevel(e.type),
+      );
+
+      const sessionId = crypto.randomUUID();
+      const session: LessonSession = {
+        userId: ctx.user.userId,
+        lessonId: "daily_refresh",
+        exerciseIds: ordered.map((e) => e.id),
+        currentIndex: 0,
+        correctCount: 0,
+        incorrectCount: 0,
+        xpEarned: 0,
+        startedAt: new Date().toISOString(),
+        cognitiveLevels,
+        sessionType: "daily_refresh",
+      };
+
+      await ctx.redis.set(
+        `session:${sessionId}`,
+        JSON.stringify(session),
+        "EX",
+        3600,
+      );
+
+      await ctx.redis.set(
+        cooldownKey,
+        "1",
+        "EX",
+        DAILY_REFRESH.COOLDOWN_HOURS * 3600,
+      );
+
+      const knownWords = await buildKnownWords(ctx.db, ctx.user.userId);
+
+      return {
+        sessionId,
+        exercises: ordered.map((e) => formatExerciseForClient(e, knownWords)),
+        hearts: user.hearts,
+        xpMultiplier: PRACTICE.REVIEW_XP_MULTIPLIER,
+        breakdown: refreshResult.breakdown,
+        totalPool: refreshResult.totalPool,
       };
     }),
 
