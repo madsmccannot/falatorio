@@ -30,9 +30,16 @@ export const progressRouter = t.router({
           lastScore: userProgress.lastScore,
           exerciseType: exercises.type,
           prompt: exercises.prompt,
+          lessonId: exercises.lessonId,
+          unitTitle: units.title,
+          unitTheme: units.theme,
+          cefrMin: sections.cefrMin,
         })
         .from(userProgress)
         .innerJoin(exercises, eq(userProgress.exerciseId, exercises.id))
+        .leftJoin(lessons, eq(exercises.lessonId, lessons.id))
+        .leftJoin(units, eq(lessons.unitId, units.id))
+        .leftJoin(sections, eq(units.sectionId, sections.id))
         .where(
           and(
             eq(userProgress.userId, ctx.user.userId),

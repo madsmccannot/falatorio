@@ -6,6 +6,9 @@ import { trpc } from "@/lib/trpc";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
+import { Button } from "@/components/ui/Button";
+import { Loading } from "@/components/ui/Loading";
+import { LockIcon } from "@/components/icons";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 const SCENARIOS = [
@@ -27,6 +30,31 @@ export default function ScenariosScreen() {
   const { isSuper } = useEntitlements();
   const session = trpc.auth.getSession.useQuery();
   const userLevel = session.data?.cefrLevel ?? "A1";
+  const { data: lessonGate, isLoading: gateLoading } = trpc.lesson.hasCompletedLesson.useQuery();
+
+  if (gateLoading) {
+    return <Loading fullScreen message="" />;
+  }
+
+  if (!lessonGate?.hasCompleted) {
+    return (
+      <View style={[styles.container, styles.centered, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
+        <LockIcon size={48} color={theme.textMuted} />
+        <Text style={[styles.lockedTitle, { color: theme.text }]}>
+          {t("practice.locked_title")}
+        </Text>
+        <Text style={[styles.lockedSubtitle, { color: theme.textMuted }]}>
+          {t("practice.locked_text")}
+        </Text>
+        <Button
+          title={t("lesson.go_back")}
+          onPress={() => router.back()}
+          variant="outline"
+          style={{ marginTop: spacing.xl }}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
@@ -154,5 +182,21 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.xs,
     marginTop: spacing.xs,
     fontStyle: "italic",
+  },
+  centered: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.xl,
+  },
+  lockedTitle: {
+    fontSize: typography.sizes.xl,
+    fontWeight: "700",
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  lockedSubtitle: {
+    fontSize: typography.sizes.sm,
+    textAlign: "center",
+    lineHeight: 20,
   },
 });

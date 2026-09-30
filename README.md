@@ -90,11 +90,11 @@ Exercises are scheduled using the FSRS algorithm. The system tracks stability, d
 
 ### Economy
 
-Currency is **ouro** (ledger-based — balance = SUM of transactions, never stored as a field). Earned through lessons, ads, and achievements. Spent on hearts, shop items, streak freezes.
+Currency is **ouro** (ledger-based — balance = SUM of transactions, never stored as a field). Earned through lessons, ads, and achievements. Spent on hearts, shop items, streak freezes. New users start with **500 ouro** (welcome bonus transaction created at registration).
 
 ### Heart System
 
-Free users get 5 hearts, refilling 1 every 4 hours. Running out mid-lesson triggers a paywall (50 ouro to continue). Super subscribers get unlimited hearts.
+Free users start with **5 hearts**, refilling 1 every 4 hours. Running out mid-lesson triggers a paywall (50 ouro to continue). Super subscribers get unlimited hearts. Completing a review session awards 1 heart (free users only, capped at 5).
 
 ### Tiers
 
@@ -104,6 +104,18 @@ Free users get 5 hearts, refilling 1 every 4 hours. Running out mid-lesson trigg
 | Ads | Banner + interstitial + reward | None |
 | Error review | 3/day | Unlimited |
 | Streak freeze | Purchasable | 1 free/month |
+| Starting ouro | 500 | 500 |
+
+### Practice Tab
+
+Four practice modes accessible from the practice tab:
+
+- **Smart Review** — random exercises from the user's completed content at 0.5x XP. Exercises never exceed the user's current progress (section + unit). Completing a review session can award 1 heart (free users below 5 hearts).
+- **Pronunciation** — L1-specific phonetic difficulty guide (PT-EU sounds: nasal vowels, nh/lh, uvular/flap r, sibilants). Links to conversation practice. Gated behind completing at least 1 lesson.
+- **Conversation** — AI-powered scenario-based chat with real-time pronunciation feedback. 8 scenarios gated by CEFR level. Gated behind completing at least 1 lesson.
+- **Common Mistakes** — accumulated errors (all exercises with `lapses > 0` since account creation) at 0.5x XP. Limited to 3 sessions/day for free users, unlimited for Super.
+
+All practice sessions reuse the same exercise flow (ExerciseRenderer, FeedbackOverlay, FSRS updates, skill evidence) as regular lessons.
 
 ### Scoring
 
@@ -161,7 +173,7 @@ Users, courses, sections (numbered + daily refresh, between course and unit), un
 
 **Tabs:** learn (course tree), practice (FSRS review queue), league (leaderboard), shop, profile.
 
-**Lesson flow:** exercise screen with 8 exercise types (translate, fill blank, listen & type, match pairs, pick correct, reorder words, speak & score), feedback overlay, result screen.
+**Lesson flow:** exercise screen with 8 exercise types (translate, fill blank, listen & type, match pairs, pick correct, reorder words, speak & score), feedback overlay, result screen. Practice modes (review, mistakes) use the same exercise flow via `usePracticeSession` hook.
 
 **Conversation:** scenario picker, chat with AI-powered PT-EU tutor with error extraction.
 

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, gt } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
@@ -14,7 +14,7 @@ import {
   skillMastery,
   skillPrerequisites,
 } from "@falatorio/db/schema";
-import { LESSON, EXERCISE_COGNITIVE_MAP } from "@falatorio/core";
+import { LESSON, EXERCISE_COGNITIVE_MAP, PRACTICE } from "@falatorio/core";
 import { runAdaptiveEngine, type AdaptiveEngineInput } from "@falatorio/core/lesson";
 import { scoreTextAnswer } from "@falatorio/core/scoring";
 import { scoreToRating } from "@falatorio/core/fsrs";
@@ -49,6 +49,8 @@ function highestCognitiveLevel(levels: CognitiveLevel[]): CognitiveLevel {
   return order[maxIdx]!;
 }
 
+type SessionType = "lesson" | "review" | "mistakes";
+
 interface LessonSession {
   userId: string;
   lessonId: string;
@@ -59,6 +61,84 @@ interface LessonSession {
   xpEarned: number;
   startedAt: string;
   cognitiveLevels: CognitiveLevel[];
+  sessionType?: SessionType;
+}
+
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j]!, a[i]!];
+  }
+  return a;
+}
+
+function formatExerciseForClient(
+  e: typeof exercises.$inferSelect,
+  knownWords: Set<string>,
+) {
+  const p = e.prompt as Record<string, unknown> | string;
+  const text = typeof p === "string" ? p : (p["text"] as string ?? "");
+
+  const glossary = typeof p === "object"
+    ? (p["glossary"] as Record<string, string[]> | undefined) ?? undefined
+    : undefined;
+
+  const genderPairs = typeof p === "object"
+    ? (p["genderPairs"] as Record<string, { g: "m" | "f"; alt: string }> | undefined) ?? undefined
+    : undefined;
+
+  const promptWords = text.match(/[\p{L}'-]+/gu) ?? [];
+  const newWords = promptWords.filter(
+    (w) => w.length > 2 && !knownWords.has(w.toLowerCase()),
+  );
+  const uniqueNew = [...new Set(newWords.map((w) => w.toLowerCase()))];
+
+  return {
+    id: e.id,
+    type: e.type,
+    prompt: text,
+    options: typeof p === "object" ? (p["options"] as string[] | undefined) : undefined,
+    pairs: typeof p === "object" ? (p["pairs"] as Array<{ left: string; right: string }> | undefined) : undefined,
+    words: typeof p === "object" ? (p["words"] as string[] | undefined) : undefined,
+    sentence: typeof p === "object" ? (p["sentence"] as string | undefined) : undefined,
+    audioUrl: e.audioUrl,
+    audioNativeUrl: e.audioNativeUrl,
+    difficulty: e.difficulty,
+    newWords: uniqueNew.length > 0 ? uniqueNew : undefined,
+    glossary,
+    genderPairs,
+  };
+}
+
+async function buildKnownWords(
+  db: any,
+  userId: string,
+) {
+  const seenExerciseIds = await db
+    .select({ exerciseId: userProgress.exerciseId })
+    .from(userProgress)
+    .where(eq(userProgress.userId, userId));
+
+  const seenIds = new Set(seenExerciseIds.map((r: { exerciseId: string }) => r.exerciseId));
+  const knownWords = new Set<string>();
+
+  if (seenIds.size > 0) {
+    const seenExercises = await db
+      .select({ prompt: exercises.prompt })
+      .from(exercises)
+      .where(sql`${exercises.id} = ANY(${[...seenIds]})`);
+
+    for (const ex of seenExercises) {
+      const p = ex.prompt as Record<string, unknown> | string;
+      const raw = typeof p === "string" ? p : (p as Record<string, unknown>)["text"] as string ?? "";
+      for (const w of raw.match(/[\p{L}'-]+/gu) ?? []) {
+        knownWords.add(w.toLowerCase());
+      }
+    }
+  }
+
+  return knownWords;
 }
 
 export const lessonRouter = t.router({
@@ -256,65 +336,11 @@ export const lessonRouter = t.router({
         3600,
       );
 
-      const seenExerciseIds = await ctx.db
-        .select({ exerciseId: userProgress.exerciseId })
-        .from(userProgress)
-        .where(eq(userProgress.userId, ctx.user.userId));
-
-      const seenIds = new Set(seenExerciseIds.map((r) => r.exerciseId));
-
-      let knownWords = new Set<string>();
-      if (seenIds.size > 0) {
-        const seenExercises = await ctx.db
-          .select({ prompt: exercises.prompt })
-          .from(exercises)
-          .where(sql`${exercises.id} = ANY(${[...seenIds]})`);
-
-        for (const ex of seenExercises) {
-          const p = ex.prompt as Record<string, unknown> | string;
-          const raw = typeof p === "string" ? p : (p as Record<string, unknown>)["text"] as string ?? "";
-          for (const w of raw.match(/[\p{L}'-]+/gu) ?? []) {
-            knownWords.add(w.toLowerCase());
-          }
-        }
-      }
+      const knownWords = await buildKnownWords(ctx.db, ctx.user.userId);
 
       return {
         sessionId,
-        exercises: lessonExercises.map((e) => {
-          const p = e.prompt as Record<string, unknown> | string;
-          const text = typeof p === "string" ? p : (p["text"] as string ?? "");
-
-          const glossary = typeof p === "object"
-            ? (p["glossary"] as Record<string, string[]> | undefined) ?? undefined
-            : undefined;
-
-          const genderPairs = typeof p === "object"
-            ? (p["genderPairs"] as Record<string, { g: "m" | "f"; alt: string }> | undefined) ?? undefined
-            : undefined;
-
-          const promptWords = text.match(/[\p{L}'-]+/gu) ?? [];
-          const newWords = promptWords.filter(
-            (w) => w.length > 2 && !knownWords.has(w.toLowerCase()),
-          );
-          const uniqueNew = [...new Set(newWords.map((w) => w.toLowerCase()))];
-
-          return {
-            id: e.id,
-            type: e.type,
-            prompt: text,
-            options: typeof p === "object" ? (p["options"] as string[] | undefined) : undefined,
-            pairs: typeof p === "object" ? (p["pairs"] as Array<{ left: string; right: string }> | undefined) : undefined,
-            words: typeof p === "object" ? (p["words"] as string[] | undefined) : undefined,
-            sentence: typeof p === "object" ? (p["sentence"] as string | undefined) : undefined,
-            audioUrl: e.audioUrl,
-            audioNativeUrl: e.audioNativeUrl,
-            difficulty: e.difficulty,
-            newWords: uniqueNew.length > 0 ? uniqueNew : undefined,
-            glossary,
-            genderPairs,
-          };
-        }),
+        exercises: lessonExercises.map((e) => formatExerciseForClient(e, knownWords)),
         hearts: user.hearts,
       };
     }),
@@ -517,20 +543,44 @@ export const lessonRouter = t.router({
         cognitiveLevel: dominantLevel,
       });
 
-      const ouroReward = getLessonReward(isPerfect);
+      const passed = accuracy >= LESSON.PASS_THRESHOLD;
+
+      const isPractice = session.sessionType === "review" || session.sessionType === "mistakes";
+      const xpMultiplier = isPractice ? PRACTICE.REVIEW_XP_MULTIPLIER : 1;
+      const finalXp = Math.round(xpResult.total * xpMultiplier);
+
+      const ouroReward = isPractice ? { amount: 0 } : getLessonReward(isPerfect);
+
+      let heartsEarned = 0;
+      if (session.sessionType === "review" && passed) {
+        const [userData] = await ctx.db
+          .select({ hearts: users.hearts, tier: users.tier })
+          .from(users)
+          .where(eq(users.id, ctx.user.userId))
+          .limit(1);
+
+        if (userData && userData.tier === "free" && userData.hearts !== null && userData.hearts < 5) {
+          heartsEarned = PRACTICE.HEART_REWARD_ON_REVIEW;
+          await ctx.db
+            .update(users)
+            .set({
+              hearts: Math.min(5, userData.hearts + heartsEarned),
+              updatedAt: new Date(),
+            })
+            .where(eq(users.id, ctx.user.userId));
+        }
+      }
 
       await ctx.db
         .update(users)
         .set({
-          totalXp: user.totalXp + xpResult.total,
+          totalXp: user.totalXp + finalXp,
           lastActivityAt: new Date(),
           updatedAt: new Date(),
         })
         .where(eq(users.id, ctx.user.userId));
 
       await ctx.redis.del(`session:${input.sessionId}`);
-
-      const passed = accuracy >= LESSON.PASS_THRESHOLD;
 
       const achievementResult = await checkAndUnlockAchievements(
         ctx.db,
@@ -540,13 +590,242 @@ export const lessonRouter = t.router({
       return {
         passed,
         accuracy,
-        xpEarned: xpResult.total,
+        xpEarned: finalXp,
         ouroEarned: ouroReward.amount,
         isPerfect,
         xpBreakdown: xpResult,
+        xpMultiplier,
+        heartsEarned,
+        sessionType: session.sessionType ?? "lesson",
         dominantCognitiveLevel: dominantLevel ?? null,
         newAchievements: achievementResult.newlyUnlocked,
       };
+    }),
+
+  startReviewSession: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const [user] = await ctx.db
+        .select({ hearts: users.hearts, tier: users.tier })
+        .from(users)
+        .where(eq(users.id, ctx.user.userId))
+        .limit(1);
+
+      if (!user) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const completedExercises = await ctx.db
+        .select({
+          exerciseId: userProgress.exerciseId,
+        })
+        .from(userProgress)
+        .where(eq(userProgress.userId, ctx.user.userId));
+
+      if (completedExercises.length === 0) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "no_completed_exercises",
+        });
+      }
+
+      const completedIds = completedExercises.map((r) => r.exerciseId);
+
+      const reviewExercises = await ctx.db
+        .select()
+        .from(exercises)
+        .where(
+          and(
+            sql`${exercises.id} = ANY(${completedIds})`,
+            eq(exercises.status, "live"),
+          ),
+        );
+
+      if (reviewExercises.length === 0) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "no_review_exercises",
+        });
+      }
+
+      const selected = shuffleArray(reviewExercises).slice(0, LESSON.EXERCISES_PER_LESSON);
+
+      const cognitiveLevels = selected.map((e) =>
+        exerciseToCognitiveLevel(e.type),
+      );
+
+      const sessionId = crypto.randomUUID();
+      const session: LessonSession = {
+        userId: ctx.user.userId,
+        lessonId: "review",
+        exerciseIds: selected.map((e) => e.id),
+        currentIndex: 0,
+        correctCount: 0,
+        incorrectCount: 0,
+        xpEarned: 0,
+        startedAt: new Date().toISOString(),
+        cognitiveLevels,
+        sessionType: "review",
+      };
+
+      await ctx.redis.set(
+        `session:${sessionId}`,
+        JSON.stringify(session),
+        "EX",
+        3600,
+      );
+
+      const knownWords = await buildKnownWords(ctx.db, ctx.user.userId);
+
+      return {
+        sessionId,
+        exercises: selected.map((e) => formatExerciseForClient(e, knownWords)),
+        hearts: user.hearts,
+        xpMultiplier: PRACTICE.REVIEW_XP_MULTIPLIER,
+      };
+    }),
+
+  startMistakesSession: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const [user] = await ctx.db
+        .select({ hearts: users.hearts, tier: users.tier })
+        .from(users)
+        .where(eq(users.id, ctx.user.userId))
+        .limit(1);
+
+      if (!user) throw new TRPCError({ code: "NOT_FOUND" });
+
+      if (user.tier === "free") {
+        const dailyKey = `mistakes:${ctx.user.userId}:${new Date().toISOString().slice(0, 10)}`;
+        const current = await ctx.redis.get(dailyKey);
+        const count = current ? parseInt(current, 10) : 0;
+
+        if (count >= PRACTICE.MISTAKES_DAILY_FREE) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "daily_mistakes_limit_reached",
+          });
+        }
+
+        await ctx.redis.incr(dailyKey);
+        if (count === 0) await ctx.redis.expire(dailyKey, 86400);
+      }
+
+      const mistakeExercises = await ctx.db
+        .select({
+          exerciseId: userProgress.exerciseId,
+        })
+        .from(userProgress)
+        .where(
+          and(
+            eq(userProgress.userId, ctx.user.userId),
+            gt(userProgress.lapses, 0),
+          ),
+        );
+
+      if (mistakeExercises.length === 0) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "no_mistakes",
+        });
+      }
+
+      const mistakeIds = mistakeExercises.map((r) => r.exerciseId);
+
+      const exerciseRows = await ctx.db
+        .select()
+        .from(exercises)
+        .where(
+          and(
+            sql`${exercises.id} = ANY(${mistakeIds})`,
+            eq(exercises.status, "live"),
+          ),
+        );
+
+      if (exerciseRows.length === 0) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "no_mistakes",
+        });
+      }
+
+      const selected = shuffleArray(exerciseRows).slice(0, LESSON.EXERCISES_PER_LESSON);
+
+      const cognitiveLevels = selected.map((e) =>
+        exerciseToCognitiveLevel(e.type),
+      );
+
+      const sessionId = crypto.randomUUID();
+      const session: LessonSession = {
+        userId: ctx.user.userId,
+        lessonId: "mistakes",
+        exerciseIds: selected.map((e) => e.id),
+        currentIndex: 0,
+        correctCount: 0,
+        incorrectCount: 0,
+        xpEarned: 0,
+        startedAt: new Date().toISOString(),
+        cognitiveLevels,
+        sessionType: "mistakes",
+      };
+
+      await ctx.redis.set(
+        `session:${sessionId}`,
+        JSON.stringify(session),
+        "EX",
+        3600,
+      );
+
+      const knownWords = await buildKnownWords(ctx.db, ctx.user.userId);
+
+      const dailyKey = `mistakes:${ctx.user.userId}:${new Date().toISOString().slice(0, 10)}`;
+      const usedRaw = await ctx.redis.get(dailyKey);
+      const used = usedRaw ? parseInt(usedRaw, 10) : 0;
+
+      return {
+        sessionId,
+        exercises: selected.map((e) => formatExerciseForClient(e, knownWords)),
+        hearts: user.hearts,
+        xpMultiplier: PRACTICE.REVIEW_XP_MULTIPLIER,
+        dailyRemaining: user.tier === "super" ? -1 : Math.max(0, PRACTICE.MISTAKES_DAILY_FREE - used),
+      };
+    }),
+
+  getMistakesCount: protectedProcedure
+    .query(async ({ ctx }) => {
+      const [result] = await ctx.db
+        .select({ count: sql<number>`count(*)`.as("count") })
+        .from(userProgress)
+        .where(
+          and(
+            eq(userProgress.userId, ctx.user.userId),
+            gt(userProgress.lapses, 0),
+          ),
+        );
+
+      const [user] = await ctx.db
+        .select({ tier: users.tier })
+        .from(users)
+        .where(eq(users.id, ctx.user.userId))
+        .limit(1);
+
+      const dailyKey = `mistakes:${ctx.user.userId}:${new Date().toISOString().slice(0, 10)}`;
+      const usedRaw = await ctx.redis.get(dailyKey);
+      const used = usedRaw ? parseInt(usedRaw, 10) : 0;
+
+      return {
+        totalMistakes: Number(result?.count ?? 0),
+        dailyUsed: used,
+        dailyRemaining: user?.tier === "super" ? -1 : Math.max(0, PRACTICE.MISTAKES_DAILY_FREE - used),
+      };
+    }),
+
+  hasCompletedLesson: protectedProcedure
+    .query(async ({ ctx }) => {
+      const [result] = await ctx.db
+        .select({ count: sql<number>`count(*)`.as("count") })
+        .from(userProgress)
+        .where(eq(userProgress.userId, ctx.user.userId))
+        .limit(1);
+
+      return { hasCompleted: Number(result?.count ?? 0) > 0 };
     }),
 
   explainExercise: protectedProcedure

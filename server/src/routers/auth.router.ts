@@ -2,8 +2,8 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
-import { users } from "@falatorio/db/schema";
-import { L1_CODES, USER_GOALS } from "@falatorio/core";
+import { users, transactions } from "@falatorio/db/schema";
+import { L1_CODES, USER_GOALS, OURO } from "@falatorio/core";
 
 const USERNAME_RE = /^[a-z][a-z0-9_]{2,29}$/;
 
@@ -51,6 +51,13 @@ export const authRouter = t.router({
           goal: input.goal ?? null,
         })
         .returning({ id: users.id });
+
+      await ctx.db.insert(transactions).values({
+        userId: user!.id,
+        type: "earn",
+        amount: OURO.WELCOME_BONUS,
+        reason: "welcome_bonus",
+      });
 
       await ctx.redis.set(
         `user:${input.clerkId}`,

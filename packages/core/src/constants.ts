@@ -112,6 +112,7 @@ export const HEARTS = {
 } as const;
 
 export const OURO = {
+  WELCOME_BONUS: 500,
   EARN_LESSON_COMPLETE: 5,
   EARN_PERFECT_LESSON: 10,
   EARN_DAILY_STREAK: 2,
@@ -164,6 +165,12 @@ export const LESSON = {
   CULTURAL_ITEMS_PER_SESSION: 2,
   PASS_THRESHOLD: 0.8,
   REVIEW_ITEMS_MAX: 20,
+} as const;
+
+export const PRACTICE = {
+  REVIEW_XP_MULTIPLIER: 0.5,
+  MISTAKES_DAILY_FREE: 3,
+  HEART_REWARD_ON_REVIEW: 1,
 } as const;
 
 export const ADS = {
