@@ -65,20 +65,22 @@ The learning path follows a 5-level hierarchy modelled after Duolingo:
 Course  (1 per L1 language)
   └── Section  (1-4 numbered + Daily Refresh)
         └── Unit  (variable per section)
-              └── Lesson  (variable per section: 5-7)
-                    └── Exercise  (dynamically generated)
+              └── Node  (lesson or chest)
+                    └── Exercise  (dynamically generated, lessons only)
 ```
 
-Sections group units by difficulty band with intentional CEFR overlap at transitions. Lesson count per unit interpolates within each section -- starting higher and decreasing as exercises become denser and harder:
+Sections group units by difficulty band with intentional CEFR overlap at transitions. Each unit contains a mix of lesson nodes and reward chest nodes. The last node is always a recap lesson; chests sit roughly in the middle. Units with 7+ total slots get 2 chests, smaller units get 1.
 
-| Section | CEFR | Units | Lessons/Unit | Pattern |
-|---------|------|-------|-------------|---------|
-| S1 Basico | A1-A2 | 10 | 5 -> 6 | Ramp up for beginners |
-| S2 Principiante | A2-B1 | 30 | 7 -> 6 | Fewer lessons, more exercises |
-| S3 Intermedio | B2-C1 | 40 | 8 -> 6 | Same progression |
-| S4 Avancado | C1-C2 | 50 | 9 -> 7 | Densest exercises |
+| Section | CEFR | Units | Slots/Unit | Chests/Unit | Pattern |
+|---------|------|-------|-----------|-------------|---------|
+| S1 Basico | A1-A2 | 10 | 5 -> 6 | 1 | Ramp up for beginners |
+| S2 Principiante | A2-B1 | 30 | 7 -> 6 | 1-2 | Daily life in Portugal |
+| S3 Intermedio | B2-C1 | 40 | 8 -> 6 | 1-2 | Conversation, work, culture |
+| S4 Avancado | C1-C2 | 50 | 9 -> 7 | 2 | Nuance, register, mastery |
 
-Total: 130 units, ~930 lessons. The Daily Refresh section provides adaptive review of previously learned material (always present, not directly accessible). Unit topics are defined in the pedagogical roadmap.
+Total: 130 units, ~930 slots (lessons + chests). Chest rewards cycle through ouro, XP boosts, streak freezes, and occasional Super days. The Daily Refresh section provides adaptive review of previously learned material (always present, not directly accessible).
+
+Unit themes follow a communicative progression: S1 covers survival ("Cafe, por favor!"), S2 covers autonomous daily life ("Casa, renda e senhorio"), S3 covers conversation and society ("Argumentar e defender uma ideia"), S4 covers advanced mastery ("Portugues sem legendas"). Grammar is embedded in communicative objectives, never exposed as unit titles.
 
 ### Dynamic Content Generation
 
@@ -155,7 +157,7 @@ Pure business logic, zero dependencies on I/O or frameworks:
 
 ### `packages/db` — 27 schema tables
 
-Users, courses, sections (numbered + daily refresh, between course and unit), units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). Initial Drizzle migration generated.
+Users, courses, sections (numbered + daily refresh, between course and unit), units, lessons (with node_type: lesson/chest and optional rewardConfig for chests), exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). Initial Drizzle migration generated.
 
 ### `server` — 16 routers, 12 services, 7 jobs
 

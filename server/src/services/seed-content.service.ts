@@ -99,186 +99,217 @@ const GRAMMAR_TO_SKILLS: Record<string, string[]> = {
   "creative grammar": ["PT.SYNTAX.STYLISTIC_VARIATION", "PT.LEX.CREATIVE_NEOLOGY", "PT.SYNTAX.ARCHAIC_FORMS"],
 };
 
+// ── Chest reward pool ──
+const CHEST_REWARDS: Array<{ type: "ouro" | "xp_boost" | "super_days" | "streak_freeze"; amount: number; weight: number }> = [
+  { type: "ouro", amount: 25, weight: 40 },
+  { type: "ouro", amount: 50, weight: 25 },
+  { type: "xp_boost", amount: 15, weight: 20 },
+  { type: "streak_freeze", amount: 1, weight: 10 },
+  { type: "super_days", amount: 1, weight: 5 },
+];
+
+function pickChestReward(unitIndex: number): { type: "ouro" | "xp_boost" | "super_days" | "streak_freeze"; amount: number } {
+  const idx = unitIndex % CHEST_REWARDS.length;
+  const r = CHEST_REWARDS[idx]!;
+  return { type: r.type, amount: r.amount };
+}
+
+function getChestPositions(totalSlots: number): number[] {
+  if (totalSlots <= 4) return [];
+  if (totalSlots <= 6) return [Math.floor(totalSlots / 2)];
+  const first = Math.floor(totalSlots / 3);
+  const second = Math.floor(2 * totalSlots / 3);
+  return [first, second];
+}
+
 export const COURSE_SECTIONS: SectionDef[] = [
-  // ── S1 Básico (A1-A2) ── 10 units, 5 lições/unit ──
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // S1 Basico (A1-A2) — 10 units — "Consigo desenrascar-me em Portugal"
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   {
     title: { pt: "Secção 1 - Básico", en: "Section 1 - Basics" },
-    description: { pt: "Fundamentos do português europeu: cumprimentos, vocabulário essencial e gramática básica", en: "European Portuguese fundamentals: greetings, essential vocabulary and basic grammar" },
+    description: { pt: "Sobreviver e construir frases: cumprimentos, necessidades básicas e primeiros passos", en: "Survive and build sentences: greetings, basic needs and first steps" },
     sectionType: "numbered",
     cefrMin: "A1",
     cefrMax: "A2",
     lessonsPerUnitStart: 5,
     lessonsPerUnitEnd: 6,
     units: [
-      { title: "Cumprimentos e apresentações", theme: "greetings", description: "Olá, como te chamas, de onde és", grammarFocus: ["ser present", "articles"], vocabTarget: ["greetings", "introductions"] },
-      { title: "Números e datas", theme: "numbers", description: "Contar, dias da semana, meses", grammarFocus: ["cardinal numbers", "ordinal numbers"], vocabTarget: ["numbers", "dates", "time"] },
-      { title: "Família e relações", theme: "family", description: "Mãe, pai, irmãos, amigos", grammarFocus: ["possessives", "gender agreement"], vocabTarget: ["family", "relationships"] },
-      { title: "Comida e bebida", theme: "food", description: "No restaurante, no café, no supermercado", grammarFocus: ["querer present", "partitive"], vocabTarget: ["food", "drinks", "restaurant"] },
-      { title: "A casa", theme: "home", description: "Divisões, mobília, rotina em casa", grammarFocus: ["estar present", "prepositions em/de"], vocabTarget: ["rooms", "furniture", "daily objects"] },
-      { title: "O corpo e a saúde", theme: "body", description: "Partes do corpo, dizer como te sentes", grammarFocus: ["ter present", "doer"], vocabTarget: ["body parts", "health", "feelings"] },
-      { title: "Transportes e direções", theme: "transport", description: "Autocarro, comboio, telemóvel, pedir direções", grammarFocus: ["ir present", "imperative basic"], vocabTarget: ["transport", "directions", "city"] },
-      { title: "Compras e dinheiro", theme: "shopping", description: "Na loja, preços, pagar", grammarFocus: ["poder present", "demonstratives"], vocabTarget: ["shopping", "clothes", "money"] },
-      { title: "Rotina diária", theme: "routine", description: "O meu dia, horas, hábitos", grammarFocus: ["reflexive verbs", "frequency adverbs"], vocabTarget: ["daily routine", "time expressions"] },
-      { title: "Tempo e estações", theme: "weather", description: "Como está o tempo, estações do ano", grammarFocus: ["fazer weather", "comparative"], vocabTarget: ["weather", "seasons", "nature"] },
+      { title: "Olá! Quem és tu?", theme: "greetings", description: "Cumprimentos, apresentações, nome, idade, nacionalidade, línguas", grammarFocus: ["ser present", "articles"], vocabTarget: ["greetings", "introductions", "nationalities", "languages"] },
+      { title: "Sobre mim", theme: "personal_info", description: "Família e informação pessoal, profissão, gostos, números, contactos, morada, datas", grammarFocus: ["cardinal numbers", "ordinal numbers", "ter present"], vocabTarget: ["personal info", "numbers", "dates", "contacts", "professions"] },
+      { title: "A minha gente", theme: "family", description: "Família, amigos, relações, descrição física básica, possessivos, género e número", grammarFocus: ["possessives", "gender agreement"], vocabTarget: ["family", "friends", "physical description", "relationships"] },
+      { title: "Café, por favor!", theme: "food", description: "Comida e bebida, café, restaurante, pastelaria, pedir e pagar, preços, quantidades", grammarFocus: ["querer present", "partitive", "gostar de"], vocabTarget: ["food", "drinks", "restaurant", "ordering", "prices"] },
+      { title: "A minha casa", theme: "home", description: "Divisões da casa, objetos comuns, localização, ser/estar, preposições básicas", grammarFocus: ["estar present", "prepositions em/de", "demonstratives"], vocabTarget: ["rooms", "furniture", "daily objects", "location"] },
+      { title: "Estou a precisar de ajuda", theme: "needs", description: "Corpo, sintomas, farmácia, necessidades básicas, pedidos, imperativo, expressões de cortesia", grammarFocus: ["ter present", "imperative basic", "doer"], vocabTarget: ["body parts", "health", "pharmacy", "needs", "courtesy"] },
+      { title: "Como chego lá?", theme: "transport", description: "Rua, cidade, transportes, direções, bilhetes, ir/vir/chegar/sair, preposições e contrações", grammarFocus: ["ir present", "prepositions para/a"], vocabTarget: ["transport", "directions", "city", "tickets", "prepositions"] },
+      { title: "Quanto custa?", theme: "shopping", description: "Lojas, compras, dinheiro, preços, tamanhos, números, pagamentos, comparações simples", grammarFocus: ["poder present", "comparative"], vocabTarget: ["shopping", "money", "prices", "sizes", "payments"] },
+      { title: "Um dia normal", theme: "routine", description: "Rotina diária, horas, dias da semana, atividades, frequência, verbos reflexivos", grammarFocus: ["reflexive verbs", "frequency adverbs"], vocabTarget: ["daily routine", "time expressions", "activities", "habits"] },
+      { title: "Hoje, amanhã, este fim de semana", theme: "weather_plans", description: "Tempo, meteorologia, planos, estações, convites, estar a + infinitivo, ir + infinitivo", grammarFocus: ["fazer weather", "comparative"], vocabTarget: ["weather", "seasons", "plans", "future", "invitations"] },
     ],
   },
-  // ── S2 Principiante (A2-B1) ── 30 units, 6 lições/unit ──
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // S2 Principiante (A2-B1) — 30 units — "Viver em Portugal"
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   {
     title: { pt: "Secção 2 - Principiante", en: "Section 2 - Beginner" },
-    description: { pt: "Consolidação e expansão: passado, opinião, cultura e vida quotidiana", en: "Consolidation and expansion: past tenses, opinions, culture and daily life" },
+    description: { pt: "Viver em Portugal: funcionar no dia a dia, pedir, explicar, perguntar e esclarecer", en: "Living in Portugal: daily autonomy, asking, explaining, questioning and clarifying" },
     sectionType: "numbered",
     cefrMin: "A2",
     cefrMax: "B1",
     lessonsPerUnitStart: 7,
     lessonsPerUnitEnd: 6,
     units: [
-      { title: "Profissões e trabalho", theme: "work", description: "O que fazes, o escritório, entrevistas", grammarFocus: ["preterite regular", "porque/por que"], vocabTarget: ["professions", "workplace"] },
-      { title: "Viagens e férias", theme: "travel", description: "No aeroporto, no hotel, férias", grammarFocus: ["preterite irregular", "prepositions para/a"], vocabTarget: ["travel", "accommodation", "tourism"] },
-      { title: "Lazer e passatempos", theme: "leisure", description: "Desporto, música, cinema, hobbies", grammarFocus: ["gostar de", "imperfect introduction"], vocabTarget: ["hobbies", "sports", "entertainment"] },
-      { title: "A cidade e serviços", theme: "city", description: "Correios, banco, hospital, polícia", grammarFocus: ["imperfect regular", "object pronouns direct"], vocabTarget: ["city services", "public places"] },
-      { title: "Saúde e bem-estar", theme: "health", description: "No médico, na farmácia, emergências", grammarFocus: ["imperfect irregular", "subjunctive present intro"], vocabTarget: ["medical", "pharmacy", "emergency"] },
-      { title: "Festas e tradições", theme: "traditions", description: "Santos Populares, Natal, Páscoa, casamentos", grammarFocus: ["preterite vs imperfect", "indirect objects"], vocabTarget: ["celebrations", "traditions", "culture"] },
-      { title: "Opinião e debate", theme: "opinion", description: "Concordar, discordar, argumentar", grammarFocus: ["subjunctive present", "conjunctions"], vocabTarget: ["opinions", "debate", "connectors"] },
-      { title: "Notícias e media", theme: "news", description: "Jornais, televisão, redes sociais", grammarFocus: ["passive voice", "reported speech intro"], vocabTarget: ["media", "news", "technology"] },
-      { title: "Cultura portuguesa", theme: "culture", description: "Fado, literatura, cinema, arte", grammarFocus: ["relative pronouns", "subjunctive with emotions"], vocabTarget: ["arts", "music", "literature"] },
-      { title: "Trabalho e carreira", theme: "career", description: "CV, entrevista, promoção, reuniões", grammarFocus: ["conditional", "por/para distinction"], vocabTarget: ["career", "business", "meetings"] },
-      { title: "Educação e formação", theme: "education", description: "Universidade, cursos, aprender", grammarFocus: ["future subjunctive", "personal infinitive"], vocabTarget: ["education", "studying", "exams"] },
-      { title: "Ambiente e natureza", theme: "environment", description: "Reciclagem, alterações climáticas, ecologia", grammarFocus: ["imperfect subjunctive", "conditional sentences"], vocabTarget: ["environment", "ecology", "sustainability"] },
-      { title: "Tecnologia e inovação", theme: "technology", description: "Internet, apps, inteligência artificial", grammarFocus: ["compound tenses intro", "gerund vs infinitive"], vocabTarget: ["technology", "innovation", "digital"] },
-      { title: "Relações e emoções", theme: "relationships", description: "Amizade, amor, conflitos, emoções", grammarFocus: ["subjunctive with doubt", "pronoun placement"], vocabTarget: ["emotions", "relationships", "personality"] },
-      { title: "Habitação e arrendamento", theme: "housing", description: "Alugar casa, contratos, vizinhos, condomínio", grammarFocus: ["conditional", "prepositions em/de"], vocabTarget: ["housing", "contracts", "neighborhoods"] },
-      { title: "Documentação e burocracia", theme: "bureaucracy", description: "NIF, NISS, SEF, vistos, finanças", grammarFocus: ["passive voice", "imperative basic"], vocabTarget: ["documents", "government offices", "bureaucracy"] },
-      { title: "Desporto e vida activa", theme: "sports", description: "Futebol, ginásio, corrida, competições", grammarFocus: ["preterite regular", "comparative"], vocabTarget: ["sports", "fitness", "competition"] },
-      { title: "Animais e natureza", theme: "animals", description: "Animais domésticos, fauna portuguesa, campo", grammarFocus: ["imperfect regular", "demonstratives"], vocabTarget: ["animals", "nature", "countryside"] },
-      { title: "Comunicação e redes sociais", theme: "communication", description: "Email, mensagens, telefonemas, publicações", grammarFocus: ["gerund vs infinitive", "reflexive verbs"], vocabTarget: ["communication", "social media", "messaging"] },
-      { title: "Direitos e deveres", theme: "rights", description: "Direitos laborais, segurança social, cidadania", grammarFocus: ["subjunctive present", "passive voice"], vocabTarget: ["rights", "labor law", "citizenship"] },
-      { title: "Culinária portuguesa", theme: "cooking", description: "Receitas, ingredientes, pratos típicos, bacalhau", grammarFocus: ["imperative basic", "partitive"], vocabTarget: ["cooking", "recipes", "ingredients"] },
-      { title: "Música e dança", theme: "music", description: "Fado, música popular, festivais, concertos", grammarFocus: ["preterite vs imperfect", "subjunctive with emotions"], vocabTarget: ["music", "dance", "festivals"] },
-      { title: "Vida social e convívio", theme: "social", description: "Fazer amigos, convites, festas, saídas", grammarFocus: ["conditional", "indirect objects"], vocabTarget: ["socializing", "invitations", "going out"] },
-      { title: "Imigração e integração", theme: "immigration", description: "Chegar a Portugal, integração, saudades, comunidade", grammarFocus: ["imperfect subjunctive", "pronoun placement"], vocabTarget: ["immigration", "integration", "community"] },
-      { title: "Vestuário e moda", theme: "clothing", description: "Roupa, tamanhos, cores, estilo", grammarFocus: ["demonstratives", "comparative"], vocabTarget: ["clothing", "fashion", "colors"] },
-      { title: "Correio e encomendas", theme: "mail", description: "Correios, encomendas online, devoluções", grammarFocus: ["preterite irregular", "passive voice"], vocabTarget: ["mail", "online shopping", "deliveries"] },
-      { title: "Vizinhança e comunidade", theme: "neighborhood", description: "Vizinhos, associações, vida local", grammarFocus: ["imperfect regular", "prepositions em/de"], vocabTarget: ["neighbors", "local community", "associations"] },
-      { title: "Emergências e segurança", theme: "emergencies", description: "112, bombeiros, polícia, primeiros socorros", grammarFocus: ["imperative basic", "conditional"], vocabTarget: ["emergencies", "safety", "first aid"] },
-      { title: "Entrevistas e candidaturas", theme: "interviews", description: "CV, carta de motivação, entrevista de emprego", grammarFocus: ["conditional", "future subjunctive"], vocabTarget: ["job applications", "CVs", "interviews"] },
-      { title: "Jardim e plantas", theme: "gardening", description: "Horta, flores, plantas, mercados biológicos", grammarFocus: ["imperfect introduction", "demonstratives"], vocabTarget: ["plants", "gardening", "organic markets"] },
+      { title: "O meu trabalho", theme: "work", description: "Profissões, local de trabalho, horários, responsabilidades, colegas, pedir e explicar tarefas", grammarFocus: ["preterite regular", "porque/por que"], vocabTarget: ["professions", "workplace", "schedules", "responsibilities"] },
+      { title: "Estudar e aprender", theme: "study", description: "Escola, universidade, disciplinas, aulas, estudar, aprender, explicar dificuldades", grammarFocus: ["preterite irregular", "gostar de"], vocabTarget: ["school", "university", "studying", "subjects"] },
+      { title: "Viajar por Portugal", theme: "travel", description: "Estações e aeroportos, bilhetes, comboios e autocarros, hotéis, check-in, perguntar informações", grammarFocus: ["prepositions para/a", "preterite regular"], vocabTarget: ["travel", "transport stations", "hotels", "information"] },
+      { title: "Férias e escapadinhas", theme: "holidays", description: "Férias, praias, campo, turismo, reservas, planos, experiências passadas", grammarFocus: ["preterite irregular", "imperfect introduction"], vocabTarget: ["holidays", "beaches", "countryside", "reservations"] },
+      { title: "A cidade onde vivo", theme: "city", description: "Bairro, ruas, lojas, serviços, transportes, locais públicos, descrever onde se vive", grammarFocus: ["prepositions em/de", "demonstratives"], vocabTarget: ["neighborhood", "local services", "public places"] },
+      { title: "Serviços do dia a dia", theme: "services", description: "Correios, cabeleireiro, oficina, serviços públicos, marcar horários, pedir informações", grammarFocus: ["imperative basic", "poder present"], vocabTarget: ["services", "appointments", "public services", "scheduling"] },
+      { title: "Saúde, médico e farmácia", theme: "health", description: "Corpo, sintomas, consultas, medicamentos, doenças comuns, explicar o que aconteceu", grammarFocus: ["imperfect regular", "object pronouns direct"], vocabTarget: ["medical", "pharmacy", "symptoms", "consultations"] },
+      { title: "Casa, renda e senhorio", theme: "housing", description: "Arrendar casa, contratos, renda, problemas domésticos, reparações, senhorio e inquilino", grammarFocus: ["conditional", "prepositions em/de"], vocabTarget: ["housing", "contracts", "landlord", "repairs"] },
+      { title: "Supermercado e compras", theme: "supermarket", description: "Produtos, quantidades, embalagens, preços, promoções, comparar produtos, pedir ajuda", grammarFocus: ["comparative", "partitive"], vocabTarget: ["supermarket", "products", "quantities", "promotions"] },
+      { title: "Roupa, tamanhos e aparência", theme: "clothing", description: "Roupa, calçado, tamanhos, cores, aparência, experimentar e comprar, descrever pessoas", grammarFocus: ["demonstratives", "comparative"], vocabTarget: ["clothing", "sizes", "appearance", "colors"] },
+      { title: "Cozinhar e comer em casa", theme: "cooking", description: "Ingredientes, receitas, cozinha, utensílios, quantidades, instruções, sequência temporal", grammarFocus: ["imperative basic", "partitive"], vocabTarget: ["cooking", "recipes", "kitchen", "utensils"] },
+      { title: "Comida portuguesa", theme: "portuguese_food", description: "Pratos portugueses, ingredientes, restaurantes, sabores, especialidades regionais", grammarFocus: ["gostar de", "preterite vs imperfect"], vocabTarget: ["Portuguese food", "dishes", "flavors", "regional specialties"] },
+      { title: "Amigos e vida social", theme: "social", description: "Amizade, convites, encontros, conversas informais, combinar planos, aceitar e recusar", grammarFocus: ["imperfect introduction", "indirect objects"], vocabTarget: ["friendship", "invitations", "social life", "informal register"] },
+      { title: "Gostos, emoções e relações", theme: "emotions", description: "Gostar, adorar, detestar, emoções, opiniões pessoais, relações, concordar e discordar", grammarFocus: ["subjunctive present intro", "gostar de"], vocabTarget: ["emotions", "opinions", "feelings", "relationships"] },
+      { title: "Convites, planos e encontros", theme: "social_plans", description: "Marcar encontros, alterar planos, confirmar e cancelar, horários, justificações", grammarFocus: ["conditional", "future subjunctive"], vocabTarget: ["plans", "appointments", "time management", "confirmation"] },
+      { title: "Desporto e tempo livre", theme: "sports", description: "Desporto, hobbies, atividades, frequência, preferências, convites", grammarFocus: ["preterite regular", "frequency adverbs"], vocabTarget: ["sports", "hobbies", "leisure", "activities"] },
+      { title: "Música, filmes e séries", theme: "entertainment", description: "Entretenimento, géneros, recomendações, descrever histórias, dar opiniões", grammarFocus: ["preterite vs imperfect", "subjunctive with emotions"], vocabTarget: ["entertainment", "genres", "recommendations", "opinions"] },
+      { title: "Telemóvel, Internet e redes sociais", theme: "daily_tech", description: "Tecnologia quotidiana, aplicações, mensagens, redes sociais, problemas técnicos", grammarFocus: ["gerund vs infinitive", "reflexive verbs"], vocabTarget: ["technology", "apps", "social media", "messaging"] },
+      { title: "Mensagens, chamadas e conversas", theme: "communication", description: "Telefonemas, mensagens escritas, pedir para repetir, esclarecer, manter uma conversa", grammarFocus: ["imperative basic", "pronoun placement"], vocabTarget: ["phone calls", "messages", "communication", "clarification"] },
+      { title: "Bairro, vizinhos e comunidade", theme: "neighborhood", description: "Vizinhança, regras, problemas comuns, pedidos, reclamações, relações comunitárias", grammarFocus: ["imperfect regular", "conditional"], vocabTarget: ["neighbors", "community", "rules", "complaints"] },
+      { title: "Correio, encomendas e entregas", theme: "mail", description: "Encomendas, moradas, entregas, levantamentos, atrasos, problemas com compras", grammarFocus: ["preterite irregular", "passive voice"], vocabTarget: ["mail", "deliveries", "packages", "online shopping"] },
+      { title: "Banco, dinheiro e pagamentos", theme: "banking", description: "Contas bancárias, cartões, transferências, pagamentos, levantamentos, comissões", grammarFocus: ["conditional", "object pronouns direct"], vocabTarget: ["banking", "cards", "transfers", "payments"] },
+      { title: "Documentos e burocracia", theme: "bureaucracy", description: "Documentos, formulários, finanças, segurança social, câmara, agendamentos", grammarFocus: ["passive voice", "imperative basic"], vocabTarget: ["documents", "government offices", "bureaucracy", "appointments"] },
+      { title: "Emergências e segurança", theme: "emergencies", description: "Emergências, polícia, bombeiros, acidente, perigo, pedir ajuda, explicar acontecimentos", grammarFocus: ["imperative basic", "preterite irregular"], vocabTarget: ["emergencies", "safety", "first aid", "police"] },
+      { title: "Família, infância e memórias", theme: "memories", description: "Infância, família, memórias, descrever acontecimentos, pretérito perfeito e imperfeito", grammarFocus: ["preterite vs imperfect", "imperfect irregular"], vocabTarget: ["childhood", "memories", "family history", "narrative"] },
+      { title: "O que aconteceu?", theme: "past_events", description: "Passado e experiências, acontecimentos passados, sequência temporal, narrar acontecimentos", grammarFocus: ["preterite vs imperfect", "reported speech intro"], vocabTarget: ["past events", "experiences", "narrative", "sequence"] },
+      { title: "O que vai acontecer?", theme: "future", description: "Planos, intenções, futuro, previsões, condições simples, expressões temporais", grammarFocus: ["conditional sentences", "future subjunctive"], vocabTarget: ["future", "plans", "predictions", "intentions"] },
+      { title: "Portugal e as suas tradições", theme: "traditions", description: "Festas, costumes, gastronomia, tradições regionais, feriados, cultura quotidiana", grammarFocus: ["relative pronouns", "subjunctive with emotions"], vocabTarget: ["traditions", "festivals", "Portuguese culture", "holidays"] },
+      { title: "Opiniões, concordância e discordância", theme: "opinions", description: "Dar opinião, justificar, concordar, discordar educadamente, comparar ideias", grammarFocus: ["subjunctive present", "conjunctions"], vocabTarget: ["opinions", "debate", "agreement", "justification"] },
+      { title: "Desenrascar-me sozinho", theme: "independence", description: "Situações inesperadas, resolver problemas, pedir ajuda, reformular, confirmar informação", grammarFocus: ["imperfect subjunctive", "pronoun placement"], vocabTarget: ["problem solving", "asking for help", "independence", "reformulation"] },
     ],
   },
-  // ── S3 Intermédio (B2-C1) ── 40 units, 8→6 lições/unit ──
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // S3 Intermedio (B2-C1) — 40 units — "Conversar, trabalhar, compreender"
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   {
     title: { pt: "Secção 3 - Intermédio", en: "Section 3 - Intermediate" },
-    description: { pt: "Fluência e profundidade: política, economia, expressões idiomáticas e análise crítica", en: "Fluency and depth: politics, economy, idioms and critical analysis" },
+    description: { pt: "Conversar, trabalhar, estudar e compreender sociedade e cultura", en: "Converse, work, study and understand society and culture" },
     sectionType: "numbered",
     cefrMin: "B2",
     cefrMax: "C1",
     lessonsPerUnitStart: 8,
     lessonsPerUnitEnd: 6,
     units: [
-      { title: "Política e sociedade", theme: "politics", description: "Democracia, eleições, problemas sociais", grammarFocus: ["pluperfect subjunctive", "complex conditionals"], vocabTarget: ["politics", "society", "government"] },
-      { title: "Economia e negócios", theme: "economy", description: "Mercado, investimento, empreendedorismo", grammarFocus: ["future perfect", "formal register"], vocabTarget: ["economics", "business", "finance"] },
-      { title: "Arte e estética", theme: "art", description: "Pintura, escultura, fotografia, design", grammarFocus: ["subjunctive in relative clauses", "passive se"], vocabTarget: ["art", "aesthetics", "criticism"] },
-      { title: "Literatura portuguesa", theme: "literature", description: "Pessoa, Saramago, Camões, poesia", grammarFocus: ["literary tenses", "mesoclisis"], vocabTarget: ["literature", "poetry", "authors"] },
-      { title: "Ciência e descoberta", theme: "science", description: "Investigação, descobertas, medicina", grammarFocus: ["compound subjunctive", "abstract nominalization"], vocabTarget: ["science", "research", "discovery"] },
-      { title: "Portugal no mundo", theme: "world", description: "Descobrimentos, CPLP, emigração, diáspora", grammarFocus: ["narrative tenses", "discourse connectors"], vocabTarget: ["history", "diaspora", "lusophone world"] },
-      { title: "Expressões idiomáticas", theme: "idioms", description: "Estar-se nas tintas, dar o litro, ficar a ver navios", grammarFocus: ["idiomatic usage", "register variation"], vocabTarget: ["idioms", "colloquialisms", "slang"] },
-      { title: "Registo formal e académico", theme: "formal", description: "Textos académicos, correspondência formal, discursos", grammarFocus: ["formal subjunctive", "impersonal constructions"], vocabTarget: ["academic", "formal writing", "correspondence"] },
-      { title: "Textos literários", theme: "literary", description: "Análise de textos, crítica, interpretação", grammarFocus: ["stylistic devices", "archaic forms"], vocabTarget: ["literary analysis", "criticism", "interpretation"] },
-      { title: "Argumentação e retórica", theme: "rhetoric", description: "Persuasão, debate formal, ensaio", grammarFocus: ["advanced connectors", "subjunctive nuances"], vocabTarget: ["argumentation", "rhetoric", "persuasion"] },
-      { title: "Direito e justiça", theme: "law", description: "Sistema judicial, tribunais, contratos, queixas", grammarFocus: ["passive voice", "formal register"], vocabTarget: ["law", "courts", "contracts"] },
-      { title: "Psicologia e comportamento", theme: "psychology", description: "Saúde mental, emoções complexas, terapia", grammarFocus: ["subjunctive with doubt", "compound subjunctive"], vocabTarget: ["psychology", "mental health", "behavior"] },
-      { title: "Filosofia e ética", theme: "philosophy", description: "Debates éticos, dilemas morais, pensamento crítico", grammarFocus: ["complex conditionals", "subjunctive nuances"], vocabTarget: ["philosophy", "ethics", "critical thinking"] },
-      { title: "Arquitectura e urbanismo", theme: "architecture", description: "Arquitectura portuguesa, Manuelino, urbanismo moderno", grammarFocus: ["passive se", "narrative tenses"], vocabTarget: ["architecture", "urban planning", "design"] },
-      { title: "Marketing e publicidade", theme: "marketing", description: "Campanhas, marca pessoal, comunicação persuasiva", grammarFocus: ["conditional", "imperative basic"], vocabTarget: ["marketing", "advertising", "branding"] },
-      { title: "Jornalismo e reportagem", theme: "journalism", description: "Escrever artigos, reportagem, jornalismo de investigação", grammarFocus: ["reported speech intro", "narrative tenses"], vocabTarget: ["journalism", "reporting", "media writing"] },
-      { title: "Diplomacia e relações internacionais", theme: "diplomacy", description: "UE, ONU, negociações, tratados", grammarFocus: ["formal subjunctive", "discourse connectors"], vocabTarget: ["diplomacy", "international relations", "treaties"] },
-      { title: "Empreendedorismo e startups", theme: "startups", description: "Criar empresa, financiamento, pitch, inovação", grammarFocus: ["future perfect", "conditional sentences"], vocabTarget: ["entrepreneurship", "startups", "funding"] },
-      { title: "Saúde pública e epidemiologia", theme: "public_health", description: "SNS, vacinação, pandemias, políticas de saúde", grammarFocus: ["impersonal constructions", "passive voice"], vocabTarget: ["public health", "healthcare system", "epidemiology"] },
-      { title: "Turismo e hospitalidade", theme: "hospitality", description: "Hotelaria, turismo rural, gastronomia, guias", grammarFocus: ["conditional", "subjunctive with emotions"], vocabTarget: ["tourism", "hospitality", "service industry"] },
-      { title: "Agricultura e pecuária", theme: "agriculture", description: "Vinho, azeite, cortiça, agricultura biológica", grammarFocus: ["passive se", "gerund vs infinitive"], vocabTarget: ["agriculture", "farming", "Portuguese products"] },
-      { title: "Energia e sustentabilidade", theme: "energy", description: "Energias renováveis, transição energética, pegada ecológica", grammarFocus: ["future subjunctive", "complex conditionals"], vocabTarget: ["energy", "sustainability", "climate"] },
-      { title: "Transportes e logística", theme: "logistics", description: "Cadeias de abastecimento, importação, exportação", grammarFocus: ["compound tenses intro", "formal register"], vocabTarget: ["logistics", "supply chain", "trade"] },
-      { title: "Comunicação empresarial", theme: "corporate_comms", description: "Apresentações, relatórios, reuniões formais", grammarFocus: ["formal subjunctive", "abstract nominalization"], vocabTarget: ["business writing", "presentations", "reports"] },
-      { title: "Mediação e resolução de conflitos", theme: "mediation", description: "Negociação, mediação, conciliação, arbitragem", grammarFocus: ["subjunctive nuances", "conditional sentences"], vocabTarget: ["mediation", "conflict resolution", "negotiation"] },
-      { title: "Linguística e tradução", theme: "linguistics", description: "Análise linguística, tradução, interpretação simultânea", grammarFocus: ["abstract nominalization", "register variation"], vocabTarget: ["linguistics", "translation", "interpretation"] },
-      { title: "Cinema e audiovisual", theme: "cinema", description: "Cinema português, análise fílmica, documentário", grammarFocus: ["narrative tenses", "relative pronouns"], vocabTarget: ["cinema", "film analysis", "documentary"] },
-      { title: "Gastronomia avançada", theme: "gastronomy", description: "Vinhos, queijos, pastelaria, cozinha de autor", grammarFocus: ["idiomatic usage", "passive se"], vocabTarget: ["gastronomy", "wine", "pastry"] },
-      { title: "Desporto e cultura física", theme: "sports_culture", description: "Comentário desportivo, análise táctica, história do desporto", grammarFocus: ["preterite vs imperfect", "discourse connectors"], vocabTarget: ["sports commentary", "tactics", "sports history"] },
-      { title: "Sociologia e demografia", theme: "sociology", description: "Estruturas sociais, migrações, envelhecimento, desigualdade", grammarFocus: ["impersonal constructions", "compound subjunctive"], vocabTarget: ["sociology", "demographics", "inequality"] },
-      { title: "Relações laborais", theme: "labour_relations", description: "Sindicatos, negociação colectiva, direitos dos trabalhadores", grammarFocus: ["formal subjunctive", "passive voice"], vocabTarget: ["labour relations", "unions", "workers' rights"] },
-      { title: "Urbanismo e habitação", theme: "urban_housing", description: "Arrendamento, reabilitação urbana, políticas de habitação", grammarFocus: ["complex conditionals", "impersonal constructions"], vocabTarget: ["housing", "urban renewal", "rental market"] },
-      { title: "Voluntariado e ONG", theme: "volunteering", description: "Solidariedade, missões humanitárias, cooperação para o desenvolvimento", grammarFocus: ["subjunctive with emotions", "gerund vs infinitive"], vocabTarget: ["volunteering", "NGOs", "humanitarian aid"] },
-      { title: "Segurança e defesa", theme: "security_defence", description: "Forças armadas, NATO, proteção civil, cibersegurança", grammarFocus: ["passive se", "compound subjunctive"], vocabTarget: ["security", "defence", "civil protection"] },
-      { title: "Propriedade intelectual", theme: "intellectual_property", description: "Patentes, direitos de autor, marcas registadas", grammarFocus: ["formal register", "abstract nominalization"], vocabTarget: ["intellectual property", "patents", "copyright"] },
-      { title: "Oceanografia e recursos marinhos", theme: "oceanography", description: "Mar português, pesca, aquacultura, economia azul", grammarFocus: ["narrative tenses", "passive se"], vocabTarget: ["oceanography", "marine resources", "blue economy"] },
-      { title: "Inteligência artificial e ética", theme: "ai_ethics", description: "Automação, privacidade, viés algorítmico, regulação", grammarFocus: ["conditional sentences", "subjunctive nuances"], vocabTarget: ["artificial intelligence", "ethics", "regulation"] },
-      { title: "Património cultural", theme: "cultural_heritage", description: "UNESCO, monumentos, tradições, preservação", grammarFocus: ["archaic forms", "discourse connectors"], vocabTarget: ["cultural heritage", "monuments", "preservation"] },
-      { title: "Comunicação intercultural", theme: "intercultural_comms", description: "Choque cultural, adaptação, mediação entre comunidades", grammarFocus: ["register variation", "complex conditionals"], vocabTarget: ["intercultural communication", "culture shock", "adaptation"] },
-      { title: "Finanças pessoais", theme: "personal_finance", description: "Poupança, impostos, crédito, literacia financeira", grammarFocus: ["conditional sentences", "formal register"], vocabTarget: ["personal finance", "taxes", "financial literacy"] },
+      { title: "Trabalho e carreira", theme: "career", description: "Carreiras, currículo, entrevistas, experiência profissional, progressão, ambiente profissional", grammarFocus: ["pluperfect subjunctive", "complex conditionals"], vocabTarget: ["career", "CV", "interviews", "professional growth"] },
+      { title: "Universidade e investigação", theme: "university", description: "Ensino superior, investigação, trabalhos académicos, hipóteses, resultados", grammarFocus: ["future perfect", "formal register"], vocabTarget: ["university", "research", "academic writing", "methodology"] },
+      { title: "Negócios e dinheiro", theme: "business", description: "Empresas, investimento, mercado, lucros e prejuízos, negociação, finanças", grammarFocus: ["conditional sentences", "formal register"], vocabTarget: ["business", "finance", "investment", "negotiation"] },
+      { title: "Tecnologia e sociedade", theme: "technology", description: "Tecnologia, digitalização, IA, redes sociais, privacidade, impacto social", grammarFocus: ["compound tenses intro", "gerund vs infinitive"], vocabTarget: ["technology", "AI", "social media", "privacy"] },
+      { title: "Ciência e descoberta", theme: "science", description: "Ciência, experiências, descobertas, evidência, hipóteses, explicações científicas", grammarFocus: ["compound subjunctive", "abstract nominalization"], vocabTarget: ["science", "research", "discovery", "methodology"] },
+      { title: "Ambiente e alterações climáticas", theme: "climate", description: "Ambiente, clima, sustentabilidade, poluição, energia, alterações climáticas", grammarFocus: ["imperfect subjunctive", "conditional sentences"], vocabTarget: ["environment", "climate", "sustainability", "energy"] },
+      { title: "Saúde e sociedade", theme: "public_health", description: "Saúde pública, medicina, prevenção, sistemas de saúde, comportamentos, debate social", grammarFocus: ["impersonal constructions", "passive voice"], vocabTarget: ["public health", "healthcare", "prevention", "social debate"] },
+      { title: "Política e cidadania", theme: "politics", description: "Cidadania, estado, participação cívica, eleições, instituições, debate público", grammarFocus: ["subjunctive in relative clauses", "passive se"], vocabTarget: ["politics", "citizenship", "elections", "civic participation"] },
+      { title: "Direitos, leis e justiça", theme: "law", description: "Direitos, obrigações, leis, tribunais, justiça, linguagem jurídica básica", grammarFocus: ["passive voice", "formal register"], vocabTarget: ["rights", "law", "courts", "justice"] },
+      { title: "Economia e vida quotidiana", theme: "economy", description: "Inflação, salários, habitação, impostos, consumo, economia doméstica", grammarFocus: ["conditional", "por/para distinction"], vocabTarget: ["economy", "salaries", "taxes", "cost of living"] },
+      { title: "Portugal no mundo", theme: "world", description: "Portugal e Europa, relações internacionais, migração, lusofonia, identidade, globalização", grammarFocus: ["narrative tenses", "discourse connectors"], vocabTarget: ["international relations", "migration", "lusophone world", "identity"] },
+      { title: "História de Portugal", theme: "history", description: "Períodos históricos, descobrimentos, Estado Novo, revolução, democracia, personagens históricas", grammarFocus: ["literary tenses", "narrative tenses"], vocabTarget: ["Portuguese history", "discoveries", "revolution", "democracy"] },
+      { title: "Cultura portuguesa", theme: "culture", description: "Música, literatura, arte, tradições, cultura popular, identidade portuguesa", grammarFocus: ["relative pronouns", "subjunctive with emotions"], vocabTarget: ["culture", "music", "traditions", "Portuguese identity"] },
+      { title: "Literatura e livros", theme: "literature", description: "Géneros literários, autores, narrativa, poesia, interpretação, linguagem literária", grammarFocus: ["literary tenses", "mesoclisis"], vocabTarget: ["literature", "genres", "authors", "literary analysis"] },
+      { title: "Cinema e televisão", theme: "cinema", description: "Filmes, séries, crítica narrativa, personagens, opiniões complexas", grammarFocus: ["narrative tenses", "relative pronouns"], vocabTarget: ["cinema", "TV", "film analysis", "criticism"] },
+      { title: "Arte e criatividade", theme: "art", description: "Pintura, escultura, fotografia, design, criatividade, crítica artística", grammarFocus: ["subjunctive in relative clauses", "passive se"], vocabTarget: ["art", "design", "creativity", "art criticism"] },
+      { title: "Viagens fora do roteiro", theme: "offbeat_travel", description: "Viagens independentes, experiências culturais, imprevistos, recomendações, narrativas", grammarFocus: ["preterite vs imperfect", "discourse connectors"], vocabTarget: ["independent travel", "cultural experiences", "recommendations"] },
+      { title: "Turismo e hospitalidade", theme: "hospitality", description: "Hotelaria, turismo, atendimento, reclamações, experiência do cliente", grammarFocus: ["conditional", "subjunctive with emotions"], vocabTarget: ["tourism", "hospitality", "service industry", "complaints"] },
+      { title: "Comida, vinho e gastronomia", theme: "gastronomy", description: "Gastronomia, vinhos, regiões, degustação, restaurantes, vocabulário especializado", grammarFocus: ["idiomatic usage", "passive se"], vocabTarget: ["gastronomy", "wine", "regional cuisine", "tasting"] },
+      { title: "Desporto e sociedade", theme: "sports_society", description: "Competições, clubes, adeptos, media, negócio do desporto, identidade coletiva", grammarFocus: ["preterite vs imperfect", "discourse connectors"], vocabTarget: ["sports", "competitions", "fandom", "sports media"] },
+      { title: "Media e notícias", theme: "media", description: "Notícias, jornalismo, fontes, manchetes, informação e desinformação, narrativa mediática", grammarFocus: ["reported speech intro", "narrative tenses"], vocabTarget: ["news", "journalism", "sources", "misinformation"] },
+      { title: "Publicidade e influência", theme: "advertising", description: "Publicidade, marketing, persuasão, marcas, comportamento do consumidor", grammarFocus: ["conditional", "imperative basic"], vocabTarget: ["advertising", "marketing", "persuasion", "consumer behavior"] },
+      { title: "Psicologia e comportamento", theme: "psychology", description: "Emoções, comportamento, relações sociais, hábitos, perceções, explicações psicológicas", grammarFocus: ["subjunctive with doubt", "compound subjunctive"], vocabTarget: ["psychology", "behavior", "emotions", "relationships"] },
+      { title: "Relações, conflito e negociação", theme: "conflict", description: "Conflitos, negociação, limites, compromissos, estratégias comunicativas", grammarFocus: ["subjunctive nuances", "conditional sentences"], vocabTarget: ["conflict resolution", "negotiation", "compromise", "diplomacy"] },
+      { title: "Humor, ironia e sarcasmo", theme: "humor_irony", description: "Humor, ironia, sarcasmo, duplo sentido, subentendidos, contexto cultural", grammarFocus: ["idiomatic usage", "stylistic choices"], vocabTarget: ["humor", "irony", "sarcasm", "double meaning"] },
+      { title: "Expressões e provérbios", theme: "idioms", description: "Expressões idiomáticas, provérbios, metáforas, linguagem figurada, origem e contexto", grammarFocus: ["idiomatic usage", "register variation"], vocabTarget: ["idioms", "proverbs", "metaphors", "figurative language"] },
+      { title: "Gíria e linguagem informal", theme: "informal_speech", description: "Gíria, calão, abreviaturas, internet, linguagem jovem, registo informal", grammarFocus: ["register variation", "regional variation"], vocabTarget: ["slang", "informal speech", "internet language", "youth speak"] },
+      { title: "Falar de forma formal", theme: "formal_speech", description: "Registo formal, cortesia, comunicação profissional, pedidos, reclamações, reformulação", grammarFocus: ["formal subjunctive", "impersonal constructions"], vocabTarget: ["formal register", "courtesy", "professional communication"] },
+      { title: "Argumentar e defender uma ideia", theme: "argumentation", description: "Argumentação, evidência, contra-argumentos, concordância e discordância, estrutura lógica", grammarFocus: ["advanced connectors", "subjunctive nuances"], vocabTarget: ["argumentation", "evidence", "debate", "persuasion"] },
+      { title: "Conversas reais", theme: "real_conversations", description: "Conversação espontânea, interrupções, reformulação, hesitação, subentendidos, registo, fluência", grammarFocus: ["all tenses review", "pronoun placement"], vocabTarget: ["spontaneous speech", "hesitation", "reformulation", "fluency"] },
+      { title: "Trabalho em equipa", theme: "teamwork", description: "Colaboração, responsabilidades, delegação, reuniões, dar e receber feedback", grammarFocus: ["formal register", "conditional"], vocabTarget: ["teamwork", "collaboration", "meetings", "feedback"] },
+      { title: "Entrevistas e carreira", theme: "job_interviews", description: "Entrevistas de emprego, currículo, experiência profissional, qualificações, objetivos", grammarFocus: ["conditional sentences", "future subjunctive"], vocabTarget: ["job interviews", "qualifications", "career goals", "professional skills"] },
+      { title: "Universidade e investigação", theme: "academic", description: "Ensino superior, trabalhos académicos, investigação, fontes, hipóteses e conclusões", grammarFocus: ["abstract nominalization", "formal register"], vocabTarget: ["academic writing", "research", "sources", "conclusions"] },
+      { title: "Tecnologia do quotidiano", theme: "everyday_tech", description: "Aplicações, inteligência artificial, privacidade, segurança digital, automação", grammarFocus: ["gerund vs infinitive", "compound tenses intro"], vocabTarget: ["technology", "AI", "digital security", "automation"] },
+      { title: "Ambiente e sustentabilidade", theme: "sustainability", description: "Alterações climáticas, energia, reciclagem, consumo, sustentabilidade, políticas ambientais", grammarFocus: ["future subjunctive", "complex conditionals"], vocabTarget: ["sustainability", "recycling", "energy policy", "green economy"] },
+      { title: "Sociedade e mudança", theme: "social_change", description: "Mudanças sociais, gerações, desigualdade, migração, comunidade, transformações culturais", grammarFocus: ["compound subjunctive", "narrative tenses"], vocabTarget: ["social change", "inequality", "generations", "migration"] },
+      { title: "Notícias e informação", theme: "news_literacy", description: "Notícias, jornalismo, fontes, manchetes, opinião, desinformação, facto vs interpretação", grammarFocus: ["passive voice", "reported speech intro"], vocabTarget: ["news literacy", "fact-checking", "media analysis", "opinion"] },
+      { title: "Comunicação e conflito", theme: "communication_conflict", description: "Desacordos, reclamações, negociação, compromissos, diplomacia, resolver mal-entendidos", grammarFocus: ["conditional sentences", "subjunctive nuances"], vocabTarget: ["conflict communication", "complaints", "compromise", "diplomacy"] },
+      { title: "Linguagem, humor e cultura", theme: "language_culture", description: "Ironia, humor, expressões idiomáticas, referências culturais, linguagem informal, memes e cultura digital", grammarFocus: ["stylistic choices", "idiomatic usage"], vocabTarget: ["cultural references", "memes", "digital culture", "humor"] },
+      { title: "Conversas sem guião", theme: "unscripted", description: "Conversação espontânea, interrupções, hesitações, reformulação, marcadores discursivos, fala natural", grammarFocus: ["discourse connectors", "register variation"], vocabTarget: ["spontaneous speech", "discourse markers", "natural talk", "register switching"] },
     ],
   },
-  // ── S4 Avançado (C1-C2) ── 50 units, 9→7 lições/unit ──
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // S4 Avancado (C1-C2) — 50 units — "Dominar nuance, registo, argumentação, humor"
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   {
     title: { pt: "Secção 4 - Avançado", en: "Section 4 - Advanced" },
-    description: { pt: "Domínio nativo: nuances, produção criativa, registo literário e variação regional", en: "Native-level mastery: nuances, creative production, literary register and regional variation" },
+    description: { pt: "Domínio avançado: nuances, produção criativa, registo literário, argumentação e variação regional", en: "Advanced mastery: nuances, creative production, literary register, argumentation and regional variation" },
     sectionType: "numbered",
     cefrMin: "C1",
     cefrMax: "C2",
     lessonsPerUnitStart: 9,
     lessonsPerUnitEnd: 7,
     units: [
-      { title: "Domínio nativo", theme: "mastery", description: "Nuances, humor, duplo sentido, registos", grammarFocus: ["all tenses review", "regional variation"], vocabTarget: ["nuance", "humor", "register"] },
-      { title: "Produção criativa", theme: "creative", description: "Escrita criativa, tradução, adaptação", grammarFocus: ["stylistic choices", "creative grammar"], vocabTarget: ["creative writing", "translation", "adaptation"] },
-      { title: "Análise crítica de textos", theme: "critical_analysis", description: "Desconstruir argumentos, identificar falácias, avaliar fontes", grammarFocus: ["discourse connectors", "subjunctive nuances"], vocabTarget: ["critical analysis", "argumentation", "fallacies"] },
-      { title: "Escrita académica", theme: "academic_writing", description: "Teses, artigos científicos, citação, estilo académico", grammarFocus: ["impersonal constructions", "abstract nominalization"], vocabTarget: ["academic writing", "citations", "methodology"] },
-      { title: "Debate parlamentar", theme: "parliamentary", description: "Linguagem parlamentar, intervenções, moções, interpelações", grammarFocus: ["formal subjunctive", "complex conditionals"], vocabTarget: ["parliament", "legislative language", "political debate"] },
-      { title: "Tradução literária", theme: "literary_translation", description: "Traduzir poesia, prosa, teatro, manter registo e ritmo", grammarFocus: ["stylistic devices", "mesoclisis"], vocabTarget: ["literary translation", "adaptation", "register"] },
-      { title: "Sociolinguística portuguesa", theme: "sociolinguistics", description: "Variação social, prestígio, estigma, mudança linguística", grammarFocus: ["register variation", "regional variation"], vocabTarget: ["sociolinguistics", "variation", "prestige"] },
-      { title: "Pragmática e implicatura", theme: "pragmatics", description: "O que se diz vs o que se quer dizer, actos de fala", grammarFocus: ["subjunctive nuances", "conditional sentences"], vocabTarget: ["pragmatics", "implicature", "speech acts"] },
-      { title: "Etimologia e história da língua", theme: "etymology", description: "Do latim ao português, empréstimos, evolução fonética", grammarFocus: ["archaic forms", "literary tenses"], vocabTarget: ["etymology", "language history", "Latin roots"] },
-      { title: "Dialectologia portuguesa", theme: "dialectology", description: "Dialectos do Norte, Centro, Sul, Açores, Madeira", grammarFocus: ["regional variation", "idiomatic usage"], vocabTarget: ["dialects", "regional speech", "phonetic variation"] },
-      { title: "Poesia e métrica", theme: "poetry", description: "Soneto, redondilha, verso livre, rima, ritmo", grammarFocus: ["stylistic devices", "archaic forms"], vocabTarget: ["poetry", "meter", "verse forms"] },
-      { title: "Teatro e dramaturgia", theme: "theatre", description: "Gil Vicente, Garrett, teatro contemporâneo, monólogo", grammarFocus: ["narrative tenses", "stylistic choices"], vocabTarget: ["theatre", "dramaturgy", "performance"] },
-      { title: "Ensaio e opinião", theme: "essay", description: "Ensaio argumentativo, crónica, coluna de opinião", grammarFocus: ["advanced connectors", "formal subjunctive"], vocabTarget: ["essay", "opinion writing", "chronicle"] },
-      { title: "Oratória e discurso público", theme: "oratory", description: "Técnicas de persuasão, discursos, comunicação pública", grammarFocus: ["discourse connectors", "impersonal constructions"], vocabTarget: ["oratory", "public speaking", "persuasion"] },
-      { title: "Negociação avançada", theme: "negotiation", description: "Estratégias, concessões, diplomacia comercial", grammarFocus: ["conditional sentences", "subjunctive nuances"], vocabTarget: ["negotiation", "strategy", "compromise"] },
-      { title: "Terminologia jurídica", theme: "legal_terminology", description: "Código civil, contratos, linguagem dos tribunais", grammarFocus: ["formal subjunctive", "passive se"], vocabTarget: ["legal terminology", "civil code", "court language"] },
-      { title: "Terminologia médica", theme: "medical_terminology", description: "Anatomia, diagnóstico, relatórios clínicos", grammarFocus: ["abstract nominalization", "compound subjunctive"], vocabTarget: ["medical terminology", "clinical reports", "diagnosis"] },
-      { title: "Terminologia técnica", theme: "technical_terminology", description: "Engenharia, informática, especificações técnicas", grammarFocus: ["passive voice", "gerund vs infinitive"], vocabTarget: ["technical writing", "specifications", "engineering"] },
-      { title: "Humor e sátira", theme: "humor", description: "Ironia, sarcasmo, paródia, comédia portuguesa", grammarFocus: ["idiomatic usage", "stylistic choices"], vocabTarget: ["humor", "satire", "irony"] },
-      { title: "Provérbios e sabedoria popular", theme: "proverbs", description: "Ditados, provérbios, sabedoria tradicional portuguesa", grammarFocus: ["archaic forms", "idiomatic usage"], vocabTarget: ["proverbs", "folk wisdom", "traditional sayings"] },
-      { title: "Calão e gíria", theme: "slang", description: "Gíria jovem, calão urbano, linguagem coloquial", grammarFocus: ["register variation", "regional variation"], vocabTarget: ["slang", "colloquial speech", "informal register"] },
-      { title: "Variação lusófona", theme: "lusophone_variation", description: "Português do Brasil, África, Timor, Macau", grammarFocus: ["regional variation", "pronoun placement"], vocabTarget: ["Brazilian Portuguese", "African Portuguese", "Lusophone world"] },
-      { title: "Textos históricos", theme: "historical_texts", description: "Carta de Pero Vaz de Caminha, crónicas medievais", grammarFocus: ["archaic forms", "literary tenses"], vocabTarget: ["historical texts", "medieval chronicles", "archaic language"] },
-      { title: "Crítica de arte e cultura", theme: "art_criticism", description: "Recensão, crítica musical, análise de exposições", grammarFocus: ["stylistic devices", "abstract nominalization"], vocabTarget: ["art criticism", "reviews", "cultural analysis"] },
-      { title: "Mediação intercultural", theme: "intercultural", description: "Comunicação entre culturas, mal-entendidos, integração", grammarFocus: ["conditional sentences", "register variation"], vocabTarget: ["intercultural communication", "cultural mediation", "integration"] },
-      { title: "Escrita jornalística avançada", theme: "advanced_journalism", description: "Reportagem longa, jornalismo narrativo, investigação", grammarFocus: ["narrative tenses", "discourse connectors"], vocabTarget: ["longform journalism", "narrative writing", "investigation"] },
-      { title: "Correspondência diplomática", theme: "diplomatic_correspondence", description: "Notas verbais, protocolos, linguagem protocolar", grammarFocus: ["formal subjunctive", "impersonal constructions"], vocabTarget: ["diplomatic writing", "protocol", "formal correspondence"] },
-      { title: "Análise do discurso político", theme: "political_discourse", description: "Propaganda, spin, framing, análise de campanha", grammarFocus: ["subjunctive nuances", "complex conditionals"], vocabTarget: ["political discourse", "propaganda analysis", "framing"] },
-      { title: "Retórica publicitária", theme: "advertising_rhetoric", description: "Slogans, copywriting, linguagem persuasiva comercial", grammarFocus: ["stylistic choices", "imperative basic"], vocabTarget: ["advertising", "copywriting", "persuasive language"] },
-      { title: "Escrita criativa avançada", theme: "advanced_creative", description: "Narrativa experimental, autoficção, microconto, crónica", grammarFocus: ["creative grammar", "stylistic devices"], vocabTarget: ["experimental fiction", "autofiction", "flash fiction"] },
-      { title: "Fonética avançada", theme: "advanced_phonetics", description: "Entoação, prosódia, sotaques regionais, pares mínimos", grammarFocus: ["regional variation", "register variation"], vocabTarget: ["phonetics", "prosody", "intonation"] },
-      { title: "Semântica e polissemia", theme: "semantics", description: "Campos semânticos, ambiguidade, conotação, denotação", grammarFocus: ["idiomatic usage", "abstract nominalization"], vocabTarget: ["semantics", "polysemy", "connotation"] },
-      { title: "Morfologia derivacional", theme: "derivation", description: "Prefixos, sufixos, composição, neologismos", grammarFocus: ["abstract nominalization", "creative grammar"], vocabTarget: ["word formation", "derivation", "neologisms"] },
-      { title: "Sintaxe complexa", theme: "complex_syntax", description: "Orações encaixadas, topicalização, clivagem", grammarFocus: ["impersonal constructions", "complex conditionals"], vocabTarget: ["complex syntax", "embedding", "topicalization"] },
-      { title: "Discurso académico oral", theme: "academic_oral", description: "Conferências, defesas de tese, painéis, moderação", grammarFocus: ["formal subjunctive", "discourse connectors"], vocabTarget: ["academic presentations", "thesis defense", "panels"] },
-      { title: "Escrita técnico-científica", theme: "scientific_writing", description: "Artigos, relatórios laboratoriais, abstracts", grammarFocus: ["passive se", "abstract nominalization"], vocabTarget: ["scientific writing", "lab reports", "abstracts"] },
-      { title: "Interpretação simultânea", theme: "interpreting", description: "Técnicas de interpretação, memória, reformulação", grammarFocus: ["pronoun placement", "gerund vs infinitive"], vocabTarget: ["interpreting", "reformulation", "memory techniques"] },
-      { title: "Análise de imprensa", theme: "press_analysis", description: "Editoriais, manchetes, viés mediático, fact-checking", grammarFocus: ["narrative tenses", "subjunctive nuances"], vocabTarget: ["press analysis", "media bias", "fact-checking"] },
-      { title: "Filosofia da linguagem", theme: "language_philosophy", description: "Wittgenstein, Saussure, significado e referência", grammarFocus: ["complex conditionals", "impersonal constructions"], vocabTarget: ["philosophy of language", "meaning", "reference"] },
-      { title: "Cultura empresarial portuguesa", theme: "corporate_culture", description: "Hierarquia, networking, cultura de reunião, horários", grammarFocus: ["formal subjunctive", "register variation"], vocabTarget: ["corporate culture", "networking", "Portuguese business"] },
-      { title: "Direito internacional", theme: "international_law", description: "Tratados, direito europeu, asilo, extradição", grammarFocus: ["passive voice", "compound subjunctive"], vocabTarget: ["international law", "EU law", "asylum"] },
-      { title: "Economia portuguesa", theme: "portuguese_economy", description: "Sectores, exportações, turismo, investimento estrangeiro", grammarFocus: ["narrative tenses", "conditional sentences"], vocabTarget: ["Portuguese economy", "sectors", "foreign investment"] },
-      { title: "Pedagogia e didáctica", theme: "pedagogy", description: "Ensinar português, métodos, avaliação, currículo", grammarFocus: ["conditional sentences", "subjunctive nuances"], vocabTarget: ["pedagogy", "teaching methods", "assessment"] },
-      { title: "Redacção publicitária avançada", theme: "advanced_copywriting", description: "Storytelling de marca, tom de voz, branded content", grammarFocus: ["stylistic choices", "idiomatic usage"], vocabTarget: ["brand storytelling", "tone of voice", "content marketing"] },
-      { title: "Antropologia cultural", theme: "anthropology", description: "Rituais, identidade, globalização, etnografia", grammarFocus: ["abstract nominalization", "discourse connectors"], vocabTarget: ["anthropology", "cultural identity", "ethnography"] },
-      { title: "Ecologia e biodiversidade", theme: "ecology", description: "Ecossistemas portugueses, Ria Formosa, Gerês, conservação", grammarFocus: ["passive se", "complex conditionals"], vocabTarget: ["ecology", "biodiversity", "conservation"] },
-      { title: "Música erudita e popular", theme: "music_theory", description: "Teoria musical, fado, música de intervenção, ópera", grammarFocus: ["archaic forms", "register variation"], vocabTarget: ["music theory", "fado history", "intervention music"] },
-      { title: "Urbanismo e mobilidade", theme: "urbanism", description: "Cidades inteligentes, gentrificação, mobilidade sustentável", grammarFocus: ["compound subjunctive", "formal register"], vocabTarget: ["urbanism", "gentrification", "sustainable mobility"] },
-      { title: "Geopolítica lusófona", theme: "lusophone_geopolitics", description: "CPLP, relações pós-coloniais, cooperação, diplomacia", grammarFocus: ["complex conditionals", "narrative tenses"], vocabTarget: ["geopolitics", "CPLP", "post-colonial relations"] },
-      { title: "Revisão e edição de texto", theme: "editing", description: "Revisão linguística, estilo, coerência, coesão textual", grammarFocus: ["discourse connectors", "stylistic choices"], vocabTarget: ["text editing", "proofreading", "cohesion"] },
+      { title: "Falar com precisão", theme: "precision", description: "Escolha lexical, nuances entre palavras próximas, precisão semântica, reformulação, evitar ambiguidades", grammarFocus: ["all tenses review", "register variation"], vocabTarget: ["lexical precision", "synonyms", "reformulation", "register"] },
+      { title: "Nuances e subtilezas", theme: "nuance", description: "Subentendidos, implicaturas, ironia subtil, atenuação, intensificação, sentido contextual", grammarFocus: ["subjunctive nuances", "conditional sentences"], vocabTarget: ["implicature", "attenuation", "intensification", "context"] },
+      { title: "Humor português", theme: "pt_humor", description: "Humor português, referências culturais, ironia, sarcasmo, absurdo, humor de situação", grammarFocus: ["idiomatic usage", "stylistic choices"], vocabTarget: ["humor", "cultural references", "irony", "wordplay"] },
+      { title: "Memes, Internet e cultura digital", theme: "memes", description: "Memes portugueses, linguagem online, abreviaturas, referências virais, humor digital", grammarFocus: ["register variation", "creative grammar"], vocabTarget: ["memes", "internet language", "viral references", "digital culture"] },
+      { title: "Gíria, calão e linguagem de rua", theme: "street_language", description: "Gíria, calão, expressões populares, linguagem juvenil, registo informal", grammarFocus: ["regional variation", "register variation"], vocabTarget: ["slang", "colloquial speech", "informal register", "youth language"] },
+      { title: "Provérbios e sabedoria popular", theme: "proverbs", description: "Provérbios, expressões tradicionais, metáforas, valores culturais, uso em contexto", grammarFocus: ["archaic forms", "idiomatic usage"], vocabTarget: ["proverbs", "folk wisdom", "traditional sayings", "metaphors"] },
+      { title: "Ironia, sarcasmo e subentendidos", theme: "irony", description: "Ironia, sarcasmo, eufemismo, litote, pergunta retórica, contraste literal e implícito", grammarFocus: ["stylistic devices", "subjunctive nuances"], vocabTarget: ["irony", "sarcasm", "euphemism", "rhetorical devices"] },
+      { title: "Debater sem perder o fio", theme: "debate", description: "Estrutura argumentativa, conectores discursivos, retoma de ideias, contraposição, gestão de turnos", grammarFocus: ["discourse connectors", "advanced connectors"], vocabTarget: ["debate structure", "connectors", "turn management", "counterarguments"] },
+      { title: "Persuadir e argumentar", theme: "persuasion", description: "Argumentação avançada, evidência, contra-argumentação, estratégias persuasivas, apelo emocional e racional", grammarFocus: ["formal subjunctive", "complex conditionals"], vocabTarget: ["persuasion", "argumentation", "evidence", "rhetoric"] },
+      { title: "Negociar e resolver conflitos", theme: "negotiation", description: "Negociação, concessão, compromisso, discordância diplomática, mediação", grammarFocus: ["conditional sentences", "subjunctive nuances"], vocabTarget: ["negotiation", "compromise", "mediation", "diplomacy"] },
+      { title: "Falar em público", theme: "public_speaking", description: "Discursos, apresentações, introdução e conclusão, ênfase, pausas, entoação, retórica", grammarFocus: ["discourse connectors", "impersonal constructions"], vocabTarget: ["public speaking", "presentations", "rhetoric", "intonation"] },
+      { title: "Entrevistas e apresentações profissionais", theme: "professional", description: "Entrevistas, apresentações profissionais, perguntas difíceis, comunicação persuasiva", grammarFocus: ["formal register", "conditional sentences"], vocabTarget: ["professional interviews", "presentations", "persuasive communication"] },
+      { title: "Reuniões e comunicação empresarial", theme: "corporate", description: "Reuniões, agenda, decisões, negociação, discordância profissional, follow-up", grammarFocus: ["formal subjunctive", "discourse connectors"], vocabTarget: ["meetings", "corporate communication", "decisions", "follow-up"] },
+      { title: "Escrever emails e mensagens formais", theme: "formal_writing", description: "Emails profissionais, pedidos, reclamações, respostas diplomáticas, cortesia linguística", grammarFocus: ["formal register", "impersonal constructions"], vocabTarget: ["formal email", "professional writing", "complaints", "courtesy"] },
+      { title: "Escrita académica", theme: "academic_writing", description: "Textos académicos, estrutura, citação, paráfrase, síntese, argumentação, registo académico", grammarFocus: ["impersonal constructions", "abstract nominalization"], vocabTarget: ["academic writing", "citations", "methodology", "academic register"] },
+      { title: "Textos jornalísticos", theme: "journalism", description: "Notícias, reportagens, editorial, entrevista, manchetes, estrutura jornalística", grammarFocus: ["narrative tenses", "passive se"], vocabTarget: ["journalism", "reporting", "editorial", "news writing"] },
+      { title: "Analisar notícias e opinião", theme: "news_analysis", description: "Facto vs opinião, enquadramento, argumentação, linguagem avaliativa, fontes", grammarFocus: ["reported speech intro", "subjunctive nuances"], vocabTarget: ["news analysis", "fact vs opinion", "framing", "media literacy"] },
+      { title: "Literatura portuguesa", theme: "pt_literature", description: "Autores, obras, géneros, contexto histórico, análise textual, interpretação", grammarFocus: ["literary tenses", "mesoclisis"], vocabTarget: ["Portuguese literature", "authors", "literary analysis", "interpretation"] },
+      { title: "Poesia e linguagem figurada", theme: "poetry", description: "Poesia, metáfora, símbolo, aliteração, anáfora, antítese, sinestesia, recursos expressivos", grammarFocus: ["stylistic devices", "archaic forms"], vocabTarget: ["poetry", "meter", "figurative language", "literary devices"] },
+      { title: "Teatro e diálogo", theme: "theatre", description: "Teatro, diálogo, monólogo, subtexto, personagens, registo, discurso direto", grammarFocus: ["narrative tenses", "stylistic choices"], vocabTarget: ["theatre", "dramaturgy", "dialogue", "subtexto"] },
+      { title: "Crítica de arte e cultura", theme: "art_criticism", description: "Crítica, avaliação, argumentação, linguagem estética, justificação de opiniões", grammarFocus: ["stylistic devices", "abstract nominalization"], vocabTarget: ["art criticism", "reviews", "cultural analysis", "aesthetics"] },
+      { title: "História e documentos", theme: "historical_texts", description: "Documentos históricos, fontes, narrativa histórica, interpretação, vocabulário histórico", grammarFocus: ["archaic forms", "literary tenses"], vocabTarget: ["historical texts", "chronicles", "archaic language", "interpretation"] },
+      { title: "Direito e linguagem jurídica", theme: "legal", description: "Contratos, legislação, direitos, deveres, obrigações, terminologia jurídica", grammarFocus: ["formal subjunctive", "passive se"], vocabTarget: ["legal terminology", "contracts", "legislation", "court language"] },
+      { title: "Ciência e linguagem técnica", theme: "scientific", description: "Textos científicos, hipóteses, métodos, resultados, causalidade, escrita científica", grammarFocus: ["passive se", "abstract nominalization"], vocabTarget: ["scientific writing", "methodology", "technical language", "causality"] },
+      { title: "Saúde e linguagem médica", theme: "medical", description: "Terminologia médica, consultas complexas, sintomas, diagnóstico, informação de saúde", grammarFocus: ["abstract nominalization", "compound subjunctive"], vocabTarget: ["medical terminology", "diagnosis", "clinical reports", "health info"] },
+      { title: "Política e discurso público", theme: "political_discourse", description: "Discurso político, debate público, retórica, argumentação, eufemismo, framing", grammarFocus: ["complex conditionals", "impersonal constructions"], vocabTarget: ["political discourse", "rhetoric", "propaganda", "framing"] },
+      { title: "Portugal, regiões e sotaques", theme: "dialects", description: "Variação regional, sotaques, vocabulário regional, Açores, Madeira, Norte, Centro, Sul", grammarFocus: ["regional variation", "idiomatic usage"], vocabTarget: ["dialects", "regional speech", "accents", "geographic variation"] },
+      { title: "Português através dos tempos", theme: "etymology", description: "Arcaísmos, evolução lexical, mudanças semânticas, neologismos, origem das palavras", grammarFocus: ["archaic forms", "literary tenses"], vocabTarget: ["etymology", "language history", "archaisms", "neologisms"] },
+      { title: "Criar, contar e escrever", theme: "creative_writing", description: "Escrita criativa, narrativa, descrição, diálogo, construção de personagens, coerência, estilo", grammarFocus: ["stylistic choices", "creative grammar"], vocabTarget: ["creative writing", "narrative", "style", "character building"] },
+      { title: "Português sem legendas", theme: "authentic_listening", description: "Listening avançado, fala espontânea, velocidade natural, redução vocálica, contrações", grammarFocus: ["all tenses review", "regional variation"], vocabTarget: ["authentic listening", "natural speech", "vowel reduction", "contractions"] },
+      { title: "O português que não se diz literalmente", theme: "implicature", description: "Implícito, pressuposição, implicatura, inferência, duplo sentido, intenção comunicativa", grammarFocus: ["subjunctive nuances", "stylistic devices"], vocabTarget: ["implicature", "presupposition", "inference", "double meaning"] },
+      { title: "Escolher a palavra certa", theme: "lexical_choice", description: "Sinónimos e quase-sinónimos, polissemia, homonímia, colocações, seleção lexical", grammarFocus: ["register variation", "idiomatic usage"], vocabTarget: ["synonyms", "polysemy", "collocations", "lexical precision"] },
+      { title: "Frases longas sem te perderes", theme: "complex_syntax", description: "Coordenação, subordinação, orações relativas, completivas, condicionais, coesão sintática", grammarFocus: ["complex conditionals", "impersonal constructions"], vocabTarget: ["complex syntax", "subordination", "relative clauses", "cohesion"] },
+      { title: "Quem fez o quê?", theme: "voice_focus", description: "Voz ativa, voz passiva, construções impessoais, se impessoal, foco informacional", grammarFocus: ["passive se", "passive voice"], vocabTarget: ["voice", "impersonal constructions", "focus", "perspective"] },
+      { title: "Tempo, aspeto e perspetiva", theme: "tense_aspect", description: "Pretéritos, futuro, condicional, aspeto, duração, iteração, relações temporais complexas", grammarFocus: ["narrative tenses", "compound tenses intro"], vocabTarget: ["tense", "aspect", "temporal relations", "duration"] },
+      { title: "Certeza, dúvida, desejo e obrigação", theme: "modality", description: "Modalidade, possibilidade, probabilidade, certeza, necessidade, obrigação, desejo", grammarFocus: ["subjunctive nuances", "conditional sentences"], vocabTarget: ["modality", "possibility", "obligation", "desire"] },
+      { title: "Dizer sem dizer diretamente", theme: "indirectness", description: "Cortesia, atenuação, estratégias indiretas, pedidos indiretos, recusas, preservação da face", grammarFocus: ["formal subjunctive", "conditional"], vocabTarget: ["politeness", "indirect speech", "face-saving", "attenuation"] },
+      { title: "Como o discurso se organiza", theme: "discourse", description: "Coerência, coesão, conectores, progressão temática, referência, elipse", grammarFocus: ["discourse connectors", "advanced connectors"], vocabTarget: ["discourse structure", "cohesion", "thematic progression", "connectors"] },
+      { title: "Contar exatamente o que alguém disse", theme: "reported_speech", description: "Discurso direto, indireto, indireto livre, verbos de elocução, alteração de tempos", grammarFocus: ["reported speech intro", "narrative tenses"], vocabTarget: ["reported speech", "speech verbs", "tense shifting", "quotation"] },
+      { title: "Ver o mundo através das palavras", theme: "deixis", description: "Deixis pessoal, temporal, espacial, contexto, referência, perspetiva do falante", grammarFocus: ["pronoun placement", "demonstratives"], vocabTarget: ["deixis", "context", "reference", "speaker perspective"] },
+      { title: "Palavras que nasceram ontem", theme: "neologisms", description: "Neologismos, internet, tecnologia, empréstimos, formação de palavras, produtividade lexical", grammarFocus: ["creative grammar", "abstract nominalization"], vocabTarget: ["neologisms", "word formation", "derivation", "borrowings"] },
+      { title: "Palavras que já quase desapareceram", theme: "archaisms", description: "Arcaísmos, vocabulário histórico, mudança lexical, textos antigos, formas antigas", grammarFocus: ["archaic forms", "literary tenses"], vocabTarget: ["archaisms", "historical vocabulary", "language change", "old texts"] },
+      { title: "Português e outras línguas", theme: "comparative", description: "Empréstimos, estrangeirismos, falsos amigos, influências linguísticas, comparação lexical", grammarFocus: ["register variation", "idiomatic usage"], vocabTarget: ["borrowings", "false friends", "linguistic influence", "comparison"] },
+      { title: "Ler nas entrelinhas", theme: "intertextuality", description: "Intertextualidade, citação, epígrafe, alusão, paráfrase, paródia, referências culturais", grammarFocus: ["stylistic devices", "literary tenses"], vocabTarget: ["intertextuality", "allusion", "parody", "cultural references"] },
+      { title: "Quando uma palavra muda tudo", theme: "semantics", description: "Polissemia, ambiguidade, metáfora, metonímia, sinédoque, personificação", grammarFocus: ["stylistic choices", "idiomatic usage"], vocabTarget: ["semantics", "metaphor", "metonymy", "ambiguity"] },
+      { title: "A língua como ferramenta de estilo", theme: "style", description: "Adjetivação, enumeração, graduação, hipérbole, pleonasmo, antítese, anástrofe", grammarFocus: ["stylistic devices", "creative grammar"], vocabTarget: ["stylistic devices", "hyperbole", "antithesis", "literary style"] },
+      { title: "Português em situações difíceis", theme: "high_stakes", description: "Reclamações complexas, conflitos, negociação, comunicação sob pressão, reformulação", grammarFocus: ["conditional sentences", "subjunctive nuances"], vocabTarget: ["high-stakes communication", "complaints", "pressure", "reformulation"] },
+      { title: "Falar como um português", theme: "native_speech", description: "Colocações naturais, expressões idiomáticas, marcadores discursivos, interjeições, ritmo, hesitação", grammarFocus: ["all tenses review", "discourse connectors"], vocabTarget: ["natural collocations", "discourse markers", "interjections", "rhythm"] },
+      { title: "Compreender Portugal", theme: "understanding_portugal", description: "Cultura contemporânea, história e memória, humor, música, televisão, internet, regionalismos", grammarFocus: ["regional variation", "idiomatic usage"], vocabTarget: ["contemporary culture", "Portuguese identity", "media", "regionalism"] },
+      { title: "Português sem limites", theme: "mastery", description: "Mistura de todos os domínios, listening autêntico, leitura avançada, escrita, argumentação, produção espontânea", grammarFocus: ["creative grammar", "stylistic choices"], vocabTarget: ["full mastery", "authentic content", "all domains", "spontaneous production"] },
     ],
   },
-  // ── Daily Refresh (sempre presente, não directamente acessível) ──
+  // ── Daily Refresh (sempre presente, nao directamente acessivel) ──
   {
     title: { pt: "Revisão Diária", en: "Daily Refresh" },
     description: { pt: "Revisão adaptativa de conteúdo aprendido, personalizada por dia", en: "Adaptive review of learned content, personalized daily" },
@@ -294,7 +325,7 @@ export const COURSE_SECTIONS: SectionDef[] = [
 export async function seedCourseStructure(
   l1: L1Code,
   db: Database,
-): Promise<{ courseId: string; sectionCount: number; unitCount: number; lessonCount: number }> {
+): Promise<{ courseId: string; sectionCount: number; unitCount: number; lessonCount: number; chestCount: number }> {
   const profile = getProfile(l1);
   const startLevel = profile.transfer.startingCEFR;
 
@@ -316,6 +347,7 @@ export async function seedCourseStructure(
   let sectionCount = 0;
   let unitCount = 0;
   let lessonCount = 0;
+  let chestCount = 0;
 
   for (let sIdx = 0; sIdx < COURSE_SECTIONS.length; sIdx++) {
     const sectionDef = COURSE_SECTIONS[sIdx]!;
@@ -377,40 +409,50 @@ export async function seedCourseStructure(
 
       const totalUnits = sectionDef.units.length;
       const progress = totalUnits > 1 ? uIdx / (totalUnits - 1) : 0;
-      const lessonsForUnit = Math.round(
+      const totalSlots = Math.round(
         sectionDef.lessonsPerUnitStart +
           (sectionDef.lessonsPerUnitEnd - sectionDef.lessonsPerUnitStart) * progress,
       );
 
-      for (let lIdx = 0; lIdx < lessonsForUnit; lIdx++) {
+      const chestPositions = new Set(getChestPositions(totalSlots));
+
+      for (let slotIdx = 0; slotIdx < totalSlots; slotIdx++) {
+        const isChest = chestPositions.has(slotIdx);
+
         const [lesson] = await db.insert(lessons).values({
           unitId: unit!.id,
-          sortOrder: lIdx,
-          grammarFocus: unitDef.grammarFocus,
-          vocabTarget: unitDef.vocabTarget,
+          sortOrder: slotIdx,
+          nodeType: isChest ? "chest" : "lesson",
+          grammarFocus: isChest ? [] : unitDef.grammarFocus,
+          vocabTarget: isChest ? [] : unitDef.vocabTarget,
+          rewardConfig: isChest ? pickChestReward(uIdx + slotIdx) : null,
         }).returning({ id: lessons.id });
 
-        if (resolvedSkillIds.length > 0 && lesson) {
-          await db.insert(lessonSkills).values(
-            resolvedSkillIds.map((s) => ({
-              lessonId: lesson.id,
-              skillId: s.id,
-              isPrimary: s.isPrimary,
-            })),
-          );
+        if (isChest) {
+          chestCount++;
+        } else {
+          if (resolvedSkillIds.length > 0 && lesson) {
+            await db.insert(lessonSkills).values(
+              resolvedSkillIds.map((s) => ({
+                lessonId: lesson.id,
+                skillId: s.id,
+                isPrimary: s.isPrimary,
+              })),
+            );
+          }
         }
         lessonCount++;
       }
     }
   }
 
-  return { courseId: course!.id, sectionCount, unitCount, lessonCount };
+  return { courseId: course!.id, sectionCount, unitCount, lessonCount, chestCount };
 }
 
 export async function seedAllPhase1Courses(
   db: Database,
-): Promise<Record<string, { courseId: string; sectionCount: number; unitCount: number; lessonCount: number }>> {
-  const results: Record<string, { courseId: string; sectionCount: number; unitCount: number; lessonCount: number }> = {};
+): Promise<Record<string, { courseId: string; sectionCount: number; unitCount: number; lessonCount: number; chestCount: number }>> {
+  const results: Record<string, { courseId: string; sectionCount: number; unitCount: number; lessonCount: number; chestCount: number }> = {};
 
   for (const l1 of L1_PHASE_1) {
     results[l1] = await seedCourseStructure(l1, db);

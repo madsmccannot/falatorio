@@ -88,8 +88,10 @@ export const contentRouter = t.router({
       return rows.map((l) => ({
         id: l.id,
         sortOrder: l.sortOrder,
+        nodeType: l.nodeType,
         grammarFocus: l.grammarFocus,
         vocabTarget: l.vocabTarget,
+        rewardConfig: l.rewardConfig,
       }));
     }),
 

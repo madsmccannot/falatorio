@@ -2,7 +2,7 @@ export { users, tierEnum, cefrEnum, l1CodeEnum, goalEnum } from "./users";
 export { courses } from "./courses";
 export { sections, sectionTypeEnum } from "./sections";
 export { units } from "./units";
-export { lessons } from "./lessons";
+export { lessons, nodeTypeEnum } from "./lessons";
 export { exercises, exerciseTypeEnum, exerciseStatusEnum } from "./exercises";
 export { userProgress } from "./user-progress";
 export { streaks } from "./streaks";
