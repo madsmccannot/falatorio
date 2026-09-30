@@ -119,7 +119,7 @@ The profile screen includes a mastery dashboard showing the user's estimated CEF
 
 ### Launch Metrics
 
-Full funnel tracking via PostHog and custom analytics: onboarding completion, placement test (start/result with level and accuracy), first lesson (with elapsed time), D1/D7 retention, mastery milestones (first skill mastered, mastery count), CEFR level progression (with confidence), trial start, and trial-to-Super conversion.
+Full funnel tracking via PostHog and custom analytics: onboarding completion, placement test (start/result with level and accuracy), first lesson (with elapsed time), D1/D7 retention, mastery milestones (first skill mastered, mastery count), CEFR level progression (with confidence), trial start, and trial-to-Super conversion. Server-side retention metrics service computes D1/D7/D30 cohort retention rates, mastery progression (average mastery, skills mastered distribution), and engagement metrics (DAU/WAU/MAU, sessions per user, exercises per session) via the `analytics` tRPC router.
 
 ### Onboarding Gate
 
@@ -141,17 +141,17 @@ Pure business logic, zero dependencies on I/O or frameworks:
 - **Ads** — ad policy (GDPR, tier, cooldowns)
 - **L1 Profiles** — 15 language transfer profiles with cultural content (all fully expanded)
 
-### `packages/db` — 24 schema tables
+### `packages/db` — 27 schema tables
 
 Users, courses, sections (numbered + daily refresh, between course and unit), units, lessons, exercises, audio clips, user progress, streaks, league entries, transactions, wallets, shop items, IAP receipts, conversation sessions, achievements, ad events, L1 cultural content, skills, knowledge items, skill prerequisites, exercise-knowledge bridge (with primary/secondary flag), skill evidence, skill mastery, knowledge relations (related/confusable/reinforces), lesson-skills bridge (curriculum mapping). Initial Drizzle migration generated.
 
-### `server` — 14 routers, 11 services, 6 jobs
+### `server` — 16 routers, 12 services, 7 jobs
 
-**Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads, pipeline, mastery.
+**Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads, pipeline, mastery, quality, analytics.
 
-**Services:** Whisper (transcription), Azure TTS, LLM (conversation tutor), content generator (dynamic lesson/exercise generation using L1 profiles), seed content (course structure seeding per L1), batch exercise pipeline (coverage gap detection, bulk generation with concurrency control), mastery recalculator (batch skill mastery recomputation), achievement checker (competence badge evaluation), FCM push, R2 storage, IAP validation (Apple + Google), RevenueCat webhooks.
+**Services:** Whisper (transcription), Azure TTS, LLM (conversation tutor), content generator (dynamic lesson/exercise generation with inline glossary and gender pairs using L1 profiles), seed content (course structure seeding per L1), batch exercise pipeline (coverage gap detection, bulk generation with concurrency control, auto-links exercises to KnowledgeItems), mastery recalculator (batch skill mastery recomputation), achievement checker (competence badge evaluation), retention metrics (D1/D7/D30 cohort retention, mastery progression, DAU/WAU/MAU engagement), FCM push, R2 storage, IAP validation (Apple + Google), RevenueCat webhooks.
 
-**Jobs (BullMQ):** exercise generation (uses content-generator service), league reset, streak reminders, quality flagging, heart refill, subscription checks.
+**Jobs (BullMQ):** exercise generation (uses content-generator service, auto-links to KnowledgeItems via lesson skills), league reset, streak reminders, quality flagging, heart refill, subscription checks, content sync.
 
 ### `apps/mobile` — 26 screens, 42 components, 8 hooks
 
@@ -165,13 +165,13 @@ Users, courses, sections (numbered + daily refresh, between course and unit), un
 
 **Conversation:** scenario picker, chat with AI-powered PT-EU tutor with error extraction.
 
-**Shop:** Super subscription detail, ouro packs (RevenueCat IAP).
+**Shop:** Super subscription detail, ouro packs (standalone route + RevenueCat IAP).
 
 **Components:** UI primitives (Button, Card, Modal, Toast, Loading), exercise renderers, lesson components (progress bar, heart indicator, feedback, PT-EU vs PT-BR toggle), audio (player, recorder, waveform), gamification (XP bar, streak badge, league card, achievement toast, mastery dashboard with CEFR estimate, confidence bar, domain breakdown), paywall (out of hearts, mid-lesson, Super upsell, feature lock, ad-or-pay choice), shop (ouro balance, item card, IAP modal, chest offer, Super banner), ads (provider, banner, interstitial, reward), pronunciation (mouth diagram SVG, phoneme card with animation, L1-based pronunciation guide), tappable text with word tooltips (170+ words, 15 L1s, gender pair display for adjectives/gendered nouns), retention tracker (session/streak analytics), SVG icon system (react-native-svg, no emojis).
 
-### `cms` — 8 collections, 35 prompt templates
+### `cms` — 11 collections, 35 prompt templates
 
-Courses, Units, Lessons, Exercises (with drafts/review/live workflow), Vocabulary, Audio Clips (with R2 upload), L1 Cultural Content, Review Queue. Hooks auto-publish and auto-reject exercises through the review pipeline. 35 prompt templates for dynamic exercise generation (10 base types + 25 L1-specific overrides).
+Courses, Units, Lessons, Exercises (with drafts/review/live workflow), Vocabulary, Audio Clips (with R2 upload), L1 Cultural Content, Review Queue, Skills, KnowledgeItems, Users. Hooks auto-publish and auto-reject exercises through the review pipeline. 35 prompt templates for dynamic exercise generation (10 base types + 25 L1-specific overrides).
 
 ## Getting Started
 

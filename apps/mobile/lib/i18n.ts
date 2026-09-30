@@ -366,6 +366,7 @@ const en = {
   "auth.error_username_taken": "This username is already taken",
 
   "funnel.first_lesson_complete": "First lesson completed!",
+  "word.new_label": "New",
 } as const;
 
 type TKey = keyof typeof en;
@@ -725,6 +726,7 @@ const es: Record<string, string> = {
   "auth.username_available": "Disponible",
   "auth.username_taken": "Ya esta en uso",
   "auth.username_invalid": "Debe empezar con una letra, 3-30 caracteres",
+  "word.new_label": "Nueva",
 };
 
 const fr: Record<string, string> = {
@@ -1078,6 +1080,7 @@ const fr: Record<string, string> = {
   "auth.username_available": "Disponible",
   "auth.username_taken": "Deja pris",
   "auth.username_invalid": "Doit commencer par une lettre, 3-30 caracteres",
+  "word.new_label": "Nouveau",
 };
 
 const hi: Record<string, string> = {
@@ -1431,6 +1434,7 @@ const hi: Record<string, string> = {
   "auth.username_available": "उपलब्ध",
   "auth.username_taken": "पहले से लिया गया",
   "auth.username_invalid": "अक्षर से शुरू होना चाहिए, 3-30 अक्षर",
+  "word.new_label": "नया",
 };
 
 const ur: Record<string, string> = {
@@ -1784,6 +1788,7 @@ const ur: Record<string, string> = {
   "auth.username_available": "دستیاب",
   "auth.username_taken": "پہلے سے لیا گیا",
   "auth.username_invalid": "حرف سے شروع ہونا چاہیے، 3-30 حروف",
+  "word.new_label": "نیا",
 };
 
 const ar: Record<string, string> = {
@@ -2137,6 +2142,7 @@ const ar: Record<string, string> = {
   "auth.username_available": "متاح",
   "auth.username_taken": "مستخدم بالفعل",
   "auth.username_invalid": "يجب أن يبدأ بحرف، 3-30 حرفاً",
+  "word.new_label": "جديد",
 };
 
 const bn: Record<string, string> = {
@@ -2490,6 +2496,7 @@ const bn: Record<string, string> = {
   "auth.username_available": "উপলব্ধ",
   "auth.username_taken": "ইতিমধ্যে নেওয়া হয়েছে",
   "auth.username_invalid": "অক্ষর দিয়ে শুরু হতে হবে, 3-30 অক্ষর",
+  "word.new_label": "নতুন",
 };
 
 const pt: Record<string, string> = {
@@ -2844,6 +2851,7 @@ const pt: Record<string, string> = {
   "auth.username_available": "Disponível",
   "auth.username_taken": "Já está em uso",
   "auth.username_invalid": "Deve começar com uma letra, 3-30 caracteres",
+  "word.new_label": "Novo",
 };
 
 const de: Record<string, string> = {
@@ -3196,6 +3204,7 @@ const de: Record<string, string> = {
   "auth.username_available": "Verfügbar",
   "auth.username_taken": "Bereits vergeben",
   "auth.username_invalid": "Muss mit einem Buchstaben beginnen, 3-30 Zeichen",
+  "word.new_label": "Neu",
 };
 
 const zh: Record<string, string> = {
@@ -3548,6 +3557,7 @@ const zh: Record<string, string> = {
   "auth.username_available": "可用",
   "auth.username_taken": "已被使用",
   "auth.username_invalid": "必须以字母开头，3-30个字符",
+  "word.new_label": "新",
 };
 
 const ru: Record<string, string> = {
@@ -3900,6 +3910,7 @@ const ru: Record<string, string> = {
   "auth.username_available": "Доступно",
   "auth.username_taken": "Уже занято",
   "auth.username_invalid": "Должно начинаться с буквы, 3-30 символов",
+  "word.new_label": "Новое",
 };
 
 const uk: Record<string, string> = {
@@ -4252,6 +4263,7 @@ const uk: Record<string, string> = {
   "auth.username_available": "Доступне",
   "auth.username_taken": "Вже зайнято",
   "auth.username_invalid": "Має починатися з літери, 3-30 символів",
+  "word.new_label": "Нове",
 };
 
 const tr: Record<string, string> = {
@@ -4604,6 +4616,7 @@ const tr: Record<string, string> = {
   "auth.username_available": "Kullanılabilir",
   "auth.username_taken": "Zaten alınmış",
   "auth.username_invalid": "Harfle başlamalı, 3-30 karakter",
+  "word.new_label": "Yeni",
 };
 
 const pl: Record<string, string> = {
@@ -4956,6 +4969,7 @@ const pl: Record<string, string> = {
   "auth.username_available": "Dostępna",
   "auth.username_taken": "Już zajęta",
   "auth.username_invalid": "Musi zaczynać się literą, 3-30 znaków",
+  "word.new_label": "Nowe",
 };
 
 const ko: Record<string, string> = {
@@ -5308,6 +5322,7 @@ const ko: Record<string, string> = {
   "auth.username_available": "사용 가능",
   "auth.username_taken": "이미 사용 중",
   "auth.username_invalid": "문자로 시작해야 하며, 3-30자",
+  "word.new_label": "새로운",
 };
 
 const ja: Record<string, string> = {
@@ -5660,6 +5675,7 @@ const ja: Record<string, string> = {
   "auth.username_available": "利用可能",
   "auth.username_taken": "既に使用されています",
   "auth.username_invalid": "英字で始まる必要があります、3-30文字",
+  "word.new_label": "新しい",
 };
 
 const ALL: Partial<Record<L1Code | "pt", Record<string, string>>> = {
