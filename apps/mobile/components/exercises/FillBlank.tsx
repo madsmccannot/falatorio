@@ -28,6 +28,8 @@ export function FillBlank({ exercise, onAnswer, disabled }: ExerciseProps) {
                 text={part}
                 direction="pt-to-l1"
                 newWords={exercise.newWords}
+                glossary={exercise.glossary}
+                genderPairs={exercise.genderPairs}
                 textStyle={styles.sentencePartText}
               />
             )}

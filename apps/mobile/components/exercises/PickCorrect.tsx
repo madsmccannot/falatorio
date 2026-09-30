@@ -18,6 +18,8 @@ export function PickCorrect({ exercise, onAnswer, disabled }: ExerciseProps) {
           text={exercise.prompt}
           direction="pt-to-l1"
           newWords={exercise.newWords}
+          glossary={exercise.glossary}
+          genderPairs={exercise.genderPairs}
           textStyle={styles.promptText}
         />
       </View>

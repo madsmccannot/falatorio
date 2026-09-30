@@ -3,7 +3,8 @@ import { View, Text, Pressable, StyleSheet, useWindowDimensions } from "react-na
 import Animated, { FadeIn } from "react-native-reanimated";
 import Svg, { Polygon } from "react-native-svg";
 import { useTheme } from "@/lib/theme";
-import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { useTranslation } from "@/lib/i18n";
+import { spacing, radii, typography } from "@falatorio/ui/tokens";
 
 interface WordTooltipProps {
   word: string;
@@ -21,6 +22,7 @@ const AUTO_DISMISS_MS = 4000;
 
 export function WordTooltip({ word, translations, isNew, position, onDismiss, genderHint }: WordTooltipProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { width: screenWidth } = useWindowDimensions();
 
   useEffect(() => {
@@ -66,8 +68,8 @@ export function WordTooltip({ word, translations, isNew, position, onDismiss, ge
         ) : null}
 
         {isNew && (
-          <View style={[styles.newBadge, { backgroundColor: colors.primary[100] }]}>
-            <Text style={[styles.newLabel, { color: colors.primary[700] }]}>Novo</Text>
+          <View style={[styles.newBadge, { backgroundColor: "#FFF8E1" }]}>
+            <Text style={[styles.newLabel, { color: "#92600A" }]}>{t("word.new_label")}</Text>
           </View>
         )}
 

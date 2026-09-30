@@ -17,6 +17,8 @@ export interface GeneratedExercise {
   acceptedAnswers: string[];
   difficulty: number;
   l1Tip: Record<string, string>;
+  glossary?: Record<string, string[]>;
+  genderPairs?: Record<string, { g: "m" | "f"; alt: string }>;
 }
 
 export interface GeneratedLesson {
@@ -137,6 +139,8 @@ Output ONLY a JSON object (not array). Fields:
 - acceptedAnswers: array of valid answers
 - difficulty: 1-5
 - l1Tip: { "${l1}": "helpful tip in ${profile.name}" }
+- glossary: object mapping each Portuguese content word (3+ letters) in the exercise to an array of translations in ${profile.name}, using the contextually correct meaning
+- genderPairs: object mapping Portuguese adjectives/nouns that have masculine/feminine forms to { "g": "m" or "f", "alt": "opposite form" } — e.g. { "bonito": { "g": "m", "alt": "bonita" } }
 
 Use European Portuguese EXCLUSIVELY: tu/vos conjugations, autocarro, telemovel, pequeno-almoco.`;
 
@@ -155,6 +159,14 @@ Use European Portuguese EXCLUSIVELY: tu/vos conjugations, autocarro, telemovel, 
   const parsed = JSON.parse(jsonMatch[0]) as GeneratedExercise;
   if (!parsed.type || !parsed.acceptedAnswers) {
     throw new Error("Invalid exercise structure");
+  }
+
+  const p = parsed.prompt as Record<string, unknown>;
+  if (parsed.glossary && typeof parsed.glossary === "object") {
+    p["glossary"] = parsed.glossary;
+  }
+  if (parsed.genderPairs && typeof parsed.genderPairs === "object") {
+    p["genderPairs"] = parsed.genderPairs;
   }
 
   return parsed;
@@ -222,7 +234,7 @@ Prompt format per type:
 === OUTPUT FORMAT ===
 
 Output ONLY a JSON array. No markdown, no explanation, no code fences.
-Each element has: type, prompt, acceptedAnswers (array of valid strings), difficulty (1-5), l1Tip (object with "${l1}" key and a helpful tip in ${l1Name}).
+Each element has: type, prompt, acceptedAnswers (array of valid strings), difficulty (1-5), l1Tip (object with "${l1}" key and a helpful tip in ${l1Name}), glossary (object mapping each Portuguese content word in the exercise to an array of translations in ${l1Name} — only include words with 3+ letters, use the contextually correct meaning), genderPairs (object mapping Portuguese adjectives/nouns that have masculine/feminine forms to { "g": "m" or "f", "alt": "opposite form" } — e.g. { "bonito": { "g": "m", "alt": "bonita" } }).
 
 === RULES ===
 - European Portuguese EXCLUSIVELY: tu/vos, estar a + infinitive (not gerund), autocarro, telemovel, pequeno-almoco
@@ -240,13 +252,24 @@ export function parseExerciseArray(text: string): GeneratedExercise[] {
   const parsed = JSON.parse(jsonMatch[0]) as GeneratedExercise[];
   if (!Array.isArray(parsed)) throw new Error("Response is not an array");
 
-  return parsed.filter(
-    (ex) =>
-      typeof ex.type === "string" &&
-      Array.isArray(ex.acceptedAnswers) &&
-      ex.acceptedAnswers.length > 0 &&
-      ex.prompt != null,
-  );
+  return parsed
+    .filter(
+      (ex) =>
+        typeof ex.type === "string" &&
+        Array.isArray(ex.acceptedAnswers) &&
+        ex.acceptedAnswers.length > 0 &&
+        ex.prompt != null,
+    )
+    .map((ex) => {
+      const p = ex.prompt as Record<string, unknown>;
+      if (ex.glossary && typeof ex.glossary === "object") {
+        p["glossary"] = ex.glossary;
+      }
+      if (ex.genderPairs && typeof ex.genderPairs === "object") {
+        p["genderPairs"] = ex.genderPairs;
+      }
+      return ex;
+    });
 }
 
 export async function generateFromKnowledgeItem(params: {
@@ -289,7 +312,9 @@ ${request.constraints?.requireContext ? `Required context: ${request.constraints
 - communication: role-play, real scenario usage
 
 === OUTPUT ===
-JSON object with: type, prompt, acceptedAnswers, difficulty, l1Tip.
+JSON object with: type, prompt, acceptedAnswers, difficulty, l1Tip, glossary, genderPairs.
+glossary: object mapping each Portuguese content word (3+ letters) in the exercise to an array of translations in ${profile.name}, using the contextually correct meaning.
+genderPairs: object mapping Portuguese adjectives/nouns that have masculine/feminine forms to { "g": "m" or "f", "alt": "opposite form" } — e.g. { "bonito": { "g": "m", "alt": "bonita" } }.
 European Portuguese EXCLUSIVELY.`;
 
   const response = await client.messages.create({
@@ -307,6 +332,14 @@ European Portuguese EXCLUSIVELY.`;
   const parsed = JSON.parse(jsonMatch[0]) as GeneratedExercise;
   if (!parsed.type || !parsed.acceptedAnswers) {
     throw new Error("Invalid exercise structure");
+  }
+
+  const p2 = parsed.prompt as Record<string, unknown>;
+  if (parsed.glossary && typeof parsed.glossary === "object") {
+    p2["glossary"] = parsed.glossary;
+  }
+  if (parsed.genderPairs && typeof parsed.genderPairs === "object") {
+    p2["genderPairs"] = parsed.genderPairs;
   }
 
   return parsed;

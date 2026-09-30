@@ -1,14 +1,17 @@
 import { useCallback, useRef, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useTheme } from "@/lib/theme";
-import { colors, spacing, typography } from "@falatorio/ui/tokens";
+import { spacing, typography } from "@falatorio/ui/tokens";
 import { WordTooltip } from "./WordTooltip";
-import { useWordTranslation, type TranslationDirection } from "@/hooks/useWordTranslation";
+
+type TranslationDirection = "pt-to-l1" | "l1-to-pt";
 
 interface TappableTextProps {
   text: string;
   direction?: TranslationDirection;
   newWords?: string[];
+  glossary?: Record<string, string[]>;
+  genderPairs?: Record<string, { g: "m" | "f"; alt: string }>;
   textStyle?: object;
 }
 
@@ -24,12 +27,13 @@ function tokenize(text: string): { word: string; trailing: string }[] {
 
 export function TappableText({
   text,
-  direction = "pt-to-l1",
+  direction: _direction = "pt-to-l1",
   newWords,
+  glossary,
+  genderPairs,
   textStyle,
 }: TappableTextProps) {
   const theme = useTheme();
-  const { translate, getGenderPair } = useWordTranslation();
   const newWordsSet = useRef(new Set((newWords ?? []).map((w) => w.toLowerCase()))).current;
   const [tooltip, setTooltip] = useState<{
     word: string;
@@ -44,12 +48,13 @@ export function TappableText({
   const handleWordPress = useCallback(
     (word: string, event: { nativeEvent: { pageX: number; pageY: number } }) => {
       const clean = word.toLowerCase();
-      const translations = translate(clean, direction);
       const isNew = newWordsSet.has(clean);
 
-      if (translations.length > 0 || isNew) {
+      const translations = glossary?.[clean] ?? glossary?.[word] ?? null;
+
+      if (translations || isNew) {
         const { pageX, pageY } = event.nativeEvent;
-        const pair = getGenderPair(clean);
+        const pair = genderPairs?.[clean] ?? genderPairs?.[word];
         let genderHint: string | null = null;
 
         if (pair) {
@@ -60,14 +65,14 @@ export function TappableText({
 
         setTooltip({
           word: clean,
-          translations: translations.length > 0 ? translations : [word],
+          translations: translations ?? [word],
           isNew,
           position: { x: pageX, y: pageY },
           genderHint,
         });
       }
     },
-    [translate, direction, newWordsSet, getGenderPair],
+    [newWordsSet, glossary, genderPairs],
   );
 
   const dismissTooltip = useCallback(() => setTooltip(null), []);
@@ -82,7 +87,6 @@ export function TappableText({
             onPress={(e) => handleWordPress(token.word, e)}
             style={({ pressed }) => [
               styles.wordWrap,
-              isNew && styles.newWordBg,
               pressed && styles.pressed,
             ]}
           >
@@ -97,6 +101,7 @@ export function TappableText({
               {token.word}
               {token.trailing}
             </Text>
+            {isNew && <View style={styles.newWordUnderline} />}
           </Pressable>
         );
       })}
@@ -133,12 +138,14 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.6,
   },
-  newWordBg: {
-    backgroundColor: colors.primary[100],
-    borderRadius: 4,
-  },
   newWordText: {
-    color: colors.primary[700],
-    fontWeight: "600",
+    color: "#B8860B",
+  },
+  newWordUnderline: {
+    height: 0,
+    borderBottomWidth: 1.5,
+    borderBottomColor: "#B8860B",
+    borderStyle: "dashed",
+    marginTop: -2,
   },
 });

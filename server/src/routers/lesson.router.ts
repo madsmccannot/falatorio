@@ -256,11 +256,49 @@ export const lessonRouter = t.router({
         3600,
       );
 
+      const seenExerciseIds = await ctx.db
+        .select({ exerciseId: userProgress.exerciseId })
+        .from(userProgress)
+        .where(eq(userProgress.userId, ctx.user.userId));
+
+      const seenIds = new Set(seenExerciseIds.map((r) => r.exerciseId));
+
+      let knownWords = new Set<string>();
+      if (seenIds.size > 0) {
+        const seenExercises = await ctx.db
+          .select({ prompt: exercises.prompt })
+          .from(exercises)
+          .where(sql`${exercises.id} = ANY(${[...seenIds]})`);
+
+        for (const ex of seenExercises) {
+          const p = ex.prompt as Record<string, unknown> | string;
+          const raw = typeof p === "string" ? p : (p as Record<string, unknown>)["text"] as string ?? "";
+          for (const w of raw.match(/[\p{L}'-]+/gu) ?? []) {
+            knownWords.add(w.toLowerCase());
+          }
+        }
+      }
+
       return {
         sessionId,
         exercises: lessonExercises.map((e) => {
           const p = e.prompt as Record<string, unknown> | string;
           const text = typeof p === "string" ? p : (p["text"] as string ?? "");
+
+          const glossary = typeof p === "object"
+            ? (p["glossary"] as Record<string, string[]> | undefined) ?? undefined
+            : undefined;
+
+          const genderPairs = typeof p === "object"
+            ? (p["genderPairs"] as Record<string, { g: "m" | "f"; alt: string }> | undefined) ?? undefined
+            : undefined;
+
+          const promptWords = text.match(/[\p{L}'-]+/gu) ?? [];
+          const newWords = promptWords.filter(
+            (w) => w.length > 2 && !knownWords.has(w.toLowerCase()),
+          );
+          const uniqueNew = [...new Set(newWords.map((w) => w.toLowerCase()))];
+
           return {
             id: e.id,
             type: e.type,
@@ -272,6 +310,9 @@ export const lessonRouter = t.router({
             audioUrl: e.audioUrl,
             audioNativeUrl: e.audioNativeUrl,
             difficulty: e.difficulty,
+            newWords: uniqueNew.length > 0 ? uniqueNew : undefined,
+            glossary,
+            genderPairs,
           };
         }),
         hearts: user.hearts,

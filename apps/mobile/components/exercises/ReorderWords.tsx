@@ -5,12 +5,11 @@ import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { WordTooltip } from "./WordTooltip";
-import { useWordTranslation } from "@/hooks/useWordTranslation";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
   const words = exercise.words ?? exercise.prompt.split(" ");
-  const { translate } = useWordTranslation();
+  const glossary = exercise.glossary;
   const [selected, setSelected] = React.useState<number[]>([]);
   const [available, setAvailable] = React.useState<number[]>(
     () => {
@@ -45,8 +44,9 @@ export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
 
   const handleLongPress = (word: string, event: { nativeEvent: { pageX: number; pageY: number } }) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const translations = translate(word.toLowerCase(), "pt-to-l1");
-    if (translations.length > 0) {
+    const clean = word.toLowerCase();
+    const translations = glossary?.[clean] ?? glossary?.[word];
+    if (translations && translations.length > 0) {
       setTooltip({
         word: word.toLowerCase(),
         translations,

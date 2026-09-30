@@ -25,6 +25,8 @@ export type ExerciseData = {
   audioUrl?: string;
   l1Tip?: string;
   newWords?: string[];
+  glossary?: Record<string, string[]>;
+  genderPairs?: Record<string, { g: "m" | "f"; alt: string }>;
 };
 
 export type ExerciseProps = {

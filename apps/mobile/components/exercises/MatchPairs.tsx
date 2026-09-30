@@ -4,14 +4,13 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { WordTooltip } from "./WordTooltip";
-import { useWordTranslation } from "@/hooks/useWordTranslation";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 type MatchState = "idle" | "selected" | "matched" | "wrong";
 
 export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
   const pairs = exercise.pairs ?? [];
-  const { translate } = useWordTranslation();
+  const glossary = exercise.glossary;
   const [leftSelected, setLeftSelected] = React.useState<number | null>(null);
   const [rightSelected, setRightSelected] = React.useState<number | null>(null);
   const [matched, setMatched] = React.useState<Set<number>>(new Set());
@@ -56,10 +55,11 @@ export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
     }
   }, [leftSelected, rightSelected]);
 
-  const handleLongPress = (word: string, direction: "pt-to-l1" | "l1-to-pt", event: { nativeEvent: { pageX: number; pageY: number } }) => {
+  const handleLongPress = (word: string, _direction: "pt-to-l1" | "l1-to-pt", event: { nativeEvent: { pageX: number; pageY: number } }) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const translations = translate(word.toLowerCase(), direction);
-    if (translations.length > 0) {
+    const clean = word.toLowerCase();
+    const translations = glossary?.[clean] ?? glossary?.[word];
+    if (translations && translations.length > 0) {
       setTooltip({
         word: word.toLowerCase(),
         translations,

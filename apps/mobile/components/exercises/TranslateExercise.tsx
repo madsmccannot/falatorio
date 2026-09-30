@@ -26,6 +26,8 @@ export function TranslateExercise({ exercise, onAnswer, disabled }: ExerciseProp
           text={exercise.prompt}
           direction={direction}
           newWords={exercise.newWords}
+          glossary={exercise.glossary}
+          genderPairs={exercise.genderPairs}
           textStyle={styles.promptText}
         />
       </View>
