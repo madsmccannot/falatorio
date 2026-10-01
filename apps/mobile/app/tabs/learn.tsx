@@ -137,6 +137,37 @@ function LessonPathNode({
   );
 }
 
+function QuestBanner() {
+  const router = useRouter();
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const quests = trpc.quests.getDailyQuests.useQuery();
+  const data = quests.data ?? [];
+  const completed = data.filter((q) => q.completed).length;
+
+  return (
+    <Pressable
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        router.push("/quests");
+      }}
+      style={[styles.questBanner, { backgroundColor: theme.dueCard, borderColor: theme.dueBorder }]}
+    >
+      <BoltIcon size={20} color={colors.xp} />
+      <View style={styles.questBannerContent}>
+        <Text style={[styles.questBannerTitle, { color: theme.text }]}>
+          {t("quests.daily_title")}
+        </Text>
+        <View style={[styles.questBannerTrack, { backgroundColor: theme.border }]}>
+          <View style={[styles.questBannerFill, { width: `${(completed / 3) * 100}%` as any }]} />
+        </View>
+      </View>
+      <Text style={[styles.questBannerCount, { color: theme.textMuted }]}>{completed}/3</Text>
+      <ChevronRightIcon size={16} color={theme.textMuted} />
+    </Pressable>
+  );
+}
+
 export default function LearnScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
@@ -336,6 +367,7 @@ export default function LearnScreen() {
             contentContainerStyle={styles.sectionListContainer}
             showsVerticalScrollIndicator={false}
           >
+            <QuestBanner />
             {numbered.length === 0 && renderEmpty()}
             {numbered.map((section, idx) => {
               const sectionColor = colors.sectionColors[idx % colors.sectionColors.length]!;
@@ -397,9 +429,20 @@ export default function LearnScreen() {
 
                       {/* Skip link for sections beyond current */}
                       {!isFirst && (
-                        <Text style={[styles.sectionSkipLink, { color: sectionColor }]}>
-                          {t("learn.skip_here")}
-                        </Text>
+                        <Pressable
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            router.push(
+                              `/section-test?sectionId=${section.id}&sectionTitle=${encodeURIComponent(title)}&cefrMin=${section.cefrMin}&cefrMax=${section.cefrMax}`,
+                            );
+                          }}
+                          hitSlop={8}
+                        >
+                          <Text style={[styles.sectionSkipLink, { color: sectionColor }]}>
+                            {t("learn.skip_here")}
+                          </Text>
+                        </Pressable>
                       )}
                     </View>
                   </View>
@@ -754,5 +797,36 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.md,
     textAlign: "center",
     lineHeight: 22,
+  },
+  questBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: spacing.md,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  questBannerContent: {
+    flex: 1,
+    gap: 4,
+  },
+  questBannerTitle: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "700",
+  },
+  questBannerTrack: {
+    height: 6,
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  questBannerFill: {
+    height: "100%",
+    backgroundColor: colors.primary[500],
+    borderRadius: 3,
+  },
+  questBannerCount: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "600",
   },
 });

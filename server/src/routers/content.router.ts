@@ -325,4 +325,42 @@ export const contentRouter = t.router({
       const result = await seedCourseStructure(l1, ctx.db);
       return { seeded: { [l1]: result } };
     }),
+
+  skipSection: protectedProcedure
+    .input(z.object({ sectionId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const unitRows = await ctx.db
+        .select({ id: units.id })
+        .from(units)
+        .where(eq(units.sectionId, input.sectionId));
+
+      const unitIds = unitRows.map((u) => u.id);
+      if (unitIds.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Section has no units" });
+      }
+
+      const allLessons = await ctx.db
+        .select({ id: lessons.id })
+        .from(lessons)
+        .where(sql`${lessons.unitId} = ANY(${unitIds})`);
+
+      if (allLessons.length === 0) return { skipped: 0 };
+
+      const now = new Date();
+      const values = allLessons.map((l) => ({
+        userId: ctx.user.userId,
+        lessonId: l.id,
+        bestAccuracy: 1.0,
+        attempts: 1,
+        firstCompletedAt: now,
+        lastCompletedAt: now,
+      }));
+
+      await ctx.db
+        .insert(lessonCompletions)
+        .values(values)
+        .onConflictDoNothing();
+
+      return { skipped: allLessons.length };
+    }),
 });
