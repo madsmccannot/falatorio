@@ -57,6 +57,19 @@ export const deProfile: L1Profile = {
       { word: "falar", l1Meaning: "sounds like 'fallen' (to fall) in German", ptMeaning: "falar means 'to speak' — to fall = cair" },
       { word: "ata", l1Meaning: "no German cognate, but looks like 'hat' backwards", ptMeaning: "ata means 'minutes (of a meeting)' — do not confuse with até (until)" },
       { word: "vaga", l1Meaning: "sounds like 'vage' (vague) in German", ptMeaning: "vaga means 'wave' or 'vacancy' — vague = vago (different word)" },
+      { word: "Hund", l1Meaning: "Hund means 'dog' in German", ptMeaning: "sounds like 'onda' (wave) to some ears — dog = cão/cachorro" },
+      { word: "Mund", l1Meaning: "Mund means 'mouth' in German", ptMeaning: "sounds like 'mundo' (world) — mouth = boca" },
+      { word: "Kur", l1Meaning: "Kur means 'cure/spa treatment' in German", ptMeaning: "cura means 'cure' — same meaning, true cognate, but 'Kurort' (spa town) ≠ 'termas'" },
+      { word: "Messe", l1Meaning: "Messe means 'trade fair' or 'mass' in German", ptMeaning: "mesa means 'table' — trade fair = feira, mass (religious) = missa" },
+      { word: "Lager", l1Meaning: "Lager means 'warehouse/camp/stock' in German", ptMeaning: "lugar means 'place/seat' — warehouse = armazém, camp = campo" },
+      { word: "Zimmer", l1Meaning: "Zimmer means 'room' in German", ptMeaning: "no PT cognate — room = quarto (bedroom), sala (living room)" },
+      { word: "Rezept", l1Meaning: "Rezept means 'recipe' or 'prescription' in German", ptMeaning: "receita means both 'recipe' AND 'prescription' AND 'revenue' — three meanings where German has two" },
+      { word: "Nummer", l1Meaning: "Nummer means 'number' in German", ptMeaning: "número means 'number' — true cognate, but PT also uses 'contribuinte' (NIF) for tax number, critical for bureaucracy" },
+      { word: "rente", l1Meaning: "Rente means 'pension' in German", ptMeaning: "rente means 'close/flush' (adj.) or 'income/rent' — pension = reforma (PT-EU), pensão" },
+      { word: "morada", l1Meaning: "no German cognate (sounds exotic)", ptMeaning: "morada means 'address' — the word you need for every form in Portugal. Adresse does not exist in PT." },
+      { word: "finanças", l1Meaning: "Finanzen means 'finances' in German", ptMeaning: "finanças means 'tax office' in daily PT-EU usage — you go to 'as finanças' to get your NIF, not to discuss abstract finances" },
+      { word: "reforma", l1Meaning: "Reform means 'reform/change' in German", ptMeaning: "reforma means 'retirement/pension' in PT-EU — estar reformado = to be retired. Reform = reforma (legal/political) too, but the daily meaning is 'pension'" },
+      { word: "Laden", l1Meaning: "Laden means 'shop/store' in German", ptMeaning: "sounds like 'lado' (side) — shop = loja. 'Do outro lado' means 'on the other side', not 'the other shop'" },
     ],
     phoneticDifficulties: [
       {
@@ -147,6 +160,18 @@ export const deProfile: L1Profile = {
         description: "Final -e nearly disappears",
         tip: "German Schwa (e in 'bitte') is similar but still audible. PT-EU final -e is barely a whisper or drops entirely. 'Cidade' sounds like 'cidadɨ' or even 'cidad'.",
       },
+      {
+        sound: "diphthongs (ei, ou, ai)",
+        ipa: "/ɐj/ /ow/ /aj/",
+        description: "Oral diphthongs differ from German",
+        tip: "German 'ei' = /aɪ/ and 'au' = /aʊ/. PT-EU diphthongs glide differently: 'ei' in 'leite' is /ɐj/ (more central), 'ou' in 'ouro' is /ow/ (tighter glide), 'ai' in 'pai' is /aj/. Don't substitute German diphthong shapes.",
+      },
+      {
+        sound: "word stress",
+        ipa: "variable",
+        description: "Stress position changes meaning",
+        tip: "German stress is mostly on the first syllable (Arbeit, Kinder). PT-EU stress is unpredictable and changes meaning: 'sábia' (wise) vs 'sabiá' (bird) vs 'sabia' (she knew). Written accents mark irregular stress — learn to rely on them.",
+      },
     ],
     grammarGaps: [
       {
@@ -218,6 +243,11 @@ export const deProfile: L1Profile = {
         concept: "Haver vs Ter",
         explanation: "PT-EU uses 'ter' as both possession and perfect auxiliary",
         l1Comparison: "German splits 'haben' (have) and uses it as auxiliary. PT-EU uses 'ter' for both: 'Eu tenho um carro' (I have a car) AND 'Eu tenho feito' (I have done). 'Haver' is impersonal: 'Há muitas pessoas' (there are many people).",
+      },
+      {
+        concept: "Reflexive verbs",
+        explanation: "Many common verbs require 'se': levantar-se, chamar-se, sentar-se, lembrar-se",
+        l1Comparison: "German has reflexive verbs too (sich setzen, sich erinnern), so the concept transfers well. The difference: PT-EU pronoun placement moves with context — 'Chamo-me Ana' (I call myself Ana) vs 'Não me chamo Ana' (I'm not called Ana). German 'sich' stays in a fixed position; PT-EU 'me/te/se' floats.",
       },
     ],
     skipBasics: false,

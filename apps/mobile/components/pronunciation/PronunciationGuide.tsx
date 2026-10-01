@@ -13,7 +13,7 @@ export function PronunciationGuide({ difficulties, l1Name }: PronunciationGuideP
     return (
       <View style={styles.empty}>
         <Text style={styles.emptyText}>
-          Sem dificuldades foneticas registadas para falantes de {l1Name}.
+          Sem dificuldades fonéticas registadas para falantes de {l1Name}.
         </Text>
       </View>
     );
@@ -22,10 +22,10 @@ export function PronunciationGuide({ difficulties, l1Name }: PronunciationGuideP
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        Sons dificeis para falantes de {l1Name}
+        Sons difíceis para falantes de {l1Name}
       </Text>
       <Text style={styles.subtitle}>
-        Toca num som para ver a posicao da lingua e dicas de pronuncia
+        Toca num som para ver a posição da língua e dicas de pronúncia
       </Text>
       <FlatList
         data={difficulties as PhoneticDifficulty[]}

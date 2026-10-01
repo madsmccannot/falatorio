@@ -10,7 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import type { PhoneticDifficulty } from "@falatorio/core/l1-profiles/types";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
-import { MouthDiagram } from "./MouthDiagram";
+import { AnimatedMouthDiagram } from "./AnimatedMouthDiagram";
 
 interface PhonemeCardProps {
   phoneme: PhoneticDifficulty;
@@ -79,7 +79,11 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
         <View style={styles.detailContent}>
           {phoneme.mouthPosition && (
             <View style={styles.diagramContainer}>
-              <MouthDiagram position={phoneme.mouthPosition} size={160} />
+              <AnimatedMouthDiagram
+                position={phoneme.mouthPosition}
+                size={160}
+                autoPlay={expanded}
+              />
             </View>
           )}
           <View style={styles.tipContainer}>
