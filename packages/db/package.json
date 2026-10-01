@@ -4,12 +4,25 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./client": "./src/client.ts",
-    "./schema": "./src/schema/index.ts",
-    "./seed/taxonomy": "./src/seed/taxonomy.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "default": "./dist/client.js"
+    },
+    "./schema": {
+      "types": "./src/schema/index.ts",
+      "default": "./dist/schema/index.js"
+    },
+    "./seed/taxonomy": {
+      "types": "./src/seed/taxonomy.ts",
+      "default": "./dist/seed/taxonomy.js"
+    }
   },
   "scripts": {
+    "build": "tsc",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:migrate": "tsx src/migrate.ts",

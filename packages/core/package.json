@@ -4,18 +4,49 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./constants": "./src/constants.ts",
-    "./fsrs": "./src/fsrs/index.ts",
-    "./scoring": "./src/scoring/index.ts",
-    "./lesson": "./src/lesson/index.ts",
-    "./gamification": "./src/gamification/index.ts",
-    "./economy": "./src/economy/index.ts",
-    "./entitlements": "./src/entitlements/index.ts",
-    "./ads": "./src/ads/index.ts",
-    "./l1-profiles": "./src/l1-profiles/index.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./constants": {
+      "types": "./src/constants.ts",
+      "default": "./dist/constants.js"
+    },
+    "./fsrs": {
+      "types": "./src/fsrs/index.ts",
+      "default": "./dist/fsrs/index.js"
+    },
+    "./scoring": {
+      "types": "./src/scoring/index.ts",
+      "default": "./dist/scoring/index.js"
+    },
+    "./lesson": {
+      "types": "./src/lesson/index.ts",
+      "default": "./dist/lesson/index.js"
+    },
+    "./gamification": {
+      "types": "./src/gamification/index.ts",
+      "default": "./dist/gamification/index.js"
+    },
+    "./economy": {
+      "types": "./src/economy/index.ts",
+      "default": "./dist/economy/index.js"
+    },
+    "./entitlements": {
+      "types": "./src/entitlements/index.ts",
+      "default": "./dist/entitlements/index.js"
+    },
+    "./ads": {
+      "types": "./src/ads/index.ts",
+      "default": "./dist/ads/index.js"
+    },
+    "./l1-profiles": {
+      "types": "./src/l1-profiles/index.ts",
+      "default": "./dist/l1-profiles/index.js"
+    }
   },
   "scripts": {
+    "build": "tsc",
     "type-check": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
