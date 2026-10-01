@@ -36,7 +36,7 @@ export const TIERS = ["free", "super"] as const;
 export type Tier = (typeof TIERS)[number];
 
 export const LEAGUE_TIERS = [
-  "bronze", "silver", "gold", "diamond", "obsidian",
+  "bronze", "silver", "gold", "sapphire", "ruby", "emerald", "diamond",
 ] as const;
 export type LeagueTier = (typeof LEAGUE_TIERS)[number];
 

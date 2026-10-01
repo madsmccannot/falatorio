@@ -14,7 +14,7 @@ export interface PromotionResult {
 }
 
 const TIER_ORDER: readonly LeagueTier[] = [
-  "bronze", "silver", "gold", "diamond", "obsidian",
+  "bronze", "silver", "gold", "sapphire", "ruby", "emerald", "diamond",
 ];
 
 function tierIndex(tier: LeagueTier): number {
@@ -37,7 +37,7 @@ export function calculatePromotions(entries: readonly LeagueEntry[]): PromotionR
   return sorted.map((entry, rank) => {
     const position = rank + 1;
 
-    if (position <= LEAGUE.PROMOTE_TOP && entry.tier !== "obsidian") {
+    if (position <= LEAGUE.PROMOTE_TOP && entry.tier !== "diamond") {
       return {
         userId: entry.userId,
         previousTier: entry.tier,

@@ -25,3 +25,5 @@ export { skillMastery } from "./skill-mastery";
 export { knowledgeRelations, knowledgeRelationTypeEnum } from "./knowledge-relations";
 export { lessonSkills } from "./lesson-skills";
 export { lessonCompletions } from "./lesson-completions";
+export { userFollows } from "./user-follows";
+export { dailyQuests, monthlyQuestProgress, questTypeEnum } from "./daily-quests";

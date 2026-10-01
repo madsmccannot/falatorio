@@ -218,8 +218,10 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     category: "social",
     condition: (s) =>
       s.leagueTier === "gold" ||
-      s.leagueTier === "diamond" ||
-      s.leagueTier === "obsidian",
+      s.leagueTier === "sapphire" ||
+      s.leagueTier === "ruby" ||
+      s.leagueTier === "emerald" ||
+      s.leagueTier === "diamond",
   },
 
   // ─── Competence (NEW) ───

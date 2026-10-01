@@ -1,5 +1,7 @@
-import { View, Text, FlatList, ScrollView, StyleSheet } from "react-native";
+import { View, Text, FlatList, ScrollView, Pressable, Image, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
 import { Loading } from "@/components/ui/Loading";
 import { TrophyIcon, StarIcon } from "@/components/icons";
@@ -9,6 +11,11 @@ import type { TKey } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { LEAGUE } from "@falatorio/core";
 import Svg, { Path } from "react-native-svg";
+
+const L1_LABELS: Record<string, string> = {
+  en: "EN", es: "ES", fr: "FR", hi: "HI", ur: "UR", ar: "AR", bn: "BN",
+  de: "DE", zh: "ZH", ru: "RU", uk: "UK", tr: "TR", pl: "PL", ko: "KO", ja: "JA",
+};
 
 const LEAGUE_TIERS: { nameKey: TKey; color: string; accent: string }[] = [
   { nameKey: "leaderboard.tier_bronze", color: "#CD7F32", accent: "#8B5E23" },
@@ -30,7 +37,7 @@ function ShieldIcon({ size = 24, color, accent }: { size?: number; color: string
   );
 }
 
-function LockIcon({ size = 16, color = "#64748B" }: { size?: number; color?: string }) {
+function LockIconLocal({ size = 16, color = "#64748B" }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path d="M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2zM7 11V7a5 5 0 0110 0v4" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
@@ -38,19 +45,42 @@ function LockIcon({ size = 16, color = "#64748B" }: { size?: number; color?: str
   );
 }
 
+function Avatar({ url, size = 36, name }: { url?: string | null; size?: number; name?: string | null }) {
+  if (url) {
+    return (
+      <Image
+        source={{ uri: url }}
+        style={{ width: size, height: size, borderRadius: size / 2 }}
+      />
+    );
+  }
+  const initials = (name ?? "?").slice(0, 1).toUpperCase();
+  return (
+    <View style={[styles.avatarPlaceholder, { width: size, height: size, borderRadius: size / 2 }]}>
+      <Text style={[styles.avatarInitial, { fontSize: size * 0.4 }]}>{initials}</Text>
+    </View>
+  );
+}
+
 export default function LeaderboardScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation();
   const leaderboard = trpc.gamification.getLeaderboard.useQuery();
   const data = leaderboard.data;
+
+  const handleUserPress = (userId: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push(`/profile/${userId}`);
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: theme.text }]}>{t("leaderboard.title")}</Text>
         {data?.tier && (
-          <View style={[styles.tierBadge, { backgroundColor: colors.primary[600] }]}>
+          <View style={[styles.tierBadge, { backgroundColor: LEAGUE_TIERS.find((_, i) => ["bronze","silver","gold","sapphire","ruby","emerald","diamond"][i] === data.tier)?.color ?? colors.primary[600] }]}>
             <Text style={styles.tierText}>
               {data.tier.charAt(0).toUpperCase() + data.tier.slice(1)}
             </Text>
@@ -79,7 +109,7 @@ export default function LeaderboardScreen() {
                 <View style={styles.tierRow}>
                   <ShieldIcon size={28} color={tier.color} accent={tier.accent} />
                   <Text style={[styles.tierName, { color: theme.text }]}>{t(tier.nameKey)}</Text>
-                  {i > 0 && <LockIcon size={16} color={theme.textMuted} />}
+                  {i > 0 && <LockIconLocal size={16} color={theme.textMuted} />}
                   {i === 0 && (
                     <Text style={[styles.tierHint, { color: colors.primary[theme.isDark ? 400 : 600] }]}>
                       {t("leaderboard.unlock")}
@@ -114,41 +144,56 @@ export default function LeaderboardScreen() {
             const isDemo = entry.rank > data.entries.length - LEAGUE.DEMOTE_BOTTOM;
 
             return (
-              <View
-                style={[
-                  styles.row,
-                  { backgroundColor: theme.bgCard, borderColor: theme.border },
-                  isMe && { borderColor: colors.primary[500], backgroundColor: theme.dueCard },
-                  isPromo && { borderLeftWidth: 3, borderLeftColor: colors.success },
-                  isDemo && { borderLeftWidth: 3, borderLeftColor: colors.accent[400] },
-                ]}
+              <Pressable
+                onPress={() => handleUserPress(entry.userId)}
               >
-                <View style={[
-                  styles.rankCircle,
-                  isPromo && { backgroundColor: "rgba(5,150,105,0.15)" },
-                  isDemo && { backgroundColor: "rgba(239,68,68,0.15)" },
-                ]}>
-                  <Text style={[
-                    styles.rank,
-                    { color: theme.textMuted },
-                    isPromo && { color: colors.success },
-                    isDemo && { color: colors.accent[500] },
-                  ]}>
-                    {entry.rank}
-                  </Text>
-                </View>
-                <Text
+                <View
                   style={[
-                    styles.entryName,
-                    { color: theme.text },
-                    isMe && { fontWeight: "700", color: colors.primary[theme.isDark ? 400 : 700] },
+                    styles.row,
+                    { backgroundColor: theme.bgCard, borderColor: theme.border },
+                    isMe && { borderColor: colors.primary[500], backgroundColor: theme.dueCard },
+                    isPromo && { borderLeftWidth: 3, borderLeftColor: colors.success },
+                    isDemo && { borderLeftWidth: 3, borderLeftColor: colors.accent[400] },
                   ]}
-                  numberOfLines={1}
                 >
-                  {entry.name ?? t("leaderboard.anon")}
-                </Text>
-                <Text style={styles.xp}>{entry.weeklyXp} XP</Text>
-              </View>
+                  <View style={[
+                    styles.rankCircle,
+                    isPromo && { backgroundColor: "rgba(5,150,105,0.15)" },
+                    isDemo && { backgroundColor: "rgba(239,68,68,0.15)" },
+                  ]}>
+                    <Text style={[
+                      styles.rank,
+                      { color: theme.textMuted },
+                      isPromo && { color: colors.success },
+                      isDemo && { color: colors.accent[500] },
+                    ]}>
+                      {entry.rank}
+                    </Text>
+                  </View>
+
+                  <Avatar url={entry.avatarUrl} size={36} name={entry.name} />
+
+                  <View style={styles.entryInfo}>
+                    <Text
+                      style={[
+                        styles.entryName,
+                        { color: theme.text },
+                        isMe && { fontWeight: "700", color: colors.primary[theme.isDark ? 400 : 700] },
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {entry.name ?? t("leaderboard.anon")}
+                    </Text>
+                    {entry.l1 && (
+                      <Text style={[styles.entryL1, { color: theme.textMuted }]}>
+                        {L1_LABELS[entry.l1] ?? entry.l1.toUpperCase()}
+                      </Text>
+                    )}
+                  </View>
+
+                  <Text style={styles.xp}>{entry.weeklyXp} XP</Text>
+                </View>
+              </Pressable>
             );
           }}
         />
@@ -194,6 +239,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.xs,
     borderWidth: 1,
+    gap: spacing.md,
   },
   rankCircle: {
     width: 32,
@@ -201,16 +247,32 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: spacing.md,
   },
   rank: {
     fontSize: typography.sizes.md,
     fontWeight: "700",
   },
-  entryName: {
+  avatarPlaceholder: {
+    backgroundColor: colors.neutral[300],
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarInitial: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+  },
+  entryInfo: {
     flex: 1,
+    gap: 2,
+  },
+  entryName: {
     fontSize: typography.sizes.md,
     fontWeight: "500",
+  },
+  entryL1: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "600",
+    letterSpacing: 0.5,
   },
   xp: {
     fontSize: typography.sizes.sm,
@@ -258,10 +320,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     gap: spacing.md,
-  },
-  tierShield: {
-    width: 28,
-    height: 28,
   },
   tierName: {
     flex: 1,

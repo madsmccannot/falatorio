@@ -9,7 +9,7 @@ import {
 import { users } from "./users";
 
 export const leagueTierEnum = pgEnum("league_tier", [
-  "bronze", "silver", "gold", "diamond", "obsidian",
+  "bronze", "silver", "gold", "sapphire", "ruby", "emerald", "diamond",
 ]);
 
 export const leagueEntries = pgTable("league_entries", {

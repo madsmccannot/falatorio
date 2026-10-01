@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, Modal, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, Modal, Image, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState, useCallback } from "react";
@@ -56,6 +56,8 @@ export default function ProfileScreen() {
   const profile = trpc.user.getProfile.useQuery();
   const achievements = trpc.gamification.getAchievements.useQuery();
   const cefrEstimate = trpc.mastery.getCEFREstimate.useQuery();
+  const following = trpc.user.getFollowing.useQuery({});
+  const followers = trpc.user.getFollowers.useQuery({});
   const { t } = useTranslation();
   const { currentDays, longestDays } = useStreak();
   const { isSuper } = useEntitlements();
@@ -112,9 +114,13 @@ export default function ProfileScreen() {
           >
             <GearIcon size={24} color={theme.textMuted} />
           </Pressable>
-          <View style={[styles.avatar, { backgroundColor: colors.primary[600] }]}>
-            <Text style={styles.avatarText}>{initial}</Text>
-          </View>
+          {user?.avatarUrl ? (
+            <Image source={{ uri: user.avatarUrl }} style={styles.avatar} />
+          ) : (
+            <View style={[styles.avatar, { backgroundColor: colors.primary[600] }]}>
+              <Text style={styles.avatarText}>{initial}</Text>
+            </View>
+          )}
           <Text style={[styles.name, { color: theme.text }]}>
             {user?.name ?? t("profile.anon")}
           </Text>
@@ -130,6 +136,17 @@ export default function ProfileScreen() {
               </View>
             )}
           </View>
+          <Pressable
+            style={styles.followCountsRow}
+            onPress={() => router.push("/profile/followers")}
+          >
+            <Text style={[styles.followCountText, { color: theme.text }]}>
+              <Text style={styles.followCountBold}>{followers.data?.length ?? 0}</Text> {t("profile.followers")}
+            </Text>
+            <Text style={[styles.followCountText, { color: theme.text }]}>
+              <Text style={styles.followCountBold}>{following.data?.length ?? 0}</Text> {t("profile.following")}
+            </Text>
+          </Pressable>
         </View>
 
         <View style={styles.statsGrid}>
@@ -340,6 +357,17 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.xl,
     fontWeight: "700",
     marginBottom: spacing.sm,
+  },
+  followCountsRow: {
+    flexDirection: "row",
+    gap: spacing.xl,
+    marginTop: spacing.md,
+  },
+  followCountText: {
+    fontSize: typography.sizes.sm,
+  },
+  followCountBold: {
+    fontWeight: "700",
   },
   badges: {
     flexDirection: "row",

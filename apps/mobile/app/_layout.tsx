@@ -93,6 +93,15 @@ function AuthInner() {
         name="settings"
         options={{ animation: "slide_from_right" }}
       />
+      <Stack.Screen name="profile" />
+      <Stack.Screen
+        name="section-test"
+        options={{ gestureEnabled: false, animation: "slide_from_bottom" }}
+      />
+      <Stack.Screen
+        name="quests"
+        options={{ animation: "slide_from_bottom" }}
+      />
     </Stack>
   );
 }
@@ -128,6 +137,15 @@ function PreviewNavigator() {
       <Stack.Screen
         name="settings"
         options={{ animation: "slide_from_right" }}
+      />
+      <Stack.Screen name="profile" />
+      <Stack.Screen
+        name="section-test"
+        options={{ gestureEnabled: false, animation: "slide_from_bottom" }}
+      />
+      <Stack.Screen
+        name="quests"
+        options={{ animation: "slide_from_bottom" }}
       />
     </Stack>
   );

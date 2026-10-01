@@ -167,10 +167,10 @@ export const gamificationRouter = t.router({
     if (redisEntries.length > 0) {
       const userIds = redisEntries.map((e) => e.userId);
       const userRows = await ctx.db
-        .select({ id: users.id, name: users.name })
+        .select({ id: users.id, name: users.name, avatarUrl: users.avatarUrl, l1: users.l1 })
         .from(users)
         .where(inArray(users.id, userIds));
-      const nameMap = new Map(userRows.map((u) => [u.id, u.name]));
+      const userMap = new Map(userRows.map((u) => [u.id, u]));
 
       const myRank = await lb.getRank(
         ctx.redis,
@@ -180,12 +180,17 @@ export const gamificationRouter = t.router({
       );
 
       return {
-        entries: redisEntries.map((e, i) => ({
-          rank: i + 1,
-          userId: e.userId,
-          name: nameMap.get(e.userId) ?? null,
-          weeklyXp: e.xp,
-        })),
+        entries: redisEntries.map((e, i) => {
+          const u = userMap.get(e.userId);
+          return {
+            rank: i + 1,
+            userId: e.userId,
+            name: u?.name ?? null,
+            avatarUrl: u?.avatarUrl ?? null,
+            l1: u?.l1 ?? null,
+            weeklyXp: e.xp,
+          };
+        }),
         myRank,
         tier: myEntry.leagueTier,
       };
@@ -196,6 +201,8 @@ export const gamificationRouter = t.router({
         userId: leagueEntries.userId,
         weeklyXp: leagueEntries.weeklyXp,
         userName: users.name,
+        userAvatar: users.avatarUrl,
+        userL1: users.l1,
       })
       .from(leagueEntries)
       .innerJoin(users, eq(leagueEntries.userId, users.id))
@@ -225,6 +232,8 @@ export const gamificationRouter = t.router({
         rank: i + 1,
         userId: e.userId,
         name: e.userName,
+        avatarUrl: e.userAvatar,
+        l1: e.userL1,
         weeklyXp: e.weeklyXp,
       })),
       myRank: myRank > 0 ? myRank : null,

@@ -29,6 +29,7 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 320 }).notNull().unique(),
   name: varchar("name", { length: 255 }).notNull(),
   username: varchar("username", { length: 30 }).notNull().unique(),
+  avatarUrl: varchar("avatar_url", { length: 2048 }),
   l1: l1CodeEnum("l1").notNull(),
   cefrLevel: cefrEnum("cefr_level").notNull().default("A1"),
   goal: goalEnum("goal"),
