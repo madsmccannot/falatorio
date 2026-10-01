@@ -1,11 +1,4 @@
-import { initTRPC } from "@trpc/server";
-import superjson from "superjson";
-import type { Context } from "./context.js";
-
-export const t = initTRPC.context<Context>().create({
-  transformer: superjson,
-  errorFormatter: ({ shape }) => shape,
-});
+import { t } from "./trpc.js";
 
 import { authRouter } from "../routers/auth.router.js";
 import { userRouter } from "../routers/user.router.js";
@@ -24,6 +17,8 @@ import { qualityRouter } from "../routers/quality.router.js";
 import { pipelineRouter } from "../routers/pipeline.router.js";
 import { analyticsRouter } from "../routers/analytics.router.js";
 import { questsRouter } from "../routers/quests.router.js";
+
+export { t } from "./trpc.js";
 
 export const appRouter = t.router({
   health: t.procedure.query(() => ({

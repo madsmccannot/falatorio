@@ -29,6 +29,7 @@ import { explainExerciseError } from "../services/llm.service.js";
 import { checkAndUnlockAchievements } from "../services/achievement-checker.service.js";
 import { recalculateMasteryForKnowledgeItems } from "../services/mastery-recalculator.service.js";
 import { buildDailyRefreshSession } from "../services/daily-refresh.service.js";
+import { updateQuestProgress } from "../services/daily-quests.service.js";
 import { EXPLAINS } from "@falatorio/core";
 
 function exerciseToCognitiveLevel(exerciseType: string): CognitiveLevel {
@@ -626,6 +627,19 @@ export const lessonRouter = t.router({
         ctx.db,
         ctx.user.userId,
       );
+
+      await updateQuestProgress(ctx.db, ctx.user.userId, "complete_lesson");
+      await updateQuestProgress(ctx.db, ctx.user.userId, "earn_xp", finalXp);
+      await updateQuestProgress(ctx.db, ctx.user.userId, "maintain_streak");
+      if (isPerfect) {
+        await updateQuestProgress(ctx.db, ctx.user.userId, "perfect_lesson");
+      }
+      if (session.sessionType === "review") {
+        await updateQuestProgress(ctx.db, ctx.user.userId, "review_items", session.correctCount);
+      }
+      if (session.sessionType === "mistakes") {
+        await updateQuestProgress(ctx.db, ctx.user.userId, "practice_mistakes", session.correctCount);
+      }
 
       return {
         passed,

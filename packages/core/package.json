@@ -43,6 +43,10 @@
     "./l1-profiles": {
       "types": "./src/l1-profiles/index.ts",
       "default": "./dist/l1-profiles/index.js"
+    },
+    "./l1-profiles/types": {
+      "types": "./src/l1-profiles/types.ts",
+      "default": "./dist/l1-profiles/types.js"
     }
   },
   "scripts": {

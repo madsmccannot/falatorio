@@ -31,8 +31,9 @@ export function createWorker<T>(
   connection: Redis,
   concurrency = 1,
 ): Worker<T> {
+  const workerConnection = connection.duplicate({ maxRetriesPerRequest: null });
   const worker = new Worker<T>(name, processor, {
-    connection,
+    connection: workerConnection,
     concurrency,
     removeOnComplete: { count: 1000 },
     removeOnFail: { count: 5000 },
