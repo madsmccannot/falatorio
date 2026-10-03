@@ -327,10 +327,6 @@ export async function seedCourseStructure(
   db: Database,
 ): Promise<{ courseId: string; sectionCount: number; unitCount: number; lessonCount: number; chestCount: number }> {
   const profile = getProfile(l1);
-  const startLevel = profile.transfer.startingCEFR;
-
-  const cefrOrder: CEFRLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
-  const startIdx = cefrOrder.indexOf(startLevel);
 
   const [course] = await db
     .insert(courses)
@@ -338,7 +334,7 @@ export async function seedCourseStructure(
       title: { pt: `Português europeu para falantes de ${profile.nativeName}`, [l1]: `European Portuguese for ${profile.name} speakers` },
       description: { pt: `Curso completo de PT-EU adaptado para falantes de ${profile.name}`, [l1]: `Complete PT-EU course adapted for ${profile.name} speakers` },
       l1Source: l1,
-      cefrMin: startLevel,
+      cefrMin: "A1" as CEFRLevel,
       cefrMax: "C2" as CEFRLevel,
       sortOrder: "0",
     })
@@ -352,10 +348,6 @@ export async function seedCourseStructure(
   for (let sIdx = 0; sIdx < COURSE_SECTIONS.length; sIdx++) {
     const sectionDef = COURSE_SECTIONS[sIdx]!;
 
-    const sectionCefrMinIdx = cefrOrder.indexOf(sectionDef.cefrMin);
-    if (sectionCefrMinIdx < startIdx && sectionDef.sectionType !== "daily_refresh") {
-      continue;
-    }
 
     const [section] = await db
       .insert(sections)

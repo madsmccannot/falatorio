@@ -55,7 +55,7 @@ export default function SignInScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     try {
-      const { createdSessionId, setActive: setActiveSession, signUp } = await startSSOFlow({
+      const { createdSessionId, setActive: setActiveSession } = await startSSOFlow({
         strategy: "oauth_google",
         redirectUrl: makeRedirectUri({ path: "/sso-callback" }),
         redirectUrlComplete: makeRedirectUri({ path: "/sso-callback" }),
