@@ -1,6 +1,6 @@
 import type { Job } from "bullmq";
 import type { Database } from "@falatorio/db/client";
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { lessons, exercises, lessonSkills, knowledgeItems, exerciseKnowledge } from "@falatorio/db/schema";
 import type { CEFRLevel, ExerciseType, L1Code } from "@falatorio/core";
 import { generateLesson } from "../services/content-generator.service.js";
@@ -51,7 +51,7 @@ export async function processGenerateExercises(
     ? await db
         .select({ id: knowledgeItems.id, skillId: knowledgeItems.skillId })
         .from(knowledgeItems)
-        .where(sql`${knowledgeItems.skillId} = ANY(${skillIds})`)
+        .where(inArray(knowledgeItems.skillId, skillIds))
     : [];
 
   for (const ex of result.exercises) {

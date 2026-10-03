@@ -37,7 +37,8 @@ export default function WelcomeScreen() {
     try {
       const { createdSessionId, setActive, signUp } = await startSSOFlow({
         strategy: "oauth_google",
-        redirectUrl: makeRedirectUri({ path: "sso-callback", preferLocalhost: true }),
+        redirectUrl: makeRedirectUri({ path: "/sso-callback" }),
+        redirectUrlComplete: makeRedirectUri({ path: "/sso-callback" }),
       });
 
       if (createdSessionId && setActive) {

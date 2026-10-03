@@ -91,7 +91,7 @@ export async function findCoverageGaps(
 
     if (entry.count >= config.targetExercisesPerKI) continue;
 
-    const allowedTypes = (ki.exerciseTypes as string[] ?? EXERCISE_TYPES) as ExerciseType[];
+    const allowedTypes = [...EXERCISE_TYPES] as ExerciseType[];
     const missingTypes = allowedTypes.filter((t) => !entry.types.has(t));
 
     const coveredCognitive = new Set<CognitiveLevel>();
@@ -186,7 +186,7 @@ async function generateForGap(
   const needed = gap.targetCount - gap.currentCount;
   const typesToGenerate = gap.missingTypes.slice(0, needed);
   if (typesToGenerate.length === 0) {
-    const allTypes = (ki.exerciseTypes as string[] ?? EXERCISE_TYPES) as ExerciseType[];
+    const allTypes = [...EXERCISE_TYPES] as ExerciseType[];
     for (let i = 0; i < needed; i++) {
       typesToGenerate.push(allTypes[i % allTypes.length]!);
     }
@@ -202,47 +202,53 @@ async function generateForGap(
       ? (ki.l1Notes as Record<string, any>)[l1]?.reason ?? null
       : null;
 
-    try {
-      const result = await generateFromKnowledgeItem({
-        request: {
-          skillCode: gap.skillCode,
-          knowledgeItemCode: gap.knowledgeItemCode,
-          l1,
-          cefrLevel: gap.cefrLevel,
-          exerciseType,
-          cognitiveLevel,
-          difficulty: cefrToDifficulty(gap.cefrLevel),
-        },
-        rule: ki.rule,
-        examples: (ki.examples as string[]) ?? [],
-        commonErrors: (ki.commonErrors as string[]) ?? [],
-        l1Notes: l1NotesStr,
-      });
-
-      const promptObj = result.prompt;
-      const [inserted] = await db
-        .insert(exercises)
-        .values({
-          lessonId: null,
-          type: result.type,
-          prompt: promptObj,
-          acceptedAnswers: result.acceptedAnswers,
-          difficulty: result.difficulty,
-          l1Tip: result.l1Tip,
-          status: "review",
-        })
-        .returning({ id: exercises.id });
-
-      if (inserted) {
-        await db.insert(exerciseKnowledge).values({
-          exerciseId: inserted.id,
-          knowledgeItemId: gap.knowledgeItemId,
-          isPrimary: true,
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const result = await generateFromKnowledgeItem({
+          request: {
+            skillCode: gap.skillCode,
+            knowledgeItemCode: gap.knowledgeItemCode,
+            l1,
+            cefrLevel: gap.cefrLevel,
+            exerciseType,
+            cognitiveLevel,
+            difficulty: cefrToDifficulty(gap.cefrLevel),
+          },
+          rule: ki.rule,
+          examples: (ki.examples as string[]) ?? [],
+          commonErrors: (ki.commonErrors as string[]) ?? [],
+          l1Notes: l1NotesStr,
         });
-        generated++;
+
+        const [inserted] = await db
+          .insert(exercises)
+          .values({
+            lessonId: null,
+            type: exerciseType,
+            prompt: result.prompt,
+            acceptedAnswers: result.acceptedAnswers,
+            difficulty: result.difficulty,
+            l1Tip: result.l1Tip,
+            status: "review",
+          })
+          .returning({ id: exercises.id });
+
+        if (inserted) {
+          await db.insert(exerciseKnowledge).values({
+            exerciseId: inserted.id,
+            knowledgeItemId: gap.knowledgeItemId,
+            isPrimary: true,
+          });
+          generated++;
+        }
+        break;
+      } catch (err) {
+        if (attempt === 1) {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.error(`  [${gap.knowledgeItemCode}] ${exerciseType}: ${msg}`);
+          throw err;
+        }
       }
-    } catch {
-      continue;
     }
   }
 

@@ -24,7 +24,7 @@ import {
   skillMastery,
   knowledgeRelations,
   lessonSkills,
-} from "./schema/index";
+} from "./schema/index.js";
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   streak: one(streaks, {

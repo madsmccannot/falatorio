@@ -4,7 +4,7 @@ import {
   primaryKey,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { knowledgeItems } from "./knowledge-items";
+import { knowledgeItems } from "./knowledge-items.js";
 
 export const knowledgeRelationTypeEnum = pgEnum("knowledge_relation_type", [
   "related",

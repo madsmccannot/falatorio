@@ -6,7 +6,7 @@ import {
   pgEnum,
   index,
 } from "drizzle-orm/pg-core";
-import { l1CodeEnum, cefrEnum } from "./users";
+import { l1CodeEnum, cefrEnum } from "./users.js";
 
 export const culturalContentTypeEnum = pgEnum("cultural_content_type", [
   "joke", "expression", "meme", "reference",

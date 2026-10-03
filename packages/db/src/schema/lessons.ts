@@ -7,7 +7,7 @@ import {
   real,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { units } from "./units";
+import { units } from "./units.js";
 
 export const nodeTypeEnum = pgEnum("node_type", ["lesson", "chest"]);
 

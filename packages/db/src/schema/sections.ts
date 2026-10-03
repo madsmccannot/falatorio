@@ -7,8 +7,8 @@ import {
   boolean,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { courses } from "./courses";
-import { cefrEnum } from "./users";
+import { courses } from "./courses.js";
+import { cefrEnum } from "./users.js";
 
 export const sectionTypeEnum = pgEnum("section_type", [
   "numbered",

@@ -45,6 +45,12 @@ async function main() {
 
   registerRevenueCatWebhook(app, db);
 
+  app.get("/", async () => ({
+    name: "Falatorio API",
+    version: "0.1.0",
+    status: "ok",
+  }));
+
   app.get("/health", async () => ({
     status: "ok",
     timestamp: new Date().toISOString(),
@@ -57,7 +63,7 @@ async function main() {
   createWorker<LeagueResetData>(QUEUE_NAMES.LEAGUE_RESET, (job) => processLeagueReset(job, db), redis);
   createWorker<GenerateExercisesData>(QUEUE_NAMES.EXERCISES, (job) => processGenerateExercises(job, db), redis);
 
-  const host = env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1";
+  const host = "0.0.0.0";
 
   await app.listen({ port: env.PORT, host });
   console.log(`Server running on ${host}:${env.PORT}`);

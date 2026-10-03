@@ -5,7 +5,7 @@ import {
   timestamp,
   primaryKey,
 } from "drizzle-orm/pg-core";
-import { users } from "./users";
+import { users } from "./users.js";
 
 export const achievements = pgTable("achievements", {
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),

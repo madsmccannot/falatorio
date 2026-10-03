@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
@@ -53,7 +53,7 @@ export const contentRouter = t.router({
               count: sql<number>`count(*)::int`.as("count"),
             })
             .from(units)
-            .where(sql`${units.sectionId} = ANY(${sectionIds})`)
+            .where(inArray(units.sectionId, sectionIds))
             .groupBy(units.sectionId)
         : [];
 
@@ -67,7 +67,7 @@ export const contentRouter = t.router({
             })
             .from(units)
             .innerJoin(lessons, eq(lessons.unitId, units.id))
-            .where(sql`${units.sectionId} = ANY(${sectionIds})`)
+            .where(inArray(units.sectionId, sectionIds))
             .groupBy(units.sectionId)
         : [];
       const lessonCountMap = new Map(lessonCounts.map((r) => [r.sectionId, r.totalLessons]));
@@ -80,8 +80,8 @@ export const contentRouter = t.router({
             })
             .from(units)
             .innerJoin(lessons, eq(lessons.unitId, units.id))
-            .innerJoin(lessonCompletions, sql`${lessonCompletions.lessonId} = ${lessons.id} AND ${lessonCompletions.userId} = ${ctx.user.userId}`)
-            .where(sql`${units.sectionId} = ANY(${sectionIds})`)
+            .innerJoin(lessonCompletions, and(eq(lessonCompletions.lessonId, lessons.id), eq(lessonCompletions.userId, ctx.user.userId)))
+            .where(inArray(units.sectionId, sectionIds))
             .groupBy(units.sectionId)
         : [];
       const completionMap = new Map(completionCounts.map((r) => [r.sectionId, r.completedLessons]));
@@ -167,7 +167,7 @@ export const contentRouter = t.router({
         ? await ctx.db
             .select()
             .from(lessons)
-            .where(sql`${lessons.unitId} = ANY(${unitIds})`)
+            .where(inArray(lessons.unitId, unitIds))
             .orderBy(lessons.unitId, lessons.sortOrder)
         : [];
 
@@ -177,7 +177,7 @@ export const contentRouter = t.router({
             .select({ lessonId: lessonCompletions.lessonId })
             .from(lessonCompletions)
             .where(
-              sql`${lessonCompletions.userId} = ${ctx.user.userId} AND ${lessonCompletions.lessonId} = ANY(${allLessonIds})`,
+              and(eq(lessonCompletions.userId, ctx.user.userId), inArray(lessonCompletions.lessonId, allLessonIds)),
             )
         : [];
       const completedSet = new Set(completedRows.map((c) => c.lessonId));
@@ -220,7 +220,7 @@ export const contentRouter = t.router({
       const allLessons = await ctx.db
         .select({ id: lessons.id })
         .from(lessons)
-        .where(sql`${lessons.unitId} = ANY(${unitIds})`);
+        .where(inArray(lessons.unitId, unitIds));
 
       const lessonIds = allLessons.map((l) => l.id);
       if (lessonIds.length === 0) return { completedLessonIds: [], totalLessons: 0 };
@@ -229,7 +229,7 @@ export const contentRouter = t.router({
         .select({ lessonId: lessonCompletions.lessonId })
         .from(lessonCompletions)
         .where(
-          sql`${lessonCompletions.userId} = ${ctx.user.userId} AND ${lessonCompletions.lessonId} = ANY(${lessonIds})`,
+          and(eq(lessonCompletions.userId, ctx.user.userId), inArray(lessonCompletions.lessonId, lessonIds)),
         );
 
       return {
@@ -342,7 +342,7 @@ export const contentRouter = t.router({
       const allLessons = await ctx.db
         .select({ id: lessons.id })
         .from(lessons)
-        .where(sql`${lessons.unitId} = ANY(${unitIds})`);
+        .where(inArray(lessons.unitId, unitIds));
 
       if (allLessons.length === 0) return { skipped: 0 };
 

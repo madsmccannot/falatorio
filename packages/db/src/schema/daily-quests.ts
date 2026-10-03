@@ -9,7 +9,7 @@ import {
   pgEnum,
   primaryKey,
 } from "drizzle-orm/pg-core";
-import { users } from "./users";
+import { users } from "./users.js";
 
 export const questTypeEnum = pgEnum("quest_type", [
   "complete_lesson",

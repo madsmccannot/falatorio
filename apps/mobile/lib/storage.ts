@@ -92,7 +92,10 @@ export { KEYS };
 export function getApiUrl(): string {
   const custom = getString(KEYS.API_URL);
   if (custom) return custom;
-  return __DEV__ ? "http://localhost:3001" : "https://api.falatorio.com";
+  const envUrl = process.env["EXPO_PUBLIC_API_URL"];
+  if (envUrl) return envUrl;
+  if (!__DEV__) return "https://api.falatorio.com";
+  return "http://localhost:3001";
 }
 
 export function hasCompletedOnboarding(): boolean {

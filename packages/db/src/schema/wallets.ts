@@ -3,7 +3,7 @@ import {
   uuid,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { users } from "./users";
+import { users } from "./users.js";
 
 export const wallets = pgTable("wallets", {
   id: uuid("id").primaryKey().defaultRandom(),

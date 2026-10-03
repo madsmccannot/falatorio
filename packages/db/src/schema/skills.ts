@@ -7,7 +7,7 @@ import {
   timestamp,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { cefrEnum } from "./users";
+import { cefrEnum } from "./users.js";
 
 export const skillDomainEnum = pgEnum("skill_domain", [
   "phonetics",

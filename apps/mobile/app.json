@@ -28,13 +28,6 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX",
-          "iosAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"
-        }
-      ],
       "expo-asset",
       "expo-font",
       [
@@ -46,21 +39,16 @@
         }
       ],
       "expo-web-browser",
-      [
-        "@sentry/react-native/expo",
-        {
-          "organization": "falatorio",
-          "project": "mobile"
-        }
-      ]
+      "expo-audio"
     ],
     "extra": {
       "eas": {
-        "projectId": "PLACEHOLDER"
+        "projectId": "86aa60e7-c4f5-4b75-97fa-7fc21c9f010b"
       },
       "router": {
         "origin": false
       }
-    }
+    },
+    "owner": "madsmccannot"
   }
 }

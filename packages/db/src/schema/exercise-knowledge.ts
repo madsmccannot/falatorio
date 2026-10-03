@@ -4,8 +4,8 @@ import {
   boolean,
   primaryKey,
 } from "drizzle-orm/pg-core";
-import { exercises } from "./exercises";
-import { knowledgeItems } from "./knowledge-items";
+import { exercises } from "./exercises.js";
+import { knowledgeItems } from "./knowledge-items.js";
 
 export const exerciseKnowledge = pgTable("exercise_knowledge", {
   exerciseId: uuid("exercise_id").notNull().references(() => exercises.id, { onDelete: "cascade" }),

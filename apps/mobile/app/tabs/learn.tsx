@@ -485,6 +485,21 @@ export default function LearnScreen() {
       {renderTopBar()}
       {courses.isLoading ? (
         <Loading message={t("learn.loading")} />
+      ) : courses.isError ? (
+        <View style={styles.empty}>
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>Erro de ligação</Text>
+          <Text style={[styles.emptyText, { color: theme.textMuted }]}>
+            {courses.error?.message ?? "Não foi possível carregar os cursos."}
+          </Text>
+          <Pressable
+            onPress={() => courses.refetch()}
+            style={{ marginTop: spacing.lg, padding: spacing.md }}
+          >
+            <Text style={{ color: colors.primary[500], fontWeight: "700", fontSize: typography.sizes.md }}>
+              Tentar novamente
+            </Text>
+          </Pressable>
+        </View>
       ) : (
         <ScrollView
           contentContainerStyle={styles.list}

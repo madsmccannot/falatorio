@@ -1,4 +1,4 @@
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import type { Database } from "@falatorio/db/client";
 import {
   skillEvidence,
@@ -17,7 +17,7 @@ export async function recalculateMasteryForKnowledgeItems(
   const kis = await db
     .select({ id: knowledgeItems.id, skillId: knowledgeItems.skillId })
     .from(knowledgeItems)
-    .where(sql`${knowledgeItems.id} = ANY(${knowledgeItemIds})`);
+    .where(inArray(knowledgeItems.id, knowledgeItemIds));
 
   const affectedSkillIds = [...new Set(kis.map((ki) => ki.skillId))];
 
@@ -35,7 +35,7 @@ export async function recalculateMasteryForKnowledgeItems(
       .where(
         and(
           eq(skillEvidence.userId, userId),
-          sql`${skillEvidence.knowledgeItemId} = ANY(${kiIds})`,
+          inArray(skillEvidence.knowledgeItemId, kiIds),
         ),
       )
       .orderBy(skillEvidence.createdAt);

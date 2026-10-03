@@ -3,7 +3,7 @@ import {
   uuid,
   primaryKey,
 } from "drizzle-orm/pg-core";
-import { skills } from "./skills";
+import { skills } from "./skills.js";
 
 export const skillPrerequisites = pgTable("skill_prerequisites", {
   skillId: uuid("skill_id").notNull().references(() => skills.id, { onDelete: "cascade" }),

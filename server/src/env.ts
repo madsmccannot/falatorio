@@ -1,9 +1,33 @@
 import { z } from "zod";
+import { readFileSync, existsSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const isDev = process.env["NODE_ENV"] !== "production";
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const optionalInDev = () =>
-  isDev ? z.string().default("") : z.string().min(1);
+function loadEnvFile() {
+  const candidates = [
+    resolve(__dirname, "../../.env.local"),
+    resolve(__dirname, "../.env.local"),
+    resolve(process.cwd(), ".env.local"),
+  ];
+  for (const p of candidates) {
+    if (!existsSync(p)) continue;
+    const content = readFileSync(p, "utf-8");
+    for (const line of content.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const idx = trimmed.indexOf("=");
+      if (idx < 0) continue;
+      const key = trimmed.slice(0, idx).trim();
+      const val = trimmed.slice(idx + 1).trim();
+      if (!process.env[key]) process.env[key] = val;
+    }
+    break;
+  }
+}
+
+loadEnvFile();
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -12,17 +36,17 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
 
-  CLERK_SECRET_KEY: optionalInDev(),
+  CLERK_SECRET_KEY: z.string().default(""),
 
-  ANTHROPIC_API_KEY: optionalInDev(),
-  OPENAI_API_KEY: optionalInDev(),
+  ANTHROPIC_API_KEY: z.string().default(""),
+  OPENAI_API_KEY: z.string().default(""),
 
-  AZURE_SPEECH_KEY: optionalInDev(),
+  AZURE_SPEECH_KEY: z.string().default(""),
   AZURE_SPEECH_REGION: z.string().default("westeurope"),
 
-  R2_ACCOUNT_ID: optionalInDev(),
-  R2_ACCESS_KEY_ID: optionalInDev(),
-  R2_SECRET_ACCESS_KEY: optionalInDev(),
+  R2_ACCOUNT_ID: z.string().default(""),
+  R2_ACCESS_KEY_ID: z.string().default(""),
+  R2_SECRET_ACCESS_KEY: z.string().default(""),
   R2_BUCKET_NAME: z.string().default("falatorio-audio"),
 
   FCM_PROJECT_ID: z.string().min(1).optional(),

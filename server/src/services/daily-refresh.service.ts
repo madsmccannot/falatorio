@@ -1,4 +1,4 @@
-import { eq, and, sql, lte, desc } from "drizzle-orm";
+import { eq, and, sql, lte, desc, inArray } from "drizzle-orm";
 import type { Database } from "@falatorio/db/client";
 import {
   userProgress,
@@ -96,14 +96,14 @@ export async function buildDailyRefreshSession(
     const skillKIs = await db
       .select({ id: knowledgeItems.id })
       .from(knowledgeItems)
-      .where(sql`${knowledgeItems.skillId} = ANY(${skillIds})`);
+      .where(inArray(knowledgeItems.skillId, skillIds));
 
     if (skillKIs.length > 0) {
       const kiIds = skillKIs.map((ki) => ki.id);
       const linkedExercises = await db
         .select({ exerciseId: exerciseKnowledge.exerciseId })
         .from(exerciseKnowledge)
-        .where(sql`${exerciseKnowledge.knowledgeItemId} = ANY(${kiIds})`)
+        .where(inArray(exerciseKnowledge.knowledgeItemId, kiIds))
         .limit(cap * 3);
 
       const liveExercises = linkedExercises.length > 0
@@ -112,7 +112,7 @@ export async function buildDailyRefreshSession(
             .from(exercises)
             .where(
               and(
-                sql`${exercises.id} = ANY(${linkedExercises.map((e) => e.exerciseId)})`,
+                inArray(exercises.id, linkedExercises.map((e) => e.exerciseId)),
                 eq(exercises.status, "live"),
               ),
             )

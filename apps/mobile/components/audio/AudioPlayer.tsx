@@ -1,8 +1,8 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Audio } from "expo-av";
+import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import * as Haptics from "expo-haptics";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type Props = {
@@ -12,75 +12,39 @@ type Props = {
 };
 
 export function AudioPlayer({ uri, label, compact }: Props) {
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [, setDuration] = React.useState(0);
-  const [, setPosition] = React.useState(0);
-  const soundRef = React.useRef<Audio.Sound | null>(null);
-  const progress = useSharedValue(0);
+  const player = useAudioPlayer(uri, { updateInterval: 100 });
+  const status = useAudioPlayerStatus(player);
+
+  const progress = status.duration > 0 ? status.currentTime / status.duration : 0;
 
   const progressStyle = useAnimatedStyle(() => ({
-    width: `${progress.value * 100}%`,
+    width: `${withTiming(progress * 100, { duration: 100 })}%`,
   }));
 
-  const play = async () => {
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      if (soundRef.current) {
-        const status = await soundRef.current.getStatusAsync();
-        if (status.isLoaded && status.didJustFinish) {
-          await soundRef.current.replayAsync();
-        } else if (status.isLoaded && status.isPlaying) {
-          await soundRef.current.pauseAsync();
-          setIsPlaying(false);
-          return;
-        } else {
-          await soundRef.current.playAsync();
-        }
-      } else {
-        const { sound } = await Audio.Sound.createAsync(
-          { uri },
-          { shouldPlay: true }
-        );
-        soundRef.current = sound;
-        sound.setOnPlaybackStatusUpdate((status) => {
-          if (!status.isLoaded) return;
-          setIsPlaying(status.isPlaying);
-          setDuration(status.durationMillis ?? 0);
-          setPosition(status.positionMillis ?? 0);
-          progress.value = withTiming(
-            status.durationMillis ? status.positionMillis / status.durationMillis : 0,
-            { duration: 100 }
-          );
-          if (status.didJustFinish) {
-            setIsPlaying(false);
-            progress.value = withTiming(0, { duration: 300 });
-          }
-        });
+  const toggle = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (status.playing) {
+      player.pause();
+    } else {
+      if (status.currentTime >= status.duration && status.duration > 0) {
+        player.seekTo(0);
       }
-      setIsPlaying(true);
-    } catch {
-      setIsPlaying(false);
+      player.play();
     }
   };
 
-  React.useEffect(() => {
-    return () => {
-      soundRef.current?.unloadAsync();
-    };
-  }, []);
-
   if (compact) {
     return (
-      <Pressable onPress={play} style={styles.compactButton}>
-        <Text style={styles.compactIcon}>{isPlaying ? "⏸" : "▶"}</Text>
+      <Pressable onPress={toggle} style={styles.compactButton}>
+        <Text style={styles.compactIcon}>{status.playing ? "||" : ">"}</Text>
       </Pressable>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={play} style={styles.playButton}>
-        <Text style={styles.playIcon}>{isPlaying ? "⏸" : "▶"}</Text>
+      <Pressable onPress={toggle} style={styles.playButton}>
+        <Text style={styles.playIcon}>{status.playing ? "||" : ">"}</Text>
       </Pressable>
       <View style={styles.trackArea}>
         {label && <Text style={styles.label} numberOfLines={1}>{label}</Text>}

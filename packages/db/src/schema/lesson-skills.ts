@@ -4,8 +4,8 @@ import {
   boolean,
   primaryKey,
 } from "drizzle-orm/pg-core";
-import { lessons } from "./lessons";
-import { skills } from "./skills";
+import { lessons } from "./lessons.js";
+import { skills } from "./skills.js";
 
 export const lessonSkills = pgTable("lesson_skills", {
   lessonId: uuid("lesson_id").notNull().references(() => lessons.id, { onDelete: "cascade" }),

@@ -6,9 +6,9 @@ import {
   timestamp,
   index,
 } from "drizzle-orm/pg-core";
-import { users } from "./users";
-import { knowledgeItems } from "./knowledge-items";
-import { exercises } from "./exercises";
+import { users } from "./users.js";
+import { knowledgeItems } from "./knowledge-items.js";
+import { exercises } from "./exercises.js";
 
 export const skillEvidence = pgTable("skill_evidence", {
   id: uuid("id").primaryKey().defaultRandom(),

@@ -9,7 +9,14 @@ import {
 import type { ExerciseGenerationRequest } from "@falatorio/core";
 import { getProfile, getCulturalRefs } from "@falatorio/core/l1-profiles";
 
-const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+let _client: Anthropic | null = null;
+function getClient(): Anthropic {
+  if (!_client) {
+    if (!env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is required for exercise generation");
+    _client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+  }
+  return _client;
+}
 
 export interface GeneratedExercise {
   type: ExerciseType;
@@ -67,8 +74,8 @@ export async function generateLesson(params: {
     culturalRefs: cefrCulturalRefs,
   });
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-5-20250514",
+  const response = await getClient().messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 8192,
     messages: [{ role: "user", content: prompt }],
   });
@@ -144,8 +151,8 @@ Output ONLY a JSON object (not array). Fields:
 
 Use European Portuguese EXCLUSIVELY: tu/vos conjugations, autocarro, telemovel, pequeno-almoco.`;
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-5-20250514",
+  const response = await getClient().messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1024,
     messages: [{ role: "user", content: prompt }],
   });
@@ -153,23 +160,7 @@ Use European Portuguese EXCLUSIVELY: tu/vos conjugations, autocarro, telemovel, 
   const textBlock = response.content.find((b) => b.type === "text");
   if (!textBlock) throw new Error("No text in LLM response");
 
-  const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error("No JSON object in response");
-
-  const parsed = JSON.parse(jsonMatch[0]) as GeneratedExercise;
-  if (!parsed.type || !parsed.acceptedAnswers) {
-    throw new Error("Invalid exercise structure");
-  }
-
-  const p = parsed.prompt as Record<string, unknown>;
-  if (parsed.glossary && typeof parsed.glossary === "object") {
-    p["glossary"] = parsed.glossary;
-  }
-  if (parsed.genderPairs && typeof parsed.genderPairs === "object") {
-    p["genderPairs"] = parsed.genderPairs;
-  }
-
-  return parsed;
+  return parseExerciseJSON(textBlock.text);
 }
 
 function buildLessonPrompt(params: {
@@ -317,8 +308,8 @@ glossary: object mapping each Portuguese content word (3+ letters) in the exerci
 genderPairs: object mapping Portuguese adjectives/nouns that have masculine/feminine forms to { "g": "m" or "f", "alt": "opposite form" } — e.g. { "bonito": { "g": "m", "alt": "bonita" } }.
 European Portuguese EXCLUSIVELY.`;
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-5-20250514",
+  const response = await getClient().messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1024,
     messages: [{ role: "user", content: prompt }],
   });
@@ -326,20 +317,50 @@ European Portuguese EXCLUSIVELY.`;
   const textBlock = response.content.find((b) => b.type === "text");
   if (!textBlock) throw new Error("No text in LLM response");
 
-  const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/);
+  return parseExerciseJSON(textBlock.text);
+}
+
+function normalizeAcceptedAnswers(val: unknown): string[] {
+  if (typeof val === "string") return [val];
+  if (!Array.isArray(val)) return [String(val)];
+  return val.flat(Infinity).map(String);
+}
+
+function repairJSON(raw: string): string {
+  let s = raw;
+  s = s.replace(/,\s*([}\]])/g, "$1");
+  s = s.replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":');
+  s = s.replace(/:\s*'([^']*)'/g, ': "$1"');
+  s = s.replace(/\t/g, "\\t");
+  return s;
+}
+
+function parseExerciseJSON(text: string): GeneratedExercise {
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("No JSON object in response");
 
-  const parsed = JSON.parse(jsonMatch[0]) as GeneratedExercise;
+  let parsed: GeneratedExercise;
+  try {
+    parsed = JSON.parse(jsonMatch[0]);
+  } catch {
+    parsed = JSON.parse(repairJSON(jsonMatch[0]));
+  }
+
   if (!parsed.type || !parsed.acceptedAnswers) {
     throw new Error("Invalid exercise structure");
   }
 
-  const p2 = parsed.prompt as Record<string, unknown>;
+  parsed.acceptedAnswers = normalizeAcceptedAnswers(parsed.acceptedAnswers);
+
+  if (typeof parsed.prompt === "string") {
+    parsed.prompt = { question: parsed.prompt } as any;
+  }
+  const p = parsed.prompt as Record<string, unknown>;
   if (parsed.glossary && typeof parsed.glossary === "object") {
-    p2["glossary"] = parsed.glossary;
+    p["glossary"] = parsed.glossary;
   }
   if (parsed.genderPairs && typeof parsed.genderPairs === "object") {
-    p2["genderPairs"] = parsed.genderPairs;
+    p["genderPairs"] = parsed.genderPairs;
   }
 
   return parsed;

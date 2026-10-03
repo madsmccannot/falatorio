@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import type { Database } from "@falatorio/db/client";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
@@ -182,7 +182,7 @@ export const pipelineRouter = t.router({
         ? await ctx.db
             .select()
             .from(exerciseKnowledge)
-            .where(sql`${exerciseKnowledge.exerciseId} = ANY(${exerciseIds})`)
+            .where(inArray(exerciseKnowledge.exerciseId, exerciseIds))
         : [];
 
       const kiIds = [...new Set(links.map((l) => l.knowledgeItemId))];
@@ -190,7 +190,7 @@ export const pipelineRouter = t.router({
         ? await ctx.db
             .select()
             .from(knowledgeItems)
-            .where(sql`${knowledgeItems.id} = ANY(${kiIds})`)
+            .where(inArray(knowledgeItems.id, kiIds))
         : [];
 
       const kiMap = new Map(kis.map((ki) => [ki.id, ki]));
@@ -232,7 +232,7 @@ export const pipelineRouter = t.router({
       await ctx.db
         .update(exercises)
         .set({ status: "live", updatedAt: new Date() })
-        .where(sql`${exercises.id} = ANY(${input.exerciseIds})`);
+        .where(inArray(exercises.id, input.exerciseIds));
 
       Promise.allSettled(
         input.exerciseIds.map((id) => generateTtsForExercise(ctx.db, id)),

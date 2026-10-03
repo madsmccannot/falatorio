@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
-import { Audio } from "expo-av";
+import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
@@ -8,38 +8,18 @@ import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function ListenAndType({ exercise, onAnswer, disabled }: ExerciseProps) {
   const [text, setText] = React.useState("");
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const soundRef = React.useRef<Audio.Sound | null>(null);
 
-  const playAudio = async () => {
+  const player = useAudioPlayer(exercise.audioUrl ?? null);
+  const status = useAudioPlayerStatus(player);
+
+  const playAudio = () => {
     if (!exercise.audioUrl) return;
-    try {
-      setIsPlaying(true);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      if (soundRef.current) {
-        await soundRef.current.replayAsync();
-      } else {
-        const { sound } = await Audio.Sound.createAsync(
-          { uri: exercise.audioUrl },
-          { shouldPlay: true }
-        );
-        soundRef.current = sound;
-        sound.setOnPlaybackStatusUpdate((status) => {
-          if (status.isLoaded && status.didJustFinish) {
-            setIsPlaying(false);
-          }
-        });
-      }
-    } catch {
-      setIsPlaying(false);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (status.currentTime >= status.duration && status.duration > 0) {
+      player.seekTo(0);
     }
+    player.play();
   };
-
-  React.useEffect(() => {
-    return () => {
-      soundRef.current?.unloadAsync();
-    };
-  }, []);
 
   const handleSubmit = () => {
     if (!text.trim()) return;
@@ -51,12 +31,12 @@ export function ListenAndType({ exercise, onAnswer, disabled }: ExerciseProps) {
     <View style={styles.container}>
       <Text style={styles.label}>Listen and type what you hear</Text>
 
-      <Pressable onPress={playAudio} style={styles.playButton} disabled={isPlaying}>
-        <View style={[styles.playCircle, isPlaying && styles.playCircleActive]}>
-          <Text style={styles.playIcon}>{isPlaying ? "..." : "▶"}</Text>
+      <Pressable onPress={playAudio} style={styles.playButton} disabled={status.playing}>
+        <View style={[styles.playCircle, status.playing && styles.playCircleActive]}>
+          <Text style={styles.playIcon}>{status.playing ? "..." : ">"}</Text>
         </View>
         <Text style={styles.playText}>
-          {isPlaying ? "Playing..." : "Tap to listen"}
+          {status.playing ? "Playing..." : "Tap to listen"}
         </Text>
       </Pressable>
 

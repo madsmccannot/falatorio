@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, sql, gt } from "drizzle-orm";
+import { eq, and, sql, gt, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
@@ -14,6 +14,7 @@ import {
   skillMastery,
   skillPrerequisites,
   lessons,
+  lessonSkills,
   lessonCompletions,
   transactions,
 } from "@falatorio/db/schema";
@@ -125,14 +126,14 @@ async function buildKnownWords(
     .from(userProgress)
     .where(eq(userProgress.userId, userId));
 
-  const seenIds = new Set(seenExerciseIds.map((r: { exerciseId: string }) => r.exerciseId));
+  const seenIds = new Set<string>(seenExerciseIds.map((r: { exerciseId: string }) => r.exerciseId));
   const knownWords = new Set<string>();
 
   if (seenIds.size > 0) {
     const seenExercises = await db
       .select({ prompt: exercises.prompt })
       .from(exercises)
-      .where(sql`${exercises.id} = ANY(${[...seenIds]})`);
+      .where(inArray(exercises.id, [...seenIds]));
 
     for (const ex of seenExercises) {
       const p = ex.prompt as Record<string, unknown> | string;
@@ -207,7 +208,7 @@ export const lessonRouter = t.router({
         const kiSkills = await ctx.db
           .select({ skillId: knowledgeItems.skillId })
           .from(knowledgeItems)
-          .where(sql`${knowledgeItems.id} = ANY(${fsrsDueKIIds})`);
+          .where(inArray(knowledgeItems.id, fsrsDueKIIds));
         fsrsDueSkillIds.push(...new Set(kiSkills.map((r) => r.skillId)));
       }
 
@@ -261,7 +262,7 @@ export const lessonRouter = t.router({
           .map((r) => r.skillId),
       );
 
-      const allLessonExercises = await ctx.db
+      let allLessonExercises = await ctx.db
         .select()
         .from(exercises)
         .where(
@@ -270,6 +271,45 @@ export const lessonRouter = t.router({
             eq(exercises.status, "live"),
           ),
         );
+
+      if (allLessonExercises.length === 0) {
+        const lsRows = await ctx.db
+          .select({ skillId: lessonSkills.skillId })
+          .from(lessonSkills)
+          .where(eq(lessonSkills.lessonId, input.lessonId));
+
+        const lessonSkillIds = lsRows.map((r) => r.skillId);
+
+        if (lessonSkillIds.length > 0) {
+          const kiRows = await ctx.db
+            .select({ id: knowledgeItems.id })
+            .from(knowledgeItems)
+            .where(inArray(knowledgeItems.skillId, lessonSkillIds));
+
+          const kiIds = kiRows.map((r) => r.id);
+
+          if (kiIds.length > 0) {
+            const exLinks = await ctx.db
+              .selectDistinct({ exerciseId: exerciseKnowledge.exerciseId })
+              .from(exerciseKnowledge)
+              .where(inArray(exerciseKnowledge.knowledgeItemId, kiIds));
+
+            const bankIds = exLinks.map((r) => r.exerciseId);
+
+            if (bankIds.length > 0) {
+              allLessonExercises = await ctx.db
+                .select()
+                .from(exercises)
+                .where(
+                  and(
+                    inArray(exercises.id, bankIds),
+                    eq(exercises.status, "live"),
+                  ),
+                );
+            }
+          }
+        }
+      }
 
       if (allLessonExercises.length === 0) {
         throw new TRPCError({
@@ -283,7 +323,7 @@ export const lessonRouter = t.router({
         ? await ctx.db
             .select()
             .from(exerciseKnowledge)
-            .where(sql`${exerciseKnowledge.exerciseId} = ANY(${exerciseIds})`)
+            .where(inArray(exerciseKnowledge.exerciseId, exerciseIds))
         : [];
 
       const exerciseSkillMap = new Map<string, Set<string>>();
@@ -687,7 +727,7 @@ export const lessonRouter = t.router({
         .from(exercises)
         .where(
           and(
-            sql`${exercises.id} = ANY(${completedIds})`,
+            inArray(exercises.id, completedIds),
             eq(exercises.status, "live"),
           ),
         );
@@ -788,7 +828,7 @@ export const lessonRouter = t.router({
         .from(exercises)
         .where(
           and(
-            sql`${exercises.id} = ANY(${mistakeIds})`,
+            inArray(exercises.id, mistakeIds),
             eq(exercises.status, "live"),
           ),
         );
@@ -998,7 +1038,7 @@ export const lessonRouter = t.router({
         .from(exercises)
         .where(
           and(
-            sql`${exercises.id} = ANY(${refreshResult.exerciseIds})`,
+            inArray(exercises.id, refreshResult.exerciseIds),
             eq(exercises.status, "live"),
           ),
         );

@@ -8,8 +8,8 @@ import {
   timestamp,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { skills } from "./skills";
-import { cefrEnum } from "./users";
+import { skills } from "./skills.js";
+import { cefrEnum } from "./users.js";
 
 export const knowledgeStatusEnum = pgEnum("knowledge_status", [
   "draft",

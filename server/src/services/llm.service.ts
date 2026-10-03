@@ -1,7 +1,14 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { env } from "../env.js";
 
-const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+let _client: Anthropic | null = null;
+function getClient(): Anthropic {
+  if (!_client) {
+    if (!env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is required");
+    _client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+  }
+  return _client;
+}
 
 interface ConversationMessage {
   role: string;
@@ -54,8 +61,8 @@ export async function chatWithTutor(
     content: m.content,
   }));
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-5-20250514",
+  const response = await getClient().messages.create({
+    model: "claude-sonnet-4-5-20250929",
     max_tokens: 1024,
     system: systemPrompt,
     messages: anthropicMessages,
@@ -75,8 +82,8 @@ export async function explainGrammarError(
   l1: string,
   context?: string,
 ): Promise<string> {
-  const response = await client.messages.create({
-    model: "claude-sonnet-5-20250514",
+  const response = await getClient().messages.create({
+    model: "claude-sonnet-4-5-20250929",
     max_tokens: 512,
     system: `You are a Portuguese (PT-EU) grammar tutor. The student's native language is ${l1}. Explain grammar errors concisely. Use the student's L1 for explanations when it helps understanding. Focus on European Portuguese, never Brazilian Portuguese.`,
     messages: [
@@ -103,8 +110,8 @@ export async function explainExerciseError(
   errorCount: number,
 ): Promise<string> {
   const depth = errorCount >= 3 ? "detailed" : "brief";
-  const response = await client.messages.create({
-    model: "claude-sonnet-5-20250514",
+  const response = await getClient().messages.create({
+    model: "claude-sonnet-4-5-20250929",
     max_tokens: depth === "detailed" ? 600 : 300,
     system: `You are a Portuguese (PT-EU) tutor. The student's L1 is ${l1}. Explain exercise errors in a way native ${l1} speakers understand. Use European Portuguese ONLY. Be ${depth}. If the student has made this error ${errorCount} times, explain from a different angle or use an L1 comparison.`,
     messages: [

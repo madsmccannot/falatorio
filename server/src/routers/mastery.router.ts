@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and, sql, desc, count } from "drizzle-orm";
+import { eq, and, sql, desc, count, inArray } from "drizzle-orm";
 import { t } from "../trpc/router.js";
 import { protectedProcedure } from "../trpc/middleware.js";
 import { recalculateMasteryForKnowledgeItems } from "../services/mastery-recalculator.service.js";
@@ -124,7 +124,7 @@ export const masteryRouter = t.router({
         ? await ctx.db
             .select()
             .from(skills)
-            .where(sql`${skills.id} = ANY(${prereqs.map((p) => p.prerequisiteId)})`)
+            .where(inArray(skills.id, prereqs.map((p) => p.prerequisiteId)))
         : [];
 
       return prereqSkills.map((s) => ({
@@ -463,12 +463,12 @@ export const masteryRouter = t.router({
       const allKIs = await ctx.db
         .select()
         .from(knowledgeItems)
-        .where(sql`${knowledgeItems.id} = ANY(${encounteredIds})`)
+        .where(inArray(knowledgeItems.id, encounteredIds))
         .limit(input?.limit ?? 50);
 
       const skillIds = [...new Set(allKIs.map((ki) => ki.skillId))];
       const relatedSkills = skillIds.length > 0
-        ? await ctx.db.select().from(skills).where(sql`${skills.id} = ANY(${skillIds})`)
+        ? await ctx.db.select().from(skills).where(inArray(skills.id, skillIds))
         : [];
 
       const skillMap = new Map(relatedSkills.map((s) => [s.id, s]));
@@ -511,7 +511,7 @@ export const masteryRouter = t.router({
       const linkedSkills = await ctx.db
         .select()
         .from(skills)
-        .where(sql`${skills.id} = ANY(${skillIds})`);
+        .where(inArray(skills.id, skillIds));
 
       const primaryMap = new Map(links.map((l) => [l.skillId, l.isPrimary]));
 
@@ -539,7 +539,7 @@ export const masteryRouter = t.router({
       const linkedLessons = await ctx.db
         .select()
         .from(lessons)
-        .where(sql`${lessons.id} = ANY(${lessonIds})`);
+        .where(inArray(lessons.id, lessonIds));
 
       const primaryMap = new Map(links.map((l) => [l.lessonId, l.isPrimary]));
 

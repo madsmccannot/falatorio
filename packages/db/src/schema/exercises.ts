@@ -8,7 +8,7 @@ import {
   timestamp,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { lessons } from "./lessons";
+import { lessons } from "./lessons.js";
 
 export const exerciseTypeEnum = pgEnum("exercise_type", [
   "translate_l1_to_pt",
