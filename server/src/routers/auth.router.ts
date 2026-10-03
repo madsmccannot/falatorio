@@ -74,6 +74,11 @@ export const authRouter = t.router({
       return { userId: user!.id, created: true };
     }),
 
+  checkAccount: t.procedure.query(async ({ ctx }) => {
+    if (!ctx.user) return { exists: false as const };
+    return { exists: true as const, l1: ctx.user.l1, tier: ctx.user.tier };
+  }),
+
   checkUsername: t.procedure
     .input(z.object({ username: z.string().min(3).max(30) }))
     .query(async ({ ctx, input }) => {
