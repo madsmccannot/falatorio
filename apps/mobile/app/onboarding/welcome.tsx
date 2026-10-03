@@ -13,6 +13,7 @@ import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 import { trackScreenView } from "@/lib/analytics";
 import { captureEvent } from "@/lib/posthog";
+import { hasCompletedOnboarding } from "@/lib/storage";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -47,9 +48,12 @@ export default function WelcomeScreen() {
 
         if (signUp?.createdUserId) {
           captureEvent("auth_sign_up", { method: "google" });
-          router.replace("/onboarding/select-language");
-        } else {
+        }
+
+        if (hasCompletedOnboarding()) {
           router.replace("/tabs/learn");
+        } else {
+          router.replace("/onboarding/select-language");
         }
       }
     } catch (err: any) {

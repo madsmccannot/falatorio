@@ -100,11 +100,11 @@ export default function ChooseProfileScreen() {
       try {
         const res = await fetch(
           `${getApiUrl()}/trpc/auth.checkUsername?input=${encodeURIComponent(
-            JSON.stringify({ username: value }),
+            JSON.stringify({ json: { username: value } }),
           )}`,
         );
         const data = await res.json();
-        const result = data?.result?.data;
+        const result = data?.result?.data?.json;
 
         if (result?.available) {
           setUsernameStatus("available");

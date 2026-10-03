@@ -22,6 +22,7 @@ import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { trackScreenView } from "@/lib/analytics";
 import { captureEvent } from "@/lib/posthog";
+import { hasCompletedOnboarding } from "@/lib/storage";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -64,10 +65,10 @@ export default function SignInScreen() {
         await setActiveSession({ session: createdSessionId });
         captureEvent("auth_sign_in", { method: "google" });
 
-        if (signUp?.createdUserId) {
-          router.replace("/onboarding/select-language");
-        } else {
+        if (hasCompletedOnboarding()) {
           router.replace("/tabs/learn");
+        } else {
+          router.replace("/onboarding/select-language");
         }
       }
     } catch (err: any) {
@@ -95,7 +96,11 @@ export default function SignInScreen() {
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
         captureEvent("auth_sign_in", { method: "email" });
-        router.replace("/tabs/learn");
+        if (hasCompletedOnboarding()) {
+          router.replace("/tabs/learn");
+        } else {
+          router.replace("/onboarding/select-language");
+        }
       }
     } catch (err: any) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
