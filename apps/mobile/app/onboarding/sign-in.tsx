@@ -22,7 +22,6 @@ import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { trackScreenView } from "@/lib/analytics";
 import { captureEvent } from "@/lib/posthog";
-import { setOnboardingComplete, setString, KEYS, getApiUrl } from "@/lib/storage";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -33,10 +32,9 @@ export default function SignInScreen() {
   const { t } = useTranslation();
   const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
 
-  const { useSSO, useSignIn, useAuth } = require("@clerk/expo");
+  const { useSSO, useSignIn } = require("@clerk/expo");
   const { startSSOFlow } = useSSO();
   const { signIn, setActive } = useSignIn();
-  const { getToken } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -65,25 +63,7 @@ export default function SignInScreen() {
       if (createdSessionId && setActiveSession) {
         await setActiveSession({ session: createdSessionId });
         captureEvent("auth_sign_in", { method: "google" });
-
-        const token = await getToken();
-        if (token) {
-          try {
-            const res = await fetch(`${getApiUrl()}/trpc/auth.checkAccount`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const data = await res.json();
-            const result = data?.result?.data?.json;
-            if (result?.exists) {
-              setOnboardingComplete();
-              if (result.l1) setString(KEYS.SELECTED_L1, result.l1);
-              router.replace("/tabs/learn");
-              return;
-            }
-          } catch {}
-        }
-
-        router.replace("/onboarding/select-language");
+        router.replace("/");
       }
     } catch (err: any) {
       if (err?.message !== "ERR_REQUEST_CANCELED") {
@@ -93,7 +73,7 @@ export default function SignInScreen() {
     } finally {
       setGoogleLoading(false);
     }
-  }, [startSSOFlow, getToken]);
+  }, [startSSOFlow]);
 
   const handleSignIn = useCallback(async () => {
     if (!isValid) return;
@@ -110,25 +90,7 @@ export default function SignInScreen() {
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
         captureEvent("auth_sign_in", { method: "email" });
-
-        const token = await getToken();
-        if (token) {
-          try {
-            const res = await fetch(`${getApiUrl()}/trpc/auth.checkAccount`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const data = await res.json();
-            const acct = data?.result?.data?.json;
-            if (acct?.exists) {
-              setOnboardingComplete();
-              if (acct.l1) setString(KEYS.SELECTED_L1, acct.l1);
-              router.replace("/tabs/learn");
-              return;
-            }
-          } catch {}
-        }
-
-        router.replace("/onboarding/select-language");
+        router.replace("/");
       }
     } catch (err: any) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);

@@ -13,7 +13,6 @@ import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 import { trackScreenView } from "@/lib/analytics";
 import { captureEvent } from "@/lib/posthog";
-import { setOnboardingComplete, setString, KEYS, getApiUrl } from "@/lib/storage";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -24,9 +23,8 @@ export default function WelcomeScreen() {
   const { t } = useTranslation();
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const { useSSO, useAuth } = require("@clerk/expo");
+  const { useSSO } = require("@clerk/expo");
   const { startSSOFlow } = useSSO();
-  const { getToken } = useAuth();
 
   useEffect(() => {
     trackScreenView("welcome");
@@ -51,24 +49,7 @@ export default function WelcomeScreen() {
           captureEvent("auth_sign_up", { method: "google" });
         }
 
-        const token = await getToken();
-        if (token) {
-          try {
-            const res = await fetch(`${getApiUrl()}/trpc/auth.checkAccount`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const data = await res.json();
-            const result = data?.result?.data?.json;
-            if (result?.exists) {
-              setOnboardingComplete();
-              if (result.l1) setString(KEYS.SELECTED_L1, result.l1);
-              router.replace("/tabs/learn");
-              return;
-            }
-          } catch {}
-        }
-
-        router.replace("/onboarding/select-language");
+        router.replace("/");
       }
     } catch (err: any) {
       if (err?.message !== "ERR_REQUEST_CANCELED") {
@@ -77,7 +58,7 @@ export default function WelcomeScreen() {
     } finally {
       setGoogleLoading(false);
     }
-  }, [startSSOFlow, getToken]);
+  }, [startSSOFlow]);
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.bg }]}>
