@@ -175,9 +175,9 @@ export const esCulturalRefs: readonly CulturalRef[] = [
   {
     id: "es_autocarro_comboio",
     type: "reference",
-    contentPt: "Autocarro, comboio, eléctrico",
+    contentPt: "Autocarro, comboio, elétrico",
     contentL1: "Autobús, tren, tranvía",
-    explanation: "Transport vocabulary is different. Bus = autocarro (not autobús). Train = comboio (not tren). Tram = eléctrico (not tranvía). Station = estação (same root). The Lisbon tram 28 is iconic. 'Comboio' literally means 'convoy'.",
+    explanation: "Transport vocabulary is different. Bus = autocarro (not autobús). Train = comboio (not tren). Tram = elétrico (not tranvía). Station = estação (same root). The Lisbon tram 28 is iconic. 'Comboio' literally means 'convoy'.",
     cefrMin: "A1",
     tags: ["vocabulary", "transport", "daily-life"],
   },

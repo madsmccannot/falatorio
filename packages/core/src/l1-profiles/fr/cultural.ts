@@ -103,9 +103,9 @@ export const frCulturalRefs: readonly CulturalRef[] = [
   {
     id: "fr_autocarro",
     type: "reference",
-    contentPt: "Autocarro / comboio / eléctrico",
+    contentPt: "Autocarro / comboio / elétrico",
     contentL1: "Bus / train / tramway",
-    explanation: "Les transports en PT-EU ont des mots différents du brésilien. Bus = autocarro (pas 'ônibus'), train = comboio (pas 'trem'), tramway = eléctrico. A Lisbonne, le fameux eléctrico 28.",
+    explanation: "Les transports en PT-EU ont des mots différents du brésilien. Bus = autocarro (pas 'ônibus'), train = comboio (pas 'trem'), tramway = elétrico. A Lisbonne, le fameux elétrico 28.",
     cefrMin: "A1",
     tags: ["daily-life", "vocabulary", "lisbon"],
   },
