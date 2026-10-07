@@ -47,7 +47,7 @@ falatorio/
 
 Every source language is a separate product. Each L1 profile contains phonetic transfer maps, grammar interference patterns, false friends, cognates, and cultural bridges. 15 L1 profiles: en, es, fr, de, hi, ur, ar, bn, zh, ru, uk, tr, pl, ko, ja.
 
-All 15 profiles are fully expanded with 40 false friends, 15 phonetic difficulties (with animated mouth position diagrams), 15 grammar gaps, 16-30 cognates, and cultural references.
+All 15 profiles are fully expanded with 30 cognates, 40 false friends, 15 phonetic difficulties (with animated mouth position diagrams), 15 grammar gaps, and 45-55 cultural references each.
 
 ### Skill / Knowledge / Mastery Model
 
@@ -137,7 +137,7 @@ Text scoring uses Levenshtein distance with PT-EU phonetic normalization. Speech
 
 ### Internationalization
 
-All UI strings translatable via `useTranslation()` hook. 16 dictionaries (15 L1 languages + Portuguese) with full key parity. English is the source of truth; Portuguese has full coverage with proper diacritics. Placement test and section test questions are fully translated in all 15 languages.
+All UI strings translatable via `useTranslation()` hook. 16 dictionaries (15 L1 languages + Portuguese) with 402 keys each at full parity. English is the source of truth; Portuguese has full coverage with proper diacritics (Acordo Ortografico). All hardcoded UI strings translated to PT-PT. Placement test and section test questions are fully translated in all 15 languages.
 
 ## Package Breakdown
 
@@ -153,7 +153,7 @@ Pure business logic, zero I/O dependencies:
 - **Entitlements** -- feature gates, heart system, access checks
 - **Gamification** -- XP calculator, streak logic, league promotion, 42 achievements (19 competence badges tied to mastery evidence)
 - **Ads** -- ad policy (GDPR, tier, cooldowns)
-- **L1 Profiles** -- 15 language transfer profiles with 40 false friends, 15 phonetic difficulties, 15 grammar gaps each
+- **L1 Profiles** -- 15 language transfer profiles with 30 cognates, 40 false friends, 15 phonetic difficulties (with mouthPosition for animated diagrams), 15 grammar gaps each
 
 ### `packages/db` -- 29 tables, 20 enums
 
