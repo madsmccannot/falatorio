@@ -1,6 +1,5 @@
 import { createDb } from "@falatorio/db/client";
 import { skills, knowledgeItems } from "@falatorio/db/schema";
-import { eq } from "drizzle-orm";
 import type { CEFRLevel } from "@falatorio/core";
 
 const DATABASE_URL = process.env["DATABASE_URL"];
