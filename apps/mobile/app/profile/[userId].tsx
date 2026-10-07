@@ -11,7 +11,7 @@ import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 const L1_NAMES: Record<string, string> = {
-  en: "English", es: "Espanol", fr: "Francais", hi: "Hindi", ur: "Urdu",
+  en: "English", es: "Español", fr: "Français", hi: "Hindi", ur: "Urdu",
   ar: "Arabic", bn: "Bengali", de: "Deutsch", zh: "Chinese",
   ru: "Russian", uk: "Ukrainian", tr: "Turkish", pl: "Polish", ko: "Korean", ja: "Japanese",
 };
