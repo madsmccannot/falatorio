@@ -11,7 +11,8 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.falatorio.app",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "Falatório needs your microphone to evaluate pronunciation exercises.",
+        "NSMicrophoneUsageDescription": "Falatorio uses your microphone to evaluate your pronunciation in speaking exercises.",
+        "NSSpeechRecognitionUsageDescription": "Falatorio uses speech recognition to check your pronunciation and score speaking exercises.",
         "NSUserTrackingUsageDescription": "We use this to show relevant ads. You can opt out anytime."
       }
     },
@@ -39,7 +40,8 @@
         }
       ],
       "expo-web-browser",
-      "expo-audio"
+      "expo-audio",
+      "expo-speech-recognition"
     ],
     "extra": {
       "eas": {
