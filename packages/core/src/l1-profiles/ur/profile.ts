@@ -79,6 +79,8 @@ export const urProfile: L1Profile = {
       { word: "morar", l1Meaning: "moraa — peacock tail feather", ptMeaning: "morar means 'to live/reside'" },
       { word: "lima", l1Meaning: "nimbu (lime) — Portuguese gave limes to South Asia", ptMeaning: "lima means 'lime' (the fruit) or 'file' (the tool)" },
       { word: "bala", l1Meaning: "baalaa — above/high, or baalaa — earring", ptMeaning: "bala means 'bullet' or 'sweet/candy'" },
+      { word: "lar", l1Meaning: "laar — affection/caress", ptMeaning: "lar means 'home/hearth' — 'sem lar' = homeless" },
+      { word: "mesa", l1Meaning: "meezaan — balance/scale", ptMeaning: "mesa means 'table' — not related to balance (balança)" },
     ],
     phoneticDifficulties: [
       { sound: "ão", ipa: "/ɐ̃w̃/", description: "Nasal diphthong", tip: "Urdu has nasal vowels via nun ghunna — use that instinct but add a strong diphthong glide. This is a moving nasal sound, not a static one.", mouthPosition: "nasal_ao" },
