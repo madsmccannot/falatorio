@@ -1,25 +1,17 @@
 import React from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
-import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { SpeakButton } from "./SpeakButton";
+import { useTheme } from "@/lib/theme";
+import { spacing, radii, typography } from "@falatorio/ui/tokens";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function ListenAndType({ exercise, onAnswer, disabled }: ExerciseProps) {
+  const theme = useTheme();
   const [text, setText] = React.useState("");
 
-  const player = useAudioPlayer(exercise.audioUrl ?? null);
-  const status = useAudioPlayerStatus(player);
-
-  const playAudio = () => {
-    if (!exercise.audioUrl) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (status.currentTime >= status.duration && status.duration > 0) {
-      player.seekTo(0);
-    }
-    player.play();
-  };
+  const targetText = exercise.sentence ?? exercise.prompt;
 
   const handleSubmit = () => {
     if (!text.trim()) return;
@@ -29,23 +21,27 @@ export function ListenAndType({ exercise, onAnswer, disabled }: ExerciseProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Listen and type what you hear</Text>
+      <Text style={[styles.label, { color: theme.text }]}>
+        Ouve e escreve o que ouves
+      </Text>
 
-      <Pressable onPress={playAudio} style={styles.playButton} disabled={status.playing}>
-        <View style={[styles.playCircle, status.playing && styles.playCircleActive]}>
-          <Text style={styles.playIcon}>{status.playing ? "..." : ">"}</Text>
-        </View>
-        <Text style={styles.playText}>
-          {status.playing ? "Playing..." : "Tap to listen"}
+      <View style={styles.playArea}>
+        <SpeakButton text={targetText} size={80} variant="circle" />
+        <Text style={[styles.tapHint, { color: theme.textMuted }]}>
+          Toca para ouvir
         </Text>
-      </Pressable>
+        <SpeakButton text={targetText} speed="slow" size={48} variant="circle" />
+        <Text style={[styles.tapHint, { color: theme.textMuted }]}>
+          Mais devagar
+        </Text>
+      </View>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { borderColor: theme.border, color: theme.text }]}
         value={text}
         onChangeText={setText}
-        placeholder="Type what you hear..."
-        placeholderTextColor={colors.neutral[400]}
+        placeholder="Escreve o que ouviste..."
+        placeholderTextColor={theme.textMuted}
         multiline
         editable={!disabled}
         autoCorrect={false}
@@ -53,7 +49,7 @@ export function ListenAndType({ exercise, onAnswer, disabled }: ExerciseProps) {
       />
 
       <Button
-        title="Check"
+        title="Verificar"
         onPress={handleSubmit}
         disabled={disabled || !text.trim()}
         size="lg"
@@ -71,41 +67,23 @@ const styles = StyleSheet.create({
   label: {
     fontSize: typography.sizes.lg,
     fontWeight: "700",
-    color: colors.neutral[900],
     marginBottom: spacing.xl,
   },
-  playButton: {
+  playArea: {
     alignItems: "center",
     marginBottom: spacing["2xl"],
+    gap: spacing.sm,
   },
-  playCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary[100],
-    alignItems: "center",
-    justifyContent: "center",
+  tapHint: {
+    fontSize: typography.sizes.xs,
     marginBottom: spacing.sm,
-  },
-  playCircleActive: {
-    backgroundColor: colors.primary[200],
-  },
-  playIcon: {
-    fontSize: 28,
-    color: colors.primary[700],
-  },
-  playText: {
-    fontSize: typography.sizes.sm,
-    color: colors.neutral[500],
   },
   input: {
     borderWidth: 2,
-    borderColor: colors.neutral[200],
     borderRadius: radii.md,
     padding: spacing.lg,
     minHeight: 80,
     fontSize: typography.sizes.md,
-    color: colors.neutral[900],
     textAlignVertical: "top",
   },
   submit: {

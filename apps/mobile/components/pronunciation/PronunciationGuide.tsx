@@ -1,7 +1,26 @@
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import type { PhoneticDifficulty } from "@falatorio/core/l1-profiles/types";
-import { colors, spacing, typography } from "@falatorio/ui/tokens";
+import { spacing, typography } from "@falatorio/ui/tokens";
+import { useTheme } from "@/lib/theme";
 import { PhonemeCard } from "./PhonemeCard";
+
+const L1_NAMES_PT: Record<string, string> = {
+  English: "Inglês",
+  Spanish: "Espanhol",
+  French: "Francês",
+  Hindi: "Hindi",
+  Urdu: "Urdu",
+  Arabic: "Árabe",
+  Bengali: "Bengali",
+  German: "Alemão",
+  Chinese: "Chinês",
+  Russian: "Russo",
+  Ukrainian: "Ucraniano",
+  Turkish: "Turco",
+  Polish: "Polaco",
+  Korean: "Coreano",
+  Japanese: "Japonês",
+};
 
 interface PronunciationGuideProps {
   difficulties: readonly PhoneticDifficulty[];
@@ -9,11 +28,14 @@ interface PronunciationGuideProps {
 }
 
 export function PronunciationGuide({ difficulties, l1Name }: PronunciationGuideProps) {
+  const theme = useTheme();
+  const l1NamePt = L1_NAMES_PT[l1Name] ?? l1Name;
+
   if (difficulties.length === 0) {
     return (
       <View style={styles.empty}>
-        <Text style={styles.emptyText}>
-          Sem dificuldades fonéticas registadas para falantes de {l1Name}.
+        <Text style={[styles.emptyText, { color: theme.textMuted }]}>
+          Sem dificuldades fonéticas registadas para falantes de {l1NamePt}.
         </Text>
       </View>
     );
@@ -21,10 +43,10 @@ export function PronunciationGuide({ difficulties, l1Name }: PronunciationGuideP
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Sons difíceis para falantes de {l1Name}
+      <Text style={[styles.title, { color: theme.text }]}>
+        Sons difíceis para falantes de {l1NamePt}
       </Text>
-      <Text style={styles.subtitle}>
+      <Text style={[styles.subtitle, { color: theme.textMuted }]}>
         Toca num som para ver a posição da língua e dicas de pronúncia
       </Text>
       <FlatList
@@ -43,16 +65,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontFamily: typography.heading.fontFamily,
-    fontWeight: typography.heading.fontWeight,
+    fontWeight: "700",
     fontSize: typography.sizes.xl,
-    color: colors.neutral[800],
     marginBottom: spacing.xs,
   },
   subtitle: {
-    fontFamily: typography.body.fontFamily,
     fontSize: typography.sizes.sm,
-    color: colors.neutral[500],
     marginBottom: spacing.xl,
   },
   list: {
@@ -63,9 +81,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   emptyText: {
-    fontFamily: typography.body.fontFamily,
     fontSize: typography.sizes.md,
-    color: colors.neutral[400],
     textAlign: "center",
   },
 });

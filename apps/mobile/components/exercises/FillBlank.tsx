@@ -2,13 +2,17 @@ import React from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
+import { SpeakButton } from "./SpeakButton";
+import { useTheme } from "@/lib/theme";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 import { TappableText } from "./TappableText";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function FillBlank({ exercise, onAnswer, disabled }: ExerciseProps) {
+  const theme = useTheme();
   const [text, setText] = React.useState("");
-  const parts = (exercise.sentence ?? exercise.prompt).split("___");
+  const fullSentence = exercise.sentence ?? exercise.prompt;
+  const parts = fullSentence.split("___");
 
   const handleSubmit = () => {
     if (!text.trim()) return;
@@ -18,7 +22,10 @@ export function FillBlank({ exercise, onAnswer, disabled }: ExerciseProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Fill in the blank</Text>
+      <View style={styles.labelRow}>
+        <Text style={[styles.label, { color: theme.text }]}>Completa a frase</Text>
+        <SpeakButton text={fullSentence.replace("___", "")} size={32} variant="circle" />
+      </View>
 
       <View style={styles.sentenceContainer}>
         {parts.map((part, i) => (
@@ -69,7 +76,7 @@ export function FillBlank({ exercise, onAnswer, disabled }: ExerciseProps) {
       )}
 
       <Button
-        title="Check"
+        title="Verificar"
         onPress={handleSubmit}
         disabled={disabled || !text.trim()}
         size="lg"
@@ -84,11 +91,15 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: spacing.lg,
   },
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.xl,
+  },
   label: {
     fontSize: typography.sizes.lg,
     fontWeight: "700",
-    color: colors.neutral[900],
-    marginBottom: spacing.xl,
   },
   sentenceContainer: {
     flexDirection: "row",

@@ -2,14 +2,18 @@ import React from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { SpeakButton } from "./SpeakButton";
+import { useTheme } from "@/lib/theme";
+import { spacing, radii, typography } from "@falatorio/ui/tokens";
 import { TappableText } from "./TappableText";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function TranslateExercise({ exercise, onAnswer, disabled }: ExerciseProps) {
+  const theme = useTheme();
   const [text, setText] = React.useState("");
 
   const direction = exercise.type === "translate_l1_to_pt" ? "l1-to-pt" as const : "pt-to-l1" as const;
+  const isPtSource = exercise.type === "translate_pt_to_l1";
 
   const handleSubmit = () => {
     if (!text.trim()) return;
@@ -19,7 +23,7 @@ export function TranslateExercise({ exercise, onAnswer, disabled }: ExerciseProp
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Translate this sentence</Text>
+      <Text style={[styles.label, { color: theme.text }]}>Traduz esta frase</Text>
 
       <View style={styles.promptWrap}>
         <TappableText
@@ -28,16 +32,21 @@ export function TranslateExercise({ exercise, onAnswer, disabled }: ExerciseProp
           newWords={exercise.newWords}
           glossary={exercise.glossary}
           genderPairs={exercise.genderPairs}
-          textStyle={styles.promptText}
+          textStyle={[styles.promptText, { color: theme.text }]}
         />
+        {isPtSource && (
+          <View style={styles.speakRow}>
+            <SpeakButton text={exercise.prompt} size={36} variant="circle" />
+          </View>
+        )}
       </View>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { borderColor: theme.border, color: theme.text }]}
         value={text}
         onChangeText={setText}
-        placeholder="Type your translation..."
-        placeholderTextColor={colors.neutral[400]}
+        placeholder="Escreve a tua traducao..."
+        placeholderTextColor={theme.textMuted}
         multiline
         editable={!disabled}
         autoCorrect={false}
@@ -45,7 +54,7 @@ export function TranslateExercise({ exercise, onAnswer, disabled }: ExerciseProp
       />
 
       <Button
-        title="Check"
+        title="Verificar"
         onPress={handleSubmit}
         disabled={disabled || !text.trim()}
         size="lg"
@@ -63,7 +72,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: typography.sizes.lg,
     fontWeight: "700",
-    color: colors.neutral[900],
     marginBottom: spacing.lg,
   },
   promptWrap: {
@@ -74,14 +82,15 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     lineHeight: 32,
   },
+  speakRow: {
+    marginTop: spacing.sm,
+  },
   input: {
     borderWidth: 2,
-    borderColor: colors.neutral[200],
     borderRadius: radii.md,
     padding: spacing.lg,
     minHeight: 100,
     fontSize: typography.sizes.md,
-    color: colors.neutral[900],
     textAlignVertical: "top",
   },
   submit: {

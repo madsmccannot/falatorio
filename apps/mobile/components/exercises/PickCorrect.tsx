@@ -2,16 +2,22 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
-import { colors, spacing, typography } from "@falatorio/ui/tokens";
+import { SpeakButton } from "./SpeakButton";
+import { useTheme } from "@/lib/theme";
+import { spacing, typography } from "@falatorio/ui/tokens";
 import { TappableText } from "./TappableText";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function PickCorrect({ exercise, onAnswer, disabled }: ExerciseProps) {
+  const theme = useTheme();
   const [selected, setSelected] = React.useState<string | null>(null);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Pick the correct answer</Text>
+      <View style={styles.labelRow}>
+        <Text style={[styles.label, { color: theme.text }]}>Escolhe a resposta correta</Text>
+        <SpeakButton text={exercise.prompt} size={32} variant="circle" />
+      </View>
 
       <View style={styles.promptWrap}>
         <TappableText
@@ -20,7 +26,7 @@ export function PickCorrect({ exercise, onAnswer, disabled }: ExerciseProps) {
           newWords={exercise.newWords}
           glossary={exercise.glossary}
           genderPairs={exercise.genderPairs}
-          textStyle={styles.promptText}
+          textStyle={[styles.promptText, { color: theme.text }]}
         />
       </View>
 
@@ -49,11 +55,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: spacing.lg,
   },
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.lg,
+  },
   label: {
     fontSize: typography.sizes.lg,
     fontWeight: "700",
-    color: colors.neutral[900],
-    marginBottom: spacing.lg,
+    flex: 1,
   },
   promptWrap: {
     marginBottom: spacing["2xl"],

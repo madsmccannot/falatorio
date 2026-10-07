@@ -3,11 +3,14 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { FadeIn, Layout } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
+import { SpeakButton } from "./SpeakButton";
+import { useTheme } from "@/lib/theme";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { WordTooltip } from "./WordTooltip";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
+  const theme = useTheme();
   const words = exercise.words ?? exercise.prompt.split(" ");
   const glossary = exercise.glossary;
   const [selected, setSelected] = React.useState<number[]>([]);
@@ -63,11 +66,14 @@ export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Put the words in order</Text>
+      <View style={styles.labelRow}>
+        <Text style={[styles.label, { color: theme.text }]}>Ordena as palavras</Text>
+        <SpeakButton text={words.join(" ")} size={32} variant="circle" />
+      </View>
 
       <View style={styles.sentenceArea}>
         {selected.length === 0 ? (
-          <Text style={styles.placeholder}>Tap words below to build the sentence</Text>
+          <Text style={[styles.placeholder, { color: theme.textMuted }]}>Toca nas palavras para construir a frase</Text>
         ) : (
           <View style={styles.wordRow}>
             {selected.map((idx, pos) => (
@@ -107,7 +113,7 @@ export function ReorderWords({ exercise, onAnswer, disabled }: ExerciseProps) {
       </View>
 
       <Button
-        title="Check"
+        title="Verificar"
         onPress={handleSubmit}
         disabled={disabled || available.length > 0}
         size="lg"
@@ -132,11 +138,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: spacing.lg,
   },
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.xl,
+  },
   label: {
     fontSize: typography.sizes.lg,
     fontWeight: "700",
-    color: colors.neutral[900],
-    marginBottom: spacing.xl,
+    flex: 1,
   },
   sentenceArea: {
     minHeight: 80,

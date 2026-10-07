@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import type { PhoneticDifficulty } from "@falatorio/core/l1-profiles/types";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { useTheme } from "@/lib/theme";
 import { AnimatedMouthDiagram } from "./AnimatedMouthDiagram";
 
 interface PhonemeCardProps {
@@ -18,6 +19,7 @@ interface PhonemeCardProps {
 }
 
 export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
+  const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
   const expandProgress = useSharedValue(0);
   const pressScale = useSharedValue(1);
@@ -55,23 +57,23 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
   }));
 
   return (
-    <Animated.View style={[styles.card, containerStyle]}>
+    <Animated.View style={[styles.card, { backgroundColor: theme.bgCard, borderColor: theme.border }, containerStyle]}>
       <Pressable
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
       >
         <View style={styles.header}>
-          <View style={styles.ipaContainer}>
-            <Text style={styles.ipa}>{phoneme.ipa}</Text>
+          <View style={[styles.ipaContainer, { backgroundColor: colors.primary[500] + "18" }]}>
+            <Text style={[styles.ipa, { color: colors.primary[400] }]}>{phoneme.ipa}</Text>
           </View>
           <View style={styles.headerText}>
-            <Text style={styles.sound}>{phoneme.sound}</Text>
-            <Text style={styles.description} numberOfLines={expanded ? undefined : 1}>
+            <Text style={[styles.sound, { color: theme.text }]}>{phoneme.sound}</Text>
+            <Text style={[styles.description, { color: theme.textSecondary }]} numberOfLines={expanded ? undefined : 1}>
               {phoneme.description}
             </Text>
           </View>
-          <Text style={styles.chevron}>{expanded ? "▲" : "▼"}</Text>
+          <Text style={[styles.chevron, { color: theme.textMuted }]}>{expanded ? "▲" : "▼"}</Text>
         </View>
       </Pressable>
 
@@ -86,9 +88,9 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
               />
             </View>
           )}
-          <View style={styles.tipContainer}>
-            <Text style={styles.tipLabel}>Dica:</Text>
-            <Text style={styles.tipText}>{phoneme.tip}</Text>
+          <View style={[styles.tipContainer, { backgroundColor: colors.primary[500] + "12" }]}>
+            <Text style={[styles.tipLabel, { color: colors.primary[400] }]}>Dica:</Text>
+            <Text style={[styles.tipText, { color: theme.text }]}>{phoneme.tip}</Text>
           </View>
         </View>
       </Animated.View>
@@ -98,10 +100,8 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.neutral[0],
     borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: colors.neutral[200],
     marginBottom: spacing.md,
     overflow: "hidden",
   },
@@ -114,35 +114,27 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: radii.md,
-    backgroundColor: colors.primary[50],
     alignItems: "center",
     justifyContent: "center",
     marginRight: spacing.md,
   },
   ipa: {
-    fontFamily: typography.mono.fontFamily,
     fontSize: typography.sizes.lg,
     fontWeight: "600",
-    color: colors.primary[700],
   },
   headerText: {
     flex: 1,
   },
   sound: {
-    fontFamily: typography.heading.fontFamily,
-    fontWeight: typography.heading.fontWeight,
+    fontWeight: "700",
     fontSize: typography.sizes.md,
-    color: colors.neutral[800],
     marginBottom: 2,
   },
   description: {
-    fontFamily: typography.body.fontFamily,
     fontSize: typography.sizes.sm,
-    color: colors.neutral[500],
   },
   chevron: {
     fontSize: 10,
-    color: colors.neutral[400],
     marginLeft: spacing.sm,
   },
   detailContent: {
@@ -154,21 +146,16 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   tipContainer: {
-    backgroundColor: colors.primary[50],
     borderRadius: radii.md,
     padding: spacing.md,
   },
   tipLabel: {
-    fontFamily: typography.heading.fontFamily,
-    fontWeight: typography.heading.fontWeight,
+    fontWeight: "700",
     fontSize: typography.sizes.sm,
-    color: colors.primary[700],
     marginBottom: spacing.xs,
   },
   tipText: {
-    fontFamily: typography.body.fontFamily,
     fontSize: typography.sizes.sm,
-    color: colors.primary[800],
     lineHeight: 20,
   },
 });

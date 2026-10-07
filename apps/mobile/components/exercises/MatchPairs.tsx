@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { useTheme } from "@/lib/theme";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { WordTooltip } from "./WordTooltip";
 import type { ExerciseProps } from "./ExerciseRenderer";
@@ -9,6 +10,7 @@ import type { ExerciseProps } from "./ExerciseRenderer";
 type MatchState = "idle" | "selected" | "matched" | "wrong";
 
 export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
+  const theme = useTheme();
   const pairs = exercise.pairs ?? [];
   const glossary = exercise.glossary;
   const [leftSelected, setLeftSelected] = React.useState<number | null>(null);
@@ -84,7 +86,7 @@ export function MatchPairs({ exercise, onAnswer, disabled }: ExerciseProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Match the pairs</Text>
+      <Text style={[styles.label, { color: theme.text }]}>Liga os pares</Text>
       <View style={styles.columns}>
         <View style={styles.column}>
           {pairs.map((pair, i) => (
