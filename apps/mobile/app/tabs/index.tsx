@@ -1,21 +1,24 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, typography } from "@falatorio/ui/tokens";
+import { typography } from "@falatorio/ui/tokens";
+import { useTheme } from "@/lib/theme";
 
 export default function TabsLayout() {
+  const theme = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary[600],
-        tabBarInactiveTintColor: colors.neutral[400],
+        tabBarActiveTintColor: theme.tabActive,
+        tabBarInactiveTintColor: theme.tabInactive,
         tabBarLabelStyle: {
           fontSize: typography.sizes.xs,
           fontWeight: "600",
         },
         tabBarStyle: {
-          borderTopColor: colors.neutral[200],
-          backgroundColor: colors.neutral[0],
+          borderTopColor: theme.tabBarBorder,
+          backgroundColor: theme.tabBar,
           height: 84,
           paddingBottom: 28,
           paddingTop: 8,

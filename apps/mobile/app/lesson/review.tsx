@@ -151,7 +151,7 @@ export default function ReviewScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { paddingTop: insets.top }]}
+      style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={styles.topBar}>
@@ -162,8 +162,8 @@ export default function ReviewScreen() {
           size="sm"
         />
         <ProgressBar current={currentIndex} total={totalExercises} />
-        <View style={styles.xpBadge}>
-          <Text style={styles.xpBadgeText}>{xpMultiplier}x XP</Text>
+        <View style={[styles.xpBadge, { backgroundColor: theme.bgAccent }]}>
+          <Text style={[styles.xpBadgeText, { color: colors.primary[theme.isDark ? 400 : 700] }]}>{xpMultiplier}x XP</Text>
         </View>
         {!unlimited && (
           <View style={styles.heartsChip}>
@@ -180,7 +180,7 @@ export default function ReviewScreen() {
           exiting={SlideOutLeft.duration(200)}
           style={styles.exerciseArea}
         >
-          <Text style={styles.exerciseType}>
+          <Text style={[styles.exerciseType, { color: theme.textMuted }]}>
             {formatExerciseType(currentExercise.type, t)}
           </Text>
 
@@ -222,8 +222,8 @@ export default function ReviewScreen() {
       )}
 
       <Modal visible={showQuit} onDismiss={() => setShowQuit(false)}>
-        <Text style={styles.modalTitle}>{t("lesson.quit_title")}</Text>
-        <Text style={styles.modalText}>{t("lesson.quit_text")}</Text>
+        <Text style={[styles.modalTitle, { color: theme.text }]}>{t("lesson.quit_title")}</Text>
+        <Text style={[styles.modalText, { color: theme.textSecondary }]}>{t("lesson.quit_text")}</Text>
         <Button
           title={t("lesson.keep_learning")}
           onPress={() => setShowQuit(false)}
@@ -238,8 +238,8 @@ export default function ReviewScreen() {
       </Modal>
 
       <Modal visible={showOutOfHearts} onDismiss={() => {}}>
-        <Text style={styles.modalTitle}>{t("lesson.out_of_hearts")}</Text>
-        <Text style={styles.modalText}>{t("lesson.out_of_hearts_text")}</Text>
+        <Text style={[styles.modalTitle, { color: theme.text }]}>{t("lesson.out_of_hearts")}</Text>
+        <Text style={[styles.modalText, { color: theme.textSecondary }]}>{t("lesson.out_of_hearts_text")}</Text>
         <Button
           title={t("lesson.continue_ouro")}
           onPress={async () => {
@@ -280,7 +280,6 @@ function formatExerciseType(type: string, t: (k: any) => string): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[0],
   },
   centered: {
     alignItems: "center",
@@ -295,7 +294,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   xpBadge: {
-    backgroundColor: colors.primary[100],
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: 8,
@@ -303,7 +301,6 @@ const styles = StyleSheet.create({
   xpBadgeText: {
     fontSize: typography.sizes.xs,
     fontWeight: "700",
-    color: colors.primary[700],
   },
   heartsChip: {
     flexDirection: "row",
@@ -321,7 +318,6 @@ const styles = StyleSheet.create({
   exerciseType: {
     fontSize: typography.sizes.sm,
     fontWeight: "600",
-    color: colors.neutral[500],
     textTransform: "uppercase",
     letterSpacing: 0.5,
     paddingHorizontal: spacing.lg,
@@ -357,12 +353,10 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: typography.sizes.lg,
     fontWeight: "700",
-    color: colors.neutral[900],
     marginBottom: spacing.sm,
   },
   modalText: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[600],
     lineHeight: 20,
     marginBottom: spacing.lg,
   },

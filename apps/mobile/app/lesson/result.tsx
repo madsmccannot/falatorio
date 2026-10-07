@@ -76,7 +76,7 @@ export default function LessonResultScreen() {
 
           <Animated.View entering={FadeInDown.delay(300).duration(300)} style={styles.statsRow}>
             <View style={[styles.statCard, { backgroundColor: theme.bgCard, borderColor: colors.xp }]}>
-              <Text style={styles.statLabel}>TOTAL DE XP</Text>
+              <Text style={[styles.statLabel, { color: theme.textMuted }]}>TOTAL DE XP</Text>
               <View style={styles.statValueRow}>
                 <BoltIcon size={18} color={colors.xp} />
                 <Text style={[styles.statValue, { color: colors.xp }]}>+{xpEarned}</Text>
@@ -84,14 +84,14 @@ export default function LessonResultScreen() {
             </View>
             {combo > 0 && (
               <View style={[styles.statCard, { backgroundColor: theme.bgCard, borderColor: colors.primary[400] }]}>
-                <Text style={styles.statLabel}>COMBO</Text>
+                <Text style={[styles.statLabel, { color: theme.textMuted }]}>COMBO</Text>
                 <View style={styles.statValueRow}>
                   <Text style={[styles.statValue, { color: colors.primary[400] }]}>x{combo}</Text>
                 </View>
               </View>
             )}
             <View style={[styles.statCard, { backgroundColor: theme.bgCard, borderColor: colors.success }]}>
-              <Text style={styles.statLabel}>{t("result.time").toUpperCase()}</Text>
+              <Text style={[styles.statLabel, { color: theme.textMuted }]}>{t("result.time").toUpperCase()}</Text>
               <View style={styles.statValueRow}>
                 <TimerIcon size={16} color={colors.success} />
                 <Text style={[styles.statValue, { color: colors.success }]}>{formatTime(elapsedSeconds)}</Text>
@@ -163,7 +163,6 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 10,
     fontWeight: "700",
-    color: "#94A3B8",
     letterSpacing: 0.5,
   },
   statValueRow: {

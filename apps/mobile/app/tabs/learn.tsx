@@ -1,5 +1,8 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet, Dimensions, BackHandler } from "react-native";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import {
+  View, Text, ScrollView, Pressable, StyleSheet, Dimensions, BackHandler,
+} from "react-native";
+import type { NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
@@ -9,16 +12,8 @@ import { useStreak } from "@/hooks/useStreak";
 import { useOuro } from "@/hooks/useOuro";
 import { Loading } from "@/components/ui/Loading";
 import {
-  HeartIcon,
-  StreakIcon,
-  GoldPrisms,
-  BookIcon,
-  ChestIcon,
-  StarIcon,
-  BoltIcon,
-  LockIcon,
-  CheckIcon,
-  ChevronRightIcon,
+  HeartIcon, StreakIcon, GoldPrisms, BookIcon, ChestIcon,
+  StarIcon, BoltIcon, LockIcon, CheckIcon, ChevronRightIcon,
 } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
@@ -27,17 +22,17 @@ import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const NODE_SIZE = 64;
 const PATH_CENTER = SCREEN_WIDTH / 2;
-const PATH_AMPLITUDE = 70;
+const PATH_AMPLITUDE = 80;
 const NODE_GAP = 20;
 
 function getUnitColor(index: number): string {
   return colors.unitColors[index % colors.unitColors.length]!;
 }
 
-const PATH_OFFSETS = [0, 0.7, 1, 0.7, 0, -0.7, -1, -0.7];
+const PATH_OFFSETS = [0, 0.6, 1, 0.8, 0, -0.6, -1, -0.8];
 
-function getNodeX(index: number): number {
-  const phase = PATH_OFFSETS[index % PATH_OFFSETS.length]!;
+function getNodeX(globalIndex: number): number {
+  const phase = PATH_OFFSETS[globalIndex % PATH_OFFSETS.length]!;
   return PATH_CENTER - NODE_SIZE / 2 + phase * PATH_AMPLITUDE;
 }
 
@@ -61,8 +56,9 @@ type UnitWithLessons = {
 
 function LessonPathNode({
   node,
-  index,
+  globalIndex,
   totalInUnit,
+  localIndex,
   unitColor,
   locked,
   theme,
@@ -70,8 +66,9 @@ function LessonPathNode({
   onPress,
 }: {
   node: LessonNode;
-  index: number;
+  globalIndex: number;
   totalInUnit: number;
+  localIndex: number;
   unitColor: string;
   locked: boolean;
   theme: ReturnType<typeof import("@/lib/theme").useTheme>;
@@ -79,21 +76,21 @@ function LessonPathNode({
   onPress: () => void;
 }) {
   const isChest = node.nodeType === "chest";
-  const nodeX = getNodeX(index);
-  const isLast = index === totalInUnit - 1 && !isChest;
+  const nodeX = getNodeX(globalIndex);
+  const isLast = localIndex === totalInUnit - 1 && !isChest;
   const isCompleted = node.completed;
 
   let lessonNum = 0;
   if (!isChest) {
-    lessonNum = index + 1;
+    lessonNum = localIndex + 1;
   }
 
   const bgColor = locked
-    ? colors.neutral[300]
+    ? (theme.isDark ? "#374151" : colors.neutral[300])
     : isChest
       ? colors.ouro
       : unitColor;
-  const borderColor = locked ? colors.neutral[400] : bgColor;
+  const borderColor = locked ? (theme.isDark ? "#4B5563" : colors.neutral[400]) : bgColor;
   const opacity = locked ? 0.5 : 1;
 
   return (
@@ -119,7 +116,7 @@ function LessonPathNode({
               <ChestIcon size={28} />
             ) : isCompleted ? (
               <CheckIcon size={24} color="#FFFFFF" />
-            ) : index === 0 || isLast ? (
+            ) : localIndex === 0 || isLast ? (
               <StarIcon size={24} color="#FFFFFF" />
             ) : lessonNum % 3 === 0 ? (
               <BoltIcon size={22} color="#FFFFFF" />
@@ -178,6 +175,9 @@ export default function LearnScreen() {
 
   const [showSections, setShowSections] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
+  const [visibleUnitIdx, setVisibleUnitIdx] = useState(0);
+
+  const unitYPositions = useRef<number[]>([]);
 
   const coursesQuery = trpc.content.getCourses.useQuery();
   const courseId = coursesQuery.data?.[0]?.id ?? null;
@@ -227,6 +227,28 @@ export default function LearnScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setActiveSectionId(sectionId);
     setShowSections(false);
+    setVisibleUnitIdx(0);
+    unitYPositions.current = [];
+  }, []);
+
+  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const scrollY = e.nativeEvent.contentOffset.y;
+    const positions = unitYPositions.current;
+    if (positions.length === 0) return;
+
+    const bannerOffset = 80;
+    let idx = 0;
+    for (let i = positions.length - 1; i >= 0; i--) {
+      if (scrollY + bannerOffset >= (positions[i] ?? 0)) {
+        idx = i;
+        break;
+      }
+    }
+    setVisibleUnitIdx(idx);
+  }, []);
+
+  const handleUnitLayout = useCallback((unitIdx: number, e: LayoutChangeEvent) => {
+    unitYPositions.current[unitIdx] = e.nativeEvent.layout.y;
   }, []);
 
   const renderTopBar = () => (
@@ -258,7 +280,7 @@ export default function LearnScreen() {
     </View>
   );
 
-  // ── SECTIONS VIEW ──
+  // -- SECTIONS VIEW --
   if (showSections) {
     return (
       <View style={[styles.container, { backgroundColor: theme.bg }]}>
@@ -356,7 +378,7 @@ export default function LearnScreen() {
 
           {dailyRefresh && (
             <View style={[styles.sectionLargeCard, { backgroundColor: theme.bgCard, borderColor: theme.border, opacity: 0.55 }]}>
-              <View style={[styles.sectionColorBlock, { backgroundColor: colors.neutral[400] }]}>
+              <View style={[styles.sectionColorBlock, { backgroundColor: theme.isDark ? "#4B5563" : colors.neutral[400] }]}>
                 <View style={styles.sectionColorContent}>
                   <View style={styles.sectionIconCircle}>
                     <LockIcon size={32} color="#FFFFFF" />
@@ -381,7 +403,7 @@ export default function LearnScreen() {
     );
   }
 
-  // ── LOADING / ERROR ──
+  // -- LOADING / ERROR --
   if (isLoading) {
     return (
       <View style={[styles.container, { backgroundColor: theme.bg }]}>
@@ -413,15 +435,23 @@ export default function LearnScreen() {
     );
   }
 
-  // ── DEFAULT: UNIT PATH (Duolingo-style) ──
+  // -- DEFAULT: UNIT PATH --
   const unitsLoading = !!activeSectionId && sectionMapQuery.isLoading;
   const unitsData = (sectionMapQuery.data ?? []) as UnitWithLessons[];
-  const sectionColor = currentSection
-    ? colors.sectionColors[currentSectionIdx % colors.sectionColors.length]!
-    : colors.primary[500];
-  const sectionTitle = currentSection
-    ? ((currentSection.title as Record<string, string>)["pt"] ?? "")
-    : "";
+
+  const visibleUnit = unitsData[visibleUnitIdx];
+  const bannerColor = visibleUnit
+    ? getUnitColor(visibleUnit.colorIndex)
+    : currentSection
+      ? colors.sectionColors[currentSectionIdx % colors.sectionColors.length]!
+      : colors.primary[500];
+  const bannerSectionNum = currentSection ? currentSection.sortOrder + 1 : 1;
+  const bannerUnitNum = visibleUnit ? visibleUnit.sortOrder + 1 : 1;
+  const bannerTitle = visibleUnit
+    ? ((visibleUnit.title as Record<string, string>)["pt"] ?? visibleUnit.theme)
+    : currentSection
+      ? ((currentSection.title as Record<string, string>)["pt"] ?? "")
+      : "";
 
   return (
     <View style={[styles.container, { backgroundColor: theme.bg }]}>
@@ -433,14 +463,14 @@ export default function LearnScreen() {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setShowSections(true);
           }}
-          style={[styles.currentSectionBanner, { backgroundColor: sectionColor }]}
+          style={[styles.currentSectionBanner, { backgroundColor: bannerColor }]}
         >
           <View style={styles.currentSectionContent}>
             <Text style={styles.currentSectionLabel}>
-              {t("learn.section").toUpperCase()} {currentSection.sortOrder + 1}
+              {t("learn.section").toUpperCase()} {bannerSectionNum}, {t("learn.unit").toUpperCase()} {bannerUnitNum}
             </Text>
             <Text style={styles.currentSectionTitle} numberOfLines={1}>
-              {sectionTitle}
+              {bannerTitle}
             </Text>
           </View>
           <View style={styles.currentSectionAction}>
@@ -457,33 +487,47 @@ export default function LearnScreen() {
         <ScrollView
           contentContainerStyle={[styles.pathContainer, { paddingBottom: insets.bottom + 100 }]}
           showsVerticalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
         >
           {(() => {
             let prevUnitLastCompleted = true;
-            return unitsData.map((unit) => {
+            let globalNodeIdx = 0;
+            return unitsData.map((unit, unitIdx) => {
               const unitColor = getUnitColor(unit.colorIndex);
               const unitTitle = (unit.title as Record<string, string>)["pt"] ?? unit.theme;
               const unitLocked = !prevUnitLastCompleted && unit.colorIndex > 0;
 
               const rendered = (
-                <View key={unit.id}>
-                  <View style={[styles.unitBanner, { backgroundColor: unitLocked ? colors.neutral[400] : unitColor, opacity: unitLocked ? 0.5 : 1 }]}>
-                    <View style={styles.unitBannerContent}>
-                      <Text style={styles.unitBannerLabel}>
-                        UNIDADE {unit.sortOrder + 1}
-                      </Text>
-                      <Text style={styles.unitBannerTitle} numberOfLines={2}>
+                <View
+                  key={unit.id}
+                  onLayout={(e) => handleUnitLayout(unitIdx, e)}
+                >
+                  {unitIdx > 0 && (
+                    <View style={styles.unitDivider}>
+                      <View style={[styles.unitDividerLine, { backgroundColor: theme.border }]} />
+                      <Text style={[styles.unitDividerText, { color: theme.textMuted }]} numberOfLines={1}>
                         {unitTitle}
                       </Text>
+                      <View style={[styles.unitDividerLine, { backgroundColor: theme.border }]} />
                     </View>
-                    <View style={styles.unitBannerIcon}>
-                      {unitLocked ? (
-                        <LockIcon size={20} color="#FFFFFF" />
-                      ) : (
-                        <BookIcon size={20} color="#FFFFFF" />
-                      )}
-                    </View>
-                  </View>
+                  )}
+
+                  {unitLocked && unitIdx > 0 && (
+                    <Pressable
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        router.push(
+                          `/section-test?sectionId=${activeSectionId}&sectionTitle=${encodeURIComponent(bannerTitle)}&cefrMin=${currentSection?.cefrMin ?? "A1"}&cefrMax=${currentSection?.cefrMax ?? "A2"}`,
+                        );
+                      }}
+                      style={[styles.jumpHereBtn, { borderColor: theme.border }]}
+                    >
+                      <Text style={[styles.jumpHereText, { color: unitColor }]}>
+                        {t("learn.skip_here")}
+                      </Text>
+                    </Pressable>
+                  )}
 
                   {unit.lessons.map((lesson, lIdx) => {
                     const prevCompleted = lIdx === 0
@@ -491,11 +535,15 @@ export default function LearnScreen() {
                       : unit.lessons[lIdx - 1]!.completed;
                     const isLocked = unitLocked || (lIdx > 0 && !prevCompleted);
 
+                    const thisGlobalIdx = globalNodeIdx;
+                    globalNodeIdx++;
+
                     return (
                       <LessonPathNode
                         key={lesson.id}
                         node={lesson}
-                        index={lIdx}
+                        globalIndex={thisGlobalIdx}
+                        localIndex={lIdx}
                         totalInUnit={unit.lessons.length}
                         unitColor={unitColor}
                         locked={isLocked}
@@ -524,18 +572,15 @@ export default function LearnScreen() {
           })()}
 
           <View style={styles.dailyRefreshBanner}>
-            <View style={[styles.unitBanner, { backgroundColor: colors.neutral[400], opacity: 0.5 }]}>
-              <View style={styles.unitBannerContent}>
-                <Text style={styles.unitBannerLabel}>
-                  {t("learn.daily_refresh").toUpperCase()}
-                </Text>
-                <Text style={styles.unitBannerTitle} numberOfLines={2}>
-                  {t("learn.daily_refresh")}
-                </Text>
-              </View>
-              <View style={styles.unitBannerIcon}>
-                <LockIcon size={20} color="#FFFFFF" />
-              </View>
+            <View style={styles.unitDivider}>
+              <View style={[styles.unitDividerLine, { backgroundColor: theme.border }]} />
+              <Text style={[styles.unitDividerText, { color: theme.textMuted }]}>
+                {t("learn.daily_refresh")}
+              </Text>
+              <View style={[styles.unitDividerLine, { backgroundColor: theme.border }]} />
+            </View>
+            <View style={[styles.lockBadge, { backgroundColor: theme.isDark ? "#4B5563" : colors.neutral[400] }]}>
+              <LockIcon size={20} color="#FFFFFF" />
             </View>
             <Text style={[styles.dailyRefreshLocked, { color: theme.textMuted }]}>
               {t("learn.daily_refresh_locked")}
@@ -552,7 +597,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // ── Top stats bar ──
+  // -- Top stats bar --
   topBar: {
     flexDirection: "row",
     justifyContent: "center",
@@ -572,7 +617,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
 
-  // ── Current section banner ──
+  // -- Current section/unit banner --
   currentSectionBanner: {
     flexDirection: "row",
     alignItems: "center",
@@ -607,7 +652,7 @@ const styles = StyleSheet.create({
     marginLeft: spacing.md,
   },
 
-  // ── Section header bar ──
+  // -- Section header bar --
   sectionHeaderBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -626,7 +671,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // ── Path view ──
+  // -- Path view --
   pathContainer: {
     paddingTop: spacing.lg,
     paddingHorizontal: spacing.lg,
@@ -664,56 +709,61 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // ── Unit banners ──
-  unitBanner: {
+  // -- Unit dividers --
+  unitDivider: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: radii.lg,
-    marginBottom: spacing.lg,
-    padding: spacing.lg,
-    minHeight: 80,
+    marginVertical: spacing.xl,
+    gap: spacing.md,
   },
-  unitBannerContent: {
+  unitDividerLine: {
     flex: 1,
+    height: 1,
   },
-  unitBannerLabel: {
-    color: "rgba(255,255,255,0.75)",
-    fontSize: typography.sizes.xs,
+  unitDividerText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "600",
+    maxWidth: "60%" as any,
+    textAlign: "center",
+  },
+  jumpHereBtn: {
+    alignSelf: "center",
+    borderWidth: 1,
+    borderRadius: radii.lg,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  jumpHereText: {
+    fontSize: typography.sizes.sm,
     fontWeight: "700",
-    letterSpacing: 1,
-    marginBottom: 2,
-  },
-  unitBannerTitle: {
-    color: "#FFFFFF",
-    fontSize: typography.sizes.xl,
-    fontWeight: "800",
-    lineHeight: 26,
-  },
-  unitBannerIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: spacing.md,
+    letterSpacing: 0.5,
   },
   unitSpacer: {
-    height: spacing["2xl"],
+    height: spacing.lg,
   },
 
-  // ── Daily Refresh ──
+  // -- Daily Refresh --
   dailyRefreshBanner: {
     marginTop: spacing.lg,
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  lockBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    opacity: 0.5,
   },
   dailyRefreshLocked: {
     fontSize: typography.sizes.sm,
     textAlign: "center",
-    marginTop: spacing.sm,
     lineHeight: 18,
   },
 
-  // ── Section list ──
+  // -- Section list --
   sectionListContainer: {
     padding: spacing.lg,
     paddingBottom: spacing["5xl"],
@@ -801,7 +851,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
-  // ── Shared ──
+  // -- Shared --
   list: {
     padding: spacing.lg,
     paddingBottom: spacing["5xl"],

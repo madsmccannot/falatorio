@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   avatarPlaceholder: {
-    backgroundColor: colors.neutral[300],
+    backgroundColor: colors.primary[400],
     alignItems: "center",
     justifyContent: "center",
   },

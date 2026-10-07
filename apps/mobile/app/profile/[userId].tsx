@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   avatarPlaceholder: {
-    backgroundColor: colors.neutral[300],
+    backgroundColor: colors.primary[400],
     alignItems: "center",
     justifyContent: "center",
   },

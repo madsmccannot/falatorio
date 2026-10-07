@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   avatarPlaceholder: {
-    backgroundColor: colors.neutral[300],
+    backgroundColor: colors.primary[400],
     alignItems: "center",
     justifyContent: "center",
   },

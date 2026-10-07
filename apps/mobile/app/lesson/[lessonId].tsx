@@ -26,6 +26,7 @@ import { Modal } from "@/components/ui/Modal";
 import { HeartIcon } from "@/components/icons";
 import { useTranslation } from "@/lib/i18n";
 import { trackLessonStart, trackLessonComplete, trackLessonQuit, trackScreenView } from "@/lib/analytics";
+import { useTheme } from "@/lib/theme";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 export default function LessonScreen() {
@@ -33,6 +34,7 @@ export default function LessonScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const theme = useTheme();
   const { hearts, unlimited, continueWithOuro } = useHearts();
 
   const {
@@ -120,9 +122,9 @@ export default function LessonScreen() {
 
   if (error) {
     return (
-      <View style={[styles.container, styles.centered, { paddingTop: insets.top }]}>
-        <Text style={styles.errorTitle}>{t("lesson.error_title")}</Text>
-        <Text style={styles.errorText}>{String(error)}</Text>
+      <View style={[styles.container, styles.centered, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
+        <Text style={[styles.errorTitle, { color: theme.text }]}>{t("lesson.error_title")}</Text>
+        <Text style={[styles.errorText, { color: theme.textMuted }]}>{String(error)}</Text>
         <Button
           title={t("lesson.go_back")}
           onPress={() => router.back()}
@@ -139,7 +141,7 @@ export default function LessonScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { paddingTop: insets.top }]}
+      style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={styles.topBar}>
@@ -165,7 +167,7 @@ export default function LessonScreen() {
           exiting={SlideOutLeft.duration(200)}
           style={styles.exerciseArea}
         >
-          <Text style={styles.exerciseType}>
+          <Text style={[styles.exerciseType, { color: theme.textMuted }]}>
             {formatExerciseType(currentExercise.type, t)}
           </Text>
 
@@ -207,8 +209,8 @@ export default function LessonScreen() {
       )}
 
       <Modal visible={showQuit} onDismiss={() => setShowQuit(false)}>
-        <Text style={styles.modalTitle}>{t("lesson.quit_title")}</Text>
-        <Text style={styles.modalText}>
+        <Text style={[styles.modalTitle, { color: theme.text }]}>{t("lesson.quit_title")}</Text>
+        <Text style={[styles.modalText, { color: theme.textSecondary }]}>
           {t("lesson.quit_text")}
         </Text>
         <Button
@@ -228,8 +230,8 @@ export default function LessonScreen() {
       </Modal>
 
       <Modal visible={showOutOfHearts} onDismiss={() => {}}>
-        <Text style={styles.modalTitle}>{t("lesson.out_of_hearts")}</Text>
-        <Text style={styles.modalText}>
+        <Text style={[styles.modalTitle, { color: theme.text }]}>{t("lesson.out_of_hearts")}</Text>
+        <Text style={[styles.modalText, { color: theme.textSecondary }]}>
           {t("lesson.out_of_hearts_text")}
         </Text>
         <Button
@@ -272,7 +274,6 @@ function formatExerciseType(type: string, t: (k: any) => string): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[0],
   },
   centered: {
     alignItems: "center",
@@ -302,7 +303,6 @@ const styles = StyleSheet.create({
   exerciseType: {
     fontSize: typography.sizes.sm,
     fontWeight: "600",
-    color: colors.neutral[500],
     textTransform: "uppercase",
     letterSpacing: 0.5,
     paddingHorizontal: spacing.lg,
@@ -318,23 +318,19 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: typography.sizes.xl,
     fontWeight: "700",
-    color: colors.neutral[900],
     marginBottom: spacing.sm,
   },
   errorText: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[500],
     textAlign: "center",
   },
   modalTitle: {
     fontSize: typography.sizes.lg,
     fontWeight: "700",
-    color: colors.neutral[900],
     marginBottom: spacing.sm,
   },
   modalText: {
     fontSize: typography.sizes.sm,
-    color: colors.neutral[600],
     lineHeight: 20,
     marginBottom: spacing.lg,
   },
