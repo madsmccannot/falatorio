@@ -332,6 +332,8 @@ function repairJSON(raw: string): string {
   s = s.replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":');
   s = s.replace(/:\s*'([^']*)'/g, ': "$1"');
   s = s.replace(/\t/g, "\\t");
+  s = s.replace(/[\x00-\x1f]/g, (ch) => ch === "\n" ? "\\n" : ch === "\r" ? "\\r" : "");
+  s = s.replace(/"\s*\n\s*"/g, '" "');
   return s;
 }
 

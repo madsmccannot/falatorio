@@ -149,6 +149,7 @@ export async function runBatchGeneration(
       batch.map((gap) => generateForGap(db, gap, l1s)),
     );
 
+    let fatal = false;
     for (let j = 0; j < batchResults.length; j++) {
       const batchResult = batchResults[j]!;
       const gap = batch[j]!;
@@ -157,11 +158,16 @@ export async function runBatchGeneration(
       if (batchResult.status === "fulfilled") {
         result.exercisesGenerated += batchResult.value;
       } else {
-        result.errors.push({
-          kiCode: gap.knowledgeItemCode,
-          error: String(batchResult.reason),
-        });
+        const errMsg = String(batchResult.reason);
+        result.errors.push({ kiCode: gap.knowledgeItemCode, error: errMsg });
+        if (errMsg.includes("credit balance is too low") || errMsg.includes("rate_limit")) {
+          fatal = true;
+        }
       }
+    }
+    if (fatal) {
+      console.error("\nStopping batch: API credits exhausted or rate limited.");
+      break;
     }
   }
 
@@ -243,8 +249,12 @@ async function generateForGap(
         }
         break;
       } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("credit balance is too low") || msg.includes("rate_limit")) {
+          console.error(`\n  FATAL: ${msg}`);
+          throw err;
+        }
         if (attempt === 1) {
-          const msg = err instanceof Error ? err.message : String(err);
           console.error(`  [${gap.knowledgeItemCode}] ${exerciseType}: ${msg}`);
           throw err;
         }
