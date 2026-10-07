@@ -843,6 +843,13 @@ const es: Record<string, string> = {
   "auth.username_taken": "Ya esta en uso",
   "auth.username_invalid": "Debe empezar con una letra, 3-30 caracteres",
   "word.new_label": "Nueva",
+  "auth.name": "Nombre",
+  "auth.forgot_password": "¿Olvidaste la contraseña?",
+  "auth.error_invalid_email": "Introduce una dirección de email válida",
+  "auth.error_name_required": "El nombre es obligatorio",
+  "auth.error_password_short": "La contraseña debe tener al menos 8 caracteres",
+  "auth.error_username_taken": "Este nombre de usuario ya está en uso",
+  "funnel.first_lesson_complete": "¡Primera lección completada!",
 };
 
 const fr: Record<string, string> = {
@@ -1255,6 +1262,17 @@ const fr: Record<string, string> = {
   "auth.username_taken": "Deja pris",
   "auth.username_invalid": "Doit commencer par une lettre, 3-30 caracteres",
   "word.new_label": "Nouveau",
+  "auth.email": "Email",
+  "auth.password": "Mot de passe",
+  "auth.name": "Nom",
+  "auth.forgot_password": "Mot de passe oublié ?",
+  "auth.has_account": "Déjà un compte ?",
+  "auth.no_account": "Pas encore de compte ?",
+  "auth.error_invalid_email": "Entrez une adresse email valide",
+  "auth.error_name_required": "Le nom est obligatoire",
+  "auth.error_password_short": "Le mot de passe doit contenir au moins 8 caractères",
+  "auth.error_username_taken": "Ce nom d'utilisateur est déjà pris",
+  "funnel.first_lesson_complete": "Première leçon terminée !",
 };
 
 const hi: Record<string, string> = {
@@ -1667,6 +1685,17 @@ const hi: Record<string, string> = {
   "auth.username_taken": "पहले से लिया गया",
   "auth.username_invalid": "अक्षर से शुरू होना चाहिए, 3-30 अक्षर",
   "word.new_label": "नया",
+  "auth.email": "ईमेल",
+  "auth.password": "पासवर्ड",
+  "auth.name": "नाम",
+  "auth.forgot_password": "पासवर्ड भूल गए?",
+  "auth.has_account": "पहले से खाता है?",
+  "auth.no_account": "खाता नहीं है?",
+  "auth.error_invalid_email": "कृपया वैध ईमेल पता दर्ज करें",
+  "auth.error_name_required": "नाम आवश्यक है",
+  "auth.error_password_short": "पासवर्ड कम से कम 8 अक्षर का होना चाहिए",
+  "auth.error_username_taken": "यह उपयोगकर्ता नाम पहले से लिया गया है",
+  "funnel.first_lesson_complete": "पहला पाठ पूरा हुआ!",
 };
 
 const ur: Record<string, string> = {
@@ -2079,6 +2108,17 @@ const ur: Record<string, string> = {
   "auth.username_taken": "پہلے سے لیا گیا",
   "auth.username_invalid": "حرف سے شروع ہونا چاہیے، 3-30 حروف",
   "word.new_label": "نیا",
+  "auth.email": "ای میل",
+  "auth.password": "پاس ورڈ",
+  "auth.name": "نام",
+  "auth.forgot_password": "پاس ورڈ بھول گئے؟",
+  "auth.has_account": "پہلے سے اکاؤنٹ ہے؟",
+  "auth.no_account": "ابھی تک اکاؤنٹ نہیں ہے؟",
+  "auth.error_invalid_email": "ایک درست ای میل ایڈریس درج کریں",
+  "auth.error_name_required": "نام ضروری ہے",
+  "auth.error_password_short": "پاس ورڈ کم از کم 8 حروف کا ہونا چاہیے",
+  "auth.error_username_taken": "یہ صارف نام پہلے سے استعمال میں ہے",
+  "funnel.first_lesson_complete": "پہلا سبق مکمل!",
 };
 
 const ar: Record<string, string> = {
@@ -2491,6 +2531,17 @@ const ar: Record<string, string> = {
   "auth.username_taken": "مستخدم بالفعل",
   "auth.username_invalid": "يجب أن يبدأ بحرف، 3-30 حرفاً",
   "word.new_label": "جديد",
+  "auth.email": "البريد الإلكتروني",
+  "auth.password": "كلمة المرور",
+  "auth.name": "الاسم",
+  "auth.forgot_password": "نسيت كلمة المرور؟",
+  "auth.has_account": "لديك حساب بالفعل؟",
+  "auth.no_account": "ليس لديك حساب؟",
+  "auth.error_invalid_email": "أدخل عنوان بريد إلكتروني صالح",
+  "auth.error_name_required": "الاسم مطلوب",
+  "auth.error_password_short": "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
+  "auth.error_username_taken": "اسم المستخدم هذا مستخدم بالفعل",
+  "funnel.first_lesson_complete": "تم إكمال الدرس الأول!",
 };
 
 const bn: Record<string, string> = {
@@ -2903,6 +2954,17 @@ const bn: Record<string, string> = {
   "auth.username_taken": "ইতিমধ্যে নেওয়া হয়েছে",
   "auth.username_invalid": "অক্ষর দিয়ে শুরু হতে হবে, 3-30 অক্ষর",
   "word.new_label": "নতুন",
+  "auth.email": "ইমেইল",
+  "auth.password": "পাসওয়ার্ড",
+  "auth.name": "নাম",
+  "auth.forgot_password": "পাসওয়ার্ড ভুলে গেছেন?",
+  "auth.has_account": "আগে থেকেই অ্যাকাউন্ট আছে?",
+  "auth.no_account": "এখনো অ্যাকাউন্ট নেই?",
+  "auth.error_invalid_email": "একটি বৈধ ইমেইল ঠিকানা লিখুন",
+  "auth.error_name_required": "নাম আবশ্যক",
+  "auth.error_password_short": "পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে",
+  "auth.error_username_taken": "এই ব্যবহারকারী নামটি ইতিমধ্যে নেওয়া হয়েছে",
+  "funnel.first_lesson_complete": "প্রথম পাঠ সম্পন্ন!",
 };
 
 const pt: Record<string, string> = {
@@ -3316,6 +3378,17 @@ const pt: Record<string, string> = {
   "auth.username_taken": "Já está em uso",
   "auth.username_invalid": "Deve começar com uma letra, 3-30 caracteres",
   "word.new_label": "Novo",
+  "auth.email": "Email",
+  "auth.password": "Palavra-passe",
+  "auth.name": "Nome",
+  "auth.forgot_password": "Esqueceste a palavra-passe?",
+  "auth.has_account": "Já tens uma conta?",
+  "auth.no_account": "Ainda não tens conta?",
+  "auth.error_invalid_email": "Introduz um endereço de email válido",
+  "auth.error_name_required": "O nome é obrigatório",
+  "auth.error_password_short": "A palavra-passe deve ter pelo menos 8 caracteres",
+  "auth.error_username_taken": "Este nome de utilizador já está em uso",
+  "funnel.first_lesson_complete": "Primeira lição concluída!",
 };
 
 const de: Record<string, string> = {
@@ -3727,6 +3800,17 @@ const de: Record<string, string> = {
   "auth.username_taken": "Bereits vergeben",
   "auth.username_invalid": "Muss mit einem Buchstaben beginnen, 3-30 Zeichen",
   "word.new_label": "Neu",
+  "auth.email": "E-Mail",
+  "auth.password": "Passwort",
+  "auth.name": "Name",
+  "auth.forgot_password": "Passwort vergessen?",
+  "auth.has_account": "Bereits ein Konto?",
+  "auth.no_account": "Noch kein Konto?",
+  "auth.error_invalid_email": "Gib eine gültige E-Mail-Adresse ein",
+  "auth.error_name_required": "Name ist erforderlich",
+  "auth.error_password_short": "Das Passwort muss mindestens 8 Zeichen lang sein",
+  "auth.error_username_taken": "Dieser Benutzername ist bereits vergeben",
+  "funnel.first_lesson_complete": "Erste Lektion abgeschlossen!",
 };
 
 const zh: Record<string, string> = {
@@ -4138,6 +4222,17 @@ const zh: Record<string, string> = {
   "auth.username_taken": "已被使用",
   "auth.username_invalid": "必须以字母开头，3-30个字符",
   "word.new_label": "新",
+  "auth.email": "电子邮箱",
+  "auth.password": "密码",
+  "auth.name": "姓名",
+  "auth.forgot_password": "忘记密码？",
+  "auth.has_account": "已有账户？",
+  "auth.no_account": "还没有账户？",
+  "auth.error_invalid_email": "请输入有效的电子邮箱地址",
+  "auth.error_name_required": "姓名为必填项",
+  "auth.error_password_short": "密码至少需要8个字符",
+  "auth.error_username_taken": "此用户名已被使用",
+  "funnel.first_lesson_complete": "第一课完成！",
 };
 
 const ru: Record<string, string> = {
@@ -4549,6 +4644,17 @@ const ru: Record<string, string> = {
   "auth.username_taken": "Уже занято",
   "auth.username_invalid": "Должно начинаться с буквы, 3-30 символов",
   "word.new_label": "Новое",
+  "auth.email": "Эл. почта",
+  "auth.password": "Пароль",
+  "auth.name": "Имя",
+  "auth.forgot_password": "Забыли пароль?",
+  "auth.has_account": "Уже есть аккаунт?",
+  "auth.no_account": "Нет аккаунта?",
+  "auth.error_invalid_email": "Введите действительный адрес электронной почты",
+  "auth.error_name_required": "Имя обязательно",
+  "auth.error_password_short": "Пароль должен содержать не менее 8 символов",
+  "auth.error_username_taken": "Это имя пользователя уже занято",
+  "funnel.first_lesson_complete": "Первый урок пройден!",
 };
 
 const uk: Record<string, string> = {
@@ -4960,6 +5066,17 @@ const uk: Record<string, string> = {
   "auth.username_taken": "Вже зайнято",
   "auth.username_invalid": "Має починатися з літери, 3-30 символів",
   "word.new_label": "Нове",
+  "auth.email": "Ел. пошта",
+  "auth.password": "Пароль",
+  "auth.name": "Ім'я",
+  "auth.forgot_password": "Забули пароль?",
+  "auth.has_account": "Вже є обліковий запис?",
+  "auth.no_account": "Немає облікового запису?",
+  "auth.error_invalid_email": "Введіть дійсну адресу електронної пошти",
+  "auth.error_name_required": "Ім'я обов'язкове",
+  "auth.error_password_short": "Пароль має містити щонайменше 8 символів",
+  "auth.error_username_taken": "Це ім'я користувача вже зайнято",
+  "funnel.first_lesson_complete": "Перший урок завершено!",
 };
 
 const tr: Record<string, string> = {
@@ -5371,6 +5488,17 @@ const tr: Record<string, string> = {
   "auth.username_taken": "Zaten alınmış",
   "auth.username_invalid": "Harfle başlamalı, 3-30 karakter",
   "word.new_label": "Yeni",
+  "auth.email": "E-posta",
+  "auth.password": "Şifre",
+  "auth.name": "Ad",
+  "auth.forgot_password": "Şifreni mi unuttun?",
+  "auth.has_account": "Zaten hesabın var mı?",
+  "auth.no_account": "Henüz hesabın yok mu?",
+  "auth.error_invalid_email": "Geçerli bir e-posta adresi girin",
+  "auth.error_name_required": "Ad gereklidir",
+  "auth.error_password_short": "Şifre en az 8 karakter olmalıdır",
+  "auth.error_username_taken": "Bu kullanıcı adı zaten alınmış",
+  "funnel.first_lesson_complete": "İlk ders tamamlandı!",
 };
 
 const pl: Record<string, string> = {
@@ -5782,6 +5910,17 @@ const pl: Record<string, string> = {
   "auth.username_taken": "Już zajęta",
   "auth.username_invalid": "Musi zaczynać się literą, 3-30 znaków",
   "word.new_label": "Nowe",
+  "auth.email": "E-mail",
+  "auth.password": "Hasło",
+  "auth.name": "Imię",
+  "auth.forgot_password": "Nie pamiętasz hasła?",
+  "auth.has_account": "Masz już konto?",
+  "auth.no_account": "Nie masz jeszcze konta?",
+  "auth.error_invalid_email": "Wpisz prawidłowy adres e-mail",
+  "auth.error_name_required": "Imię jest wymagane",
+  "auth.error_password_short": "Hasło musi mieć co najmniej 8 znaków",
+  "auth.error_username_taken": "Ta nazwa użytkownika jest już zajęta",
+  "funnel.first_lesson_complete": "Pierwsza lekcja ukończona!",
 };
 
 const ko: Record<string, string> = {
@@ -6193,6 +6332,17 @@ const ko: Record<string, string> = {
   "auth.username_taken": "이미 사용 중",
   "auth.username_invalid": "문자로 시작해야 하며, 3-30자",
   "word.new_label": "새로운",
+  "auth.email": "이메일",
+  "auth.password": "비밀번호",
+  "auth.name": "이름",
+  "auth.forgot_password": "비밀번호를 잊으셨나요?",
+  "auth.has_account": "이미 계정이 있으신가요?",
+  "auth.no_account": "계정이 없으신가요?",
+  "auth.error_invalid_email": "유효한 이메일 주소를 입력하세요",
+  "auth.error_name_required": "이름은 필수입니다",
+  "auth.error_password_short": "비밀번호는 8자 이상이어야 합니다",
+  "auth.error_username_taken": "이 사용자 이름은 이미 사용 중입니다",
+  "funnel.first_lesson_complete": "첫 번째 레슨 완료!",
 };
 
 const ja: Record<string, string> = {
@@ -6604,6 +6754,17 @@ const ja: Record<string, string> = {
   "auth.username_taken": "既に使用されています",
   "auth.username_invalid": "英字で始まる必要があります、3-30文字",
   "word.new_label": "新しい",
+  "auth.email": "メールアドレス",
+  "auth.password": "パスワード",
+  "auth.name": "名前",
+  "auth.forgot_password": "パスワードをお忘れですか？",
+  "auth.has_account": "すでにアカウントをお持ちですか？",
+  "auth.no_account": "アカウントをお持ちでないですか？",
+  "auth.error_invalid_email": "有効なメールアドレスを入力してください",
+  "auth.error_name_required": "名前は必須です",
+  "auth.error_password_short": "パスワードは8文字以上である必要があります",
+  "auth.error_username_taken": "このユーザー名はすでに使用されています",
+  "funnel.first_lesson_complete": "最初のレッスン完了！",
 };
 
 const ALL: Partial<Record<L1Code | "pt", Record<string, string>>> = {
