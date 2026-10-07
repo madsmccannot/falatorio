@@ -13,12 +13,14 @@ import { SpeakButton } from "./SpeakButton";
 import { useTheme } from "@/lib/theme";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { TappableText } from "./TappableText";
+import { scoreSpeech, type SpeechScore } from "@/lib/speech-scorer";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
 export function SpeakAndScore({ exercise, onAnswer, disabled }: ExerciseProps) {
   const theme = useTheme();
-  const { isListening, transcript, startListening, stopListening } = useSpeechRecognition();
+  const { isListening, transcript, confidence, startListening, stopListening } = useSpeechRecognition();
   const [finalTranscript, setFinalTranscript] = React.useState<string | null>(null);
+  const [scoreResult, setScoreResult] = React.useState<SpeechScore | null>(null);
   const pulse = useSharedValue(1);
 
   const prompt = exercise.prompt as Record<string, unknown> | string;
@@ -52,10 +54,17 @@ export function SpeakAndScore({ exercise, onAnswer, disabled }: ExerciseProps) {
     } else {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       setFinalTranscript(null);
+      setScoreResult(null);
       const result = await startListening();
       if (result) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        const scored = scoreSpeech(targetText, result, confidence);
+        setScoreResult(scored);
         setFinalTranscript(result);
+        if (scored.result === "correct") {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } else {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        }
         onAnswer(result);
       }
     }
@@ -66,7 +75,7 @@ export function SpeakAndScore({ exercise, onAnswer, disabled }: ExerciseProps) {
   return (
     <View style={styles.container}>
       <Text style={[styles.label, { color: theme.text }]}>
-        Diz isto em portugues
+        Diz isto em português
       </Text>
 
       <View style={styles.promptWrap}>
@@ -114,9 +123,22 @@ export function SpeakAndScore({ exercise, onAnswer, disabled }: ExerciseProps) {
             <Text style={[styles.transcriptionLabel, { color: theme.textSecondary }]}>
               {isListening ? "A reconhecer:" : "O que disseste:"}
             </Text>
-            <Text style={[styles.transcriptionText, { color: theme.text }]}>
-              {displayTranscript}
-            </Text>
+            {scoreResult && !isListening ? (
+              <Text style={styles.transcriptionText}>
+                {scoreResult.transcriptDiff.map((w, i) => (
+                  <Text
+                    key={i}
+                    style={{ color: w.status === "match" ? colors.success : theme.text }}
+                  >
+                    {i > 0 ? " " : ""}{w.word}
+                  </Text>
+                ))}
+              </Text>
+            ) : (
+              <Text style={[styles.transcriptionText, { color: theme.text }]}>
+                {displayTranscript}
+              </Text>
+            )}
           </View>
         ) : null}
       </View>
