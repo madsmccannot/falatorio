@@ -53,7 +53,7 @@ export function FeedbackOverlay({
       style={[styles.container, correct ? (hasWarnings ? styles.correctWarning : styles.correct) : styles.wrong]}
     >
       <Text style={styles.title}>
-        {correct ? (hasWarnings ? "Quase perfeito!" : "Correto!") : "Nao foi desta"}
+        {correct ? (hasWarnings ? "Quase perfeito!" : "Correto!") : "Não foi desta"}
       </Text>
 
       {!correct && correctAnswer && (
@@ -84,7 +84,7 @@ export function FeedbackOverlay({
           <Text style={styles.explainText}>{explain.explanation}</Text>
           {explain.remaining !== null && (
             <Text style={styles.explainRemaining}>
-              {explain.remaining} {explain.remaining === 1 ? "explicacao restante" : "explicacoes restantes"} hoje
+              {explain.remaining} {explain.remaining === 1 ? "explicação restante" : "explicações restantes"} hoje
             </Text>
           )}
         </Animated.View>
@@ -93,7 +93,7 @@ export function FeedbackOverlay({
       {explain.error === "limit_reached" && (
         <Animated.View entering={FadeIn.duration(200)} style={styles.limitBox}>
           <Text style={styles.limitText}>
-            Limite diario de explicacoes atingido. Atualiza para Super para mais!
+            Limite diário de explicações atingido. Atualiza para Super para mais!
           </Text>
         </Animated.View>
       )}

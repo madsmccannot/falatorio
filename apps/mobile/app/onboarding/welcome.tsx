@@ -68,7 +68,7 @@ export default function WelcomeScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(400).duration(600)}>
-          <Text style={[styles.appName, { color: theme.text }]}>Falatorio</Text>
+          <Text style={[styles.appName, { color: theme.text }]}>Falatório</Text>
           <Text style={[styles.title, { color: theme.text }]}>
             {t("auth.welcome_title")}
           </Text>

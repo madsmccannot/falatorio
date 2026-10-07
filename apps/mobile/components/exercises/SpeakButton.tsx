@@ -68,7 +68,7 @@ export function SpeakButton({ text, speed = "normal", size = 44, variant = "circ
         style={[
           isCircle ? [styles.circle, { width: size, height: size, borderRadius: size / 2, backgroundColor: isSpeaking ? colors.primary[500] + "30" : colors.primary[500] + "18" }] : styles.inline,
         ]}
-        accessibilityLabel={isSpeaking ? "Parar audio" : "Ouvir pronuncia"}
+        accessibilityLabel={isSpeaking ? "Parar áudio" : "Ouvir pronúncia"}
         accessibilityRole="button"
       >
         <SpeakerIcon

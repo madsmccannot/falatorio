@@ -26,10 +26,10 @@ export function AdOrPayChoice({
   return (
     <Modal visible={visible} onDismiss={onDismiss}>
       <Text style={styles.title}>{rewardLabel}</Text>
-      <Text style={styles.subtitle}>Choose how you'd like to continue.</Text>
+      <Text style={styles.subtitle}>Escolhe como queres continuar.</Text>
 
       <Button
-        title="Watch a short ad"
+        title="Ver um anúncio curto"
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           onWatchAd();
@@ -39,12 +39,12 @@ export function AdOrPayChoice({
 
       <View style={styles.dividerRow}>
         <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>or</Text>
+        <Text style={styles.dividerText}>ou</Text>
         <View style={styles.dividerLine} />
       </View>
 
       <Button
-        title={`Spend ${ouroCost} ouro`}
+        title={`Gastar ${ouroCost} ouro`}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           onPayOuro();
@@ -55,7 +55,7 @@ export function AdOrPayChoice({
       />
 
       <Button
-        title="Cancel"
+        title="Cancelar"
         onPress={onDismiss}
         variant="ghost"
         style={styles.action}

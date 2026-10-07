@@ -30,26 +30,26 @@ export function MidLessonPaywall({ visible, sessionId, onContinue, onQuit }: Pro
 
   return (
     <Modal visible={visible} onDismiss={() => {}}>
-      <Text style={styles.title}>Keep going?</Text>
+      <Text style={styles.title}>Continuar?</Text>
       <Text style={styles.subtitle}>
-        You've run out of hearts mid-lesson. Spend {cost} ouro to continue
-        where you left off.
+        Ficaste sem vidas a meio da lição. Gasta {cost} ouro para continuar
+        de onde paraste.
       </Text>
 
       <View style={styles.balanceRow}>
-        <Text style={styles.balanceLabel}>Your balance:</Text>
+        <Text style={styles.balanceLabel}>O teu saldo:</Text>
         <Text style={styles.balanceValue}>{balance} ouro</Text>
       </View>
 
       <Button
-        title={`Continue (${cost} ouro)`}
+        title={`Continuar (${cost} ouro)`}
         onPress={handleContinue}
         disabled={!canAfford}
         style={styles.action}
       />
 
       <Button
-        title="Get Super — never run out"
+        title="Obter Super — nunca mais ficas sem"
         onPress={() => {
           onQuit();
           router.push("/shop/super-detail");
@@ -59,7 +59,7 @@ export function MidLessonPaywall({ visible, sessionId, onContinue, onQuit }: Pro
       />
 
       <Button
-        title="Leave lesson"
+        title="Sair da lição"
         onPress={onQuit}
         variant="danger"
         style={styles.action}

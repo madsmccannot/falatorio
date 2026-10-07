@@ -15,9 +15,9 @@ export function SuperUpsellBanner({ message }: Props) {
       style={styles.container}
     >
       <Text style={styles.text}>
-        {message ?? "Upgrade to Super for unlimited hearts and no ads"}
+        {message ?? "Passa para Super — vidas ilimitadas e sem anúncios"}
       </Text>
-      <Text style={styles.cta}>Learn more →</Text>
+      <Text style={styles.cta}>Saber mais →</Text>
     </Pressable>
   );
 }

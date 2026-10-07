@@ -52,7 +52,7 @@ export default function ConversationScreen() {
           {
             id: "tutor-0",
             role: "tutor",
-            text: "Ola! Vamos praticar portugues. Diz-me alguma coisa!",
+            text: "Olá! Vamos praticar português. Diz-me alguma coisa!",
           },
         ]);
       } catch {
@@ -91,7 +91,7 @@ export default function ConversationScreen() {
       const errorMsg: Message = {
         id: `error-${Date.now()}`,
         role: "tutor",
-        text: "Something went wrong. Try again.",
+        text: "Algo correu mal. Tenta outra vez.",
       };
       setMessages((prev) => [...prev, errorMsg]);
     }
@@ -110,9 +110,9 @@ export default function ConversationScreen() {
     return (
       <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg, justifyContent: "center", alignItems: "center" }]}>
         <Text style={[styles.errorText, { color: theme.text }]}>
-          Could not start conversation.
+          Não foi possível iniciar a conversa.
         </Text>
-        <Button title="Go back" onPress={() => router.back()} style={{ marginTop: spacing.md }} />
+        <Button title="Voltar" onPress={() => router.back()} style={{ marginTop: spacing.md }} />
       </View>
     );
   }
@@ -120,7 +120,7 @@ export default function ConversationScreen() {
   if (startMutation.isPending) {
     return (
       <View style={{ flex: 1, backgroundColor: theme.bg }}>
-        <Loading fullScreen message="Starting conversation..." />
+        <Loading fullScreen message="A iniciar conversa..." />
       </View>
     );
   }
@@ -136,7 +136,7 @@ export default function ConversationScreen() {
       keyboardVerticalOffset={0}
     >
       <View style={[styles.topBar, { borderBottomColor: theme.border, backgroundColor: theme.bgElevated }]}>
-        <Button title="End" onPress={handleEnd} variant="ghost" size="sm" />
+        <Button title="Terminar" onPress={handleEnd} variant="ghost" size="sm" />
         <Text style={[styles.topTitle, { color: theme.text }]}>{scenarioId}</Text>
         <View style={{ width: 50 }} />
       </View>
@@ -171,7 +171,7 @@ export default function ConversationScreen() {
             </Text>
             {item.errors && item.errors.length > 0 && (
               <Button
-                title={`${item.errors.length} error${item.errors.length > 1 ? "s" : ""} found`}
+                title={`${item.errors.length} erro${item.errors.length > 1 ? "s" : ""} encontrado${item.errors.length > 1 ? "s" : ""}`}
                 onPress={() => setSelectedError(item.errors)}
                 variant="ghost"
                 size="sm"
@@ -184,7 +184,7 @@ export default function ConversationScreen() {
 
       {sendMutation.isPending && (
         <View style={styles.typing}>
-          <Text style={[styles.typingText, { color: theme.textMuted }]}>Tutor is typing...</Text>
+          <Text style={[styles.typingText, { color: theme.textMuted }]}>O tutor está a escrever...</Text>
         </View>
       )}
 
@@ -193,14 +193,14 @@ export default function ConversationScreen() {
           style={[styles.textInput, { backgroundColor: theme.bgInput, color: theme.text }]}
           value={input}
           onChangeText={setInput}
-          placeholder="Type in Portuguese..."
+          placeholder="Escreve em português..."
           placeholderTextColor={theme.textMuted}
           multiline
           maxLength={500}
           editable={!sendMutation.isPending}
         />
         <Button
-          title="Send"
+          title="Enviar"
           onPress={handleSend}
           size="sm"
           disabled={!input.trim() || sendMutation.isPending}
@@ -212,7 +212,7 @@ export default function ConversationScreen() {
         visible={!!selectedError}
         onDismiss={() => setSelectedError(undefined)}
       >
-        <Text style={[styles.modalTitle, { color: theme.text }]}>Errors in your message</Text>
+        <Text style={[styles.modalTitle, { color: theme.text }]}>Erros na tua mensagem</Text>
         {selectedError?.map((err, i) => (
           <View key={i} style={[styles.errorCard, { backgroundColor: theme.bgInput }]}>
             <Text style={styles.errorFragment}>"{err.userSaid}"</Text>
@@ -221,7 +221,7 @@ export default function ConversationScreen() {
           </View>
         ))}
         <Button
-          title="Got it"
+          title="Percebi"
           onPress={() => setSelectedError(undefined)}
           style={{ marginTop: spacing.md }}
         />

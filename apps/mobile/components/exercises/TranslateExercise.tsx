@@ -45,7 +45,7 @@ export function TranslateExercise({ exercise, onAnswer, disabled }: ExerciseProp
         style={[styles.input, { borderColor: theme.border, color: theme.text }]}
         value={text}
         onChangeText={setText}
-        placeholder="Escreve a tua traducao..."
+        placeholder="Escreve a tua tradução..."
         placeholderTextColor={theme.textMuted}
         multiline
         editable={!disabled}

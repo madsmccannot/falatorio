@@ -29,7 +29,7 @@ const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] =
   {
     id: "vowels", label: "Vogais",
     entries: [
-      { letter: "A", word: "agua", ipa: "/a/" },
+      { letter: "A", word: "água", ipa: "/a/" },
       { letter: "E", word: "escola", ipa: "/e/, /ɛ/" },
       { letter: "I", word: "ilha", ipa: "/i/" },
       { letter: "O", word: "olho", ipa: "/o/, /ɔ/" },
@@ -39,10 +39,10 @@ const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] =
   {
     id: "accented", label: "Acentos e sinais",
     entries: [
-      { letter: "A", word: "agua (aguda)", ipa: "/a/" },
-      { letter: "A", word: "lama (circunflexo)", ipa: "/ɐ/" },
-      { letter: "A", word: "la (til)", ipa: "/ɐ̃/" },
-      { letter: "C", word: "cacao (cedilha)", ipa: "/s/" },
+      { letter: "Á", word: "água (agudo)", ipa: "/a/" },
+      { letter: "Â", word: "câmara (circunflexo)", ipa: "/ɐ/" },
+      { letter: "Ã", word: "lã (til)", ipa: "/ɐ̃/" },
+      { letter: "Ç", word: "ação (cedilha)", ipa: "/s/" },
     ],
   },
   {
@@ -98,15 +98,15 @@ const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] =
 ];
 
 const DOMAIN_LABELS: Record<string, Record<string, string>> = {
-  phonetics: { en: "Phonetics", pt: "Fonetica" },
+  phonetics: { en: "Phonetics", pt: "Fonética" },
   morphology: { en: "Morphology", pt: "Morfologia" },
   tenses_moods: { en: "Tenses & Moods", pt: "Tempos e modos" },
   determiners: { en: "Determiners", pt: "Determinantes" },
   pronouns: { en: "Pronouns", pt: "Pronomes" },
-  prepositions: { en: "Prepositions", pt: "Preposicoes" },
+  prepositions: { en: "Prepositions", pt: "Preposições" },
   syntax: { en: "Syntax", pt: "Sintaxe" },
-  lexicon: { en: "Vocabulary", pt: "Vocabulario" },
-  pragmatics: { en: "Pragmatics", pt: "Pragmatica" },
+  lexicon: { en: "Vocabulary", pt: "Vocabulário" },
+  pragmatics: { en: "Pragmatics", pt: "Pragmática" },
   orthography: { en: "Spelling", pt: "Ortografia" },
 };
 

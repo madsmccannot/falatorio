@@ -17,19 +17,19 @@ export function IAPModal({ visible, onDismiss, status, productName, errorMessage
     <Modal visible={visible} onDismiss={status === "loading" ? () => {} : onDismiss}>
       {status === "loading" && (
         <View style={styles.centered}>
-          <Loading message="Processing purchase..." />
+          <Loading message="A processar compra..." />
         </View>
       )}
 
       {status === "success" && (
         <View style={styles.centered}>
           <Text style={styles.successIcon}>✓</Text>
-          <Text style={styles.title}>Purchase complete</Text>
+          <Text style={styles.title}>Compra concluída</Text>
           <Text style={styles.subtitle}>
-            {productName ?? "Your item"} has been added to your account.
+            {productName ?? "O teu item"} foi adicionado à tua conta.
           </Text>
           <Button
-            title="Done"
+            title="Feito"
             onPress={onDismiss}
             style={styles.action}
           />
@@ -38,9 +38,9 @@ export function IAPModal({ visible, onDismiss, status, productName, errorMessage
 
       {status === "error" && (
         <View style={styles.centered}>
-          <Text style={styles.title}>Purchase failed</Text>
+          <Text style={styles.title}>Compra falhada</Text>
           <Text style={styles.subtitle}>
-            {errorMessage ?? "Something went wrong. You were not charged."}
+            {errorMessage ?? "Algo correu mal. Não foste cobrado."}
           </Text>
           <Button
             title="OK"

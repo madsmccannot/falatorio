@@ -289,7 +289,7 @@ function PickerModal({
   title,
   onClose,
   theme,
-  closeLabel = "Done",
+  closeLabel = "Feito",
   children,
 }: {
   visible: boolean;

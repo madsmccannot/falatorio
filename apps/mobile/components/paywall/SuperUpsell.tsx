@@ -17,7 +17,7 @@ export function SuperUpsell({ feature, compact }: Props) {
         style={styles.compactContainer}
       >
         <Text style={styles.compactText}>
-          Unlock with Super →
+          Desbloquear com Super →
         </Text>
       </Pressable>
     );
@@ -28,11 +28,11 @@ export function SuperUpsell({ feature, compact }: Props) {
       onPress={() => router.push("/shop/super-detail")}
       style={styles.container}
     >
-      <Text style={styles.title}>Upgrade to Super</Text>
+      <Text style={styles.title}>Passa para Super</Text>
       <Text style={styles.description}>
-        Get {feature} and more with Falatório Super.
+        Obtém {feature} e mais com Falatório Super.
       </Text>
-      <Text style={styles.cta}>Learn more →</Text>
+      <Text style={styles.cta}>Saber mais →</Text>
     </Pressable>
   );
 }

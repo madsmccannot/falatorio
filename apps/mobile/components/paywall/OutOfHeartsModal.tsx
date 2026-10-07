@@ -27,19 +27,19 @@ export function OutOfHeartsModal({ visible, onDismiss, context }: Props) {
       <View style={styles.iconRow}>
         <HeartIcon size={48} />
       </View>
-      <Text style={styles.title}>Out of hearts</Text>
+      <Text style={styles.title}>Sem vidas</Text>
       <Text style={styles.subtitle}>
         {context === "lesson"
-          ? "You need hearts to continue this lesson."
-          : "You need hearts to start a lesson."}
+          ? "Precisas de vidas para continuar esta lição."
+          : "Precisas de vidas para começar uma lição."}
       </Text>
 
       {nextRefillIn && (
-        <Text style={styles.timer}>Next free heart in {nextRefillIn}</Text>
+        <Text style={styles.timer}>Próxima vida grátis em {nextRefillIn}</Text>
       )}
 
       <Button
-        title={`Refill hearts (${refillCost} ouro)`}
+        title={`Repor vidas (${refillCost} ouro)`}
         onPress={async () => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           await refillWithOuro();
@@ -50,7 +50,7 @@ export function OutOfHeartsModal({ visible, onDismiss, context }: Props) {
       />
 
       <Button
-        title="Watch an ad for a heart"
+        title="Ver anúncio por uma vida"
         onPress={() => {
           onDismiss();
         }}
@@ -59,7 +59,7 @@ export function OutOfHeartsModal({ visible, onDismiss, context }: Props) {
       />
 
       <Button
-        title="Get Super — unlimited hearts"
+        title="Obter Super — vidas ilimitadas"
         onPress={() => {
           onDismiss();
           router.push("/shop/super-detail");

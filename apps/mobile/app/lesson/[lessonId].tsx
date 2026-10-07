@@ -187,7 +187,7 @@ export default function LessonScreen() {
           />
         </Animated.View>
       ) : (
-        <Loading message="Loading exercise..." />
+        <Loading message="A carregar exercício..." />
       )}
 
       {isSubmitting && (
