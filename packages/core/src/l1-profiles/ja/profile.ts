@@ -141,6 +141,7 @@ export const jaProfile: L1Profile = {
         ipa: "/ɨ/ /ə/",
         description: "Unstressed vowels nearly vanish",
         tip: "Japanese pronounces every mora evenly. PT-EU swallows unstressed vowels — 'telefonema' sounds like 'tlfnema'. Japanese speakers find this the hardest rhythm adjustment.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "s/z/ʃ/ʒ",
@@ -167,18 +168,21 @@ export const jaProfile: L1Profile = {
         ipa: "/ɫ/",
         description: "Velarized L at end of syllables",
         tip: "Japanese has no L at all — ら行 is a flap. PT-EU final L is dark and velarized, with the back of the tongue raised. It sounds almost like a 'w'. 'Portugal', 'sol' (sun), 'mal' (badly). Distinct from the tap r.",
+        mouthPosition: "alveolar_tap",
       },
       {
         sound: "diphthongs (ei, ou, ai)",
         ipa: "/ɐj/ /ow/ /aj/",
         description: "Oral diphthongs — smooth glides between vowels",
         tip: "Japanese diphthongs tend to be two separate morae (あい = a-i). PT-EU diphthongs glide within one syllable: 'pai' (father, /aj/), 'coisa' (thing, /oj/), 'eu' (I, /ew/). Keep them as single beats, not two.",
+        mouthPosition: "open_e",
       },
       {
         sound: "word-final -e",
         ipa: "/ɨ/ or silent",
         description: "Final -e nearly disappears",
         tip: "Japanese always gives every mora equal weight. PT-EU final -e is barely a whisper or drops entirely. 'Cidade' sounds like 'cidadɨ' or even 'cidad'. Do not pronounce it as a full え (e).",
+        mouthPosition: "closed_e",
       },
     ],
     grammarGaps: [

@@ -149,6 +149,7 @@ export const trProfile: L1Profile = {
         ipa: "/ɨ/ /ə/",
         description: "Unstressed vowels nearly vanish",
         tip: "Turkish pronounces every vowel clearly. PT-EU swallows unstressed vowels — 'telefonema' sounds like 'tlfnema'. This is the biggest rhythm challenge for Turkish speakers.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "s/z/ʃ/ʒ",
@@ -162,18 +163,21 @@ export const trProfile: L1Profile = {
         ipa: "/ɫ/",
         description: "Velarized L at end of syllables",
         tip: "Turkish L is always clear/light (ince L). PT-EU final L is dark and velarized — the back of the tongue rises toward the velum, giving a heavy 'w'-like quality. 'Portugal', 'sol' (sun), 'mal' (badly).",
+        mouthPosition: "alveolar_tap",
       },
       {
         sound: "diphthongs",
         ipa: "/ej/ /ow/ /aj/ /oj/",
         description: "Oral diphthongs (ei, ou, ai, oi)",
         tip: "Turkish has no true diphthongs — vowel sequences are split across syllables. PT-EU glides two vowels into one syllable: 'lei' (law), 'coisa' (thing), 'vai' (goes), 'noite' (night). Do not break them apart.",
+        mouthPosition: "open_e",
       },
       {
         sound: "word-final -e",
         ipa: "/ɨ/ or silent",
         description: "Final -e nearly disappears",
         tip: "Turkish always pronounces final vowels fully. PT-EU final -e is barely a whisper or drops entirely. 'Cidade' sounds like 'cidadɨ' or even 'cidad'. Do not give it a full Turkish 'e' sound.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "open/closed o",

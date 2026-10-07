@@ -143,6 +143,7 @@ export const ruProfile: L1Profile = {
         ipa: "/ɨ/ /ə/",
         description: "Unstressed vowels nearly vanish",
         tip: "Good news: Russian also reduces vowels (аканье/иканье). PT-EU goes even further — 'telefonema' sounds like 'tlfnema'. Your instinct for vowel reduction is an advantage.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "s/z/ʃ/ʒ",
@@ -163,6 +164,7 @@ export const ruProfile: L1Profile = {
         ipa: "/ɫ/",
         description: "Velarized L at end of syllables",
         tip: "Russian has hard л which is very similar. PT-EU final L is dark/velarized: 'Portugal', 'sol' (sun). Your Russian л is an advantage here.",
+        mouthPosition: "alveolar_tap",
       },
       {
         sound: "consonant clusters",
@@ -175,12 +177,14 @@ export const ruProfile: L1Profile = {
         ipa: "/ɨ/ or silent",
         description: "Final -e nearly disappears",
         tip: "Russian final -е is always pronounced. PT-EU final -e is barely a whisper or drops entirely. 'Cidade' sounds like 'cidadɨ' or even 'cidad'. This is a major difference from Russian clear endings.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "diphthongs",
         ipa: "/ej/ /ow/ /aj/ /oj/",
         description: "Oral diphthongs (ei, ou, ai, oi)",
         tip: "Russian has few true diphthongs. PT-EU has many: 'primeiro' (ei), 'outro' (ou), 'pai' (ai), 'noite' (oi). The two vowels glide into each other in a single syllable — do not separate them.",
+        mouthPosition: "open_e",
       },
     ],
     grammarGaps: [

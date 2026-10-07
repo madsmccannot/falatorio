@@ -143,6 +143,7 @@ export const plProfile: L1Profile = {
         ipa: "/ɨ/ /ə/",
         description: "Unstressed vowels nearly vanish",
         tip: "Polish pronounces every vowel. PT-EU swallows unstressed vowels drastically — 'telefonema' sounds like 'tlfnema'. This is the biggest rhythm adjustment for Polish speakers.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "s/z/ʃ/ʒ",
@@ -163,6 +164,7 @@ export const plProfile: L1Profile = {
         ipa: "/ɫ/",
         description: "Velarized L at end of syllables",
         tip: "Polish ł is now /w/ in modern pronunciation. PT-EU dark L is velarized /ɫ/ — tongue touches the alveolar ridge while the back rises. 'Portugal', 'sol' (sun), 'mal' (badly). Not the Polish ł glide, but not a clear L either.",
+        mouthPosition: "alveolar_tap",
       },
       {
         sound: "consonant clusters",
@@ -175,6 +177,7 @@ export const plProfile: L1Profile = {
         ipa: "/ɨ/ or silent",
         description: "Final -e nearly disappears",
         tip: "Polish always pronounces final -e (like in 'pole', 'morze'). PT-EU final -e is barely a whisper or drops entirely. 'Cidade' sounds like 'cidadɨ' or even 'cidad'. Do not give it a full Polish -e.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "word stress",

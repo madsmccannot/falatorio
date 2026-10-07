@@ -148,6 +148,7 @@ export const zhProfile: L1Profile = {
         ipa: "/ɨ/ /ə/",
         description: "Unstressed vowels vanish",
         tip: "Mandarin pronounces every syllable with a tone. PT-EU swallows unstressed syllables — 'telefonema' sounds like 'tlfnema'. This is the biggest rhythm shock for Mandarin speakers.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "s/z/ʃ/ʒ",
@@ -167,18 +168,21 @@ export const zhProfile: L1Profile = {
         ipa: "/ɫ/",
         description: "Velarized L at end of syllables",
         tip: "Mandarin 'l' is always light (as in 拉 lā). PT-EU final L is dark and heavy — the back of the tongue raises toward the velum, making it sound almost like a 'w'. 'Portugal', 'sol' (sun), 'mal' (badly). This dark L does not exist in Mandarin.",
+        mouthPosition: "alveolar_tap",
       },
       {
         sound: "diphthongs (ei, ou, ai)",
         ipa: "/ɐj/ /ow/ /aj/",
         description: "Oral diphthongs",
         tip: "Mandarin has diphthongs (ai, ei, ao, ou) so the concept is familiar. PT-EU diphthongs are similar but with European vowel qualities: 'pai' (/paj/), 'sei' (/sɐj/), 'vou' (/vow/). The glide is faster and less emphasised than in Mandarin.",
+        mouthPosition: "open_e",
       },
       {
         sound: "word-final -e",
         ipa: "/ɨ/ or silent",
         description: "Final -e nearly disappears",
         tip: "Mandarin always pronounces final vowels clearly. PT-EU final -e is barely a whisper or drops entirely — 'cidade' sounds like 'cidadɨ' or 'cidad'. Never add a full Mandarin-style vowel at the end.",
+        mouthPosition: "closed_e",
       },
     ],
     grammarGaps: [

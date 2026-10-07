@@ -141,6 +141,7 @@ export const koProfile: L1Profile = {
         ipa: "/ɨ/ /ə/",
         description: "Unstressed vowels nearly vanish",
         tip: "Korean pronounces every syllable evenly. PT-EU swallows unstressed vowels — 'telefonema' sounds like 'tlfnema'. This timing shift is the biggest rhythm challenge.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "s/z/ʃ/ʒ",
@@ -167,18 +168,21 @@ export const koProfile: L1Profile = {
         ipa: "/ɫ/",
         description: "Velarized L at end of syllables",
         tip: "Korean ㄹ at the end of a syllable is a lateral, but light. PT-EU final L is dark and heavy — the back of the tongue raises toward the velum, almost like a 'w'. 'Portugal', 'sol' (sun), 'mal' (badly).",
+        mouthPosition: "alveolar_tap",
       },
       {
         sound: "diphthongs (ei, ou, ai)",
         ipa: "/ɐj/ /ow/ /aj/",
         description: "Oral diphthongs — two vowels gliding together",
         tip: "Korean has diphthongs (ㅐ, ㅔ, ㅘ) but they work differently. PT-EU diphthongs glide smoothly: 'pai' (father, /aj/), 'coisa' (thing, /oj/), 'eu' (I, /ew/). Do not break them into two syllables.",
+        mouthPosition: "open_e",
       },
       {
         sound: "word-final -e",
         ipa: "/ɨ/ or silent",
         description: "Final -e nearly disappears",
         tip: "Korean always gives final syllables full weight. PT-EU final -e is barely a whisper or silent entirely. 'Cidade' sounds like 'cidadɨ' or 'cidad'. Do not pronounce it as a full 에 (e).",
+        mouthPosition: "closed_e",
       },
     ],
     grammarGaps: [

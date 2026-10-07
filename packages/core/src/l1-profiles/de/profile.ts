@@ -101,6 +101,7 @@ export const deProfile: L1Profile = {
         ipa: "/ɨ/ /ə/",
         description: "Unstressed vowels nearly vanish",
         tip: "German pronounces every syllable clearly. PT-EU swallows unstressed vowels — 'telefonema' sounds like 'tlfnema'. This is the biggest rhythm difference.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "open/closed e",
@@ -163,18 +164,21 @@ export const deProfile: L1Profile = {
         ipa: "/ɫ/",
         description: "Velarized L at end of syllables",
         tip: "German L is always clear/light. PT-EU final L is dark and thick, almost like a 'w'. 'Portugal', 'sol' (sun), 'mal' (badly) — the L is heavy at the back of the mouth.",
+        mouthPosition: "alveolar_tap",
       },
       {
         sound: "word-final -e",
         ipa: "/ɨ/ or silent",
         description: "Final -e nearly disappears",
         tip: "German Schwa (e in 'bitte') is similar but still audible. PT-EU final -e is barely a whisper or drops entirely. 'Cidade' sounds like 'cidadɨ' or even 'cidad'.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "diphthongs (ei, ou, ai)",
         ipa: "/ɐj/ /ow/ /aj/",
         description: "Oral diphthongs differ from German",
         tip: "German 'ei' = /aɪ/ and 'au' = /aʊ/. PT-EU diphthongs glide differently: 'ei' in 'leite' is /ɐj/ (more central), 'ou' in 'ouro' is /ow/ (tighter glide), 'ai' in 'pai' is /aj/. Don't substitute German diphthong shapes.",
+        mouthPosition: "open_e",
       },
       {
         sound: "word stress",

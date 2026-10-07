@@ -143,6 +143,7 @@ export const ukProfile: L1Profile = {
         ipa: "/ɨ/ /ə/",
         description: "Unstressed vowels nearly vanish",
         tip: "Ukrainian reduces vowels less than Russian but more than many languages. PT-EU goes very far — 'Portugal' sounds like 'Purtugal'. Lean into this instinct.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "s/z/ʃ/ʒ",
@@ -163,6 +164,7 @@ export const ukProfile: L1Profile = {
         ipa: "/ɫ/",
         description: "Velarized L at syllable end",
         tip: "Ukrainian has hard л similar to PT-EU dark L. Use it for final positions: 'Portugal', 'sol' (sun), 'mal' (badly).",
+        mouthPosition: "alveolar_tap",
       },
       {
         sound: "consonant clusters",
@@ -175,12 +177,14 @@ export const ukProfile: L1Profile = {
         ipa: "/ɨ/ or silent",
         description: "Final -e nearly disappears",
         tip: "Ukrainian final -е is always clearly pronounced. PT-EU final -e is barely a whisper or vanishes entirely. 'Cidade' sounds like 'cidadɨ' or even 'cidad'. This is a major rhythm difference.",
+        mouthPosition: "closed_e",
       },
       {
         sound: "diphthongs",
         ipa: "/ej/ /ow/ /aj/ /oj/",
         description: "Oral diphthongs (ei, ou, ai, oi)",
         tip: "Ukrainian has few true diphthongs. PT-EU has many: 'primeiro' (ei), 'outro' (ou), 'pai' (ai), 'noite' (oi). The two vowels glide smoothly in a single syllable — do not break them into separate syllables.",
+        mouthPosition: "open_e",
       },
     ],
     grammarGaps: [
