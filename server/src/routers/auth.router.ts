@@ -30,6 +30,33 @@ export const authRouter = t.router({
         return { userId: existing[0]!.id, created: false };
       }
 
+      const [byEmail] = await ctx.db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, input.email))
+        .limit(1);
+
+      if (byEmail) {
+        await ctx.db
+          .update(users)
+          .set({ clerkId: input.clerkId, updatedAt: new Date() })
+          .where(eq(users.id, byEmail.id));
+
+        await ctx.redis.set(
+          `user:${input.clerkId}`,
+          JSON.stringify({
+            userId: byEmail.id,
+            clerkId: input.clerkId,
+            tier: "free",
+            l1: input.l1,
+          }),
+          "EX",
+          3600,
+        );
+
+        return { userId: byEmail.id, created: false };
+      }
+
       const taken = await ctx.db
         .select({ id: users.id })
         .from(users)
@@ -86,16 +113,19 @@ export const authRouter = t.router({
         return { available: false, reason: "INVALID_FORMAT" as const };
       }
 
-      const existing = await ctx.db
-        .select({ id: users.id })
+      const [existing] = await ctx.db
+        .select({ id: users.id, clerkId: users.clerkId })
         .from(users)
         .where(eq(users.username, input.username))
         .limit(1);
 
-      return {
-        available: existing.length === 0,
-        reason: existing.length > 0 ? ("TAKEN" as const) : null,
-      };
+      if (!existing) return { available: true, reason: null };
+
+      if (ctx.user && existing.clerkId === ctx.user.clerkId) {
+        return { available: true, reason: null };
+      }
+
+      return { available: false, reason: "TAKEN" as const };
     }),
 
   getSession: protectedProcedure.query(async ({ ctx }) => {

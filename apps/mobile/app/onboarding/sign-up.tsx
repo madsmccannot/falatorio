@@ -64,7 +64,7 @@ export default function SignUpScreen() {
         await setActiveSession({ session: createdSessionId });
         captureEvent("auth_sign_up", { method: "google" });
         trackOnboardingStep("account_created");
-        router.replace("/onboarding/select-language");
+        router.replace("/");
       }
     } catch (err: any) {
       if (err?.message !== "ERR_REQUEST_CANCELED") {
