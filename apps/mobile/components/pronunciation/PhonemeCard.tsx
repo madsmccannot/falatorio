@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import type { LayoutChangeEvent } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -23,10 +24,12 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
   const [expanded, setExpanded] = useState(false);
   const expandProgress = useSharedValue(0);
   const pressScale = useSharedValue(1);
+  const contentHeight = useSharedValue(320);
 
   const handlePress = () => {
-    setExpanded((prev) => !prev);
-    expandProgress.value = withSpring(expanded ? 0 : 1, {
+    const next = !expanded;
+    setExpanded(next);
+    expandProgress.value = withSpring(next ? 1 : 0, {
       damping: 15,
       stiffness: 120,
     });
@@ -41,6 +44,11 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
     pressScale.value = withTiming(1, { duration: 150 });
   };
 
+  const onContentLayout = useCallback((e: LayoutChangeEvent) => {
+    const h = e.nativeEvent.layout.height;
+    if (h > 0) contentHeight.value = h;
+  }, []);
+
   const containerStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pressScale.value }],
   }));
@@ -49,7 +57,7 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
     height: interpolate(
       expandProgress.value,
       [0, 1],
-      [0, 280],
+      [0, contentHeight.value],
       Extrapolation.CLAMP,
     ),
     opacity: expandProgress.value,
@@ -78,7 +86,7 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
       </Pressable>
 
       <Animated.View style={detailStyle}>
-        <View style={styles.detailContent}>
+        <View style={styles.detailContent} onLayout={onContentLayout}>
           {phoneme.mouthPosition && (
             <View style={styles.diagramContainer}>
               <AnimatedMouthDiagram
