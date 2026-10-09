@@ -12,6 +12,7 @@ import Animated, {
 import type { PhoneticDifficulty } from "@falatorio/core/l1-profiles/types";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { useTheme } from "@/lib/theme";
+import { useTranslation } from "@/lib/i18n";
 import { AnimatedMouthDiagram } from "./AnimatedMouthDiagram";
 
 interface PhonemeCardProps {
@@ -21,6 +22,7 @@ interface PhonemeCardProps {
 
 export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const expandProgress = useSharedValue(0);
   const pressScale = useSharedValue(1);
@@ -97,7 +99,7 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
             </View>
           )}
           <View style={[styles.tipContainer, { backgroundColor: colors.primary[500] + "12" }]}>
-            <Text style={[styles.tipLabel, { color: colors.primary[400] }]}>Dica:</Text>
+            <Text style={[styles.tipLabel, { color: colors.primary[400] }]}>{t("reference.tip_label")}</Text>
             <Text style={[styles.tipText, { color: theme.text }]}>{phoneme.tip}</Text>
           </View>
         </View>

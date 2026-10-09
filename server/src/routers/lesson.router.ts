@@ -588,9 +588,8 @@ export const lessonRouter = t.router({
         cognitiveLevel: dominantLevel,
       });
 
-      const passed = accuracy >= LESSON.PASS_THRESHOLD;
-
       const isPractice = session.sessionType === "review" || session.sessionType === "mistakes" || session.sessionType === "daily_refresh";
+      const passed = !isPractice || accuracy >= LESSON.PASS_THRESHOLD;
       const xpMultiplier = isPractice ? PRACTICE.REVIEW_XP_MULTIPLIER : 1;
       const finalXp = Math.round(xpResult.total * xpMultiplier);
 

@@ -220,6 +220,7 @@ export function useLesson(lessonId?: string) {
     await utils.hearts.getState.invalidate();
     await utils.economy.getBalance.invalidate();
     await utils.gamification.getStreak.invalidate();
+    await utils.content.getSectionMap.invalidate();
 
     return result;
   }, [state.sessionId, completeMutation, utils]);

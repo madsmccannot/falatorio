@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, Pressable, Modal, Image, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useStreak } from "@/hooks/useStreak";
 import { useEntitlements } from "@/hooks/useEntitlements";
@@ -80,6 +80,28 @@ export default function ProfileScreen() {
   });
   const [showL1Picker, setShowL1Picker] = useState(false);
   const [showGoalPicker, setShowGoalPicker] = useState(false);
+  const updateSettings = trpc.user.updateSettings.useMutation();
+
+  useEffect(() => {
+    if (!user) return;
+    const stored = getString("daily_goal");
+    if (stored) {
+      const local = parseInt(stored, 10);
+      if (dailyGoal == null) setDailyGoal(local);
+      if (user.dailyGoalMin !== local) {
+        updateSettings.mutate({ dailyGoalMin: local }, { onError: () => {} });
+      }
+    } else if (user.dailyGoalMin != null) {
+      setDailyGoal(user.dailyGoalMin);
+      setString("daily_goal", user.dailyGoalMin.toString());
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user && !selectedL1 && user.l1) {
+      setSelectedL1(user.l1);
+    }
+  }, [user?.l1]);
 
   const handleSelectL1 = useCallback((code: string) => {
     setSelectedL1(code);
@@ -91,7 +113,8 @@ export default function ProfileScreen() {
     setDailyGoal(min);
     setString("daily_goal", min.toString());
     setShowGoalPicker(false);
-  }, []);
+    updateSettings.mutate({ dailyGoalMin: min });
+  }, [updateSettings]);
 
   if (profile.isLoading) {
     return <Loading fullScreen message={t("profile.loading")} />;
@@ -172,7 +195,7 @@ export default function ProfileScreen() {
           <View style={[styles.statCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
             <MedalIcon size={20} color={colors.ouro} />
             <Text style={[styles.statValue, { color: colors.ouro }]}>
-              {(achievements.data?.length ?? 0).toString()}
+              {(achievements.data?.unlocked?.length ?? 0).toString()}
             </Text>
             <Text style={[styles.statLabel, { color: theme.textMuted }]}>{t("profile.medals")}</Text>
           </View>

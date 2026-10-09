@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   View, Text, ScrollView, Pressable, StyleSheet, Dimensions, BackHandler, Modal,
+  Animated as RNAnimated,
 } from "react-native";
 import type { NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
+import Svg, { Path } from "react-native-svg";
 import { trpc } from "@/lib/trpc";
 import { useHearts } from "@/hooks/useHearts";
 import { useStreak } from "@/hooks/useStreak";
@@ -36,12 +38,31 @@ function getNodeX(globalIndex: number): number {
   return PATH_CENTER - NODE_SIZE / 2 + phase * PATH_AMPLITUDE;
 }
 
+const ARC_SIZE = NODE_SIZE + 18;
+const ARC_GAP_DEG = 12;
+
+function getSessionsForLesson(sectionSortOrder: number, isLastInUnit: boolean, isChest: boolean): number {
+  if (isChest) return 0;
+  if (isLastInUnit) return 1;
+  if (sectionSortOrder <= 0) return 2;
+  if (sectionSortOrder === 1) return 3;
+  if (sectionSortOrder === 2) return 4;
+  return 5;
+}
+
+function getEstimatedXp(sectionSortOrder: number, isLastInUnit: boolean, isRepeat: boolean): number {
+  if (isRepeat) return 15;
+  if (isLastInUnit) return 50;
+  return sectionSortOrder >= 2 ? 30 : 25;
+}
+
 type LessonNode = {
   id: string;
   sortOrder: number;
   nodeType: "lesson" | "chest";
   rewardConfig: { type: string; amount: number } | null;
   completed: boolean;
+  completedSessions: number;
 };
 
 type UnitWithLessons = {
@@ -55,6 +76,70 @@ type UnitWithLessons = {
   lessons: LessonNode[];
 };
 
+type SelectedLesson = {
+  id: string;
+  nodeType: "lesson" | "chest";
+  unitTitle: string;
+  unitColor: string;
+  lessonNum: number;
+  totalLessons: number;
+  completed: boolean;
+  completedSessions: number;
+  isLastInUnit: boolean;
+  sessionsRequired: number;
+  sectionSortOrder: number;
+};
+
+function ProgressArcs({
+  total,
+  completed,
+  color,
+  locked,
+}: {
+  total: number;
+  completed: number;
+  color: string;
+  locked: boolean;
+}) {
+  if (total <= 0) return null;
+  const r = (ARC_SIZE - 6) / 2;
+  const cx = ARC_SIZE / 2;
+  const cy = ARC_SIZE / 2;
+  const segAngle = (360 - total * ARC_GAP_DEG) / total;
+
+  return (
+    <Svg
+      width={ARC_SIZE}
+      height={ARC_SIZE}
+      style={{ position: "absolute", top: -(ARC_SIZE - NODE_SIZE) / 2, left: -(ARC_SIZE - NODE_SIZE) / 2 }}
+    >
+      {Array.from({ length: total }, (_, i) => {
+        const startDeg = -90 + i * (segAngle + ARC_GAP_DEG);
+        const endDeg = startDeg + segAngle;
+        const sr = (startDeg * Math.PI) / 180;
+        const er = (endDeg * Math.PI) / 180;
+        const x1 = cx + r * Math.cos(sr);
+        const y1 = cy + r * Math.sin(sr);
+        const x2 = cx + r * Math.cos(er);
+        const y2 = cy + r * Math.sin(er);
+        const la = segAngle > 180 ? 1 : 0;
+        const filled = i < completed;
+
+        return (
+          <Path
+            key={i}
+            d={`M ${x1} ${y1} A ${r} ${r} 0 ${la} 1 ${x2} ${y2}`}
+            stroke={locked ? "#6B728040" : filled ? color : `${color}35`}
+            strokeWidth={3.5}
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
+      })}
+    </Svg>
+  );
+}
+
 function LessonPathNode({
   node,
   globalIndex,
@@ -62,6 +147,7 @@ function LessonPathNode({
   localIndex,
   unitColor,
   locked,
+  sessionsRequired,
   theme,
   t,
   onPress,
@@ -72,14 +158,17 @@ function LessonPathNode({
   localIndex: number;
   unitColor: string;
   locked: boolean;
+  sessionsRequired: number;
   theme: ReturnType<typeof import("@/lib/theme").useTheme>;
   t: (key: import("@/lib/i18n").TKey) => string;
   onPress: () => void;
 }) {
+  const scaleAnim = useRef(new RNAnimated.Value(1)).current;
   const isChest = node.nodeType === "chest";
   const nodeX = getNodeX(globalIndex);
   const isLast = localIndex === totalInUnit - 1 && !isChest;
   const isCompleted = node.completed;
+  const filledSessions = isChest ? 0 : Math.min(node.completedSessions, sessionsRequired);
 
   let lessonNum = 0;
   if (!isChest) {
@@ -94,9 +183,19 @@ function LessonPathNode({
   const borderColor = locked ? (theme.isDark ? "#4B5563" : colors.neutral[400]) : bgColor;
   const opacity = locked ? 0.5 : 1;
 
+  const handlePressIn = () => {
+    if (locked) return;
+    RNAnimated.spring(scaleAnim, { toValue: 0.88, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
+  };
+  const handlePressOut = () => {
+    RNAnimated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, speed: 20, bounciness: 8 }).start();
+  };
+
   return (
     <View style={styles.nodeRow}>
       <Pressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         onPress={() => {
           if (locked) return;
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -104,31 +203,43 @@ function LessonPathNode({
         }}
         style={[styles.nodeWrapper, { left: nodeX, opacity }]}
       >
-        <View
-          style={[
-            styles.nodeCircle,
-            { backgroundColor: bgColor, borderColor },
-          ]}
-        >
-          <View style={styles.nodeInnerShadow}>
-            {locked ? (
-              <LockIcon size={22} color="#FFFFFF" />
-            ) : isChest ? (
-              <ChestIcon size={28} />
-            ) : isCompleted ? (
-              <CheckIcon size={24} color="#FFFFFF" />
-            ) : localIndex === 0 || isLast ? (
-              <StarIcon size={24} color="#FFFFFF" />
-            ) : lessonNum % 3 === 0 ? (
-              <BoltIcon size={22} color="#FFFFFF" />
-            ) : (
-              <BookIcon size={22} color="#FFFFFF" />
+        <RNAnimated.View style={{ alignItems: "center", transform: [{ scale: scaleAnim }] }}>
+          <View style={{ position: "relative" }}>
+            {!isChest && !locked && sessionsRequired > 0 && (
+              <ProgressArcs
+                total={sessionsRequired}
+                completed={filledSessions}
+                color={unitColor}
+                locked={locked}
+              />
             )}
+            <View
+              style={[
+                styles.nodeCircle,
+                { backgroundColor: bgColor, borderColor },
+              ]}
+            >
+              <View style={styles.nodeInnerShadow}>
+                {locked ? (
+                  <LockIcon size={22} color="#FFFFFF" />
+                ) : isChest ? (
+                  <ChestIcon size={28} />
+                ) : isCompleted ? (
+                  <CheckIcon size={24} color="#FFFFFF" />
+                ) : localIndex === 0 || isLast ? (
+                  <StarIcon size={24} color="#FFFFFF" />
+                ) : lessonNum % 3 === 0 ? (
+                  <BoltIcon size={22} color="#FFFFFF" />
+                ) : (
+                  <BookIcon size={22} color="#FFFFFF" />
+                )}
+              </View>
+            </View>
           </View>
-        </View>
-        <Text style={[styles.nodeLabel, { color: theme.textMuted }]} numberOfLines={1}>
-          {isChest ? t("learn.chest") : isLast ? t("learn.recap") : `${t("learn.lesson")} ${lessonNum}`}
-        </Text>
+          <Text style={[styles.nodeLabel, { color: theme.textMuted }]} numberOfLines={1}>
+            {isChest ? t("learn.chest") : isLast ? t("learn.recap") : `${t("learn.lesson")} ${lessonNum}`}
+          </Text>
+        </RNAnimated.View>
       </Pressable>
     </View>
   );
@@ -184,8 +295,9 @@ function UnitGuideModal({
 }) {
   if (!unit) return null;
   const unitTitle = (unit.title as Record<string, string>)["pt"] ?? unit.theme;
-  const unitDesc = unit.description
-    ? ((unit.description as Record<string, string>)["pt"] ?? null)
+  const descMap = unit.description as Record<string, string> | null;
+  const unitDesc = descMap
+    ? (descMap[l1] ?? descMap["en"] ?? descMap["pt"] ?? null)
     : null;
   const unitColor = getUnitColor(unit.colorIndex);
   const lessonsCount = unit.lessons.filter((l) => l.nodeType === "lesson").length;
@@ -265,6 +377,7 @@ export default function LearnScreen() {
   const [showUnitGuide, setShowUnitGuide] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [visibleUnitIdx, setVisibleUnitIdx] = useState(0);
+  const [selectedLesson, setSelectedLesson] = useState<SelectedLesson | null>(null);
 
   const unitYPositions = useRef<number[]>([]);
 
@@ -637,6 +750,10 @@ export default function LearnScreen() {
                     const thisGlobalIdx = globalNodeIdx;
                     globalNodeIdx++;
 
+                    const sectionSort = currentSection?.sortOrder ?? 0;
+                    const isLastLesson = lIdx === unit.lessons.length - 1 && lesson.nodeType === "lesson";
+                    const sessions = getSessionsForLesson(sectionSort, isLastLesson, lesson.nodeType === "chest");
+
                     return (
                       <LessonPathNode
                         key={lesson.id}
@@ -646,14 +763,24 @@ export default function LearnScreen() {
                         totalInUnit={unit.lessons.length}
                         unitColor={unitColor}
                         locked={isLocked}
+                        sessionsRequired={sessions}
                         theme={theme}
                         t={t}
                         onPress={() => {
-                          if (lesson.nodeType === "chest") {
-                            router.push(`/lesson/chest?lessonId=${lesson.id}`);
-                          } else {
-                            router.push(`/lesson/${lesson.id}`);
-                          }
+                          const lessonCount = unit.lessons.filter((l) => l.nodeType === "lesson").length;
+                          setSelectedLesson({
+                            id: lesson.id,
+                            nodeType: lesson.nodeType,
+                            unitTitle: unitTitle,
+                            unitColor,
+                            lessonNum: lIdx + 1,
+                            totalLessons: lessonCount,
+                            completed: lesson.completed,
+                            completedSessions: lesson.completedSessions ?? 0,
+                            isLastInUnit: isLastLesson,
+                            sessionsRequired: sessions,
+                            sectionSortOrder: sectionSort,
+                          });
                         }}
                       />
                     );
@@ -697,6 +824,77 @@ export default function LearnScreen() {
         theme={theme}
         t={t}
       />
+
+      <Modal
+        visible={!!selectedLesson}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSelectedLesson(null)}
+      >
+        <Pressable style={styles.tooltipBackdrop} onPress={() => setSelectedLesson(null)}>
+          <View
+            style={[styles.tooltipCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
+            onStartShouldSetResponder={() => true}
+          >
+            <View style={[styles.tooltipStrip, { backgroundColor: selectedLesson?.unitColor }]} />
+            <View style={styles.tooltipBody}>
+              <Text style={[styles.tooltipTitle, { color: theme.text }]} numberOfLines={1}>
+                {selectedLesson?.unitTitle}
+              </Text>
+              <Text style={[styles.tooltipSub, { color: theme.textMuted }]}>
+                {selectedLesson?.nodeType === "chest"
+                  ? t("learn.chest")
+                  : `${t("learn.lesson")} ${selectedLesson?.lessonNum ?? 1} / ${selectedLesson?.totalLessons ?? 1}`}
+              </Text>
+              {selectedLesson && selectedLesson.nodeType === "lesson" && selectedLesson.sessionsRequired > 0 && (
+                <View style={styles.tooltipArcsRow}>
+                  {Array.from({ length: selectedLesson.sessionsRequired }, (_, i) => (
+                    <View
+                      key={i}
+                      style={[
+                        styles.tooltipArcDot,
+                        {
+                          backgroundColor: i < selectedLesson.completedSessions
+                            ? selectedLesson.unitColor
+                            : `${selectedLesson.unitColor}30`,
+                        },
+                      ]}
+                    />
+                  ))}
+                  <Text style={[styles.tooltipArcLabel, { color: theme.textMuted }]}>
+                    {Math.min(selectedLesson.completedSessions, selectedLesson.sessionsRequired)}/{selectedLesson.sessionsRequired}
+                  </Text>
+                </View>
+              )}
+              <Pressable
+                style={[styles.tooltipBtn, { backgroundColor: selectedLesson?.nodeType === "chest" ? colors.ouro : (selectedLesson?.unitColor ?? colors.primary[500]) }]}
+                onPress={() => {
+                  const sl = selectedLesson!;
+                  setSelectedLesson(null);
+                  if (sl.nodeType === "chest") {
+                    router.push(`/lesson/chest?lessonId=${sl.id}`);
+                  } else {
+                    router.push(`/lesson/${sl.id}`);
+                  }
+                }}
+              >
+                <Text style={styles.tooltipBtnText}>
+                  {selectedLesson?.nodeType === "chest"
+                    ? t("chest.open").toUpperCase()
+                    : selectedLesson?.completed
+                      ? t("learn.recap").toUpperCase()
+                      : t("result.continue").toUpperCase()}
+                </Text>
+                {selectedLesson?.nodeType === "lesson" && (
+                  <Text style={styles.tooltipBtnXp}>
+                    +{getEstimatedXp(selectedLesson.sectionSortOrder, selectedLesson.isLastInUnit, selectedLesson.completed)} XP
+                  </Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -1116,5 +1314,70 @@ const styles = StyleSheet.create({
   guideEmptyText: {
     fontSize: typography.sizes.md,
     textAlign: "center",
+  },
+
+  // -- Lesson tooltip --
+  tooltipBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  tooltipCard: {
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing["3xl"],
+    borderRadius: radii.xl,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  tooltipStrip: {
+    height: 5,
+  },
+  tooltipBody: {
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  tooltipTitle: {
+    fontSize: typography.sizes.lg,
+    fontWeight: "800",
+  },
+  tooltipSub: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "600",
+  },
+  tooltipArcsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 2,
+  },
+  tooltipArcDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  tooltipArcLabel: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "700",
+    marginLeft: 2,
+  },
+  tooltipBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: spacing.md,
+    borderRadius: radii.lg,
+    marginTop: spacing.sm,
+    gap: spacing.sm,
+  },
+  tooltipBtnText: {
+    color: "#FFFFFF",
+    fontSize: typography.sizes.md,
+    fontWeight: "800",
+    letterSpacing: 0.8,
+  },
+  tooltipBtnXp: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: typography.sizes.sm,
+    fontWeight: "700",
   },
 });

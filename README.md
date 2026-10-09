@@ -69,14 +69,18 @@ Course  (1 per L1 language)
                     └── Exercise  (dynamically generated)
 ```
 
-| Section | CEFR | Units | Slots/Unit | Pattern |
-|---------|------|-------|-----------|---------|
-| S1 Basico | A1-A2 | 10 | 5-6 | Survival basics |
-| S2 Principiante | A2-B1 | 30 | 6-7 | Daily life in Portugal |
-| S3 Intermedio | B2-C1 | 40 | 6-8 | Conversation, work, culture |
-| S4 Avancado | C1-C2 | 50 | 7-9 | Nuance, register, mastery |
+| Section | CEFR | Units | Slots/Unit | Sessions/Lesson | XP/Lesson | Pattern |
+|---------|------|-------|-----------|-----------------|-----------|---------|
+| S1 Basico | A1-A2 | 10 | 5-6 | 2 | 25 | Survival basics |
+| S2 Principiante | A2-B1 | 30 | 6-7 | 3 | 25 | Daily life in Portugal |
+| S3 Intermedio | B2-C1 | 40 | 6-8 | 4 | 30 | Conversation, work, culture |
+| S4 Avancado | C1-C2 | 50 | 7-9 | 5 | 30 | Nuance, register, mastery |
 
 Total: 130 units, ~930 slots (lessons + chests). Chest rewards cycle through ouro, XP boosts, streak freezes, and occasional Super days.
+
+Each lesson requires multiple exercise sessions to fully master. The number of sessions scales with section difficulty (2 in S1, up to 5 in S4). Unit recap lessons (last in each unit) require 1 session and award 50 XP. Progress arcs around each lesson node show how many sessions are completed. Repeating an already-completed lesson awards reduced XP (15).
+
+Unit descriptions are available in all 16 languages (130 themes x 16 languages, server-side fallback from `unit-descriptions.ts`). Unit guide phrases (520 phrases x 16 languages) provide vocabulary previews.
 
 **Section Skip Test:** Each section has a "SALTAR PARA AQUI" button that launches a placement test filtered by the section's CEFR range. Passing (80%+ accuracy) marks all lessons in that section as completed.
 
@@ -102,7 +106,7 @@ Currency is **ouro** (ledger-based -- balance = SUM of transactions). Earned thr
 
 ### Heart System
 
-Free users start with 5 hearts, refilling 1 every 4 hours. Running out mid-lesson triggers a paywall (50 ouro to continue). Super subscribers get unlimited hearts.
+Free users start with 5 hearts, refilling 1 every 4 hours. Each wrong answer costs 1 heart and re-queues the exercise. Running out mid-lesson triggers a paywall (50 ouro to continue or wait for refill). Finishing a lesson (reaching the end of all exercises, including re-queued ones) always counts as a completion regardless of accuracy -- there is no pass threshold. Accuracy is tracked in `bestAccuracy` for stats but does not gate progression. Super subscribers get unlimited hearts.
 
 ### Tiers
 
@@ -129,7 +133,7 @@ Four practice modes:
 
 ### Pronunciation Animations
 
-14 mouth positions (rest, nasal_ao, nasal_vowel, palatal_lateral, palatal_nasal, uvular_r, alveolar_tap, open_e, closed_e, open_o, closed_o, sibilant_s, sibilant_sh, labiodental_v). The `AnimatedMouthDiagram` component renders animated cross-section SVGs of the oral cavity using react-native-reanimated.
+14 mouth positions (rest, nasal_ao, nasal_vowel, palatal_lateral, palatal_nasal, uvular_r, alveolar_tap, open_e, closed_e, open_o, closed_o, sibilant_s, sibilant_sh, labiodental_v). The `AnimatedMouthDiagram` component renders animated cross-section SVGs of the oral cavity using timer-based React state animation (setInterval at 33ms) with standard react-native-svg elements.
 
 ### Scoring
 
@@ -171,9 +175,9 @@ Users, courses, sections, units, lessons, exercises, audio clips, user progress,
 
 **Onboarding:** welcome, sign-up/sign-in (email + Google SSO via Clerk), choose profile, language select, GDPR consent, goal, daily goal, level, placement test (10 questions, all 15 L1s), plan.
 
-**Tabs:** learn (winding path with lesson gating, section cards, Daily Refresh banner, quest progress, section skip test), practice (FSRS review queue), league (leaderboard), shop, profile (mastery dashboard), reference.
+**Tabs:** learn (winding path with SVG progress arcs, lesson tooltip popup, press animations, section cards, Daily Refresh banner, quest progress, section skip test), practice (FSRS review queue), league (leaderboard), shop, profile (mastery dashboard), reference.
 
-**Lesson flow:** 8 exercise types (translate, fill blank, listen & type, match pairs, pick correct, reorder words, speak & score), feedback overlay, result screen, chest opening (Reanimated shake + reward reveal).
+**Lesson flow:** Tapping a lesson node opens a tooltip popup showing unit title, lesson number, session progress dots, and a "CONTINUAR +XP" button. 8 exercise types (translate, fill blank, listen & type, match pairs, pick correct, reorder words, speak & score), feedback overlay, result screen, chest opening (Reanimated shake + reward reveal).
 
 **Audio:** expo-audio for playback (`useAudioPlayer` + `useAudioPlayerStatus`) and recording (`useAudioRecorder` with `RecordingPresets.HIGH_QUALITY`). Recorded audio is read as base64 via expo-file-system.
 

@@ -8,6 +8,7 @@ import { useTheme } from "@/lib/theme";
 import { onboardingStyles } from "@/lib/styles";
 import { useTranslation } from "@/lib/i18n";
 import { setString, KEYS } from "@/lib/storage";
+import { trpc } from "@/lib/trpc";
 import { trackOnboardingStep, trackScreenView } from "@/lib/analytics";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
@@ -26,6 +27,7 @@ export default function DailyGoalScreen() {
   const { t } = useTranslation();
   const shared = useMemo(() => onboardingStyles(theme), [theme.isDark]);
   const [selected, setSelected] = useState<number | null>(null);
+  const updateSettings = trpc.user.updateSettings.useMutation();
 
   useEffect(() => {
     trackScreenView("onboarding_daily_goal");
@@ -39,6 +41,7 @@ export default function DailyGoalScreen() {
   const handleContinue = () => {
     if (selected === null) return;
     setString(KEYS.DAILY_GOAL, String(selected));
+    updateSettings.mutate({ dailyGoalMin: selected }, { onError: () => {} });
     trackOnboardingStep("daily_goal_selected", String(selected));
     router.push("/onboarding/select-level");
   };

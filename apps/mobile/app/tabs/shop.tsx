@@ -6,7 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { useOuro } from "@/hooks/useOuro";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { Loading } from "@/components/ui/Loading";
-import { GoldPrisms, CrownIcon, HeartIcon, FlameIcon, ShieldIcon, TimerIcon } from "@/components/icons";
+import { GoldPrisms, CrownIcon, HeartIcon, FlameIcon, ShieldIcon } from "@/components/icons";
 import { OuroBalance } from "@/components/shop/OuroBalance";
 import { OuroPacks } from "@/components/shop/OuroPacks";
 import { useTheme } from "@/lib/theme";
@@ -18,7 +18,6 @@ const PREVIEW_ITEMS: { id: string; nameKey: TKey; descKey: TKey | null; price: n
   { id: "hearts_refill", nameKey: "shop.hearts_refill", descKey: null, price: 350, icon: "heart", color: colors.heart },
   { id: "streak_freeze", nameKey: "shop.streak_freeze", descKey: null, price: 200, icon: "shield", color: colors.info },
   { id: "double_xp", nameKey: "shop.double_xp", descKey: null, price: 500, icon: "flame", color: colors.xp },
-  { id: "timer_boost", nameKey: "shop.timer_boost", descKey: null, price: 150, icon: "timer", color: colors.streak },
 ];
 
 function ItemIcon({ type, size, color }: { type: string; size: number; color: string }) {
@@ -26,7 +25,6 @@ function ItemIcon({ type, size, color }: { type: string; size: number; color: st
     case "heart": return <HeartIcon size={size} color={color} />;
     case "shield": return <ShieldIcon size={size} color={color} />;
     case "flame": return <FlameIcon size={size} color={color} />;
-    case "timer": return <TimerIcon size={size} color={color} />;
     default: return <GoldPrisms size={size} />;
   }
 }

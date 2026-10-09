@@ -1,21 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Animated, {
-  useSharedValue,
-  useAnimatedProps,
-  withRepeat,
-  withSequence,
-  withTiming,
-  Easing,
-  cancelAnimation,
-} from "react-native-reanimated";
 import Svg, { Path, Ellipse, Line, G, Circle } from "react-native-svg";
 import type { MouthPosition } from "@falatorio/core/l1-profiles/types";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
-
-const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-const AnimatedLine = Animated.createAnimatedComponent(Line);
 
 interface MouthParams {
   tongueCY: number;
@@ -27,68 +14,71 @@ interface MouthParams {
 }
 
 const REST: MouthParams = {
-  tongueCY: 132, tongueRX: 35, tongueTipCY: 128,
+  tongueCY: 138, tongueRX: 35, tongueTipCY: 132,
   jaw: 0, lipRY: 5, hasAirflow: false,
 };
 
 const PARAMS: Record<MouthPosition, MouthParams> = {
   rest: REST,
   nasal_ao: {
-    tongueCY: 128, tongueRX: 38, tongueTipCY: 118,
-    jaw: 8, lipRY: 9, hasAirflow: true,
+    tongueCY: 118, tongueRX: 44, tongueTipCY: 108,
+    jaw: 14, lipRY: 14, hasAirflow: true,
   },
   nasal_vowel: {
-    tongueCY: 126, tongueRX: 36, tongueTipCY: 116,
-    jaw: 6, lipRY: 8, hasAirflow: true,
+    tongueCY: 120, tongueRX: 40, tongueTipCY: 110,
+    jaw: 10, lipRY: 12, hasAirflow: true,
   },
   palatal_lateral: {
-    tongueCY: 115, tongueRX: 30, tongueTipCY: 100,
-    jaw: 2, lipRY: 6, hasAirflow: false,
+    tongueCY: 105, tongueRX: 26, tongueTipCY: 88,
+    jaw: 4, lipRY: 7, hasAirflow: false,
   },
   palatal_nasal: {
-    tongueCY: 112, tongueRX: 30, tongueTipCY: 98,
-    jaw: 3, lipRY: 6, hasAirflow: true,
+    tongueCY: 102, tongueRX: 26, tongueTipCY: 85,
+    jaw: 5, lipRY: 7, hasAirflow: true,
   },
   uvular_r: {
-    tongueCY: 125, tongueRX: 32, tongueTipCY: 120,
-    jaw: 4, lipRY: 7, hasAirflow: false,
-  },
-  alveolar_tap: {
-    tongueCY: 118, tongueRX: 28, tongueTipCY: 105,
-    jaw: 3, lipRY: 6, hasAirflow: false,
-  },
-  open_e: {
-    tongueCY: 128, tongueRX: 36, tongueTipCY: 122,
-    jaw: 7, lipRY: 9, hasAirflow: false,
-  },
-  closed_e: {
-    tongueCY: 118, tongueRX: 32, tongueTipCY: 110,
-    jaw: 3, lipRY: 6, hasAirflow: false,
-  },
-  open_o: {
-    tongueCY: 132, tongueRX: 38, tongueTipCY: 128,
+    tongueCY: 115, tongueRX: 30, tongueTipCY: 112,
     jaw: 8, lipRY: 10, hasAirflow: false,
   },
-  closed_o: {
-    tongueCY: 128, tongueRX: 34, tongueTipCY: 124,
+  alveolar_tap: {
+    tongueCY: 108, tongueRX: 24, tongueTipCY: 92,
+    jaw: 5, lipRY: 7, hasAirflow: false,
+  },
+  open_e: {
+    tongueCY: 122, tongueRX: 40, tongueTipCY: 116,
+    jaw: 12, lipRY: 13, hasAirflow: false,
+  },
+  closed_e: {
+    tongueCY: 112, tongueRX: 30, tongueTipCY: 100,
     jaw: 4, lipRY: 7, hasAirflow: false,
   },
+  open_o: {
+    tongueCY: 126, tongueRX: 44, tongueTipCY: 122,
+    jaw: 14, lipRY: 15, hasAirflow: false,
+  },
+  closed_o: {
+    tongueCY: 120, tongueRX: 36, tongueTipCY: 118,
+    jaw: 6, lipRY: 10, hasAirflow: false,
+  },
   sibilant_s: {
-    tongueCY: 118, tongueRX: 28, tongueTipCY: 106,
-    jaw: 2, lipRY: 5, hasAirflow: false,
+    tongueCY: 110, tongueRX: 24, tongueTipCY: 94,
+    jaw: 3, lipRY: 6, hasAirflow: false,
   },
   sibilant_sh: {
-    tongueCY: 120, tongueRX: 30, tongueTipCY: 110,
-    jaw: 3, lipRY: 6, hasAirflow: false,
+    tongueCY: 114, tongueRX: 26, tongueTipCY: 100,
+    jaw: 4, lipRY: 7, hasAirflow: false,
   },
   labiodental_v: {
     tongueCY: 130, tongueRX: 34, tongueTipCY: 126,
-    jaw: 2, lipRY: 3, hasAirflow: false,
+    jaw: 3, lipRY: 2, hasAirflow: false,
   },
 };
 
+function easeInOut(t: number): number {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
 function lerp(a: number, b: number, t: number): number {
-  "worklet";
   return a + (b - a) * t;
 }
 
@@ -116,97 +106,48 @@ const LABEL_MAP: Record<MouthPosition, string> = {
   labiodental_v: "V labiodental",
 };
 
+const CYCLE_MS = 5300;
+
 export function AnimatedMouthDiagram({
   position,
   size = 200,
   showLabel = true,
   autoPlay = true,
 }: AnimatedMouthDiagramProps) {
-  const progress = useSharedValue(0);
+  const [progress, setProgress] = useState(0);
   const p = PARAMS[position];
 
-  const tCY = p.tongueCY;
-  const tRX = p.tongueRX;
-  const tTipCY = p.tongueTipCY;
-  const tJaw = p.jaw;
-  const tLipRY = p.lipRY;
-  const tAirflow = p.hasAirflow;
-
   useEffect(() => {
-    if (autoPlay) {
-      progress.value = withRepeat(
-        withSequence(
-          withTiming(1, { duration: 800, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 1200 }),
-          withTiming(0, { duration: 800, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0, { duration: 2500 }),
-        ),
-        -1,
-        false,
-      );
-    } else {
-      cancelAnimation(progress);
-      progress.value = withTiming(0, { duration: 300 });
+    if (!autoPlay) {
+      setProgress(0);
+      return;
     }
-    return () => cancelAnimation(progress);
+
+    const start = Date.now();
+    const id = setInterval(() => {
+      const elapsed = (Date.now() - start) % CYCLE_MS;
+      let t: number;
+      if (elapsed < 800) {
+        t = easeInOut(elapsed / 800);
+      } else if (elapsed < 2000) {
+        t = 1;
+      } else if (elapsed < 2800) {
+        t = 1 - easeInOut((elapsed - 2000) / 800);
+      } else {
+        t = 0;
+      }
+      setProgress(t);
+    }, 33);
+
+    return () => clearInterval(id);
   }, [position, autoPlay]);
 
-  const tongueBodyProps = useAnimatedProps(() => {
-    const t = progress.value;
-    return {
-      cy: lerp(REST.tongueCY, tCY, t),
-      rx: lerp(REST.tongueRX, tRX, t),
-    };
-  });
-
-  const tongueTipProps = useAnimatedProps(() => {
-    const t = progress.value;
-    return {
-      cy: lerp(REST.tongueTipCY, tTipCY, t),
-    };
-  });
-
-  const jawCurveProps = useAnimatedProps(() => {
-    const t = progress.value;
-    const jaw = lerp(0, tJaw, t);
-    return {
-      cy: 152 + jaw,
-      ry: 16 + jaw * 0.5,
-    };
-  });
-
-  const lowerTeethProps = useAnimatedProps(() => {
-    const t = progress.value;
-    const jaw = lerp(0, tJaw, t);
-    return {
-      cy: 140 + jaw,
-    };
-  });
-
-  const upperLipProps = useAnimatedProps(() => {
-    const t = progress.value;
-    const spread = lerp(REST.lipRY, tLipRY, t);
-    return {
-      cy: 105 - spread * 0.5,
-      ry: 3 + spread * 0.2,
-    };
-  });
-
-  const lowerLipProps = useAnimatedProps(() => {
-    const t = progress.value;
-    const spread = lerp(REST.lipRY, tLipRY, t);
-    return {
-      cy: 105 + spread * 0.5,
-      ry: 3 + spread * 0.2,
-    };
-  });
-
-  const airflowProps = useAnimatedProps(() => {
-    const t = progress.value;
-    return {
-      opacity: tAirflow ? t * 0.8 : 0,
-    };
-  });
+  const tongueCY = lerp(REST.tongueCY, p.tongueCY, progress);
+  const tongueRX = lerp(REST.tongueRX, p.tongueRX, progress);
+  const tongueTipCY = lerp(REST.tongueTipCY, p.tongueTipCY, progress);
+  const jaw = lerp(0, p.jaw, progress);
+  const lipSpread = lerp(REST.lipRY, p.lipRY, progress);
+  const airflowOpacity = p.hasAirflow ? progress * 0.8 : 0;
 
   return (
     <View style={[styles.container, { width: size, height: size + 40 }]}>
@@ -236,61 +177,65 @@ export function AnimatedMouthDiagram({
             strokeWidth={1.5}
           />
 
-          {/* Lower teeth (animated) */}
-          <AnimatedCircle
-            animatedProps={lowerTeethProps}
+          {/* Lower teeth */}
+          <Circle
             cx={65}
+            cy={140 + jaw}
             r={5}
             fill={colors.neutral[0]}
             stroke={colors.neutral[400]}
             strokeWidth={1}
           />
 
-          {/* Lower jaw (animated) */}
-          <AnimatedEllipse
-            animatedProps={jawCurveProps}
+          {/* Lower jaw */}
+          <Ellipse
             cx={120}
+            cy={152 + jaw}
             rx={60}
+            ry={16 + jaw * 0.5}
             fill="none"
             stroke={colors.neutral[400]}
             strokeWidth={2}
           />
 
-          {/* Tongue body (animated) */}
-          <AnimatedEllipse
-            animatedProps={tongueBodyProps}
+          {/* Tongue body */}
+          <Ellipse
             cx={125}
+            cy={tongueCY}
+            rx={tongueRX}
             ry={10}
             fill={colors.accent[200]}
             stroke={colors.accent[400]}
             strokeWidth={2}
           />
 
-          {/* Tongue tip (animated) */}
-          <AnimatedCircle
-            animatedProps={tongueTipProps}
+          {/* Tongue tip */}
+          <Circle
             cx={90}
+            cy={tongueTipCY}
             r={6}
             fill={colors.accent[200]}
             stroke={colors.accent[400]}
             strokeWidth={1.5}
           />
 
-          {/* Upper lip (animated) */}
-          <AnimatedEllipse
-            animatedProps={upperLipProps}
+          {/* Upper lip */}
+          <Ellipse
             cx={40}
+            cy={105 - lipSpread * 0.5}
             rx={8}
+            ry={3 + lipSpread * 0.2}
             fill={colors.accent[300]}
             stroke={colors.accent[500]}
             strokeWidth={1.5}
           />
 
-          {/* Lower lip (animated) */}
-          <AnimatedEllipse
-            animatedProps={lowerLipProps}
+          {/* Lower lip */}
+          <Ellipse
             cx={40}
+            cy={105 + lipSpread * 0.5}
             rx={8}
+            ry={3 + lipSpread * 0.2}
             fill={colors.accent[300]}
             stroke={colors.accent[500]}
             strokeWidth={1.5}
@@ -307,24 +252,21 @@ export function AnimatedMouthDiagram({
             strokeWidth={1}
           />
 
-          {/* Nasal airflow (animated) */}
-          <G>
-            <AnimatedLine
-              animatedProps={airflowProps}
+          {/* Nasal airflow */}
+          <G opacity={airflowOpacity}>
+            <Line
               x1={148} y1={80} x2={152} y2={45}
               stroke={colors.info}
               strokeWidth={1.5}
               strokeDasharray="4,3"
             />
-            <AnimatedLine
-              animatedProps={airflowProps}
+            <Line
               x1={155} y1={78} x2={160} y2={42}
               stroke={colors.info}
               strokeWidth={1.5}
               strokeDasharray="4,3"
             />
           </G>
-
         </Svg>
       </View>
 

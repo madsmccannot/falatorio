@@ -55,10 +55,15 @@ export default function LessonScreen() {
     error,
     results,
     startTimeRef,
+    startLesson,
   } = useLesson(lessonId!);
 
   const [showQuit, setShowQuit] = React.useState(false);
   const [showOutOfHearts, setShowOutOfHearts] = React.useState(false);
+
+  useEffect(() => {
+    startLesson();
+  }, []);
 
   useEffect(() => {
     trackScreenView("lesson");

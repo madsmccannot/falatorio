@@ -18,6 +18,8 @@ import {
   type L1Code,
 } from "@falatorio/core";
 import { seedCourseStructure, seedAllPhase1Courses } from "../services/seed-content.service.js";
+import { GUIDE_PHRASES } from "../data/unit-guide-phrases.js";
+import { UNIT_DESCRIPTIONS } from "../data/unit-descriptions.js";
 
 export const contentRouter = t.router({
   getCourses: protectedProcedure.query(async ({ ctx }) => {
@@ -129,7 +131,7 @@ export const contentRouter = t.router({
         id: u.id,
         title: u.title,
         theme: u.theme,
-        description: u.description,
+        description: { ...(UNIT_DESCRIPTIONS[u.theme] ?? {}), ...(u.description as Record<string, string> ?? {}) },
         sortOrder: u.sortOrder,
       }));
     }),
@@ -174,13 +176,14 @@ export const contentRouter = t.router({
       const allLessonIds = lessonRows.map((l) => l.id);
       const completedRows = allLessonIds.length > 0
         ? await ctx.db
-            .select({ lessonId: lessonCompletions.lessonId })
+            .select({ lessonId: lessonCompletions.lessonId, attempts: lessonCompletions.attempts })
             .from(lessonCompletions)
             .where(
               and(eq(lessonCompletions.userId, ctx.user.userId), inArray(lessonCompletions.lessonId, allLessonIds)),
             )
         : [];
       const completedSet = new Set(completedRows.map((c) => c.lessonId));
+      const attemptsMap = new Map(completedRows.map((c) => [c.lessonId, c.attempts]));
 
       const lessonsByUnit = new Map<string, typeof lessonRows>();
       for (const l of lessonRows) {
@@ -195,16 +198,17 @@ export const contentRouter = t.router({
           id: u.id,
           title: u.title,
           theme: u.theme,
-          description: u.description,
+          description: { ...(UNIT_DESCRIPTIONS[u.theme] ?? {}), ...(u.description as Record<string, string> ?? {}) },
           sortOrder: u.sortOrder,
           colorIndex: idx,
-          guidePhrases: (u.guidePhrases ?? []) as Array<Record<string, string>>,
+          guidePhrases: (u.guidePhrases?.length ? u.guidePhrases : GUIDE_PHRASES[u.theme] ?? []) as Array<Record<string, string>>,
           lessons: unitLessons.map((l) => ({
             id: l.id,
             sortOrder: l.sortOrder,
             nodeType: l.nodeType,
             rewardConfig: l.rewardConfig,
             completed: completedSet.has(l.id),
+            completedSessions: attemptsMap.get(l.id) ?? 0,
           })),
         };
       });
