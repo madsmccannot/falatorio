@@ -15,6 +15,7 @@ export const units = pgTable("units", {
   title: jsonb("title").notNull().$type<Record<string, string>>(),
   theme: varchar("theme", { length: 255 }).notNull(),
   description: jsonb("description").$type<Record<string, string>>(),
+  guidePhrases: jsonb("guide_phrases").$type<Array<Record<string, string>>>(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

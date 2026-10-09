@@ -1,8 +1,9 @@
 import type { Database } from "@falatorio/db/client";
 import { courses, sections, units, lessons, lessonSkills, skills } from "@falatorio/db/schema";
 
-import { L1_PHASE_1, type L1Code, type CEFRLevel } from "@falatorio/core";
+import { L1_PHASE_1, L1_PHASE_2, type L1Code, type CEFRLevel } from "@falatorio/core";
 import { getProfile } from "@falatorio/core/l1-profiles";
+import { GUIDE_PHRASES } from "../data/unit-guide-phrases.js";
 
 export interface UnitDef {
   title: string;
@@ -10,6 +11,7 @@ export interface UnitDef {
   description: string;
   grammarFocus: string[];
   vocabTarget: string[];
+  guidePhrases?: Array<Record<string, string>>;
   skillCodes?: string[];
 }
 
@@ -375,6 +377,7 @@ export async function seedCourseStructure(
           title: { pt: unitDef.title },
           theme: unitDef.theme,
           description: { pt: unitDef.description },
+          guidePhrases: unitDef.guidePhrases ?? GUIDE_PHRASES[unitDef.theme] ?? null,
           sortOrder: uIdx,
         })
         .returning({ id: units.id });
@@ -447,6 +450,18 @@ export async function seedAllPhase1Courses(
   const results: Record<string, { courseId: string; sectionCount: number; unitCount: number; lessonCount: number; chestCount: number }> = {};
 
   for (const l1 of L1_PHASE_1) {
+    results[l1] = await seedCourseStructure(l1, db);
+  }
+
+  return results;
+}
+
+export async function seedAllCourses(
+  db: Database,
+): Promise<Record<string, { courseId: string; sectionCount: number; unitCount: number; lessonCount: number; chestCount: number }>> {
+  const results: Record<string, { courseId: string; sectionCount: number; unitCount: number; lessonCount: number; chestCount: number }> = {};
+
+  for (const l1 of [...L1_PHASE_1, ...L1_PHASE_2]) {
     results[l1] = await seedCourseStructure(l1, db);
   }
 

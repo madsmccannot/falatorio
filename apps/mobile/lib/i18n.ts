@@ -36,6 +36,9 @@ const en = {
   "learn.section_test_exit_desc": "Your progress will be lost.",
   "learn.section_test_stay": "Keep going",
   "learn.section_test_leave": "Leave",
+  "learn.unit_guide_vocab": "Key phrases",
+  "learn.unit_guide_grammar": "Grammar",
+  "learn.unit_guide_empty": "Content will appear as you progress",
 
   "chest.title": "Treasure Chest",
   "chest.subtitle": "Open to discover your reward!",
@@ -464,6 +467,9 @@ const es: Record<string, string> = {
   "learn.section_test_exit_desc": "Tu progreso se perderá.",
   "learn.section_test_stay": "Seguir",
   "learn.section_test_leave": "Salir",
+  "learn.unit_guide_vocab": "Frases clave",
+  "learn.unit_guide_grammar": "Gramática",
+  "learn.unit_guide_empty": "El contenido aparecerá a medida que avances",
 
   "chest.title": "Cofre del tesoro",
   "chest.subtitle": "¡Abre para descubrir tu recompensa!",
@@ -887,6 +893,9 @@ const fr: Record<string, string> = {
   "learn.section_test_exit_desc": "Votre progression sera perdue.",
   "learn.section_test_stay": "Continuer",
   "learn.section_test_leave": "Quitter",
+  "learn.unit_guide_vocab": "Phrases clés",
+  "learn.unit_guide_grammar": "Grammaire",
+  "learn.unit_guide_empty": "Le contenu apparaîtra au fur et à mesure de votre progression",
 
   "chest.title": "Coffre au trésor",
   "chest.subtitle": "Ouvrez pour découvrir votre récompense !",
@@ -1310,6 +1319,9 @@ const hi: Record<string, string> = {
   "learn.section_test_exit_desc": "आपकी प्रगति खो जाएगी।",
   "learn.section_test_stay": "जारी रखें",
   "learn.section_test_leave": "छोड़ें",
+  "learn.unit_guide_vocab": "मुख्य वाक्यांश",
+  "learn.unit_guide_grammar": "व्याकरण",
+  "learn.unit_guide_empty": "आगे बढ़ने पर सामग्री दिखाई देगी",
 
   "chest.title": "खजाना संदूक",
   "chest.subtitle": "अपना इनाम खोजने के लिए खोलें!",
@@ -1733,6 +1745,9 @@ const ur: Record<string, string> = {
   "learn.section_test_exit_desc": "آپ کی پیشرفت ضائع ہو جائے گی۔",
   "learn.section_test_stay": "جاری رکھیں",
   "learn.section_test_leave": "چھوڑیں",
+  "learn.unit_guide_vocab": "اہم جملے",
+  "learn.unit_guide_grammar": "گرامر",
+  "learn.unit_guide_empty": "مواد آگے بڑھنے پر ظاہر ہوگا",
 
   "chest.title": "خزانے کا صندوق",
   "chest.subtitle": "اپنا انعام دریافت کرنے کے لیے کھولیں!",
@@ -2156,6 +2171,9 @@ const ar: Record<string, string> = {
   "learn.section_test_exit_desc": "سيتم فقدان تقدمك.",
   "learn.section_test_stay": "استمر",
   "learn.section_test_leave": "غادر",
+  "learn.unit_guide_vocab": "عبارات رئيسية",
+  "learn.unit_guide_grammar": "قواعد",
+  "learn.unit_guide_empty": "سيظهر المحتوى مع تقدمك",
 
   "chest.title": "صندوق الكنز",
   "chest.subtitle": "افتح لاكتشاف مكافأتك!",
@@ -2579,6 +2597,9 @@ const bn: Record<string, string> = {
   "learn.section_test_exit_desc": "আপনার অগ্রগতি হারিয়ে যাবে।",
   "learn.section_test_stay": "চালিয়ে যান",
   "learn.section_test_leave": "ছাড়ুন",
+  "learn.unit_guide_vocab": "মূল বাক্যাংশ",
+  "learn.unit_guide_grammar": "ব্যাকরণ",
+  "learn.unit_guide_empty": "অগ্রগতির সাথে বিষয়বস্তু প্রদর্শিত হবে",
 
   "chest.title": "ধনভাণ্ডার",
   "chest.subtitle": "আপনার পুরস্কার আবিষ্কার করতে খুলুন!",
@@ -3002,6 +3023,9 @@ const pt: Record<string, string> = {
   "learn.section_test_exit_desc": "O teu progresso será perdido.",
   "learn.section_test_stay": "Continuar",
   "learn.section_test_leave": "Sair",
+  "learn.unit_guide_vocab": "Frases-chave",
+  "learn.unit_guide_grammar": "Gramática",
+  "learn.unit_guide_empty": "O conteúdo aparecerá à medida que avançares",
 
   "chest.title": "Baú do tesouro",
   "chest.subtitle": "Abre para descobrir a tua recompensa!",
@@ -3426,6 +3450,9 @@ const de: Record<string, string> = {
   "learn.section_test_exit_desc": "Dein Fortschritt geht verloren.",
   "learn.section_test_stay": "Weitermachen",
   "learn.section_test_leave": "Verlassen",
+  "learn.unit_guide_vocab": "Schlüsselphrasen",
+  "learn.unit_guide_grammar": "Grammatik",
+  "learn.unit_guide_empty": "Inhalte erscheinen mit deinem Fortschritt",
 
   "chest.title": "Schatztruhe",
   "chest.subtitle": "Öffne sie, um deine Belohnung zu entdecken!",
@@ -3848,6 +3875,9 @@ const zh: Record<string, string> = {
   "learn.section_test_exit_desc": "你的进度将会丢失。",
   "learn.section_test_stay": "继续",
   "learn.section_test_leave": "离开",
+  "learn.unit_guide_vocab": "关键短语",
+  "learn.unit_guide_grammar": "语法",
+  "learn.unit_guide_empty": "随着学习进度内容将会出现",
 
   "chest.title": "宝箱",
   "chest.subtitle": "打开发现你的奖励！",
@@ -4270,6 +4300,9 @@ const ru: Record<string, string> = {
   "learn.section_test_exit_desc": "Ваш прогресс будет потерян.",
   "learn.section_test_stay": "Продолжить",
   "learn.section_test_leave": "Выйти",
+  "learn.unit_guide_vocab": "Ключевые фразы",
+  "learn.unit_guide_grammar": "Грамматика",
+  "learn.unit_guide_empty": "Содержание появится по мере вашего продвижения",
 
   "chest.title": "Сундук с сокровищами",
   "chest.subtitle": "Откройте, чтобы узнать свою награду!",
@@ -4692,6 +4725,9 @@ const uk: Record<string, string> = {
   "learn.section_test_exit_desc": "Ваш прогрес буде втрачено.",
   "learn.section_test_stay": "Продовжити",
   "learn.section_test_leave": "Вийти",
+  "learn.unit_guide_vocab": "Ключові фрази",
+  "learn.unit_guide_grammar": "Граматика",
+  "learn.unit_guide_empty": "Вміст з'явиться в міру вашого прогресу",
 
   "chest.title": "Скриня з скарбами",
   "chest.subtitle": "Відкрийте, щоб дізнатися про свою нагороду!",
@@ -5113,7 +5149,10 @@ const tr: Record<string, string> = {
   "learn.section_test_exit_title": "Testten çik?",
   "learn.section_test_exit_desc": "İlerlemeniz kaybolacak.",
   "learn.section_test_stay": "Devam et",
-  "learn.section_test_leave": "Çik",
+  "learn.section_test_leave": "Çık",
+  "learn.unit_guide_vocab": "Anahtar ifadeler",
+  "learn.unit_guide_grammar": "Dilbilgisi",
+  "learn.unit_guide_empty": "İlerledikçe içerik görünecektir",
 
   "chest.title": "Hazine sandığı",
   "chest.subtitle": "Ödülünü keşfetmek için aç!",
@@ -5535,7 +5574,10 @@ const pl: Record<string, string> = {
   "learn.section_test_exit_title": "Opuscic test?",
   "learn.section_test_exit_desc": "Twoj postep zostanie utracony.",
   "learn.section_test_stay": "Kontynuuj",
-  "learn.section_test_leave": "Opusc",
+  "learn.section_test_leave": "Opuść",
+  "learn.unit_guide_vocab": "Kluczowe zwroty",
+  "learn.unit_guide_grammar": "Gramatyka",
+  "learn.unit_guide_empty": "Treść pojawi się w miarę postępów",
 
   "chest.title": "Skrzynia ze skarbem",
   "chest.subtitle": "Otwórz, żeby odkryć nagrodę!",
@@ -5958,6 +6000,9 @@ const ko: Record<string, string> = {
   "learn.section_test_exit_desc": "진행 상황이 사라집니다.",
   "learn.section_test_stay": "계속하기",
   "learn.section_test_leave": "떠나기",
+  "learn.unit_guide_vocab": "핵심 문구",
+  "learn.unit_guide_grammar": "문법",
+  "learn.unit_guide_empty": "진행하면서 콘텐츠가 표시됩니다",
 
   "chest.title": "보물 상자",
   "chest.subtitle": "보상을 확인하려면 열어보세요!",
@@ -6380,6 +6425,9 @@ const ja: Record<string, string> = {
   "learn.section_test_exit_desc": "進捗が失われます。",
   "learn.section_test_stay": "続ける",
   "learn.section_test_leave": "やめる",
+  "learn.unit_guide_vocab": "キーフレーズ",
+  "learn.unit_guide_grammar": "文法",
+  "learn.unit_guide_empty": "進むにつれてコンテンツが表示されます",
 
   "chest.title": "宝箱",
   "chest.subtitle": "開けて報酬を見つけよう！",

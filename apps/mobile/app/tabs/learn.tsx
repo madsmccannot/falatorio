@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
-  View, Text, ScrollView, Pressable, StyleSheet, Dimensions, BackHandler,
+  View, Text, ScrollView, Pressable, StyleSheet, Dimensions, BackHandler, Modal,
 } from "react-native";
 import type { NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent } from "react-native";
 import { useRouter } from "expo-router";
@@ -51,6 +51,7 @@ type UnitWithLessons = {
   description: Record<string, string> | null;
   sortOrder: number;
   colorIndex: number;
+  guidePhrases: Array<Record<string, string>>;
   lessons: LessonNode[];
 };
 
@@ -164,6 +165,93 @@ function QuestBanner() {
   );
 }
 
+function UnitGuideModal({
+  visible,
+  unit,
+  sectionNum,
+  l1,
+  onClose,
+  theme,
+  t,
+}: {
+  visible: boolean;
+  unit: UnitWithLessons | null;
+  sectionNum: number;
+  l1: string;
+  onClose: () => void;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: import("@/lib/i18n").TKey) => string;
+}) {
+  if (!unit) return null;
+  const unitTitle = (unit.title as Record<string, string>)["pt"] ?? unit.theme;
+  const unitDesc = unit.description
+    ? ((unit.description as Record<string, string>)["pt"] ?? null)
+    : null;
+  const unitColor = getUnitColor(unit.colorIndex);
+  const lessonsCount = unit.lessons.filter((l) => l.nodeType === "lesson").length;
+  const completed = unit.lessons.filter((l) => l.completed).length;
+  const progressPct = lessonsCount > 0 ? (completed / lessonsCount) * 100 : 0;
+  const phrases = unit.guidePhrases ?? [];
+
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+      <View style={[styles.guideContainer, { backgroundColor: theme.bg }]}>
+        <View style={styles.guideHeader}>
+          <Pressable onPress={onClose} hitSlop={12}>
+            <Text style={[styles.guideClose, { color: theme.textMuted }]}>{"X"}</Text>
+          </Pressable>
+        </View>
+
+        <View style={[styles.guideHero, { backgroundColor: unitColor }]}>
+          <Text style={styles.guideHeroLabel}>
+            {t("learn.section").toUpperCase()} {sectionNum}, {t("learn.unit").toUpperCase()} {unit.sortOrder + 1}
+          </Text>
+          <Text style={styles.guideHeroTitle}>{unitTitle}</Text>
+          <View style={styles.guideProgress}>
+            <View style={styles.guideProgressTrack}>
+              <View style={[styles.guideProgressFill, { width: `${progressPct}%` as any, backgroundColor: "#FFFFFF" }]} />
+            </View>
+            <Text style={styles.guideProgressLabel}>{completed}/{lessonsCount}</Text>
+          </View>
+        </View>
+
+        <ScrollView contentContainerStyle={styles.guideBody}>
+          {unitDesc && (
+            <Text style={[styles.guideDesc, { color: theme.textSecondary }]}>{unitDesc}</Text>
+          )}
+
+          {phrases.length > 0 ? (
+            <View style={styles.guideSection}>
+              <Text style={[styles.guideSectionTitle, { color: theme.text }]}>
+                {t("learn.unit_guide_vocab")}
+              </Text>
+              {phrases.map((phrase, idx) => {
+                const ptText = phrase["pt"] ?? "";
+                const l1Text = phrase[l1] ?? phrase["en"] ?? "";
+                return (
+                  <View key={idx} style={[styles.guidePhrase, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                    <Text style={[styles.guidePhraseTextPt, { color: theme.text }]}>{ptText}</Text>
+                    {l1 !== "pt" && l1Text !== "" && (
+                      <Text style={[styles.guidePhraseTextL1, { color: theme.textMuted }]}>{l1Text}</Text>
+                    )}
+                  </View>
+                );
+              })}
+            </View>
+          ) : (
+            <View style={styles.guideEmpty}>
+              <BookIcon size={40} color={theme.textMuted} />
+              <Text style={[styles.guideEmptyText, { color: theme.textMuted }]}>
+                {t("learn.unit_guide_empty")}
+              </Text>
+            </View>
+          )}
+        </ScrollView>
+      </View>
+    </Modal>
+  );
+}
+
 export default function LearnScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -171,9 +259,10 @@ export default function LearnScreen() {
   const { hearts, unlimited } = useHearts();
   const { currentDays } = useStreak();
   const { balance } = useOuro();
-  const { t } = useTranslation();
+  const { t, l1 } = useTranslation();
 
   const [showSections, setShowSections] = useState(false);
+  const [showUnitGuide, setShowUnitGuide] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [visibleUnitIdx, setVisibleUnitIdx] = useState(0);
 
@@ -212,6 +301,10 @@ export default function LearnScreen() {
 
   useEffect(() => {
     const handler = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (showUnitGuide) {
+        setShowUnitGuide(false);
+        return true;
+      }
       if (showSections) {
         setShowSections(false);
         return true;
@@ -219,7 +312,7 @@ export default function LearnScreen() {
       return true;
     });
     return () => handler.remove();
-  }, [showSections]);
+  }, [showSections, showUnitGuide]);
 
   const isLoading = coursesQuery.isLoading || (!!courseId && sectionsQuery.isLoading);
 
@@ -458,25 +551,31 @@ export default function LearnScreen() {
       {renderTopBar()}
 
       {currentSection && (
-        <Pressable
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setShowSections(true);
-          }}
-          style={[styles.currentSectionBanner, { backgroundColor: bannerColor }]}
-        >
-          <View style={styles.currentSectionContent}>
+        <View style={[styles.currentSectionBanner, { backgroundColor: bannerColor }]}>
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setShowSections(true);
+            }}
+            style={styles.currentSectionContent}
+          >
             <Text style={styles.currentSectionLabel}>
               {t("learn.section").toUpperCase()} {bannerSectionNum}, {t("learn.unit").toUpperCase()} {bannerUnitNum}
             </Text>
             <Text style={styles.currentSectionTitle} numberOfLines={1}>
               {bannerTitle}
             </Text>
-          </View>
-          <View style={styles.currentSectionAction}>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setShowUnitGuide(true);
+            }}
+            style={styles.currentSectionAction}
+          >
             <BookIcon size={18} color="#FFFFFF" />
-          </View>
-        </Pressable>
+          </Pressable>
+        </View>
       )}
 
       {unitsLoading ? (
@@ -588,6 +687,16 @@ export default function LearnScreen() {
           </View>
         </ScrollView>
       )}
+
+      <UnitGuideModal
+        visible={showUnitGuide}
+        unit={visibleUnit ?? null}
+        sectionNum={bannerSectionNum}
+        l1={l1}
+        onClose={() => setShowUnitGuide(false)}
+        theme={theme}
+        t={t}
+      />
     </View>
   );
 }
@@ -909,5 +1018,103 @@ const styles = StyleSheet.create({
   questBannerCount: {
     fontSize: typography.sizes.sm,
     fontWeight: "600",
+  },
+  guideContainer: {
+    flex: 1,
+  },
+  guideHeader: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    padding: spacing.md,
+  },
+  guideClose: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  guideHero: {
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing["2xl"],
+    alignItems: "center",
+  },
+  guideHeroLabel: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "700",
+    color: "rgba(255,255,255,0.7)",
+    letterSpacing: 1.2,
+    marginBottom: spacing.xs,
+  },
+  guideHeroTitle: {
+    fontSize: typography.sizes["2xl"],
+    fontWeight: "800",
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+  guideBody: {
+    padding: spacing.lg,
+    paddingBottom: 60,
+  },
+  guideDesc: {
+    fontSize: typography.sizes.md,
+    lineHeight: 22,
+    marginBottom: spacing.lg,
+  },
+  guideProgress: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: spacing.md,
+    gap: spacing.sm,
+    width: "100%",
+    maxWidth: 200,
+  },
+  guideProgressTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(255,255,255,0.3)",
+    overflow: "hidden",
+  },
+  guideProgressFill: {
+    height: "100%",
+    borderRadius: 3,
+  },
+  guideProgressLabel: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "700",
+    color: "rgba(255,255,255,0.85)",
+  },
+  guideSection: {
+    marginBottom: spacing.xl,
+  },
+  guideSectionTitle: {
+    fontSize: typography.sizes.lg,
+    fontWeight: "700",
+    marginBottom: spacing.md,
+  },
+  guidePhrase: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    marginBottom: spacing.sm,
+  },
+  guidePhraseTextPt: {
+    fontSize: typography.sizes.md,
+    fontWeight: "600",
+    lineHeight: 22,
+  },
+  guidePhraseTextL1: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "400",
+    lineHeight: 20,
+    marginTop: 4,
+  },
+  guideEmpty: {
+    alignItems: "center",
+    paddingVertical: spacing["3xl"],
+    gap: spacing.md,
+  },
+  guideEmptyText: {
+    fontSize: typography.sizes.md,
+    textAlign: "center",
   },
 });

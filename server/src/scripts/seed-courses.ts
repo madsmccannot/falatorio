@@ -1,5 +1,5 @@
 import { createDb } from "@falatorio/db/client";
-import { seedAllPhase1Courses } from "../services/seed-content.service.js";
+import { seedAllCourses } from "../services/seed-content.service.js";
 
 const DATABASE_URL = process.env["DATABASE_URL"];
 if (!DATABASE_URL) {
@@ -11,8 +11,8 @@ async function main() {
   console.log("Connecting to database...");
   const db = createDb(DATABASE_URL!);
 
-  console.log("Seeding course structure for all Phase 1 L1s...\n");
-  const results = await seedAllPhase1Courses(db);
+  console.log("Seeding course structure for all L1s...\n");
+  const results = await seedAllCourses(db);
 
   for (const [l1, result] of Object.entries(results)) {
     console.log(

@@ -189,21 +189,25 @@ export const contentRouter = t.router({
         lessonsByUnit.set(l.unitId, arr);
       }
 
-      return unitRows.map((u, idx) => ({
-        id: u.id,
-        title: u.title,
-        theme: u.theme,
-        description: u.description,
-        sortOrder: u.sortOrder,
-        colorIndex: idx,
-        lessons: (lessonsByUnit.get(u.id) ?? []).map((l) => ({
-          id: l.id,
-          sortOrder: l.sortOrder,
-          nodeType: l.nodeType,
-          rewardConfig: l.rewardConfig,
-          completed: completedSet.has(l.id),
-        })),
-      }));
+      return unitRows.map((u, idx) => {
+        const unitLessons = lessonsByUnit.get(u.id) ?? [];
+        return {
+          id: u.id,
+          title: u.title,
+          theme: u.theme,
+          description: u.description,
+          sortOrder: u.sortOrder,
+          colorIndex: idx,
+          guidePhrases: (u.guidePhrases ?? []) as Array<Record<string, string>>,
+          lessons: unitLessons.map((l) => ({
+            id: l.id,
+            sortOrder: l.sortOrder,
+            nodeType: l.nodeType,
+            rewardConfig: l.rewardConfig,
+            completed: completedSet.has(l.id),
+          })),
+        };
+      });
     }),
 
   getSectionProgress: protectedProcedure
