@@ -41,15 +41,6 @@ function getNodeX(globalIndex: number): number {
 const ARC_SIZE = NODE_SIZE + 18;
 const ARC_GAP_DEG = 12;
 
-function getSessionsForLesson(sectionSortOrder: number, isLastInUnit: boolean, isChest: boolean): number {
-  if (isChest) return 0;
-  if (isLastInUnit) return 1;
-  if (sectionSortOrder <= 0) return 2;
-  if (sectionSortOrder === 1) return 3;
-  if (sectionSortOrder === 2) return 4;
-  return 5;
-}
-
 function getEstimatedXp(sectionSortOrder: number, isLastInUnit: boolean, isRepeat: boolean): number {
   if (isRepeat) return 15;
   if (isLastInUnit) return 50;
@@ -60,6 +51,7 @@ type LessonNode = {
   id: string;
   sortOrder: number;
   nodeType: "lesson" | "chest";
+  sessionsRequired: number;
   rewardConfig: { type: string; amount: number } | null;
   completed: boolean;
   completedSessions: number;
@@ -752,7 +744,6 @@ export default function LearnScreen() {
 
                     const sectionSort = currentSection?.sortOrder ?? 0;
                     const isLastLesson = lIdx === unit.lessons.length - 1 && lesson.nodeType === "lesson";
-                    const sessions = getSessionsForLesson(sectionSort, isLastLesson, lesson.nodeType === "chest");
 
                     return (
                       <LessonPathNode
@@ -763,7 +754,7 @@ export default function LearnScreen() {
                         totalInUnit={unit.lessons.length}
                         unitColor={unitColor}
                         locked={isLocked}
-                        sessionsRequired={sessions}
+                        sessionsRequired={lesson.sessionsRequired}
                         theme={theme}
                         t={t}
                         onPress={() => {
@@ -778,7 +769,7 @@ export default function LearnScreen() {
                             completed: lesson.completed,
                             completedSessions: lesson.completedSessions ?? 0,
                             isLastInUnit: isLastLesson,
-                            sessionsRequired: sessions,
+                            sessionsRequired: lesson.sessionsRequired,
                             sectionSortOrder: sectionSort,
                           });
                         }}

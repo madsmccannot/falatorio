@@ -206,6 +206,7 @@ export const contentRouter = t.router({
             id: l.id,
             sortOrder: l.sortOrder,
             nodeType: l.nodeType,
+            sessionsRequired: l.sessionsRequired,
             rewardConfig: l.rewardConfig,
             completed: completedSet.has(l.id),
             completedSessions: attemptsMap.get(l.id) ?? 0,

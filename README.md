@@ -71,14 +71,14 @@ Course  (1 per L1 language)
 
 | Section | CEFR | Units | Slots/Unit | Sessions/Lesson | XP/Lesson | Pattern |
 |---------|------|-------|-----------|-----------------|-----------|---------|
-| S1 Basico | A1-A2 | 10 | 5-6 | 2 | 25 | Survival basics |
-| S2 Principiante | A2-B1 | 30 | 6-7 | 3 | 25 | Daily life in Portugal |
-| S3 Intermedio | B2-C1 | 40 | 6-8 | 4 | 30 | Conversation, work, culture |
-| S4 Avancado | C1-C2 | 50 | 7-9 | 5 | 30 | Nuance, register, mastery |
+| S1 Basico | A1-A2 | 10 | 5-6 | 2-4 | 25 | Survival basics |
+| S2 Principiante | A2-B1 | 30 | 6-7 | 2-5 | 25 | Daily life in Portugal |
+| S3 Intermedio | B2-C1 | 40 | 6-8 | 3-6 | 30 | Conversation, work, culture |
+| S4 Avancado | C1-C2 | 50 | 7-9 | 3-7 | 30 | Nuance, register, mastery |
 
 Total: 130 units, ~930 slots (lessons + chests). Chest rewards cycle through ouro, XP boosts, streak freezes, and occasional Super days.
 
-Each lesson requires multiple exercise sessions to fully master. The number of sessions scales with section difficulty (2 in S1, up to 5 in S4). Unit recap lessons (last in each unit) require 1 session and award 50 XP. Progress arcs around each lesson node show how many sessions are completed. Repeating an already-completed lesson awards reduced XP (15).
+Each lesson requires multiple exercise sessions to fully master. The number of sessions is determined by each node's pedagogical position within the unit, not by section alone: early nodes (new content) require more sessions, later nodes (application/reinforcement) require fewer, and the unit recap (last lesson in each unit) always requires 1 session. `sessionsRequired` is stored per lesson in the database. Progress arcs around each lesson node show how many sessions are completed. Repeating an already-completed lesson awards reduced XP (15).
 
 Unit descriptions are available in all 16 languages (130 themes x 16 languages, server-side fallback from `unit-descriptions.ts`). Unit guide phrases (520 phrases x 16 languages) provide vocabulary previews.
 

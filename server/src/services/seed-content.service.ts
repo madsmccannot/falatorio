@@ -124,6 +124,29 @@ function getChestPositions(totalSlots: number): number[] {
   return [first, second];
 }
 
+// Sessions per node derived from pedagogical position within the unit.
+// Early nodes (new content) need more repetition; later nodes (application/
+// reinforcement) need less. Recap (last lesson) is always 1. Sections add
+// a scaling factor so advanced content naturally requires more work.
+const SESSION_RANGE: Array<{ min: number; max: number }> = [
+  { min: 2, max: 4 },  // S1 Basico
+  { min: 2, max: 5 },  // S2 Principiante
+  { min: 3, max: 6 },  // S3 Intermedio
+  { min: 3, max: 7 },  // S4 Avancado
+];
+
+function computeSessionsRequired(
+  lessonIdx: number,
+  totalLessons: number,
+  sectionIdx: number,
+): number {
+  if (lessonIdx === totalLessons - 1) return 1;
+  const effective = totalLessons - 1;
+  const ratio = effective > 1 ? lessonIdx / (effective - 1) : 0;
+  const cfg = SESSION_RANGE[sectionIdx] ?? SESSION_RANGE[1]!;
+  return Math.round(cfg.max - ratio * (cfg.max - cfg.min));
+}
+
 export const COURSE_SECTIONS: SectionDef[] = [
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // S1 Basico (A1-A2) — 10 units — "Consigo desenrascar-me em Portugal"
@@ -410,14 +433,22 @@ export async function seedCourseStructure(
       );
 
       const chestPositions = new Set(getChestPositions(totalSlots));
+      const lessonSlots: number[] = [];
+      for (let s = 0; s < totalSlots; s++) {
+        if (!chestPositions.has(s)) lessonSlots.push(s);
+      }
+      const totalLessonsInUnit = lessonSlots.length;
 
       for (let slotIdx = 0; slotIdx < totalSlots; slotIdx++) {
         const isChest = chestPositions.has(slotIdx);
+        const lessonIdx = isChest ? -1 : lessonSlots.indexOf(slotIdx);
+        const sessions = isChest ? 0 : computeSessionsRequired(lessonIdx, totalLessonsInUnit, sIdx);
 
         const [lesson] = await db.insert(lessons).values({
           unitId: unit!.id,
           sortOrder: slotIdx,
           nodeType: isChest ? "chest" : "lesson",
+          sessionsRequired: sessions,
           grammarFocus: isChest ? [] : unitDef.grammarFocus,
           vocabTarget: isChest ? [] : unitDef.vocabTarget,
           rewardConfig: isChest ? pickChestReward(uIdx + slotIdx) : null,
