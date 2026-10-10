@@ -39,10 +39,25 @@ apps/mobile/start-mobile.sh
 01-stack-comparativo.html
 02-mapa-tecnico-plataforma.html
 03-directory-tree.html
-falatorio-roadmap-pedagogico.html
+04-falatorio-roadmap-pedagogico.html
 05-Roadmap-conhecimento.md
 06-resolucao-exercises-population-claude.md
+07-gpt-feedback.md
 Mensagens_12ano_paginas_359-383.pdf
 *.html:Zone.Identifier
+# Media / images (app icons are excluded via negation below)
+*.png
 *.jpg
-Screenshot_*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.webp
+*.ico
+*.svg
+*.mp4
+*.mov
+*.mp3
+*.wav
+!apps/mobile/assets/icon.png
+!apps/mobile/assets/adaptive-icon.png
+!apps/mobile/assets/splash.png
