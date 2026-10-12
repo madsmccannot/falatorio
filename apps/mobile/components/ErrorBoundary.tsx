@@ -3,7 +3,23 @@ import { View, Text, StyleSheet } from "react-native";
 import { Button } from "@/components/ui/Button";
 import { captureError } from "@/lib/sentry";
 import { trackError } from "@/lib/analytics";
+import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
+
+function ErrorFallback({ onReset }: { onReset: () => void }) {
+  const { t } = useTranslation();
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{t("error.title" as any)}</Text>
+      <Text style={styles.subtitle}>{t("error.subtitle" as any)}</Text>
+      <Button
+        title={t("error.retry" as any)}
+        onPress={onReset}
+        style={styles.button}
+      />
+    </View>
+  );
+}
 
 interface Props {
   children: React.ReactNode;
@@ -31,19 +47,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   override render() {
     if (this.state.hasError) {
-      return (
-        <View style={styles.container}>
-          <Text style={styles.title}>Algo correu mal</Text>
-          <Text style={styles.subtitle}>
-            O erro foi reportado automaticamente.
-          </Text>
-          <Button
-            title="Tentar novamente"
-            onPress={this.handleReset}
-            style={styles.button}
-          />
-        </View>
-      );
+      return <ErrorFallback onReset={this.handleReset} />;
     }
 
     return this.props.children;

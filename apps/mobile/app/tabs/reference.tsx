@@ -25,9 +25,9 @@ interface LetterEntry {
   ipa: string;
 }
 
-const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] = [
+const ALPHABET_GROUPS: { id: string; labelKey: string; entries: LetterEntry[] }[] = [
   {
-    id: "vowels", label: "Vogais",
+    id: "vowels", labelKey: "reference.group_vowels",
     entries: [
       { letter: "A", word: "água", ipa: "/a/" },
       { letter: "E", word: "escola", ipa: "/e/, /ɛ/" },
@@ -37,7 +37,7 @@ const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] =
     ],
   },
   {
-    id: "accented", label: "Acentos e sinais",
+    id: "accented", labelKey: "reference.group_accents",
     entries: [
       { letter: "Á", word: "água (agudo)", ipa: "/a/" },
       { letter: "Â", word: "câmara (circunflexo)", ipa: "/ɐ/" },
@@ -46,7 +46,7 @@ const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] =
     ],
   },
   {
-    id: "consonants_1", label: "Consoantes I",
+    id: "consonants_1", labelKey: "reference.group_consonants_1",
     entries: [
       { letter: "B", word: "bola", ipa: "/b/" },
       { letter: "C", word: "casa", ipa: "/k/" },
@@ -56,7 +56,7 @@ const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] =
     ],
   },
   {
-    id: "consonants_2", label: "Consoantes II",
+    id: "consonants_2", labelKey: "reference.group_consonants_2",
     entries: [
       { letter: "H", word: "hora (mudo)", ipa: "—" },
       { letter: "J", word: "janela", ipa: "/ʒ/" },
@@ -66,7 +66,7 @@ const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] =
     ],
   },
   {
-    id: "consonants_3", label: "Consoantes III",
+    id: "consonants_3", labelKey: "reference.group_consonants_3",
     entries: [
       { letter: "N", word: "navio", ipa: "/n/" },
       { letter: "P", word: "pato", ipa: "/p/" },
@@ -76,7 +76,7 @@ const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] =
     ],
   },
   {
-    id: "consonants_4", label: "Consoantes IV",
+    id: "consonants_4", labelKey: "reference.group_consonants_4",
     entries: [
       { letter: "T", word: "tomate", ipa: "/t/" },
       { letter: "V", word: "vento", ipa: "/v/" },
@@ -86,7 +86,7 @@ const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] =
     ],
   },
   {
-    id: "digraphs", label: "Digrafos",
+    id: "digraphs", labelKey: "reference.group_digraphs",
     entries: [
       { letter: "LH", word: "olho", ipa: "/ʎ/" },
       { letter: "NH", word: "vinho", ipa: "/ɲ/" },
@@ -97,17 +97,17 @@ const ALPHABET_GROUPS: { id: string; label: string; entries: LetterEntry[] }[] =
   },
 ];
 
-const DOMAIN_LABELS: Record<string, Record<string, string>> = {
-  phonetics: { en: "Phonetics", pt: "Fonética" },
-  morphology: { en: "Morphology", pt: "Morfologia" },
-  tenses_moods: { en: "Tenses & Moods", pt: "Tempos e modos" },
-  determiners: { en: "Determiners", pt: "Determinantes" },
-  pronouns: { en: "Pronouns", pt: "Pronomes" },
-  prepositions: { en: "Prepositions", pt: "Preposições" },
-  syntax: { en: "Syntax", pt: "Sintaxe" },
-  lexicon: { en: "Vocabulary", pt: "Vocabulário" },
-  pragmatics: { en: "Pragmatics", pt: "Pragmática" },
-  orthography: { en: "Spelling", pt: "Ortografia" },
+const DOMAIN_I18N_KEYS: Record<string, string> = {
+  phonetics: "reference.domain_phonetics",
+  morphology: "reference.domain_morphology",
+  tenses_moods: "reference.domain_tenses_moods",
+  determiners: "reference.domain_determiners",
+  pronouns: "reference.domain_pronouns",
+  prepositions: "reference.domain_prepositions",
+  syntax: "reference.domain_syntax",
+  lexicon: "reference.domain_lexicon",
+  pragmatics: "reference.domain_pragmatics",
+  orthography: "reference.domain_orthography",
 };
 
 function ChevronIcon({ size = 16, color = "#94A3B8", direction = "right" }: { size?: number; color?: string; direction?: "right" | "down" }) {
@@ -335,7 +335,7 @@ export default function ReferenceScreen() {
                       {group.entries.slice(0, 3).map((e) => e.letter).join(" ")}
                     </Text>
                     <Text style={[styles.alphabetLabel, { color: theme.textMuted }]}>
-                      {group.label}
+                      {t(group.labelKey as any)}
                     </Text>
                     <ProgressBar progress={progress} color={colors.primary[500]} />
                     <Text style={[styles.practiceLabel, { color: colors.primary[500] }]}>
@@ -382,7 +382,7 @@ export default function ReferenceScreen() {
           SKILL_DOMAINS.filter((d) => groupedGlossary[d]).map((domain) => {
             const items = groupedGlossary[domain]!;
             const isExpanded = expandedDomain === domain;
-            const domainLabel = DOMAIN_LABELS[domain]?.[lang === "pt" ? "pt" : "en"] ?? domain;
+            const domainLabel = DOMAIN_I18N_KEYS[domain] ? t(DOMAIN_I18N_KEYS[domain] as any) : domain;
 
             return (
               <View key={domain} style={styles.domainSection}>
