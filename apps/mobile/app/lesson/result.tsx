@@ -11,7 +11,10 @@ import { PastelNataCelebration } from "@/components/lesson/PastelNataCelebration
 import { useTranslation } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 import { trackScreenView, trackFunnelFirstLesson } from "@/lib/analytics";
-import { getString, setString } from "@/lib/storage";
+import { getString, setString, getNumber, setNumber } from "@/lib/storage";
+import { trpc } from "@/lib/trpc";
+import { useInterstitialAd } from "@/components/ads/InterstitialAd";
+import { ADS } from "@falatorio/core";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 function formatTime(seconds: number): string {
@@ -42,6 +45,9 @@ export default function LessonResultScreen() {
   const [contentVisible, setContentVisible] = React.useState(false);
   const celebrationType = React.useMemo(() => (Math.random() < 0.5 ? "galo" : "pastel"), []);
 
+  const recordAdView = trpc.ads.recordAdView.useMutation();
+  const { show: showInterstitial } = useInterstitialAd();
+
   React.useEffect(() => {
     trackScreenView("lesson_result");
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -50,6 +56,16 @@ export default function LessonResultScreen() {
     if (!getString(firstLessonKey)) {
       trackFunnelFirstLesson("first", elapsedSeconds);
       setString(firstLessonKey, new Date().toISOString());
+    }
+
+    const lessonCount = (getNumber("lessons_completed_count") ?? 0) + 1;
+    setNumber("lessons_completed_count", lessonCount);
+    if (lessonCount % ADS.INTERSTITIAL_EVERY_N_LESSONS === 0) {
+      showInterstitial().then((shown) => {
+        if (shown) {
+          recordAdView.mutate({ adType: "interstitial", rewardType: "ouro" });
+        }
+      });
     }
   }, []);
 

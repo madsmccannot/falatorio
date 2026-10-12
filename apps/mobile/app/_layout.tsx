@@ -7,6 +7,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StyleSheet, useColorScheme } from "react-native";
 import { useTRPCClient } from "@/lib/trpc";
 import { ToastProvider } from "@/components/ui/Toast";
+import { AdProvider } from "@/components/ads/AdProvider";
 import * as SecureStore from "expo-secure-store";
 import { applyThemePref } from "@/lib/theme";
 import { initSentry, identifyUser } from "@/lib/sentry";
@@ -159,10 +160,12 @@ function AppShell({ children }: { children: React.ReactNode }) {
       <ErrorBoundary>
         <SafeAreaProvider>
           <TRPCWrapper>
-            <ToastProvider>
-              {children}
-              <StatusBar style="auto" />
-            </ToastProvider>
+            <AdProvider>
+              <ToastProvider>
+                {children}
+                <StatusBar style="auto" />
+              </ToastProvider>
+            </AdProvider>
           </TRPCWrapper>
         </SafeAreaProvider>
       </ErrorBoundary>

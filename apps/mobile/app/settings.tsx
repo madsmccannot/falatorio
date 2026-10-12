@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, Switch, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, Switch, Alert, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
@@ -49,11 +49,36 @@ function VolumeIcon({ size = 20, color = "#94A3B8" }: { size?: number; color?: s
   );
 }
 
+function LogOutIcon({ size = 20, color = "#94A3B8" }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation();
+
+  const HAS_CLERK = !!process.env["EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY"];
+  let signOut: (() => void) | null = null;
+  if (HAS_CLERK) {
+    const { useAuth } = require("@clerk/expo");
+    const auth = useAuth();
+    signOut = () => {
+      Alert.alert(
+        t("settings.sign_out_confirm_title" as any),
+        t("settings.sign_out_confirm_msg" as any),
+        [
+          { text: t("common.cancel" as any), style: "cancel" },
+          { text: t("settings.sign_out" as any), style: "destructive", onPress: () => auth.signOut() },
+        ],
+      );
+    };
+  }
 
   const [themePref, setThemePrefState] = useState<ThemePref>(() => getThemePref());
   const [soundEnabled, setSoundEnabled] = useState(() => getBoolean("settings_sound") !== false);
@@ -176,6 +201,22 @@ export default function SettingsScreen() {
           <Divider color={theme.settingsBorder} />
           <SettingsNavRow label={t("settings.about")} theme={theme} />
         </View>
+
+        {signOut && (
+          <>
+            <Text style={[styles.sectionHeader, { color: theme.settingsHeader }]}> </Text>
+            <View style={[styles.card, { backgroundColor: theme.settingsCard, borderColor: theme.settingsBorder }]}>
+              <Pressable style={styles.row} onPress={signOut}>
+                <View style={styles.rowLeft}>
+                  <View style={styles.rowIcon}>
+                    <LogOutIcon size={20} color={colors.error} />
+                  </View>
+                  <Text style={[styles.rowLabel, { color: colors.error }]}>{t("settings.sign_out" as any)}</Text>
+                </View>
+              </Pressable>
+            </View>
+          </>
+        )}
 
         <Text style={[styles.version, { color: theme.textMuted }]}>
           Falatório v1.0.0

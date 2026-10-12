@@ -34,12 +34,13 @@ falatorio/
 | Cache/Queue | Redis (Upstash), ioredis, BullMQ (7 job queues) |
 | Auth | Clerk (JWT) -- optional, app runs in preview mode without it |
 | CMS | Payload CMS v3, PostgreSQL adapter, R2 storage |
+| Ads | react-native-google-mobile-ads (rewarded, interstitial, banner) |
 | Payments | RevenueCat (subscriptions) |
 | AI | Claude (conversation tutor, dynamic content generation), OpenAI Whisper (speech), Azure TTS |
 | Storage | MMKV (device), Cloudflare R2 (audio, media) |
 | Deploy | Docker, Railway (server), EAS Build (mobile APK/AAB) |
 | Analytics | PostHog (analytics, A/B testing, feature flags), custom batched event queue |
-| i18n | Custom hook-based system, 16 dictionaries (en, pt, es, fr, hi, ur, ar, bn, de, zh, ru, uk, tr, pl, ko, ja) |
+| i18n | Custom hook-based system, 16 dictionaries (en, pt, es, fr, hi, ur, ar, bn, de, zh, ru, uk, tr, pl, ko, ja), ~420 keys |
 
 ## Core Concepts
 
@@ -118,9 +119,15 @@ Free users start with 5 hearts, refilling 1 every 4 hours. Each wrong answer cos
 | Streak freeze | Purchasable | 1 free/month |
 | Starting ouro | 500 | 500 |
 
+### Ads
+
+Free-tier users see three ad formats: banner ads on key screens, interstitial ads every 5th completed lesson, and rewarded ads (watch to earn hearts or ouro). Ad decisions are server-controlled based on tier, GDPR consent, and cooldowns. Super subscribers see no ads. SDK: react-native-google-mobile-ads with AdProvider context, useRewardAd/useInterstitialAd hooks, and server-side reward recording via `ads.router`.
+
 ### Social & Leagues
 
-Users can follow/unfollow each other. 7 league tiers: Bronze, Silver, Gold, Sapphire, Ruby, Emerald, Diamond. Weekly leaderboard resets with promotion/demotion.
+Users can follow/unfollow each other. Profiles show L1 flag (native language, not Portuguese), overview stats (streak, league tier, XP), friend streaks, and unlocked achievements. Public profiles support follow/unfollow, report, and block with confirmation dialogs. Share/invite via native Share API.
+
+7 league tiers: Bronze, Silver, Gold, Sapphire, Ruby, Emerald, Diamond. Weekly leaderboard with trophy carousel, promotion zone (top 10), demotion zone (bottom 5), timer showing days left in the week. Tier names are translated in all 16 languages.
 
 ### Practice Tab
 
@@ -141,7 +148,7 @@ Text scoring uses Levenshtein distance with PT-EU phonetic normalization. Speech
 
 ### Internationalization
 
-All UI strings translatable via `useTranslation()` hook. 16 dictionaries (15 L1 languages + Portuguese) with 402 keys each at full parity. English is the source of truth; Portuguese has full coverage with proper diacritics (Acordo Ortografico). All hardcoded UI strings translated to PT-PT. Placement test and section test questions are fully translated in all 15 languages.
+All UI strings translatable via `useTranslation()` hook. 16 dictionaries (15 L1 languages + Portuguese) with ~420 keys each at full parity. English is the source of truth; Portuguese has full coverage with proper diacritics (Acordo Ortografico). All hardcoded UI strings translated to PT-PT. Placement test and section test questions are fully translated in all 15 languages.
 
 ## Package Breakdown
 
@@ -165,7 +172,7 @@ Users, courses, sections, units, lessons, exercises, audio clips, user progress,
 
 ### `server` -- 17 routers, 16 services, 7 jobs
 
-**Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads, pipeline, mastery, quality, analytics, quests.
+**Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads (ad decisions + reward recording), pipeline, mastery, quality, analytics, quests.
 
 **Services:** whisper (transcription), tts (Azure), llm (conversation tutor), content-generator (dynamic exercise generation with L1 profiles), seed-content (course structure seeding per L1), batch-exercise-pipeline (coverage gap detection, bulk generation), mastery-recalculator, achievement-checker, retention-metrics (D1/D7/D30 cohort retention, DAU/WAU/MAU), daily-refresh (adaptive review sessions), daily-quests, push (FCM), storage (R2), iap-validator (Apple + Google), leaderboard, revenuecat-webhook.
 
@@ -175,13 +182,13 @@ Users, courses, sections, units, lessons, exercises, audio clips, user progress,
 
 **Onboarding:** welcome, sign-up/sign-in (email + Google SSO via Clerk), choose profile, language select, GDPR consent, goal, daily goal, level, placement test (10 questions, all 15 L1s), plan.
 
-**Tabs:** learn (winding path with SVG progress arcs, lesson tooltip popup, press animations, section cards, Daily Refresh banner, quest progress, section skip test), practice (FSRS review queue), league (leaderboard), shop, profile (mastery dashboard), reference.
+**Tabs:** learn (winding path with 3D lesson nodes, glow arcs, chest rendering, locked modal, lesson tooltip popup, press animations, section cards, Daily Refresh banner, quest progress, section skip test), practice (FSRS review queue), league (leaderboard with trophy carousel, promotion/demotion zones, L1 flags), shop, profile (blue hero header with gear icon, SUPER badge, overview stats, friend streaks, achievements carousel, mastery dashboard, inline L1/goal pickers), reference.
 
 **Lesson flow:** Tapping a lesson node opens a tooltip popup showing unit title, lesson number, session progress dots, and a "CONTINUAR +XP" button. 8 exercise types (translate, fill blank, listen & type, match pairs, pick correct, reorder words, speak & score), feedback overlay, result screen, chest opening (Reanimated shake + reward reveal).
 
 **Audio:** expo-audio for playback (`useAudioPlayer` + `useAudioPlayerStatus`) and recording (`useAudioRecorder` with `RecordingPresets.HIGH_QUALITY`). Recorded audio is read as base64 via expo-file-system.
 
-**Components:** UI primitives (Button, Card, Modal, Toast), exercise renderers, audio (player, recorder), gamification (XP bar, streak badge, league card, achievement toast, mastery dashboard with CEFR estimate), paywall (hearts, mid-lesson, Super upsell), shop (ouro balance, IAP modal), pronunciation (animated mouth diagram SVG, phoneme cards, L1-based guide), tappable text with word tooltips (170+ words, 15 L1s, gender pair display), SVG icon system (react-native-svg).
+**Components:** UI primitives (Button, Card, Modal, Toast), exercise renderers, audio (player, recorder), gamification (XP bar, streak badge, league card, achievement toast, mastery dashboard with CEFR estimate), ads (AdProvider, RewardAd, InterstitialAd, BannerAd with useAdReward/useInterstitialAd hooks), paywall (hearts, mid-lesson, Super upsell), shop (ouro balance, IAP modal), pronunciation (animated mouth diagram SVG, phoneme cards, L1-based guide), tappable text with word tooltips (170+ words, 15 L1s, gender pair display), SVG icon system (react-native-svg).
 
 ### `cms` -- 11 collections, 35 prompt templates
 
@@ -260,6 +267,11 @@ EXPO_PUBLIC_POSTHOG_HOST=   # default: https://eu.i.posthog.com
 
 # Mobile
 EXPO_PUBLIC_API_URL=        # Server URL for the mobile app
+
+# Ads (optional -- uses test IDs in dev)
+EXPO_PUBLIC_ADMOB_REWARD_ID=
+EXPO_PUBLIC_ADMOB_INTERSTITIAL_ID=
+EXPO_PUBLIC_ADMOB_BANNER_ID=
 ```
 
 ### Mobile Builds (EAS)

@@ -1,20 +1,63 @@
-import { View, Text, ScrollView, Pressable, Image, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, Image, Alert, StyleSheet } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { trpc } from "@/lib/trpc";
 import { Loading } from "@/components/ui/Loading";
-import { Button } from "@/components/ui/Button";
-import { StarIcon, BoltIcon } from "@/components/icons";
+import { FlameIcon, BoltIcon, ShieldIcon } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import Svg, { Path } from "react-native-svg";
 
-const L1_NAMES: Record<string, string> = {
-  en: "English", es: "Español", fr: "Français", hi: "Hindi", ur: "Urdu",
-  ar: "Arabic", bn: "Bengali", de: "Deutsch", zh: "Chinese",
-  ru: "Russian", uk: "Ukrainian", tr: "Turkish", pl: "Polish", ko: "Korean", ja: "Japanese",
+const TIER_COLORS: Record<string, string> = {
+  bronze: "#CD7F32",
+  silver: "#C0C0C0",
+  gold: "#FFD700",
+  sapphire: "#0EA5E9",
+  ruby: "#EF4444",
+  emerald: "#10B981",
+  diamond: "#A78BFA",
 };
+
+const L1_FLAGS: Record<string, string> = {
+  en: "gb", es: "es", fr: "fr", hi: "in", ur: "pk",
+  ar: "sa", bn: "bd", de: "de", zh: "cn",
+  ru: "ru", uk: "ua", tr: "tr", pl: "pl", ko: "kr", ja: "jp",
+};
+
+function BackArrow({ size = 24, color = "#FFF" }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M19 12H5M12 19l-7-7 7-7" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+function UserPlusIcon({ size = 20, color = "#FFF" }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M9 11a4 4 0 100-8 4 4 0 000 8zM19 8v6M22 11h-6" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+function FlagIcon({ size = 20, color = "#94A3B8" }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+function BlockIcon({ size = 20, color = "#94A3B8" }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM4.93 4.93l14.14 14.14" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
 
 export default function PublicProfileScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
@@ -45,31 +88,29 @@ export default function PublicProfileScreen() {
     );
   }
 
-  const joinDate = new Date(data.createdAt).toLocaleDateString("pt-PT", {
-    month: "short",
-    year: "numeric",
-  });
+  const joinYear = new Date(data.createdAt).getFullYear();
+  const tierName = data.leagueTier ?? "bronze";
+  const tierColor = TIER_COLORS[tierName] ?? TIER_COLORS["bronze"];
+  const flagCode = L1_FLAGS[data.l1] ?? null;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
-      <View style={[styles.headerBar, { borderBottomColor: theme.border }]}>
-        <Pressable onPress={() => router.back()} hitSlop={12}>
-          <Text style={[styles.backArrow, { color: theme.textMuted }]}>{"<-"}</Text>
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
+      {/* Header bar */}
+      <View style={[styles.headerBar, { paddingTop: insets.top + spacing.sm, backgroundColor: theme.bg, borderBottomColor: theme.border }]}>
+        <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backButton}>
+          <BackArrow size={22} color={theme.text} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: theme.text }]} numberOfLines={1}>
-          @{data.username}
+          {data.name ?? t("profile.anon")}
         </Text>
-        <View style={{ width: 32 }} />
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Avatar + name */}
+        {/* Avatar section */}
         <View style={styles.avatarSection}>
           {data.avatarUrl ? (
-            <Image
-              source={{ uri: data.avatarUrl }}
-              style={styles.avatarLarge}
-            />
+            <Image source={{ uri: data.avatarUrl }} style={styles.avatarLarge} />
           ) : (
             <View style={[styles.avatarLarge, styles.avatarPlaceholder]}>
               <Text style={styles.avatarInitial}>
@@ -77,21 +118,37 @@ export default function PublicProfileScreen() {
               </Text>
             </View>
           )}
-          <Text style={[styles.displayName, { color: theme.text }]}>{data.name}</Text>
-          <Text style={[styles.username, { color: theme.textMuted }]}>@{data.username}</Text>
+        </View>
 
-          <View style={styles.followRow}>
-            <Text style={[styles.followStat, { color: theme.text }]}>
-              <Text style={styles.followCount}>{data.followerCount}</Text> {t("profile.followers")}
-            </Text>
-            <Text style={[styles.followDot, { color: theme.textMuted }]}>{"  "}  </Text>
-            <Text style={[styles.followStat, { color: theme.text }]}>
-              <Text style={styles.followCount}>{data.followingCount}</Text> {t("profile.following")}
-            </Text>
+        {/* Username + joined */}
+        <Text style={[styles.usernameJoined, { color: theme.textMuted }]}>
+          @{data.username?.toUpperCase() ?? "USER"} {"·"} {t("profile.joined").toUpperCase()} {joinYear}
+        </Text>
+
+        {/* Counts row */}
+        <View style={styles.countsRow}>
+          {flagCode && (
+            <View style={styles.countCol}>
+              <Image
+                source={{ uri: `https://flagcdn.com/w40/${flagCode}.png` }}
+                style={styles.countFlag}
+              />
+              <Text style={[styles.countLabel, { color: theme.textMuted }]}>{t("profile.courses")}</Text>
+            </View>
+          )}
+          <View style={styles.countCol}>
+            <Text style={[styles.countNumber, { color: theme.text }]}>{data.followingCount}</Text>
+            <Text style={[styles.countLabel, { color: theme.textMuted }]}>{t("profile.following")}</Text>
           </View>
+          <View style={styles.countCol}>
+            <Text style={[styles.countNumber, { color: theme.text }]}>{data.followerCount}</Text>
+            <Text style={[styles.countLabel, { color: theme.textMuted }]}>{t("profile.followers")}</Text>
+          </View>
+        </View>
 
-          <Button
-            title={data.isFollowing ? t("profile.unfollow") : t("profile.follow")}
+        {/* Follow button */}
+        <View style={styles.followRow}>
+          <Pressable
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               if (data.isFollowing) {
@@ -100,55 +157,135 @@ export default function PublicProfileScreen() {
                 followMut.mutate({ userId: userId! });
               }
             }}
-            size="sm"
-            variant={data.isFollowing ? "outline" : "primary"}
-            style={styles.followButton}
-          />
+            style={[
+              styles.followButton,
+              data.isFollowing
+                ? { borderColor: theme.border, backgroundColor: "transparent" }
+                : { backgroundColor: "#1CB0F6", borderColor: "#1CB0F6" },
+            ]}
+          >
+            {!data.isFollowing && <UserPlusIcon size={18} color="#FFF" />}
+            <Text style={[
+              styles.followButtonText,
+              data.isFollowing
+                ? { color: theme.text }
+                : { color: "#FFFFFF" },
+            ]}>
+              {data.isFollowing ? t("profile.unfollow").toUpperCase() : t("profile.follow").toUpperCase()}
+            </Text>
+          </Pressable>
         </View>
 
-        {/* Stats grid */}
-        <View style={styles.statsGrid}>
-          <View style={[styles.statBox, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-            <BoltIcon size={18} color={colors.xp} />
-            <Text style={[styles.statValue, { color: theme.text }]}>{data.totalXp.toLocaleString()}</Text>
-            <Text style={[styles.statLabel, { color: theme.textMuted }]}>{t("profile.xp_total")}</Text>
-          </View>
-          <View style={[styles.statBox, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-            <StarIcon size={18} color={colors.streak} />
-            <Text style={[styles.statValue, { color: theme.text }]}>{data.streakDays}</Text>
-            <Text style={[styles.statLabel, { color: theme.textMuted }]}>{t("profile.streak")}</Text>
-          </View>
-          <View style={[styles.statBox, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-            <Text style={[styles.statValue, { color: theme.text }]}>{data.lessonsCompleted}</Text>
-            <Text style={[styles.statLabel, { color: theme.textMuted }]}>{t("profile.lessons_completed")}</Text>
-          </View>
-          <View style={[styles.statBox, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-            <Text style={[styles.statValue, { color: theme.text }]}>{data.achievementCount}</Text>
-            <Text style={[styles.statLabel, { color: theme.textMuted }]}>{t("profile.medals")}</Text>
+        {/* OVERVIEW section */}
+        <View style={[styles.dividerFull, { backgroundColor: theme.border }]} />
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.textMuted }]}>{t("profile.overview")}</Text>
+          <View style={styles.overviewGrid}>
+            <View style={styles.overviewItem}>
+              <FlameIcon size={20} />
+              <Text style={[styles.overviewValue, { color: theme.text }]}>{data.streakDays} dias</Text>
+            </View>
+            {flagCode && (
+              <View style={styles.overviewItem}>
+                <Image
+                  source={{ uri: `https://flagcdn.com/w40/${flagCode}.png` }}
+                  style={styles.overviewFlag}
+                />
+                <Text style={[styles.overviewValue, { color: theme.text }]}>1</Text>
+              </View>
+            )}
+            <View style={styles.overviewItem}>
+              <ShieldIcon size={20} color={tierColor} />
+              <Text style={[styles.overviewValue, { color: theme.text }]}>
+                {t(`leaderboard.tier_${tierName}` as any)}
+              </Text>
+            </View>
+            <View style={styles.overviewItem}>
+              <BoltIcon size={20} color={colors.xp} />
+              <Text style={[styles.overviewValue, { color: theme.text }]}>
+                {data.totalXp.toLocaleString()} XP
+              </Text>
+            </View>
           </View>
         </View>
 
-        {/* Info rows */}
-        <View style={[styles.infoCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-          <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: theme.textMuted }]}>{t("profile.my_language")}</Text>
-            <Text style={[styles.infoValue, { color: theme.text }]}>{L1_NAMES[data.l1] ?? data.l1}</Text>
+        {/* Stats cards */}
+        <View style={[styles.dividerFull, { backgroundColor: theme.border }]} />
+        <View style={styles.section}>
+          <View style={[styles.infoCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: theme.textMuted }]}>CEFR</Text>
+              <Text style={[styles.infoValue, { color: theme.text }]}>{data.cefrLevel}</Text>
+            </View>
+            <View style={[styles.infoDivider, { backgroundColor: theme.border }]} />
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: theme.textMuted }]}>{t("profile.record")}</Text>
+              <Text style={[styles.infoValue, { color: theme.text }]}>{data.longestStreak} dias</Text>
+            </View>
+            <View style={[styles.infoDivider, { backgroundColor: theme.border }]} />
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: theme.textMuted }]}>{t("profile.lessons_completed")}</Text>
+              <Text style={[styles.infoValue, { color: theme.text }]}>{data.lessonsCompleted}</Text>
+            </View>
+            <View style={[styles.infoDivider, { backgroundColor: theme.border }]} />
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: theme.textMuted }]}>{t("profile.medals")}</Text>
+              <Text style={[styles.infoValue, { color: theme.text }]}>{data.achievementCount}</Text>
+            </View>
           </View>
-          <View style={[styles.infoDivider, { backgroundColor: theme.border }]} />
-          <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: theme.textMuted }]}>CEFR</Text>
-            <Text style={[styles.infoValue, { color: theme.text }]}>{data.cefrLevel}</Text>
-          </View>
-          <View style={[styles.infoDivider, { backgroundColor: theme.border }]} />
-          <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: theme.textMuted }]}>{t("profile.record")}</Text>
-            <Text style={[styles.infoValue, { color: theme.text }]}>{data.longestStreak} dias</Text>
-          </View>
-          <View style={[styles.infoDivider, { backgroundColor: theme.border }]} />
-          <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: theme.textMuted }]}>{t("profile.joined")}</Text>
-            <Text style={[styles.infoValue, { color: theme.text }]}>{joinDate}</Text>
-          </View>
+        </View>
+
+        {/* Report / Block */}
+        <View style={styles.bottomActions}>
+          <Pressable
+            style={styles.bottomAction}
+            onPress={() => {
+              Alert.alert(
+                t("profile.report_confirm_title" as any),
+                t("profile.report_confirm_msg" as any),
+                [
+                  { text: t("common.cancel" as any), style: "cancel" },
+                  {
+                    text: t("common.confirm" as any),
+                    style: "destructive",
+                    onPress: () => {
+                      Alert.alert(t("profile.user_reported" as any));
+                    },
+                  },
+                ],
+              );
+            }}
+          >
+            <FlagIcon size={18} color={theme.textMuted} />
+            <Text style={[styles.bottomActionText, { color: theme.textMuted }]}>
+              {t("profile.report_user").toUpperCase()}
+            </Text>
+          </Pressable>
+          <Pressable
+            style={styles.bottomAction}
+            onPress={() => {
+              Alert.alert(
+                t("profile.block_confirm_title" as any),
+                t("profile.block_confirm_msg" as any),
+                [
+                  { text: t("common.cancel" as any), style: "cancel" },
+                  {
+                    text: t("common.confirm" as any),
+                    style: "destructive",
+                    onPress: () => {
+                      Alert.alert(t("profile.user_blocked" as any));
+                      router.back();
+                    },
+                  },
+                ],
+              );
+            }}
+          >
+            <BlockIcon size={18} color={theme.textMuted} />
+            <Text style={[styles.bottomActionText, { color: theme.textMuted }]}>
+              {t("profile.block_user").toUpperCase()}
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
     </View>
@@ -163,13 +300,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    gap: spacing.md,
   },
-  backArrow: {
-    fontSize: 22,
-    fontWeight: "600",
+  backButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerTitle: {
     flex: 1,
@@ -178,18 +316,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   scroll: {
-    padding: spacing.lg,
     paddingBottom: spacing["5xl"],
   },
   avatarSection: {
     alignItems: "center",
-    marginBottom: spacing.xl,
+    paddingTop: spacing.xl,
+    marginBottom: spacing.md,
   },
   avatarLarge: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    marginBottom: spacing.md,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
   },
   avatarPlaceholder: {
     backgroundColor: colors.primary[400],
@@ -198,58 +335,91 @@ const styles = StyleSheet.create({
   },
   avatarInitial: {
     color: "#FFFFFF",
-    fontSize: 36,
+    fontSize: 38,
     fontWeight: "700",
   },
-  displayName: {
-    fontSize: typography.sizes.xl,
-    fontWeight: "700",
-    marginBottom: 2,
-  },
-  username: {
-    fontSize: typography.sizes.sm,
-    marginBottom: spacing.md,
-  },
-  followRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: spacing.md,
-  },
-  followStat: {
-    fontSize: typography.sizes.sm,
-  },
-  followCount: {
-    fontWeight: "700",
-  },
-  followDot: {
-    fontSize: typography.sizes.sm,
-  },
-  followButton: {
-    minWidth: 140,
-  },
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  statBox: {
-    flex: 1,
-    minWidth: "45%",
-    alignItems: "center",
-    padding: spacing.lg,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    gap: 4,
-  },
-  statValue: {
-    fontSize: typography.sizes.xl,
-    fontWeight: "800",
-  },
-  statLabel: {
+  usernameJoined: {
     fontSize: typography.sizes.xs,
     fontWeight: "600",
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
+    textAlign: "center",
+    marginBottom: spacing.lg,
+  },
+  countsRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: spacing["2xl"],
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.lg,
+  },
+  countCol: {
+    alignItems: "center",
+    gap: 2,
+  },
+  countFlag: {
+    width: 24,
+    height: 16,
+    borderRadius: 2,
+  },
+  countNumber: {
+    fontSize: typography.sizes.lg,
+    fontWeight: "800",
+  },
+  countLabel: {
+    fontSize: typography.sizes.xs,
+  },
+  followRow: {
+    paddingHorizontal: spacing.xl,
+    marginBottom: spacing.lg,
+  },
+  followButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    paddingVertical: 14,
+    borderRadius: radii.lg,
+    borderWidth: 2,
+  },
+  followButtonText: {
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  dividerFull: {
+    height: 1,
+    marginHorizontal: spacing.lg,
+  },
+  section: {
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.lg,
+  },
+  sectionTitle: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "700",
+    letterSpacing: 1,
+    marginBottom: spacing.md,
+  },
+  overviewGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.md,
+  },
+  overviewItem: {
+    width: "47%",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  overviewValue: {
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+  },
+  overviewFlag: {
+    width: 24,
+    height: 16,
+    borderRadius: 2,
   },
   infoCard: {
     borderRadius: radii.lg,
@@ -274,5 +444,21 @@ const styles = StyleSheet.create({
   infoDivider: {
     height: 1,
     marginHorizontal: spacing.lg,
+  },
+  bottomActions: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xl,
+    gap: spacing.lg,
+    alignItems: "center",
+  },
+  bottomAction: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  bottomActionText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
 });

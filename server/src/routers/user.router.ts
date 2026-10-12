@@ -227,6 +227,46 @@ export const userRouter = t.router({
     };
   }),
 
+  searchUsers: protectedProcedure
+    .input(
+      z.object({
+        query: z.string().min(1).max(100),
+        limit: z.number().int().min(1).max(20).optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const searchTerm = `%${input.query.toLowerCase()}%`;
+      const rows = await ctx.db
+        .select({
+          id: users.id,
+          name: users.name,
+          username: users.username,
+          avatarUrl: users.avatarUrl,
+          streakDays: users.streakDays,
+          totalXp: users.totalXp,
+        })
+        .from(users)
+        .where(
+          and(
+            sql`(LOWER(${users.username}) LIKE ${searchTerm} OR LOWER(${users.name}) LIKE ${searchTerm})`,
+            sql`${users.id} != ${ctx.user.userId}`,
+          ),
+        )
+        .limit(input.limit ?? 10);
+
+      const followedIds = await ctx.db
+        .select({ followingId: userFollows.followingId })
+        .from(userFollows)
+        .where(eq(userFollows.followerId, ctx.user.userId));
+
+      const followedSet = new Set(followedIds.map((r) => r.followingId));
+
+      return rows.map((u) => ({
+        ...u,
+        isFollowing: followedSet.has(u.id),
+      }));
+    }),
+
   updateSettings: protectedProcedure
     .input(
       z.object({

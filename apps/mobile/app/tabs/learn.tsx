@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   View, Text, ScrollView, Pressable, StyleSheet, Dimensions, BackHandler, Modal,
-  Animated as RNAnimated,
+  Animated as RNAnimated, Image,
 } from "react-native";
 import type { NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent } from "react-native";
 import { useRouter } from "expo-router";
@@ -19,7 +19,11 @@ import {
 } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
+import { useAdReward } from "@/hooks/useAdReward";
+import { BannerAdComponent } from "@/components/ads/BannerAd";
+import { useEntitlements } from "@/hooks/useEntitlements";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
+import { OURO, HEARTS } from "@falatorio/core";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const NODE_SIZE = 64;
@@ -38,12 +42,13 @@ function getNodeX(globalIndex: number): number {
   return PATH_CENTER - NODE_SIZE / 2 + phase * PATH_AMPLITUDE;
 }
 
-const ARC_SIZE = NODE_SIZE + 30;
-const ARC_RADIUS = (NODE_SIZE + 14) / 2;
-const ARC_STROKE = 5.5;
-const ARC_GLOW_STROKE = 12;
+const ARC_SIZE = NODE_SIZE + 48;
+const ARC_RADIUS = (NODE_SIZE + 30) / 2;
+const ARC_STROKE = 5;
+const ARC_GLOW_STROKE = 10;
 const ARC_GAP_DEG = 14;
 const NODE_3D_DEPTH = 7;
+const NODE_RADIUS = 30;
 
 function darkenColor(hex: string, amount = 0.35): string {
   const c = hex.replace("#", "");
@@ -133,7 +138,6 @@ function ProgressArcs({
     <Svg
       width={ARC_SIZE}
       height={ARC_SIZE}
-      style={{ position: "absolute", top: -(ARC_SIZE - NODE_SIZE) / 2, left: -(ARC_SIZE - NODE_SIZE) / 2 }}
     >
       {!locked && arcs.map((a) => (
         <Path
@@ -178,40 +182,28 @@ function ProgressArcs({
 function LessonPathNode({
   node,
   globalIndex,
-  totalInUnit,
-  localIndex,
   unitColor,
   locked,
   sessionsRequired,
   isSelected,
   theme,
-  t,
   onPress,
 }: {
   node: LessonNode;
   globalIndex: number;
-  totalInUnit: number;
-  localIndex: number;
   unitColor: string;
   locked: boolean;
   sessionsRequired: number;
   isSelected: boolean;
   theme: ReturnType<typeof import("@/lib/theme").useTheme>;
-  t: (key: import("@/lib/i18n").TKey) => string;
   onPress: () => void;
 }) {
   const scaleAnim = useRef(new RNAnimated.Value(1)).current;
   const pressAnim = useRef(new RNAnimated.Value(0)).current;
   const isChest = node.nodeType === "chest";
   const nodeX = getNodeX(globalIndex);
-  const isLast = localIndex === totalInUnit - 1 && !isChest;
   const isCompleted = node.completed;
   const filledSessions = isChest ? 0 : Math.min(node.completedSessions, sessionsRequired);
-
-  let lessonNum = 0;
-  if (!isChest) {
-    lessonNum = localIndex + 1;
-  }
 
   const bgColor = locked
     ? (theme.isDark ? "#374151" : colors.neutral[300])
@@ -260,15 +252,24 @@ function LessonPathNode({
         }}
         style={[styles.nodeWrapper, { left: nodeX }]}
       >
-        <View style={{ alignItems: "center" }}>
+        <View style={{ alignItems: "center", overflow: "visible" as const }}>
           {isChest ? (
-            <RNAnimated.View style={{ transform: [{ scale: scaleAnim }] }}>
-              <View style={{ width: NODE_SIZE, height: NODE_SIZE + NODE_3D_DEPTH, alignItems: "center", justifyContent: "center", opacity: locked ? 0.4 : 1 }}>
-                <ChestIcon size={44} />
-              </View>
+            <RNAnimated.View style={{ transform: [{ scale: scaleAnim }], opacity: locked ? 0.4 : 1 }}>
+              <ChestIcon size={NODE_SIZE + 8} />
             </RNAnimated.View>
           ) : (
-            <View style={{ position: "relative", width: NODE_SIZE, height: NODE_SIZE + NODE_3D_DEPTH }}>
+            <View style={{ position: "relative", width: NODE_SIZE, height: NODE_SIZE + NODE_3D_DEPTH, alignItems: "center", justifyContent: "center", overflow: "visible" as const }}>
+              {!locked && sessionsRequired > 0 && (
+                <View pointerEvents="none" style={{ position: "absolute", top: -(ARC_SIZE - NODE_SIZE) / 2, left: -(ARC_SIZE - NODE_SIZE) / 2, overflow: "visible" as const }}>
+                  <ProgressArcs
+                    total={sessionsRequired}
+                    completed={filledSessions}
+                    color={unitColor}
+                    locked={false}
+                    isSelected={isSelected}
+                  />
+                </View>
+              )}
               {!locked && (
                 <View
                   style={{
@@ -276,7 +277,7 @@ function LessonPathNode({
                     bottom: 0,
                     width: NODE_SIZE,
                     height: NODE_SIZE,
-                    borderRadius: NODE_SIZE / 2,
+                    borderRadius: NODE_RADIUS,
                     backgroundColor: shadowBg,
                   }}
                 />
@@ -290,36 +291,22 @@ function LessonPathNode({
                     : [{ translateY: pressAnim }, { scale: scaleAnim }],
                 }}
               >
-                <View style={{ position: "relative" }}>
-                  {!locked && sessionsRequired > 0 && (
-                    <ProgressArcs
-                      total={sessionsRequired}
-                      completed={filledSessions}
-                      color={unitColor}
-                      locked={false}
-                      isSelected={isSelected}
-                    />
+                <View
+                  style={[
+                    styles.nodeCircle,
+                    { backgroundColor: bgColor, borderColor: rimColor },
+                  ]}
+                >
+                  {!locked && (
+                    <View style={styles.nodeHighlight} />
                   )}
-                  <View
-                    style={[
-                      styles.nodeCircle,
-                      { backgroundColor: bgColor, borderColor: rimColor },
-                    ]}
-                  >
-                    {!locked && (
-                      <View style={styles.nodeHighlight} />
-                    )}
-                    <View style={styles.nodeInnerShadow}>
-                      {nodeIcon}
-                    </View>
+                  <View style={styles.nodeInnerShadow}>
+                    {nodeIcon}
                   </View>
                 </View>
               </RNAnimated.View>
             </View>
           )}
-          <Text style={[styles.nodeLabel, { color: theme.textMuted }]} numberOfLines={1}>
-            {isChest ? t("learn.chest") : isLast ? t("learn.recap") : `${t("learn.lesson")} ${lessonNum}`}
-          </Text>
         </View>
       </Pressable>
     </View>
@@ -445,17 +432,510 @@ function UnitGuideModal({
   );
 }
 
+function formatCountdown(ms: number | null): string {
+  if (!ms || ms <= 0) return "0:00";
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+function StreakModal({
+  visible, onClose, theme, t, currentDays, longestDays,
+  freezeAvailable, isActive, balance, onPurchaseFreeze, onStartLesson,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: any) => string;
+  currentDays: number;
+  longestDays: number;
+  freezeAvailable: boolean;
+  isActive: boolean;
+  balance: number;
+  onPurchaseFreeze: () => void;
+  onStartLesson: () => void;
+}) {
+  const router = useRouter();
+  const [tab, setTab] = useState<"personal" | "friends">("personal");
+  const [calMonth, setCalMonth] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() };
+  });
+
+  const following = trpc.user.getFollowing.useQuery({}, { enabled: visible && tab === "friends" });
+
+  const dayLabels = [
+    t("streak.sun"), t("streak.mon"), t("streak.tue"), t("streak.wed"),
+    t("streak.thu"), t("streak.fri"), t("streak.sat"),
+  ];
+
+  const today = new Date();
+  const calDays = useMemo(() => {
+    const { year, month } = calMonth;
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cells: Array<{ day: number; active: boolean; isToday: boolean; isFrozen: boolean } | null> = [];
+    for (let i = 0; i < firstDay; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const isToday = date.toDateString() === today.toDateString();
+      const isPast = date < today && !isToday;
+      const active = isPast || (isToday && isActive);
+      cells.push({ day: d, active, isToday, isFrozen: false });
+    }
+    return cells;
+  }, [calMonth, isActive]);
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+
+  const prevMonth = () => {
+    setCalMonth((prev) => {
+      if (prev.month === 0) return { year: prev.year - 1, month: 11 };
+      return { ...prev, month: prev.month - 1 };
+    });
+  };
+  const nextMonth = () => {
+    setCalMonth((prev) => {
+      if (prev.month === 11) return { year: prev.year + 1, month: 0 };
+      return { ...prev, month: prev.month + 1 };
+    });
+  };
+
+  const isPersonal = tab === "personal";
+  const heroColor = isPersonal ? "#1CB0F6" : "#FF9600";
+
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+      <View style={[styles.modalContainer, { backgroundColor: theme.bg }]}>
+        <View style={[styles.modalHeader, { backgroundColor: heroColor }]}>
+          <Pressable onPress={onClose} hitSlop={12}>
+            <Text style={[styles.modalClose, { color: "#FFFFFF" }]}>{"X"}</Text>
+          </Pressable>
+          <Text style={[styles.modalHeaderTitle, { color: "#FFFFFF" }]}>{t("streak.title")}</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
+        <View style={styles.streakTabRow}>
+          <Pressable
+            onPress={() => setTab("personal")}
+            style={[styles.streakTab, isPersonal && { borderBottomColor: heroColor, borderBottomWidth: 3 }]}
+          >
+            <Text style={[styles.streakTabText, { color: isPersonal ? heroColor : theme.textMuted }]}>
+              {t("streak.personal")}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setTab("friends")}
+            style={[styles.streakTab, !isPersonal && { borderBottomColor: "#FF9600", borderBottomWidth: 3 }]}
+          >
+            <Text style={[styles.streakTabText, { color: !isPersonal ? "#FF9600" : theme.textMuted }]}>
+              {t("streak.friends")}
+            </Text>
+          </Pressable>
+        </View>
+
+        {isPersonal ? (
+          <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
+            <View style={[styles.streakHero, { backgroundColor: heroColor }]}>
+              <Text style={styles.streakSocietyBadge}>{t("streak.society")}</Text>
+              <Text style={styles.streakBigNum}>{currentDays}</Text>
+              <Text style={styles.streakSubtext}>{t("streak.day_streak")}</Text>
+            </View>
+
+            {!isActive && (
+              <View style={[styles.streakFrozenCard, { backgroundColor: theme.isDark ? "#1F2937" : "#1A1A2E" }]}>
+                <View style={[styles.freezeIconWrap, { backgroundColor: "rgba(28,176,246,0.15)" }]}>
+                  <StreakIcon size={28} color="#1CB0F6" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: "#FFFFFF", fontWeight: "600", fontSize: typography.sizes.md, lineHeight: 22 }}>
+                    {t("streak.keep_going")}
+                  </Text>
+                  <Pressable onPress={onStartLesson}>
+                    <Text style={{ color: "#1CB0F6", fontWeight: "800", fontSize: typography.sizes.sm, marginTop: 4 }}>
+                      {t("streak.start_lesson")}
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
+
+            <View style={[styles.modalBody, { paddingBottom: 0 }]}>
+              <Text style={[styles.streakCalendarTitle, { color: theme.text }]}>
+                {t("streak.calendar")}
+              </Text>
+              <View style={[styles.modalCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                <View style={styles.calendarNav}>
+                  <Pressable onPress={prevMonth} hitSlop={12}>
+                    <Text style={[styles.calendarArrow, { color: theme.textMuted }]}>{"<"}</Text>
+                  </Pressable>
+                  <Text style={[styles.calendarMonthLabel, { color: theme.text }]}>
+                    {monthNames[calMonth.month]} {calMonth.year}
+                  </Text>
+                  <Pressable onPress={nextMonth} hitSlop={12}>
+                    <Text style={[styles.calendarArrow, { color: theme.textMuted }]}>{">"}</Text>
+                  </Pressable>
+                </View>
+                <View style={styles.calendarDayHeaders}>
+                  {dayLabels.map((l, i) => (
+                    <Text key={i} style={[styles.calendarDayHeader, { color: theme.textMuted }]}>{l}</Text>
+                  ))}
+                </View>
+                <View style={styles.calendarGrid}>
+                  {calDays.map((cell, i) => (
+                    <View key={i} style={styles.calendarCell}>
+                      {cell ? (
+                        <View style={[
+                          styles.calendarDayCircle,
+                          cell.active
+                            ? { backgroundColor: "#FF9600" }
+                            : cell.isToday
+                              ? { backgroundColor: "transparent", borderWidth: 2, borderColor: "#1CB0F6" }
+                              : {},
+                        ]}>
+                          <Text style={[
+                            styles.calendarDayText,
+                            { color: cell.active ? "#FFFFFF" : cell.isToday ? "#1CB0F6" : theme.textMuted },
+                          ]}>
+                            {cell.day}
+                          </Text>
+                        </View>
+                      ) : null}
+                    </View>
+                  ))}
+                </View>
+              </View>
+
+              <View style={[styles.modalCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                <View style={styles.streakStatsGrid}>
+                  <View style={styles.streakStatBlock}>
+                    <Text style={[styles.streakStatBlockNum, { color: "#FF9600" }]}>{currentDays}</Text>
+                    <Text style={[styles.streakStatBlockLabel, { color: theme.textMuted }]}>{t("streak.current")}</Text>
+                  </View>
+                  <View style={[styles.streakStatBlockDivider, { backgroundColor: theme.border }]} />
+                  <View style={styles.streakStatBlock}>
+                    <Text style={[styles.streakStatBlockNum, { color: theme.text }]}>{longestDays}</Text>
+                    <Text style={[styles.streakStatBlockLabel, { color: theme.textMuted }]}>{t("streak.longest")}</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={[styles.modalCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                <View style={styles.freezeRow}>
+                  <View style={[styles.freezeIconWrap, { backgroundColor: freezeAvailable ? "rgba(16,185,129,0.12)" : "rgba(59,130,246,0.12)" }]}>
+                    <StreakIcon size={24} color={freezeAvailable ? "#10B981" : "#3B82F6"} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.modalCardTitle, { color: theme.text }]}>{t("streak.freeze_buy")}</Text>
+                    <Text style={[styles.modalCardDesc, { color: theme.textMuted }]}>{t("streak.freeze_desc")}</Text>
+                  </View>
+                </View>
+                {freezeAvailable ? (
+                  <View style={[styles.freezeActiveBadge, { backgroundColor: "rgba(16,185,129,0.12)" }]}>
+                    <View style={[styles.freezeActiveDot, { backgroundColor: "#10B981" }]} />
+                    <Text style={{ color: "#10B981", fontWeight: "700", fontSize: typography.sizes.sm }}>
+                      {t("streak.freeze_active")}
+                    </Text>
+                  </View>
+                ) : (
+                  <Pressable
+                    style={[styles.freezeBuyBtn, {
+                      backgroundColor: theme.isDark ? "#1F2937" : colors.neutral[100],
+                      opacity: balance < OURO.COST_STREAK_FREEZE ? 0.5 : 1,
+                    }]}
+                    onPress={onPurchaseFreeze}
+                    disabled={balance < OURO.COST_STREAK_FREEZE}
+                  >
+                    <GoldPrisms size={16} />
+                    <Text style={[styles.modalSecondaryBtnText, { color: theme.text }]}>
+                      {OURO.COST_STREAK_FREEZE}
+                    </Text>
+                  </Pressable>
+                )}
+              </View>
+            </View>
+          </ScrollView>
+        ) : (
+          <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
+            <View style={[styles.streakHero, { backgroundColor: "#FF9600", paddingVertical: spacing["2xl"] }]}>
+              <StreakIcon size={64} color="#FFFFFF" />
+            </View>
+
+            <View style={styles.modalBody}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing.sm }}>
+                <Text style={[styles.streakCalendarTitle, { color: theme.text, marginBottom: 0 }]}>
+                  {t("streak.friend_streaks")}
+                </Text>
+                <Pressable onPress={() => {
+                  onClose();
+                  router.push("/profile/followers");
+                }}>
+                  <Text style={{ color: "#FF9600", fontWeight: "800", fontSize: typography.sizes.sm }}>
+                    {t("streak.edit")}
+                  </Text>
+                </Pressable>
+              </View>
+
+              {(following.data ?? []).length === 0 ? (
+                <View style={[styles.modalCard, { backgroundColor: theme.bgCard, borderColor: theme.border, alignItems: "center", paddingVertical: spacing["2xl"] }]}>
+                  <Text style={[styles.modalCardDesc, { color: theme.textMuted, textAlign: "center" }]}>
+                    {t("streak.no_friends")}
+                  </Text>
+                </View>
+              ) : (
+                (following.data ?? []).map((friend) => (
+                  <Pressable
+                    key={friend.id}
+                    onPress={() => {
+                      onClose();
+                      router.push(`/profile/${friend.id}`);
+                    }}
+                  >
+                    <View style={[styles.friendStreakRow, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                      {friend.avatarUrl ? (
+                        <Image source={{ uri: friend.avatarUrl }} style={styles.friendAvatar} />
+                      ) : (
+                        <View style={[styles.friendAvatar, styles.friendAvatarPlaceholder]}>
+                          <Text style={styles.friendAvatarInitial}>
+                            {(friend.name ?? "?").slice(0, 1).toUpperCase()}
+                          </Text>
+                        </View>
+                      )}
+                      <Text style={[styles.friendName, { color: theme.text }]} numberOfLines={1}>
+                        {friend.name}
+                      </Text>
+                      <StreakIcon size={16} color="#9CA3AF" />
+                      <Text style={[styles.friendStreakCount, { color: theme.textMuted }]}>
+                        {friend.streakDays ?? 0}
+                      </Text>
+                    </View>
+                  </Pressable>
+                ))
+              )}
+
+              <Pressable
+                onPress={() => {
+                  onClose();
+                  router.push("/profile/followers");
+                }}
+                style={[styles.friendStreakRow, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
+              >
+                <View style={[styles.friendAvatar, { borderWidth: 2, borderColor: theme.border, borderStyle: "dashed", alignItems: "center", justifyContent: "center" }]}>
+                  <Text style={{ color: theme.textMuted, fontSize: 20, fontWeight: "300" }}>+</Text>
+                </View>
+                <Text style={[styles.friendName, { color: theme.textMuted }]}>
+                  {t("streak.invite_friend")}
+                </Text>
+              </Pressable>
+            </View>
+          </ScrollView>
+        )}
+      </View>
+    </Modal>
+  );
+}
+
+function HeartsModal({
+  visible, onClose, theme, t, hearts, unlimited,
+  nextRefillIn, balance, onRefill, isRefilling, onPractice,
+  canWatchAd, isWatchingAd, onWatchAd,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: any) => string;
+  hearts: number;
+  unlimited: boolean;
+  nextRefillIn: number | null;
+  balance: number;
+  onRefill: () => void;
+  isRefilling: boolean;
+  onPractice: () => void;
+  canWatchAd: boolean;
+  isWatchingAd: boolean;
+  onWatchAd: () => void;
+}) {
+  const heartIcons = Array.from({ length: HEARTS.MAX }, (_, i) => i < hearts);
+
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+      <View style={[styles.modalContainer, { backgroundColor: theme.bg }]}>
+        <View style={styles.modalHeader}>
+          <Pressable onPress={onClose} hitSlop={12}>
+            <Text style={[styles.modalClose, { color: theme.textMuted }]}>{"X"}</Text>
+          </Pressable>
+          <Text style={[styles.modalHeaderTitle, { color: theme.text }]}>{t("hearts.title")}</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
+        <View style={[styles.heartsHero, { backgroundColor: colors.heart }]}>
+          <View style={styles.heartsRowBig}>
+            {heartIcons.map((filled, i) => (
+              <View key={i} style={styles.heartIconWrap}>
+                <HeartIcon size={40} color={filled ? "#FFFFFF" : "rgba(255,255,255,0.25)"} />
+              </View>
+            ))}
+          </View>
+          <Text style={styles.heartsCountBig}>
+            {unlimited ? "UNLIMITED" : `${hearts}/${HEARTS.MAX}`}
+          </Text>
+          {!unlimited && hearts < HEARTS.MAX && hearts > 0 && (
+            <Text style={styles.heartsSubtext}>{t("hearts.empty_message")}</Text>
+          )}
+        </View>
+
+        <ScrollView contentContainerStyle={styles.modalBody}>
+          {unlimited ? (
+            <View style={[styles.heartsStatusCard, { backgroundColor: "rgba(16,185,129,0.08)", borderColor: "rgba(16,185,129,0.2)" }]}>
+              <View style={[styles.heartsStatusDot, { backgroundColor: "#10B981" }]} />
+              <Text style={[styles.heartsStatusText, { color: "#10B981" }]}>
+                {t("hearts.unlimited_message")}
+              </Text>
+            </View>
+          ) : hearts >= HEARTS.MAX ? (
+            <View style={[styles.heartsStatusCard, { backgroundColor: "rgba(16,185,129,0.08)", borderColor: "rgba(16,185,129,0.2)" }]}>
+              <View style={[styles.heartsStatusDot, { backgroundColor: "#10B981" }]} />
+              <Text style={[styles.heartsStatusText, { color: "#10B981" }]}>
+                {t("hearts.full_message")}
+              </Text>
+            </View>
+          ) : (
+            <>
+              {hearts === 0 && (
+                <View style={[styles.heartsStatusCard, { backgroundColor: "rgba(239,68,68,0.08)", borderColor: "rgba(239,68,68,0.2)" }]}>
+                  <Text style={[styles.heartsStatusText, { color: colors.heart }]}>
+                    {t("hearts.empty_message")}
+                  </Text>
+                </View>
+              )}
+
+              {nextRefillIn != null && nextRefillIn > 0 && (
+                <View style={[styles.modalCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+                  <View style={styles.timerRow}>
+                    <View>
+                      <Text style={[styles.modalCardDesc, { color: theme.textMuted }]}>
+                        {t("hearts.next_refill")}
+                      </Text>
+                      <Text style={[styles.timerText, { color: theme.text }]}>
+                        {formatCountdown(nextRefillIn)}
+                      </Text>
+                    </View>
+                    <View style={styles.timerBar}>
+                      <View style={[styles.timerBarTrack, { backgroundColor: theme.isDark ? "#374151" : colors.neutral[200] }]}>
+                        <View style={[styles.timerBarFill, {
+                          backgroundColor: colors.heart,
+                          width: `${Math.max(5, 100 - (nextRefillIn / (HEARTS.REFILL_INTERVAL_MS)) * 100)}%` as any,
+                        }]} />
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              )}
+            </>
+          )}
+
+          {!unlimited && hearts < HEARTS.MAX && (
+            <View style={[styles.modalCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+              <View style={styles.heartsOptionRow}>
+                <View style={[styles.heartsOptionIcon, { backgroundColor: "rgba(239,68,68,0.1)" }]}>
+                  <HeartIcon size={20} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.modalCardTitle, { color: theme.text }]}>{t("hearts.refill_ouro")}</Text>
+                  <Text style={[styles.modalCardDesc, { color: theme.textMuted }]}>
+                    {HEARTS.MAX - hearts} / {HEARTS.MAX}
+                  </Text>
+                </View>
+              </View>
+              <Pressable
+                style={[styles.heartsRefillBtn, {
+                  backgroundColor: colors.heart,
+                  opacity: balance < OURO.COST_HEART_REFILL || isRefilling ? 0.5 : 1,
+                }]}
+                onPress={onRefill}
+                disabled={balance < OURO.COST_HEART_REFILL || isRefilling}
+              >
+                <GoldPrisms size={16} />
+                <Text style={styles.modalPrimaryBtnText}>{OURO.COST_HEART_REFILL}</Text>
+              </Pressable>
+            </View>
+          )}
+
+          {!unlimited && (
+            <View style={[styles.modalCard, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+              <View style={styles.heartsOptionRow}>
+                <View style={[styles.heartsOptionIcon, { backgroundColor: "rgba(59,130,246,0.1)" }]}>
+                  <StarIcon size={20} color="#3B82F6" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.modalCardTitle, { color: theme.text }]}>{t("hearts.practice_btn")}</Text>
+                  <Text style={[styles.modalCardDesc, { color: theme.textMuted }]}>
+                    {t("hearts.practice_desc")}
+                  </Text>
+                </View>
+              </View>
+              <Pressable
+                style={[styles.heartsPracticeBtn, { backgroundColor: "#3B82F6" }]}
+                onPress={onPractice}
+              >
+                <Text style={styles.modalPrimaryBtnText}>{t("hearts.practice_btn")}</Text>
+              </Pressable>
+            </View>
+          )}
+
+          {!unlimited && hearts < HEARTS.MAX && (
+            <View style={[styles.modalCard, { backgroundColor: theme.bgCard, borderColor: theme.border, opacity: canWatchAd ? 1 : 0.5 }]}>
+              <View style={styles.heartsOptionRow}>
+                <View style={[styles.heartsOptionIcon, { backgroundColor: "rgba(255,165,0,0.1)" }]}>
+                  <BoltIcon size={20} color="#FFA500" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.modalCardTitle, { color: theme.text }]}>{t("hearts.watch_ad")}</Text>
+                  <Text style={[styles.modalCardDesc, { color: theme.textMuted }]}>
+                    {t("hearts.watch_ad_desc")}
+                  </Text>
+                </View>
+              </View>
+              <Pressable
+                style={[styles.heartsRefillBtn, {
+                  backgroundColor: "#FFA500",
+                  opacity: !canWatchAd || isWatchingAd ? 0.5 : 1,
+                }]}
+                onPress={onWatchAd}
+                disabled={!canWatchAd || isWatchingAd}
+              >
+                <BoltIcon size={16} color="#FFFFFF" />
+                <Text style={styles.modalPrimaryBtnText}>{t("hearts.watch_ad")}</Text>
+              </Pressable>
+            </View>
+          )}
+        </ScrollView>
+      </View>
+    </Modal>
+  );
+}
+
 export default function LearnScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const { hearts, unlimited } = useHearts();
-  const { currentDays } = useStreak();
+  const { hearts, unlimited, nextRefillIn, refillWithOuro, isRefilling } = useHearts();
+  const { currentDays, longestDays, freezeAvailable, isActive, purchaseFreeze } = useStreak();
   const { balance } = useOuro();
   const { t, l1 } = useTranslation();
+  const { isSuper } = useEntitlements();
+  const { canWatch: canWatchAd, isWatching: isWatchingAd, claimReward: claimAdReward } = useAdReward();
 
   const [showSections, setShowSections] = useState(false);
   const [showUnitGuide, setShowUnitGuide] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const [showHeartsModal, setShowHeartsModal] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [visibleUnitIdx, setVisibleUnitIdx] = useState(0);
   const [selectedLesson, setSelectedLesson] = useState<SelectedLesson | null>(null);
@@ -495,18 +975,14 @@ export default function LearnScreen() {
 
   useEffect(() => {
     const handler = BackHandler.addEventListener("hardwareBackPress", () => {
-      if (showUnitGuide) {
-        setShowUnitGuide(false);
-        return true;
-      }
-      if (showSections) {
-        setShowSections(false);
-        return true;
-      }
+      if (showStreakModal) { setShowStreakModal(false); return true; }
+      if (showHeartsModal) { setShowHeartsModal(false); return true; }
+      if (showUnitGuide) { setShowUnitGuide(false); return true; }
+      if (showSections) { setShowSections(false); return true; }
       return true;
     });
     return () => handler.remove();
-  }, [showSections, showUnitGuide]);
+  }, [showSections, showUnitGuide, showStreakModal, showHeartsModal]);
 
   const isLoading = coursesQuery.isLoading || (!!courseId && sectionsQuery.isLoading);
 
@@ -544,13 +1020,13 @@ export default function LearnScreen() {
         <GoldPrisms size={20} />
         <Text style={[styles.topBarValue, { color: colors.ouro }]}>{balance}</Text>
       </Pressable>
-      <Pressable style={styles.topBarStat}>
+      <Pressable style={styles.topBarStat} onPress={() => setShowHeartsModal(true)}>
         <HeartIcon size={20} />
         <Text style={[styles.topBarValue, { color: colors.heart }]}>
           {unlimited ? "∞" : hearts}
         </Text>
       </Pressable>
-      <Pressable style={styles.topBarStat}>
+      <Pressable style={styles.topBarStat} onPress={() => setShowStreakModal(true)}>
         <StreakIcon size={20} color={colors.streak} />
         <Text style={[styles.topBarValue, { color: colors.streak }]}>{currentDays}</Text>
       </Pressable>
@@ -839,14 +1315,11 @@ export default function LearnScreen() {
                         key={lesson.id}
                         node={lesson}
                         globalIndex={thisGlobalIdx}
-                        localIndex={lIdx}
-                        totalInUnit={unit.lessons.length}
                         unitColor={unitColor}
                         locked={isLocked}
                         sessionsRequired={lesson.sessionsRequired}
                         isSelected={selectedLesson?.id === lesson.id}
                         theme={theme}
-                        t={t}
                         onPress={() => {
                           const lessonCount = unit.lessons.filter((l) => l.nodeType === "lesson").length;
                           setSelectedLesson({
@@ -896,6 +1369,8 @@ export default function LearnScreen() {
           </View>
         </ScrollView>
       )}
+
+      {!isSuper && <BannerAdComponent />}
 
       <UnitGuideModal
         visible={showUnitGuide}
@@ -992,6 +1467,44 @@ export default function LearnScreen() {
           </View>
         </Pressable>
       </Modal>
+
+      <StreakModal
+        visible={showStreakModal}
+        onClose={() => setShowStreakModal(false)}
+        theme={theme}
+        t={t}
+        currentDays={currentDays}
+        longestDays={longestDays}
+        freezeAvailable={freezeAvailable}
+        isActive={isActive}
+        balance={balance}
+        onPurchaseFreeze={purchaseFreeze}
+        onStartLesson={() => {
+          setShowStreakModal(false);
+        }}
+      />
+
+      <HeartsModal
+        visible={showHeartsModal}
+        onClose={() => setShowHeartsModal(false)}
+        theme={theme}
+        t={t}
+        hearts={hearts}
+        unlimited={unlimited}
+        nextRefillIn={nextRefillIn}
+        balance={balance}
+        onRefill={refillWithOuro}
+        isRefilling={isRefilling}
+        onPractice={() => {
+          setShowHeartsModal(false);
+          router.push("/tabs/practice");
+        }}
+        canWatchAd={canWatchAd}
+        isWatchingAd={isWatchingAd}
+        onWatchAd={async () => {
+          await claimAdReward("heart");
+        }}
+      />
     </View>
   );
 }
@@ -1081,19 +1594,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   nodeRow: {
-    height: NODE_SIZE + NODE_3D_DEPTH + NODE_GAP + 18,
+    height: NODE_SIZE + NODE_3D_DEPTH + NODE_GAP,
     position: "relative",
+    overflow: "visible" as const,
   },
   nodeWrapper: {
     position: "absolute",
     top: 0,
     alignItems: "center",
     width: NODE_SIZE,
+    overflow: "visible" as const,
   },
   nodeCircle: {
     width: NODE_SIZE,
     height: NODE_SIZE,
-    borderRadius: NODE_SIZE / 2,
+    borderRadius: NODE_RADIUS,
     borderWidth: 4,
     alignItems: "center",
     justifyContent: "center",
@@ -1105,22 +1620,16 @@ const styles = StyleSheet.create({
     left: 4,
     right: 4,
     height: "45%",
-    borderTopLeftRadius: NODE_SIZE / 2,
-    borderTopRightRadius: NODE_SIZE / 2,
+    borderTopLeftRadius: NODE_RADIUS,
+    borderTopRightRadius: NODE_RADIUS,
     backgroundColor: "rgba(255,255,255,0.18)",
   },
   nodeInnerShadow: {
     width: NODE_SIZE - 12,
     height: NODE_SIZE - 12,
-    borderRadius: (NODE_SIZE - 12) / 2,
+    borderRadius: NODE_RADIUS - 6,
     alignItems: "center",
     justifyContent: "center",
-  },
-  nodeLabel: {
-    fontSize: typography.sizes.xs,
-    fontWeight: "600",
-    marginTop: 4,
-    textAlign: "center",
   },
 
   // -- Unit dividers --
@@ -1431,7 +1940,7 @@ const styles = StyleSheet.create({
   },
   tooltipCard: {
     marginHorizontal: spacing.lg,
-    marginBottom: spacing["3xl"],
+    marginBottom: spacing["5xl"],
     borderRadius: radii.xl,
     borderWidth: 1,
     overflow: "hidden",
@@ -1486,5 +1995,375 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.85)",
     fontSize: typography.sizes.sm,
     fontWeight: "700",
+  },
+
+  // -- Shared modal styles --
+  modalContainer: {
+    flex: 1,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  modalClose: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  modalHeaderTitle: {
+    fontSize: typography.sizes.lg,
+    fontWeight: "800",
+  },
+  modalBody: {
+    padding: spacing.lg,
+    paddingBottom: 60,
+    gap: spacing.md,
+  },
+  modalCard: {
+    borderRadius: radii.xl,
+    borderWidth: 1,
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  modalCardTitle: {
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+  },
+  modalCardDesc: {
+    fontSize: typography.sizes.sm,
+    lineHeight: 20,
+  },
+  modalCardText: {
+    fontSize: typography.sizes.md,
+    lineHeight: 22,
+    textAlign: "center",
+  },
+  modalPrimaryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: spacing.md,
+    borderRadius: radii.lg,
+    marginTop: spacing.xs,
+    gap: spacing.sm,
+  },
+  modalPrimaryBtnText: {
+    color: "#FFFFFF",
+    fontSize: typography.sizes.md,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+  modalSecondaryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: spacing.md,
+    borderRadius: radii.lg,
+    marginTop: spacing.xs,
+    gap: spacing.sm,
+  },
+  modalSecondaryBtnText: {
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+  },
+
+  // -- Streak modal --
+  streakTabRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.1)",
+  },
+  streakTab: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: spacing.md,
+    borderBottomWidth: 3,
+    borderBottomColor: "transparent",
+  },
+  streakTabText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "800",
+    letterSpacing: 1,
+  },
+  streakHero: {
+    paddingVertical: spacing["3xl"],
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  streakSocietyBadge: {
+    fontSize: typography.sizes.xs,
+    fontWeight: "800",
+    color: "rgba(255,255,255,0.8)",
+    letterSpacing: 1.5,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+    borderRadius: radii.sm,
+    overflow: "hidden",
+  },
+  streakBigNum: {
+    fontSize: 72,
+    fontWeight: "900",
+    color: "#FFFFFF",
+    letterSpacing: -3,
+    marginTop: -4,
+  },
+  streakSubtext: {
+    fontSize: typography.sizes.lg,
+    fontWeight: "700",
+    color: "rgba(255,255,255,0.85)",
+  },
+  streakFrozenCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: spacing.lg,
+    marginTop: -spacing.md,
+    padding: spacing.lg,
+    borderRadius: radii.xl,
+    gap: spacing.md,
+  },
+  streakCalendarTitle: {
+    fontSize: typography.sizes.xl,
+    fontWeight: "800",
+    marginBottom: spacing.sm,
+  },
+  calendarNav: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.md,
+  },
+  calendarArrow: {
+    fontSize: 20,
+    fontWeight: "700",
+    paddingHorizontal: spacing.sm,
+  },
+  calendarMonthLabel: {
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+  },
+  calendarDayHeaders: {
+    flexDirection: "row",
+    marginBottom: spacing.xs,
+  },
+  calendarDayHeader: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  calendarGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  calendarCell: {
+    width: `${100 / 7}%` as any,
+    alignItems: "center",
+    paddingVertical: 4,
+  },
+  calendarDayCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  calendarDayText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "600",
+  },
+  friendStreakRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    gap: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  friendAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  friendAvatarPlaceholder: {
+    backgroundColor: colors.primary[400],
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  friendAvatarInitial: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  friendName: {
+    flex: 1,
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+  },
+  friendStreakCount: {
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+  },
+  streakStatsGrid: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  streakStatBlock: {
+    flex: 1,
+    alignItems: "center",
+    gap: 2,
+  },
+  streakStatBlockNum: {
+    fontSize: 28,
+    fontWeight: "900",
+    letterSpacing: -1,
+  },
+  streakStatBlockLabel: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "600",
+  },
+  streakStatBlockDivider: {
+    width: 1,
+    height: 40,
+  },
+  streakStartBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: radii.lg,
+    gap: spacing.sm,
+  },
+  freezeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  freezeIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  freezeActiveBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radii.md,
+    gap: spacing.sm,
+  },
+  freezeActiveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  freezeBuyBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: spacing.md,
+    borderRadius: radii.lg,
+    gap: spacing.sm,
+  },
+
+  // -- Hearts modal --
+  heartsHero: {
+    paddingVertical: spacing["3xl"],
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  heartsRowBig: {
+    flexDirection: "row",
+    gap: 6,
+  },
+  heartIconWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heartsCountBig: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: "#FFFFFF",
+    letterSpacing: -1,
+  },
+  heartsSubtext: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.7)",
+    textAlign: "center",
+    paddingHorizontal: spacing.xl,
+  },
+  heartsStatusCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    gap: spacing.sm,
+  },
+  heartsStatusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  heartsStatusText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "700",
+    flex: 1,
+  },
+  heartsOptionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  heartsOptionIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heartsRefillBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: radii.lg,
+    gap: spacing.sm,
+  },
+  heartsPracticeBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: radii.lg,
+    gap: spacing.sm,
+  },
+  timerRow: {
+    gap: spacing.sm,
+  },
+  timerBar: {
+    marginTop: spacing.xs,
+  },
+  timerBarTrack: {
+    height: 6,
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  timerBarFill: {
+    height: "100%",
+    borderRadius: 3,
+  },
+  timerText: {
+    fontSize: typography.sizes["2xl"],
+    fontWeight: "800",
   },
 });
