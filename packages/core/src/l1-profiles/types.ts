@@ -31,10 +31,10 @@ export type MouthPosition =
   | "sibilant_sh" | "labiodental_v";
 
 export interface PhoneticDifficulty {
-  sound: string;
+  sound: string | Record<string, string>;
   ipa: string;
-  description: string;
-  tip: string;
+  description: string | Record<string, string>;
+  tip: string | Record<string, string>;
   mouthPosition?: MouthPosition;
 }
 

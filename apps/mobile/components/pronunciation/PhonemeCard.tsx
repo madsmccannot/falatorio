@@ -20,9 +20,14 @@ interface PhonemeCardProps {
   onPress?: () => void;
 }
 
+function resolveLocalized(value: string | Record<string, string>, lang: string): string {
+  if (typeof value === "string") return value;
+  return value[lang] ?? value["en"] ?? Object.values(value)[0] ?? "";
+}
+
 export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t, l1 } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const expandProgress = useSharedValue(0);
   const pressScale = useSharedValue(1);
@@ -78,9 +83,9 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
             <Text style={[styles.ipa, { color: colors.primary[400] }]}>{phoneme.ipa}</Text>
           </View>
           <View style={styles.headerText}>
-            <Text style={[styles.sound, { color: theme.text }]}>{phoneme.sound}</Text>
+            <Text style={[styles.sound, { color: theme.text }]}>{resolveLocalized(phoneme.sound, l1)}</Text>
             <Text style={[styles.description, { color: theme.textSecondary }]} numberOfLines={expanded ? undefined : 1}>
-              {phoneme.description}
+              {resolveLocalized(phoneme.description, l1)}
             </Text>
           </View>
           <Text style={[styles.chevron, { color: theme.textMuted }]}>{expanded ? "▲" : "▼"}</Text>
@@ -101,7 +106,7 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
           )}
           <View style={[styles.tipContainer, { backgroundColor: colors.primary[500] + "12" }]}>
             <Text style={[styles.tipLabel, { color: colors.primary[400] }]}>{t("reference.tip_label")}</Text>
-            <Text style={[styles.tipText, { color: theme.text }]}>{phoneme.tip}</Text>
+            <Text style={[styles.tipText, { color: theme.text }]}>{resolveLocalized(phoneme.tip, l1)}</Text>
           </View>
         </View>
       </Animated.View>

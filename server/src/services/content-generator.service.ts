@@ -173,7 +173,7 @@ function buildLessonPrompt(params: {
   exerciseCount: number;
   falseFriends: Array<{ word: string; l1Meaning: string; ptMeaning: string }>;
   grammarGaps: Array<{ concept: string; explanation: string; l1Comparison: string }>;
-  phoneticDifficulties: Array<{ sound: string; ipa: string; description: string }>;
+  phoneticDifficulties: Array<{ sound: string | Record<string, string>; ipa: string; description: string | Record<string, string> }>;
   cognates: readonly string[];
   culturalRefs: Array<{ contentPt: string; contentL1: string; explanation: string }>;
 }): string {
@@ -194,7 +194,7 @@ GRAMMAR GAPS (focus exercises on these):
 ${grammarGaps.map((g) => `- ${g.concept}: ${g.explanation} (vs ${l1Name}: ${g.l1Comparison})`).join("\n")}
 
 PHONETIC DIFFICULTIES:
-${phoneticDifficulties.map((p) => `- ${p.sound} ${p.ipa}: ${p.description}`).join("\n")}
+${phoneticDifficulties.map((p) => `- ${typeof p.sound === "string" ? p.sound : p.sound["en"] ?? Object.values(p.sound)[0]} ${p.ipa}: ${typeof p.description === "string" ? p.description : p.description["en"] ?? Object.values(p.description)[0]}`).join("\n")}
 
 SAFE COGNATES (use for easier exercises):
 ${cognates.join(", ")}
