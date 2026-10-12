@@ -45,7 +45,7 @@ function getNodeX(globalIndex: number): number {
 const ARC_SIZE = NODE_SIZE + 30;
 const ARC_RADIUS = 40;
 const ARC_STROKE = 5;
-const ARC_GLOW_STROKE = 12;
+const ARC_GLOW_STROKE = 10;
 const ARC_GAP_DEG = 10;
 const NODE_3D_DEPTH = 7;
 const NODE_RADIUS = NODE_SIZE / 2;
@@ -260,7 +260,7 @@ function LessonPathNode({
           ) : (
             <View style={{ position: "relative", width: NODE_SIZE, height: NODE_SIZE + NODE_3D_DEPTH, alignItems: "center", justifyContent: "center", overflow: "visible" as const }}>
               {!locked && sessionsRequired > 0 && (
-                <View pointerEvents="none" style={{ position: "absolute", top: -(ARC_SIZE - NODE_SIZE) / 2, left: -(ARC_SIZE - NODE_SIZE) / 2, overflow: "visible" as const }}>
+                <View pointerEvents="none" style={{ position: "absolute", top: -(ARC_SIZE - NODE_SIZE) / 2 + NODE_3D_DEPTH / 2, left: -(ARC_SIZE - NODE_SIZE) / 2, overflow: "visible" as const }}>
                   <ProgressArcs
                     total={sessionsRequired}
                     completed={filledSessions}
