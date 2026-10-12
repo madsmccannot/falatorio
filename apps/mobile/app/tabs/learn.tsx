@@ -42,13 +42,13 @@ function getNodeX(globalIndex: number): number {
   return PATH_CENTER - NODE_SIZE / 2 + phase * PATH_AMPLITUDE;
 }
 
-const ARC_SIZE = NODE_SIZE + 48;
-const ARC_RADIUS = (NODE_SIZE + 30) / 2;
+const ARC_SIZE = NODE_SIZE + 30;
+const ARC_RADIUS = 40;
 const ARC_STROKE = 5;
-const ARC_GLOW_STROKE = 10;
-const ARC_GAP_DEG = 14;
+const ARC_GLOW_STROKE = 12;
+const ARC_GAP_DEG = 10;
 const NODE_3D_DEPTH = 7;
-const NODE_RADIUS = 30;
+const NODE_RADIUS = NODE_SIZE / 2;
 
 function darkenColor(hex: string, amount = 0.35): string {
   const c = hex.replace("#", "");
@@ -236,9 +236,9 @@ function LessonPathNode({
   const nodeIcon = isChest ? (
     <ChestIcon size={28} />
   ) : isCompleted ? (
-    <CheckIcon size={24} color={locked ? "#9CA3AF" : "#FFFFFF"} />
+    <CheckIcon size={26} color={locked ? "#9CA3AF" : "#FFFFFF"} />
   ) : (
-    <StarIcon size={24} color={locked ? "#9CA3AF" : "#FFFFFF"} />
+    <StarIcon size={26} color={locked ? "#9CA3AF" : "#FFFFFF"} />
   );
 
   return (
