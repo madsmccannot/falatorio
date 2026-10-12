@@ -40,7 +40,7 @@ falatorio/
 | Storage | MMKV (device), Cloudflare R2 (audio, media) |
 | Deploy | Docker, Railway (server), EAS Build (mobile APK/AAB) |
 | Analytics | PostHog (analytics, A/B testing, feature flags), custom batched event queue |
-| i18n | Custom hook-based system, 16 dictionaries (en, pt, es, fr, hi, ur, ar, bn, de, zh, ru, uk, tr, pl, ko, ja), ~420 keys |
+| i18n | Custom hook-based system, 16 dictionaries (en, pt, es, fr, hi, ur, ar, bn, de, zh, ru, uk, tr, pl, ko, ja), ~437 keys |
 
 ## Core Concepts
 
@@ -140,7 +140,7 @@ Four practice modes:
 
 ### Pronunciation Animations
 
-14 mouth positions (rest, nasal_ao, nasal_vowel, palatal_lateral, palatal_nasal, uvular_r, alveolar_tap, open_e, closed_e, open_o, closed_o, sibilant_s, sibilant_sh, labiodental_v). The `AnimatedMouthDiagram` component renders animated cross-section SVGs of the oral cavity using timer-based React state animation (setInterval at 33ms) with standard react-native-svg elements.
+14 mouth positions (rest, nasal_ao, nasal_vowel, palatal_lateral, palatal_nasal, uvular_r, alveolar_tap, open_e, closed_e, open_o, closed_o, sibilant_s, sibilant_sh, labiodental_v). `AnimatedMouthDiagram` renders anatomical sagittal cross-section SVGs with a recognizable head profile, bezier-interpolated tongue (5 control points: tip, blade, front, dorsum, back), hard/soft palate, velum with nasal airflow arrows, uvula, upper/lower teeth, and protruding lips. Timer-based animation (setInterval at 28ms) with easeInOut interpolation smoothly transitions between positions. `MouthDiagram` is the static equivalent for non-animated contexts. All anatomy and position labels are i18n-translated (17 keys across 16 languages).
 
 ### Scoring
 
@@ -148,7 +148,7 @@ Text scoring uses Levenshtein distance with PT-EU phonetic normalization. Speech
 
 ### Internationalization
 
-All UI strings translatable via `useTranslation()` hook. 16 dictionaries (15 L1 languages + Portuguese) with ~420 keys each at full parity. English is the source of truth; Portuguese has full coverage with proper diacritics (Acordo Ortografico). All hardcoded UI strings translated to PT-PT. Placement test and section test questions are fully translated in all 15 languages.
+All UI strings translatable via `useTranslation()` hook. 16 dictionaries (15 L1 languages + Portuguese) with ~437 keys each at full parity. English is the source of truth; Portuguese has full coverage with proper diacritics (Acordo Ortografico). All hardcoded UI strings translated to PT-PT. Placement test and section test questions are fully translated in all 15 languages.
 
 ## Package Breakdown
 
