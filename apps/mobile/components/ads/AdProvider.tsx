@@ -1,6 +1,13 @@
 import React, { createContext, useContext } from "react";
-import mobileAds, { MaxAdContentRating } from "react-native-google-mobile-ads";
 import { storage, KEYS } from "@/lib/storage";
+
+let mobileAds: any = null;
+let MaxAdContentRating: any = null;
+try {
+  const mod = require("react-native-google-mobile-ads");
+  mobileAds = mod.default;
+  MaxAdContentRating = mod.MaxAdContentRating;
+} catch {}
 
 type AdContextValue = {
   initialized: boolean;
@@ -21,6 +28,7 @@ export function AdProvider({ children }: { children: React.ReactNode }) {
   const gdprConsent = storage.getBoolean(KEYS.GDPR_CONSENT) ?? false;
 
   React.useEffect(() => {
+    if (!mobileAds) return;
     (async () => {
       try {
         await mobileAds().setRequestConfiguration({

@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useRef } from "react";
-import {
-  InterstitialAd as GInterstitialAd,
-  AdEventType,
-  TestIds,
-} from "react-native-google-mobile-ads";
 import { useAds } from "./AdProvider";
 import { useEntitlements } from "@/hooks/useEntitlements";
+
+let GInterstitialAd: any = null;
+let AdEventType: any = null;
+let TestIds: any = { INTERSTITIAL: "" };
+try {
+  const mod = require("react-native-google-mobile-ads");
+  GInterstitialAd = mod.InterstitialAd;
+  AdEventType = mod.AdEventType;
+  TestIds = mod.TestIds;
+} catch {}
 
 const AD_UNIT_ID = __DEV__
   ? TestIds.INTERSTITIAL
@@ -14,11 +19,11 @@ const AD_UNIT_ID = __DEV__
 export function useInterstitialAd() {
   const { initialized, gdprConsent } = useAds();
   const { isSuper } = useEntitlements();
-  const adRef = useRef<GInterstitialAd | null>(null);
+  const adRef = useRef<any>(null);
   const loadedRef = useRef(false);
 
   useEffect(() => {
-    if (isSuper || !initialized) return;
+    if (isSuper || !initialized || !GInterstitialAd) return;
 
     const ad = GInterstitialAd.createForAdRequest(AD_UNIT_ID, {
       requestNonPersonalizedAdsOnly: !gdprConsent,

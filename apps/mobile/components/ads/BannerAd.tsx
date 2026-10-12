@@ -1,8 +1,17 @@
 import { View, StyleSheet } from "react-native";
-import { BannerAd as GBannerAd, BannerAdSize, TestIds } from "react-native-google-mobile-ads";
 import { useAds } from "./AdProvider";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { spacing } from "@falatorio/ui/tokens";
+
+let GBannerAd: any = null;
+let BannerAdSize: any = null;
+let TestIds: any = { BANNER: "" };
+try {
+  const mod = require("react-native-google-mobile-ads");
+  GBannerAd = mod.BannerAd;
+  BannerAdSize = mod.BannerAdSize;
+  TestIds = mod.TestIds;
+} catch {}
 
 const AD_UNIT_ID = __DEV__ ? TestIds.BANNER : process.env["EXPO_PUBLIC_ADMOB_BANNER_ID"] ?? TestIds.BANNER;
 
@@ -10,7 +19,7 @@ export function BannerAdComponent() {
   const { initialized, gdprConsent } = useAds();
   const { isSuper } = useEntitlements();
 
-  if (isSuper || !initialized) return null;
+  if (isSuper || !initialized || !GBannerAd) return null;
 
   return (
     <View style={styles.container}>

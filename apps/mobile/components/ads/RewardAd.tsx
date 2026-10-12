@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  RewardedAd,
-  RewardedAdEventType,
-  TestIds,
-} from "react-native-google-mobile-ads";
 import { useAds } from "./AdProvider";
 import { useEntitlements } from "@/hooks/useEntitlements";
+
+let RewardedAd: any = null;
+let RewardedAdEventType: any = null;
+let TestIds: any = { REWARDED: "" };
+try {
+  const mod = require("react-native-google-mobile-ads");
+  RewardedAd = mod.RewardedAd;
+  RewardedAdEventType = mod.RewardedAdEventType;
+  TestIds = mod.TestIds;
+} catch {}
 
 const AD_UNIT_ID = __DEV__
   ? TestIds.REWARDED
@@ -14,11 +19,11 @@ const AD_UNIT_ID = __DEV__
 export function useRewardAd() {
   const { initialized, gdprConsent } = useAds();
   const { isSuper } = useEntitlements();
-  const adRef = useRef<RewardedAd | null>(null);
+  const adRef = useRef<any>(null);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    if (isSuper || !initialized) return;
+    if (isSuper || !initialized || !RewardedAd) return;
 
     const ad = RewardedAd.createForAdRequest(AD_UNIT_ID, {
       requestNonPersonalizedAdsOnly: !gdprConsent,
