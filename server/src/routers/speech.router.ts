@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import { exercises, exerciseKnowledge, skillEvidence } from "@falatorio/db/schema";
 import { scoreSpeechAnswer } from "@falatorio/core/scoring";
 import { EXERCISE_COGNITIVE_MAP } from "@falatorio/core";
@@ -10,6 +10,7 @@ import type { L1Code, ExerciseType } from "@falatorio/core";
 
 export const speechRouter = t.router({
   transcribe: protectedProcedure
+    .use(rateLimiter(20, 60_000, "speech:transcribe"))
     .input(
       z.object({
         audioBase64: z.string().min(1).max(5_000_000),

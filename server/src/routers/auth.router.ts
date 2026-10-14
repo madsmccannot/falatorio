@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { t } from "../trpc/router.js";
-import { protectedProcedure, clerkTokenProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, clerkTokenProcedure, rateLimiter } from "../trpc/middleware.js";
 import { users, transactions } from "@falatorio/db/schema";
 import { L1_CODES, USER_GOALS, OURO } from "@falatorio/core";
 
@@ -9,6 +9,7 @@ const USERNAME_RE = /^[a-z][a-z0-9_]{2,29}$/;
 
 export const authRouter = t.router({
   register: clerkTokenProcedure
+    .use(rateLimiter(5, 60_000, "auth:register"))
     .input(
       z.object({
         email: z.string().email().max(320),
@@ -156,7 +157,7 @@ export const authRouter = t.router({
     };
   }),
 
-  deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {
+  deleteAccount: protectedProcedure.use(rateLimiter(3, 3_600_000, "auth:delete")).mutation(async ({ ctx }) => {
     await ctx.db.delete(users).where(eq(users.id, ctx.user.userId));
     await ctx.redis.del(`user:${ctx.user.clerkId}`);
     return { deleted: true };

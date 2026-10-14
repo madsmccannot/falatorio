@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq, and, sql, gt, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import {
   users,
   exercises,
@@ -149,6 +149,7 @@ async function buildKnownWords(
 
 export const lessonRouter = t.router({
   startLesson: protectedProcedure
+    .use(rateLimiter(20, 60_000, "lesson:start"))
     .input(z.object({ lessonId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       const [user] = await ctx.db
@@ -391,6 +392,7 @@ export const lessonRouter = t.router({
     }),
 
   submitAnswer: protectedProcedure
+    .use(rateLimiter(60, 60_000, "lesson:answer"))
     .input(
       z.object({
         sessionId: z.string().uuid(),
@@ -560,6 +562,7 @@ export const lessonRouter = t.router({
     }),
 
   completeLesson: protectedProcedure
+    .use(rateLimiter(20, 60_000, "lesson:complete"))
     .input(z.object({ sessionId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       const sessionRaw = await ctx.redis.get(`session:${input.sessionId}`);
@@ -934,6 +937,7 @@ export const lessonRouter = t.router({
     }),
 
   explainExercise: protectedProcedure
+    .use(rateLimiter(10, 60_000, "lesson:explain"))
     .input(
       z.object({
         exerciseId: z.string().uuid(),
@@ -1111,6 +1115,7 @@ export const lessonRouter = t.router({
     }),
 
   openChest: protectedProcedure
+    .use(rateLimiter(10, 60_000, "lesson:chest"))
     .input(z.object({ lessonId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       const [node] = await ctx.db
@@ -1121,6 +1126,33 @@ export const lessonRouter = t.router({
 
       if (!node || node.nodeType !== "chest") {
         throw new TRPCError({ code: "BAD_REQUEST", message: "NOT_A_CHEST" });
+      }
+
+      const precedingLessons = await ctx.db
+        .select({ id: lessons.id })
+        .from(lessons)
+        .where(
+          and(
+            eq(lessons.unitId, node.unitId),
+            eq(lessons.nodeType, "lesson"),
+            sql`${lessons.sortOrder} < ${node.sortOrder}`,
+          ),
+        );
+
+      if (precedingLessons.length > 0) {
+        const completedRows = await ctx.db
+          .select({ lessonId: lessonCompletions.lessonId })
+          .from(lessonCompletions)
+          .where(
+            and(
+              eq(lessonCompletions.userId, ctx.user.userId),
+              inArray(lessonCompletions.lessonId, precedingLessons.map((l) => l.id)),
+            ),
+          );
+
+        if (completedRows.length < precedingLessons.length) {
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: "PRECEDING_LESSONS_INCOMPLETE" });
+        }
       }
 
       const openedKey = `chest:${ctx.user.userId}:${input.lessonId}`;

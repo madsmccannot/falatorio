@@ -7,6 +7,7 @@ import { env } from "./env.js";
 import { appRouter } from "./trpc/router.js";
 import { createContextFactory } from "./trpc/context.js";
 import { registerRevenueCatWebhook } from "./services/revenuecat-webhook.js";
+import { registerAdMobSSV } from "./services/admob-ssv.service.js";
 import { shutdownQueues, createWorker, QUEUE_NAMES } from "./jobs/queue.js";
 import { processHeartRefill, type HeartRefillData } from "./jobs/heart-refill.job.js";
 import { processSubscriptionCheck, type SubscriptionCheckData } from "./jobs/subscription-check.job.js";
@@ -44,6 +45,7 @@ async function main() {
   });
 
   registerRevenueCatWebhook(app, db);
+  registerAdMobSSV(app, db, redis);
 
   app.get("/", async () => ({
     name: "Falatorio API",

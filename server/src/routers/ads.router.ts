@@ -63,11 +63,12 @@ export const adsRouter = t.router({
     }),
 
   recordAdView: protectedProcedure
-    .use(rateLimiter(10, 60_000))
+    .use(rateLimiter(10, 60_000, "ads:view"))
     .input(
       z.object({
         adType: z.enum(["banner", "interstitial", "reward"]),
         rewardType: z.enum(["heart", "ouro"]).optional(),
+        transactionId: z.string().max(256).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -88,6 +89,15 @@ export const adsRouter = t.router({
           if (elapsed < ADS.REWARD_COOLDOWN_MS) {
             throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Reward cooldown active" });
           }
+        }
+
+        if (input.transactionId) {
+          const verifiedKey = `admob:verified:${ctx.user.userId}:${input.transactionId}`;
+          const verified = await ctx.redis.get(verifiedKey);
+          if (!verified) {
+            throw new TRPCError({ code: "FORBIDDEN", message: "Ad reward not verified by SSV" });
+          }
+          await ctx.redis.del(verifiedKey);
         }
       }
 

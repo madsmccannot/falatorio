@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
-import { protectedProcedure, spendLock } from "../trpc/middleware.js";
+import { protectedProcedure, spendLock, rateLimiter } from "../trpc/middleware.js";
 import { users, transactions } from "@falatorio/db/schema";
 import { HEARTS, OURO } from "@falatorio/core";
 import { getHearts } from "@falatorio/core/entitlements";
@@ -39,7 +39,7 @@ export const heartsRouter = t.router({
     };
   }),
 
-  refillWithOuro: protectedProcedure.use(spendLock).mutation(async ({ ctx }) => {
+  refillWithOuro: protectedProcedure.use(rateLimiter(10, 60_000, "hearts:refill")).use(spendLock).mutation(async ({ ctx }) => {
     const [user] = await ctx.db
       .select({ hearts: users.hearts, tier: users.tier })
       .from(users)

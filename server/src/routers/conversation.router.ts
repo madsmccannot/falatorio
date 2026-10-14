@@ -2,13 +2,14 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import { conversationSessions, skillEvidence, knowledgeItems } from "@falatorio/db/schema";
 import { EXPLAINS } from "@falatorio/core";
 import { chatWithTutor, explainGrammarError } from "../services/llm.service.js";
 
 export const conversationRouter = t.router({
   startSession: protectedProcedure
+    .use(rateLimiter(15, 60_000, "conversation:start"))
     .input(
       z.object({
         scenarioId: z.string().min(1).max(64),
@@ -29,6 +30,7 @@ export const conversationRouter = t.router({
     }),
 
   sendMessage: protectedProcedure
+    .use(rateLimiter(30, 60_000, "conversation:message"))
     .input(
       z.object({
         sessionId: z.string().uuid(),
@@ -138,6 +140,7 @@ export const conversationRouter = t.router({
     }),
 
   explainError: protectedProcedure
+    .use(rateLimiter(10, 60_000, "conversation:explain"))
     .input(
       z.object({
         errorText: z.string().min(1).max(500),

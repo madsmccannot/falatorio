@@ -35,11 +35,13 @@ export const requireSuper = t.middleware(async ({ ctx, next }) => {
   return next({ ctx: { ...ctx, user: ctx.user } });
 });
 
-export const rateLimiter = (maxRequests: number, windowMs: number) =>
+export const rateLimiter = (maxRequests: number, windowMs: number, scope?: string) =>
   t.middleware(async ({ ctx, next }) => {
     if (!ctx.user) return next();
 
-    const key = `ratelimit:${ctx.user.userId}`;
+    const key = scope
+      ? `ratelimit:${scope}:${ctx.user.userId}`
+      : `ratelimit:${ctx.user.userId}`;
     const current = await ctx.redis.incr(key);
     if (current === 1) {
       await ctx.redis.pexpire(key, windowMs);
