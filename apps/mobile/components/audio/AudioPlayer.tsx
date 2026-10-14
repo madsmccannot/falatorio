@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import * as Haptics from "expo-haptics";
