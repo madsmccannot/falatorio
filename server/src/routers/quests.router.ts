@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import type { L1Code } from "@falatorio/core";
 import {
   getOrCreateDailyQuests,
@@ -27,6 +27,7 @@ export const questsRouter = t.router({
   }),
 
   updateProgress: protectedProcedure
+    .use(rateLimiter(30, 60_000, "quests:progress"))
     .input(
       z.object({
         questType: z.enum([
@@ -62,7 +63,7 @@ export const questsRouter = t.router({
     return getMonthlyProgress(ctx.db, ctx.user.userId);
   }),
 
-  claimReward: protectedProcedure.mutation(async ({ ctx }) => {
+  claimReward: protectedProcedure.use(rateLimiter(10, 60_000, "quests:claim")).mutation(async ({ ctx }) => {
     return claimMonthlyReward(ctx.db, ctx.user.userId);
   }),
 });

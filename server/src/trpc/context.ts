@@ -18,6 +18,7 @@ export interface Context {
   redis: Redis;
   user: UserContext | null;
   clerkId: string | null;
+  clientIp: string;
 }
 
 const DEV_CLERK_ID = "dev_local_user";
@@ -110,6 +111,6 @@ export function createContextFactory(db: Database, redis: Redis) {
       clerkId = clerkId ?? DEV_CLERK_ID;
     }
 
-    return { db, redis, user, clerkId };
+    return { db, redis, user, clerkId, clientIp: req.ip };
   };
 }

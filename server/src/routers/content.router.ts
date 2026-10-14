@@ -2,7 +2,7 @@ import { z } from "zod";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import {
   courses,
   sections,
@@ -318,6 +318,7 @@ export const contentRouter = t.router({
     }),
 
   seedContent: protectedProcedure
+    .use(rateLimiter(5, 60_000, "content:seed"))
     .input(
       z.object({
         l1: z.enum(L1_CODES).optional(),
@@ -336,6 +337,7 @@ export const contentRouter = t.router({
     }),
 
   skipSection: protectedProcedure
+    .use(rateLimiter(10, 60_000, "content:skip"))
     .input(z.object({ sectionId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       const unitRows = await ctx.db

@@ -1,9 +1,10 @@
-import { gte, count } from "drizzle-orm";
+import { gte, count, eq, and, countDistinct, isNotNull } from "drizzle-orm";
 import type { Database } from "@falatorio/db/client";
 import {
   users,
   skillMastery,
   userProgress,
+  lessonCompletions,
 } from "@falatorio/db/schema";
 
 export interface CohortRetention {
@@ -203,6 +204,109 @@ export async function computeEngagementMetrics(
     avgExercisesPerSession: totalSessions > 0
       ? Math.round((totalExercises / totalSessions) * 10) / 10
       : 0,
+  };
+}
+
+export interface OnboardingFunnel {
+  period: string;
+  signups: number;
+  l1Selected: number;
+  l1Rate: number;
+  firstLessonStarted: number;
+  firstLessonRate: number;
+  firstLessonCompleted: number;
+  firstLessonCompletedRate: number;
+}
+
+export interface ConversionMetrics {
+  totalUsers: number;
+  freeUsers: number;
+  superUsers: number;
+  conversionRate: number;
+  superWithActiveSubscription: number;
+}
+
+export async function computeOnboardingFunnel(
+  db: Database,
+  daysBack: number = 30,
+): Promise<OnboardingFunnel> {
+  const since = new Date();
+  since.setDate(since.getDate() - daysBack);
+
+  const period = `${since.toISOString().slice(0, 10)} to ${new Date().toISOString().slice(0, 10)}`;
+
+  const [signupResult] = await db
+    .select({ count: count() })
+    .from(users)
+    .where(gte(users.createdAt, since));
+  const signups = Number(signupResult?.count ?? 0);
+
+  const [l1Result] = await db
+    .select({ count: count() })
+    .from(users)
+    .where(and(gte(users.createdAt, since), isNotNull(users.l1)));
+  const l1Selected = Number(l1Result?.count ?? 0);
+
+  const [startedResult] = await db
+    .select({
+      count: countDistinct(userProgress.userId),
+    })
+    .from(userProgress)
+    .innerJoin(users, eq(userProgress.userId, users.id))
+    .where(gte(users.createdAt, since));
+  const firstLessonStarted = Number(startedResult?.count ?? 0);
+
+  const [completedResult] = await db
+    .select({
+      count: countDistinct(lessonCompletions.userId),
+    })
+    .from(lessonCompletions)
+    .innerJoin(users, eq(lessonCompletions.userId, users.id))
+    .where(gte(users.createdAt, since));
+  const firstLessonCompleted = Number(completedResult?.count ?? 0);
+
+  return {
+    period,
+    signups,
+    l1Selected,
+    l1Rate: signups > 0 ? Math.round((l1Selected / signups) * 100) : 0,
+    firstLessonStarted,
+    firstLessonRate: signups > 0 ? Math.round((firstLessonStarted / signups) * 100) : 0,
+    firstLessonCompleted,
+    firstLessonCompletedRate: signups > 0 ? Math.round((firstLessonCompleted / signups) * 100) : 0,
+  };
+}
+
+export async function computeConversionMetrics(
+  db: Database,
+): Promise<ConversionMetrics> {
+  const [totalResult] = await db.select({ count: count() }).from(users);
+  const totalUsers = Number(totalResult?.count ?? 0);
+
+  const [superResult] = await db
+    .select({ count: count() })
+    .from(users)
+    .where(eq(users.tier, "super"));
+  const superUsers = Number(superResult?.count ?? 0);
+
+  const now = new Date();
+  const [activeSubResult] = await db
+    .select({ count: count() })
+    .from(users)
+    .where(
+      and(
+        eq(users.tier, "super"),
+        gte(users.tierExpiresAt, now),
+      ),
+    );
+  const superWithActiveSubscription = Number(activeSubResult?.count ?? 0);
+
+  return {
+    totalUsers,
+    freeUsers: totalUsers - superUsers,
+    superUsers,
+    conversionRate: totalUsers > 0 ? Math.round((superUsers / totalUsers) * 10000) / 100 : 0,
+    superWithActiveSubscription,
   };
 }
 

@@ -55,6 +55,23 @@ export const rateLimiter = (maxRequests: number, windowMs: number, scope?: strin
     return next();
   });
 
+export const ipRateLimiter = (maxRequests: number, windowMs: number, scope: string) =>
+  t.middleware(async ({ ctx, next }) => {
+    const ip = ctx.clientIp ?? "unknown";
+    const key = `ratelimit:ip:${scope}:${ip}`;
+    const current = await ctx.redis.incr(key);
+    if (current === 1) {
+      await ctx.redis.pexpire(key, windowMs);
+    }
+    if (current > maxRequests) {
+      throw new TRPCError({
+        code: "TOO_MANY_REQUESTS",
+        message: "Rate limit exceeded",
+      });
+    }
+    return next();
+  });
+
 export const spendLock = t.middleware(async ({ ctx, next }) => {
   if (!ctx.user) return next();
   const key = `lock:spend:${ctx.user.userId}`;

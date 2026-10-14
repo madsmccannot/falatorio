@@ -25,6 +25,7 @@ export interface UserStats {
   productionExercisesCompleted: number;
   domainsCovered: number;
   masteredDomains: readonly SkillDomain[];
+  masteredSkillCodes: readonly string[];
   averageMastery: number;
   evidenceCount: number;
   distinctExerciseTypes: number;
@@ -38,6 +39,15 @@ const CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 function cefrAtLeast(current: string, target: string): boolean {
   return CEFR_ORDER.indexOf(current as typeof CEFR_ORDER[number]) >=
     CEFR_ORDER.indexOf(target as typeof CEFR_ORDER[number]);
+}
+
+function hasMasteredAllMatching(codes: readonly string[], prefix: string): boolean {
+  const matching = codes.filter((c) => c.startsWith(prefix));
+  return matching.length >= 2;
+}
+
+function hasMasteredCodes(codes: readonly string[], required: readonly string[]): boolean {
+  return required.every((r) => codes.includes(r));
 }
 
 export const ACHIEVEMENTS: readonly AchievementDef[] = [
@@ -400,6 +410,120 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     icon: "stars",
     category: "competence",
     condition: (s) => s.perfectLessons >= 5,
+  },
+
+  // ─── Missing domain mastery ───
+  {
+    id: "domain_determiners",
+    name: "Article Expert",
+    description: "Master all determiner skills at your CEFR level",
+    icon: "tag",
+    category: "competence",
+    condition: (s) => s.masteredDomains.includes("determiners"),
+  },
+  {
+    id: "domain_pronouns",
+    name: "Pronoun Navigator",
+    description: "Master all pronoun skills at your CEFR level",
+    icon: "arrows",
+    category: "competence",
+    condition: (s) => s.masteredDomains.includes("pronouns"),
+  },
+  {
+    id: "domain_prepositions",
+    name: "Mestre das Preposições",
+    description: "Master all preposition skills at your CEFR level",
+    icon: "link",
+    category: "competence",
+    condition: (s) => s.masteredDomains.includes("prepositions"),
+  },
+  {
+    id: "domain_orthography",
+    name: "Spelling Master",
+    description: "Master all orthography skills at your CEFR level",
+    icon: "pen",
+    category: "competence",
+    condition: (s) => s.masteredDomains.includes("orthography"),
+  },
+
+  // ─── Sub-domain (granular skill-group) mastery ───
+  {
+    id: "sub_subjunctive",
+    name: "Senhor do Conjuntivo",
+    description: "Master all subjunctive mood skills",
+    icon: "crystal",
+    category: "competence",
+    condition: (s) => hasMasteredAllMatching(s.masteredSkillCodes, "PT.TENSES.SUBJUNCTIVE"),
+  },
+  {
+    id: "sub_past_tenses",
+    name: "Tempos do Passado",
+    description: "Master the preterite, imperfect, and pluperfect",
+    icon: "hourglass",
+    category: "competence",
+    condition: (s) =>
+      hasMasteredCodes(s.masteredSkillCodes, [
+        "PT.TENSES.PRETERITE_PERFECT",
+        "PT.TENSES.IMPERFECT",
+        "PT.TENSES.PLUPERFECT",
+      ]),
+  },
+  {
+    id: "sub_ser_estar",
+    name: "Ser ou Estar?",
+    description: "Master the ser/estar distinction",
+    icon: "scale",
+    category: "competence",
+    condition: (s) => s.masteredSkillCodes.includes("PT.TENSES.SER_ESTAR"),
+  },
+  {
+    id: "sub_clitics",
+    name: "Dominas os Clíticos",
+    description: "Master clitic placement and combined clitics",
+    icon: "chain",
+    category: "competence",
+    condition: (s) =>
+      hasMasteredCodes(s.masteredSkillCodes, [
+        "PT.PRON.PERSONAL.CLITIC_PLACEMENT",
+      ]) &&
+      hasMasteredAllMatching(s.masteredSkillCodes, "PT.PRON.PERSONAL."),
+  },
+  {
+    id: "sub_articles_contractions",
+    name: "Artigo Certo",
+    description: "Master articles and contractions",
+    icon: "bookmark",
+    category: "competence",
+    condition: (s) =>
+      hasMasteredCodes(s.masteredSkillCodes, [
+        "PT.DET.ARTICLES.DEFINITE",
+        "PT.DET.ARTICLES.INDEFINITE",
+        "PT.DET.ARTICLES.CONTRACTIONS",
+      ]),
+  },
+  {
+    id: "sub_por_para",
+    name: "Por ou Para?",
+    description: "Master the por/para distinction",
+    icon: "crossroads",
+    category: "competence",
+    condition: (s) => s.masteredSkillCodes.includes("PT.PREP.POR_PARA"),
+  },
+  {
+    id: "sub_vowel_system",
+    name: "Sistema Vocálico",
+    description: "Master the Portuguese vowel system",
+    icon: "sound",
+    category: "competence",
+    condition: (s) => hasMasteredAllMatching(s.masteredSkillCodes, "PT.PHON.VOWELS."),
+  },
+  {
+    id: "sub_word_formation",
+    name: "Construtor de Palavras",
+    description: "Master derivation and composition",
+    icon: "bricks",
+    category: "competence",
+    condition: (s) => hasMasteredAllMatching(s.masteredSkillCodes, "PT.MORPH.DERIVATION."),
   },
 ];
 

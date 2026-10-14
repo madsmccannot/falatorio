@@ -86,6 +86,7 @@ async function gatherUserStats(
       totalEvidence: skillMastery.totalEvidence,
       varietyScore: skillMastery.varietyScore,
       domain: skills.domain,
+      code: skills.code,
     })
       .from(skillMastery)
       .innerJoin(skills, eq(skillMastery.skillId, skills.id))
@@ -156,12 +157,14 @@ async function gatherUserStats(
       .limit(20),
   ]);
 
-  const skillsMastered = masteryRows.filter(
+  const masteredRows = masteryRows.filter(
     (r) =>
       r.mastery >= MASTERY_THRESHOLD &&
       r.varietyScore >= VARIETY_THRESHOLD &&
       r.totalEvidence >= MIN_EVIDENCE,
-  ).length;
+  );
+  const skillsMastered = masteredRows.length;
+  const masteredSkillCodes = masteredRows.map((r) => r.code);
 
   const domainSet = new Set(masteryRows.filter((r) => r.totalEvidence > 0).map((r) => r.domain));
 
@@ -223,6 +226,7 @@ async function gatherUserStats(
     productionExercisesCompleted: Number(productionStats?.cnt ?? 0),
     domainsCovered: domainSet.size,
     masteredDomains,
+    masteredSkillCodes,
     averageMastery,
     evidenceCount: Number(evidenceStats?.totalEvidence ?? 0),
     distinctExerciseTypes: exerciseTypeStats.length,

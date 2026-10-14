@@ -91,6 +91,11 @@ jobs:
       - name: Run tests
         run: pnpm test
 
+      - name: Check coverage thresholds
+        run: |
+          pnpm --filter=@falatorio/server exec vitest run --coverage 2>&1 || exit 1
+          pnpm --filter=@falatorio/core exec vitest run --coverage 2>&1 || exit 1
+
   build:
     name: Build
     runs-on: ubuntu-latest

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq, and, sql, count } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import {
   users,
   leagueEntries,
@@ -117,6 +117,7 @@ export const userRouter = t.router({
     }),
 
   follow: protectedProcedure
+    .use(rateLimiter(20, 60_000, "user:follow"))
     .input(z.object({ userId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       if (input.userId === ctx.user.userId) {
@@ -143,6 +144,7 @@ export const userRouter = t.router({
     }),
 
   unfollow: protectedProcedure
+    .use(rateLimiter(20, 60_000, "user:unfollow"))
     .input(z.object({ userId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
@@ -235,7 +237,8 @@ export const userRouter = t.router({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const searchTerm = `%${input.query.toLowerCase()}%`;
+      const escaped = input.query.toLowerCase().replace(/[%_\\]/g, "\\$&");
+      const searchTerm = `%${escaped}%`;
       const rows = await ctx.db
         .select({
           id: users.id,
@@ -268,6 +271,7 @@ export const userRouter = t.router({
     }),
 
   updateSettings: protectedProcedure
+    .use(rateLimiter(10, 60_000, "user:settings"))
     .input(
       z.object({
         name: z.string().min(1).max(255).optional(),
@@ -296,6 +300,7 @@ export const userRouter = t.router({
     }),
 
   updateCEFR: protectedProcedure
+    .use(rateLimiter(10, 60_000, "user:cefr"))
     .input(z.object({ level: z.enum(CEFR_LEVELS) }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db

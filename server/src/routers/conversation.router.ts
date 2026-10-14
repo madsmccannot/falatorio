@@ -115,6 +115,7 @@ export const conversationRouter = t.router({
     }),
 
   completeSession: protectedProcedure
+    .use(rateLimiter(15, 60_000, "conversation:complete"))
     .input(z.object({ sessionId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       const [session] = await ctx.db

@@ -88,7 +88,7 @@ export async function generateLesson(params: {
   });
 
   const response = await getClient().messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-haiku-5-5-20260301",
     max_tokens: 8192,
     messages: [{ role: "user", content: prompt }],
   });
@@ -167,7 +167,7 @@ Output ONLY a JSON object (not array). Fields:
 Use European Portuguese EXCLUSIVELY: tu/vos conjugations, autocarro, telemovel, pequeno-almoco.`;
 
   const response = await getClient().messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-haiku-5-5-20260301",
     max_tokens: 1024,
     messages: [{ role: "user", content: prompt }],
   });
@@ -324,7 +324,7 @@ genderPairs: object mapping Portuguese adjectives/nouns that have masculine/femi
 European Portuguese EXCLUSIVELY.`;
 
   const response = await getClient().messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-haiku-5-5-20260301",
     max_tokens: 1024,
     messages: [{ role: "user", content: prompt }],
   });

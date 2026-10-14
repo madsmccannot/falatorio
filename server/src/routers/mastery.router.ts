@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { eq, and, sql, desc, count, inArray } from "drizzle-orm";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import { recalculateMasteryForKnowledgeItems } from "../services/mastery-recalculator.service.js";
 import {
   skills,
@@ -553,6 +553,7 @@ export const masteryRouter = t.router({
     }),
 
   linkLessonSkill: protectedProcedure
+    .use(rateLimiter(20, 60_000, "mastery:link"))
     .input(
       z.object({
         lessonId: z.string().uuid(),
@@ -577,6 +578,7 @@ export const masteryRouter = t.router({
     }),
 
   unlinkLessonSkill: protectedProcedure
+    .use(rateLimiter(20, 60_000, "mastery:unlink"))
     .input(
       z.object({
         lessonId: z.string().uuid(),
@@ -597,6 +599,7 @@ export const masteryRouter = t.router({
     }),
 
   recordEvidence: protectedProcedure
+    .use(rateLimiter(60, 60_000, "mastery:evidence"))
     .input(
       z.object({
         knowledgeItemId: z.string().uuid(),
@@ -655,6 +658,7 @@ export const masteryRouter = t.router({
   }),
 
   recordVocabLookup: protectedProcedure
+    .use(rateLimiter(30, 60_000, "mastery:vocab"))
     .input(
       z.object({
         knowledgeItemCode: z.string().min(1).max(128),

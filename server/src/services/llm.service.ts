@@ -62,7 +62,7 @@ export async function chatWithTutor(
   }));
 
   const response = await getClient().messages.create({
-    model: "claude-sonnet-4-5-20250929",
+    model: "claude-sonnet-5-5-20260301",
     max_tokens: 1024,
     system: systemPrompt,
     messages: anthropicMessages,
@@ -83,7 +83,7 @@ export async function explainGrammarError(
   context?: string,
 ): Promise<string> {
   const response = await getClient().messages.create({
-    model: "claude-sonnet-4-5-20250929",
+    model: "claude-sonnet-5-5-20260301",
     max_tokens: 512,
     system: `You are a Portuguese (PT-EU) grammar tutor. The student's native language is ${l1}. Explain grammar errors concisely. Use the student's L1 for explanations when it helps understanding. Focus on European Portuguese, never Brazilian Portuguese.`,
     messages: [
@@ -111,7 +111,7 @@ export async function explainExerciseError(
 ): Promise<string> {
   const depth = errorCount >= 3 ? "detailed" : "brief";
   const response = await getClient().messages.create({
-    model: "claude-sonnet-4-5-20250929",
+    model: "claude-sonnet-5-5-20260301",
     max_tokens: depth === "detailed" ? 600 : 300,
     system: `You are a Portuguese (PT-EU) tutor. The student's L1 is ${l1}. Explain exercise errors in a way native ${l1} speakers understand. Use European Portuguese ONLY. Be ${depth}. If the student has made this error ${errorCount} times, explain from a different angle or use an L1 comparison.`,
     messages: [

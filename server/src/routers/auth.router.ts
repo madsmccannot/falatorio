@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { t } from "../trpc/router.js";
-import { protectedProcedure, clerkTokenProcedure, rateLimiter } from "../trpc/middleware.js";
+import { protectedProcedure, clerkTokenProcedure, rateLimiter, ipRateLimiter } from "../trpc/middleware.js";
 import { users, transactions } from "@falatorio/db/schema";
 import { L1_CODES, USER_GOALS, OURO } from "@falatorio/core";
 
@@ -107,12 +107,13 @@ export const authRouter = t.router({
       return { userId: user!.id, created: true };
     }),
 
-  checkAccount: t.procedure.query(async ({ ctx }) => {
+  checkAccount: t.procedure.use(ipRateLimiter(30, 60_000, "auth:check")).query(async ({ ctx }) => {
     if (!ctx.user) return { exists: false as const };
     return { exists: true as const, l1: ctx.user.l1, tier: ctx.user.tier };
   }),
 
   checkUsername: t.procedure
+    .use(ipRateLimiter(20, 60_000, "auth:username"))
     .input(z.object({ username: z.string().min(3).max(30) }))
     .query(async ({ ctx, input }) => {
       if (!USERNAME_RE.test(input.username)) {

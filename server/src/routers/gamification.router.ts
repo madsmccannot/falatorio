@@ -1,7 +1,7 @@
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import {
   users,
   streaks,
@@ -50,7 +50,7 @@ export const gamificationRouter = t.router({
     };
   }),
 
-  recordDailyActivity: protectedProcedure.mutation(async ({ ctx }) => {
+  recordDailyActivity: protectedProcedure.use(rateLimiter(20, 60_000, "gamification:activity")).mutation(async ({ ctx }) => {
     const now = new Date();
     const timezone = "Europe/Lisbon";
     const today = now.toLocaleDateString("en-CA", { timeZone: timezone });
@@ -112,7 +112,7 @@ export const gamificationRouter = t.router({
     return { currentDays: updated.currentDays, isNew: false };
   }),
 
-  purchaseStreakFreeze: protectedProcedure.mutation(async ({ ctx }) => {
+  purchaseStreakFreeze: protectedProcedure.use(rateLimiter(5, 60_000, "gamification:freeze")).mutation(async ({ ctx }) => {
     const rows = await ctx.db
       .select({ type: transactions.type, amount: transactions.amount })
       .from(transactions)
@@ -265,7 +265,7 @@ export const gamificationRouter = t.router({
     };
   }),
 
-  checkAchievements: protectedProcedure.mutation(async ({ ctx }) => {
+  checkAchievements: protectedProcedure.use(rateLimiter(10, 60_000, "gamification:achievements")).mutation(async ({ ctx }) => {
     const result = await checkAndUnlockAchievements(ctx.db, ctx.user.userId);
     return {
       newlyUnlocked: result.newlyUnlocked,

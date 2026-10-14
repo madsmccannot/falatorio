@@ -5,6 +5,8 @@ import {
   computeCohortRetention,
   computeMasteryMetrics,
   computeEngagementMetrics,
+  computeOnboardingFunnel,
+  computeConversionMetrics,
   getRetentionSummary,
 } from "../services/retention-metrics.service.js";
 
@@ -27,5 +29,15 @@ export const analyticsRouter = t.router({
 
   engagement: protectedProcedure.query(async ({ ctx }) => {
     return computeEngagementMetrics(ctx.db);
+  }),
+
+  onboardingFunnel: protectedProcedure
+    .input(z.object({ daysBack: z.number().min(7).max(90).default(30) }).optional())
+    .query(async ({ ctx, input }) => {
+      return computeOnboardingFunnel(ctx.db, input?.daysBack ?? 30);
+    }),
+
+  conversion: protectedProcedure.query(async ({ ctx }) => {
+    return computeConversionMetrics(ctx.db);
   }),
 });
