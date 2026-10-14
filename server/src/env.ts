@@ -39,7 +39,6 @@ const envSchema = z.object({
   CLERK_SECRET_KEY: z.string().default(""),
 
   ANTHROPIC_API_KEY: z.string().default(""),
-  OPENAI_API_KEY: z.string().default(""),
 
   AZURE_SPEECH_KEY: z.string().default(""),
   AZURE_SPEECH_REGION: z.string().default("westeurope"),

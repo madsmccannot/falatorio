@@ -36,7 +36,8 @@ falatorio/
 | CMS | Payload CMS v3, PostgreSQL adapter, R2 storage |
 | Ads | react-native-google-mobile-ads (rewarded, interstitial, banner) |
 | Payments | RevenueCat (subscriptions) |
-| AI | Claude (conversation tutor, dynamic content generation), OpenAI Whisper (speech), Azure TTS |
+| AI | Claude Sonnet 5.5 (conversation tutor), Claude Haiku 5.5 (dynamic content generation), Azure TTS |
+| Speech | On-device speech recognition (expo-speech-recognition), on-device TTS (expo-speech), local scoring (Levenshtein + PT-EU phonetic rules) |
 | Storage | MMKV (device), Cloudflare R2 (audio, media) |
 | Deploy | Docker, Railway (server), EAS Build (mobile APK/AAB) |
 | Analytics | PostHog (analytics, A/B testing, feature flags), custom batched event queue |
@@ -95,7 +96,7 @@ A parallel review layer that picks the optimal exercise mix based on user state.
 
 ### Dynamic Content Generation
 
-Exercises are not statically authored. L1 profiles provide seed knowledge, and AI generates personalized exercises dynamically based on L1, CEFR level, and demonstrated weaknesses. Generated exercises are stored in the database so they are not regenerated.
+Exercises are not statically authored. L1 profiles provide seed knowledge, and AI generates personalized exercises dynamically based on L1, CEFR level, and demonstrated weaknesses. Generated exercises are stored in the database so they are not regenerated. AI-generated exercises enter the database with `status: "review"` and must be approved (individually or in bulk) via the pipeline router before becoming `"live"` and visible to learners. Rejected exercises are deleted.
 
 ### FSRS (Free Spaced Repetition Scheduler)
 
@@ -144,7 +145,7 @@ Four practice modes:
 
 ### Scoring
 
-Text scoring uses Levenshtein distance with PT-EU phonetic normalization. Speech scoring uses Whisper transcription + text scoring pipeline.
+Text scoring uses Levenshtein distance with PT-EU phonetic normalization. Speech recognition runs entirely on-device via `expo-speech-recognition` (no server calls, no API costs). Scoring is local: the transcribed text is compared against accepted answers using the same Levenshtein + phonetic pipeline.
 
 ### Internationalization
 
@@ -162,7 +163,7 @@ Pure business logic, zero I/O dependencies:
 - **Mastery** -- evidence recorder, mastery calculator, CEFR estimator with confidence, QA validator, prerequisite checker, coverage metrics, exercise generation spec
 - **Economy** -- currency ops, earn/spend rules, shop catalog, IAP tiers
 - **Entitlements** -- feature gates, heart system, access checks
-- **Gamification** -- XP calculator, streak logic, league promotion, 42 achievements (19 competence badges tied to mastery evidence)
+- **Gamification** -- XP calculator, streak logic, league promotion, 54 achievements (31 competence badges tied to mastery evidence, including 10 domain-level and 8 sub-domain badges like Senhor do Conjuntivo, Tempos do Passado, Ser ou Estar?)
 - **Ads** -- ad policy (GDPR, tier, cooldowns)
 - **L1 Profiles** -- 15 language transfer profiles with 30 cognates, 40 false friends, 15 phonetic difficulties (with mouthPosition for animated diagrams), 15 grammar gaps each
 
@@ -172,9 +173,9 @@ Users, courses, sections, units, lessons, exercises, audio clips, user progress,
 
 ### `server` -- 17 routers, 16 services, 7 jobs
 
-**Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads (ad decisions + reward recording), pipeline, mastery, quality, analytics, quests.
+**Routers:** auth, user, lesson, progress, speech, conversation, gamification, content, economy, shop, hearts, ads (ad decisions + reward recording), pipeline (exercise review queue, approve/reject/edit, bulk approve), mastery, quality, analytics (retention, mastery, engagement, onboarding funnel, conversion), quests. All mutation endpoints are rate-limited (scoped per-user via Redis). Public auth endpoints use IP-based rate limiting to prevent enumeration.
 
-**Services:** whisper (transcription), tts (Azure), llm (conversation tutor), content-generator (dynamic exercise generation with L1 profiles), seed-content (course structure seeding per L1), batch-exercise-pipeline (coverage gap detection, bulk generation), mastery-recalculator, achievement-checker, retention-metrics (D1/D7/D30 cohort retention, DAU/WAU/MAU), daily-refresh (adaptive review sessions), daily-quests, push (FCM), storage (R2), iap-validator (Apple + Google), leaderboard, revenuecat-webhook.
+**Services:** tts (Azure), llm (conversation tutor), content-generator (dynamic exercise generation with L1 profiles, prompt injection sanitization), seed-content (course structure seeding per L1), batch-exercise-pipeline (coverage gap detection, bulk generation), mastery-recalculator, achievement-checker (gathers masteredSkillCodes for granular sub-domain badges), retention-metrics (D1/D7/D30 cohort retention, DAU/WAU/MAU, onboarding funnel, trial-to-Super conversion), daily-refresh (adaptive review sessions), daily-quests, push (FCM), storage (R2), iap-validator (Apple + Google), leaderboard, revenuecat-webhook, admob-ssv (AdMob server-side verification), economy (atomic ouro operations with Redis spend lock).
 
 **Jobs (BullMQ):** generate-exercises, league-reset, streak-reminder, quality-flag, heart-refill, subscription-check, content-sync.
 
@@ -240,7 +241,6 @@ EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=
 
 # AI
 ANTHROPIC_API_KEY=      # Claude conversation tutor + content generation
-OPENAI_API_KEY=         # Whisper transcription
 
 # Speech
 AZURE_SPEECH_KEY=       # Azure Neural TTS
@@ -299,6 +299,22 @@ docker run -p 3001:3001 --env-file .env.local falatorio-server
 ```
 
 Railway config (`railway.json`) uses the Dockerfile builder with a `/health` healthcheck endpoint.
+
+## Security
+
+- **Rate limiting** -- all mutation endpoints are rate-limited per user via Redis with scoped keys (`ratelimit:user:{scope}:{userId}`). Public auth endpoints use IP-based rate limiting (`ratelimit:ip:{scope}:{ip}`) to prevent username enumeration.
+- **Prompt injection** -- user-supplied text is sanitized before inclusion in LLM prompts (content-generator service).
+- **LIKE injection** -- search queries escape `%`, `_`, and `\` before use in SQL LIKE clauses.
+- **AdMob SSV** -- rewarded ad callbacks are verified via Google's public key before crediting ouro.
+- **Atomic economy** -- ouro spend operations use a Redis lock (`spendLock`) to prevent double-spend race conditions.
+- **Chest validation** -- chest rewards require preceding lessons to be completed.
+- **Exercise review gate** -- AI-generated exercises must be approved before reaching learners (`status: "review"` -> `"live"`).
+
+## Testing & CI
+
+- **274 tests** -- 132 core (pure logic) + 142 server (routers, services, integration).
+- **Coverage gates** -- CI enforces minimum thresholds via vitest v8 provider: server (40% statements, 30% branches, 35% functions, 40% lines), core (50/40/45/50%).
+- **Type-checking** -- `tsc --noEmit` runs for both `packages/core` and `server` in CI.
 
 ## Visual Identity
 
