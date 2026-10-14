@@ -137,7 +137,7 @@ jobs:
         run: pnpm turbo lint --filter=@falatorio/mobile
 
       - name: Export bundle check
-        run: pnpm --filter=@falatorio/mobile exec expo export --platform web --output-dir /tmp/expo-export --no-minify 2>&1 || true
+        run: pnpm --filter=@falatorio/mobile exec expo export --platform web --output-dir /tmp/expo-export --no-minify
 
   db-check:
     name: DB Migration Check
