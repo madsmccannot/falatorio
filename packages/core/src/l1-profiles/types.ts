@@ -40,8 +40,8 @@ export interface PhoneticDifficulty {
 
 export interface GrammarGap {
   concept: string;
-  explanation: string;
-  l1Comparison: string;
+  explanation: string | Record<string, string>;
+  l1Comparison: string | Record<string, string>;
 }
 
 export interface CulturalRef {
