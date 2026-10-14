@@ -4,13 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
 import { protectedProcedure, spendLock } from "../trpc/middleware.js";
 import { transactions } from "@falatorio/db/schema";
-import {
-  computeBalance,
-  getSkillMasteredReward,
-  getFirstProductionReward,
-  getDomainMilestoneReward,
-  type Transaction,
-} from "@falatorio/core/economy";
+import { computeBalance, type Transaction } from "@falatorio/core/economy";
 
 export const economyRouter = t.router({
   getBalance: protectedProcedure.query(async ({ ctx }) => {
@@ -51,29 +45,6 @@ export const economyRouter = t.router({
         itemId: r.itemId,
         createdAt: r.createdAt,
       }));
-    }),
-
-  earnOuro: protectedProcedure
-    .input(
-      z.object({
-        amount: z.number().int().positive().max(1000),
-        reason: z.string().min(1).max(255),
-        itemId: z.string().max(128).optional(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const [tx] = await ctx.db
-        .insert(transactions)
-        .values({
-          userId: ctx.user.userId,
-          type: "earn",
-          amount: input.amount,
-          reason: input.reason,
-          itemId: input.itemId ?? null,
-        })
-        .returning({ id: transactions.id });
-
-      return { transactionId: tx!.id };
     }),
 
   spendOuro: protectedProcedure
@@ -118,40 +89,4 @@ export const economyRouter = t.router({
       return { transactionId: tx!.id, newBalance: balance - input.amount };
     }),
 
-  awardMasteryReward: protectedProcedure
-    .input(
-      z.object({
-        reason: z.enum(["skill_mastered", "first_production", "domain_milestone"]),
-        domainsCovered: z.number().int().min(0).optional(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      let reward;
-      switch (input.reason) {
-        case "skill_mastered":
-          reward = getSkillMasteredReward();
-          break;
-        case "first_production":
-          reward = getFirstProductionReward();
-          break;
-        case "domain_milestone":
-          reward = getDomainMilestoneReward(input.domainsCovered ?? 0);
-          if (!reward) {
-            return { awarded: false, amount: 0 };
-          }
-          break;
-      }
-
-      const [tx] = await ctx.db
-        .insert(transactions)
-        .values({
-          userId: ctx.user.userId,
-          type: "earn",
-          amount: reward.amount,
-          reason: reward.reason,
-        })
-        .returning({ id: transactions.id });
-
-      return { awarded: true, amount: reward.amount, transactionId: tx!.id };
-    }),
 });

@@ -9,6 +9,15 @@ import {
 import type { ExerciseGenerationRequest } from "@falatorio/core";
 import { getProfile, getCulturalRefs } from "@falatorio/core/l1-profiles";
 
+function sanitizePromptInput(s: string): string {
+  return s
+    .replace(/[<>{}]/g, "")
+    .replace(/\n/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .slice(0, 200)
+    .trim();
+}
+
 let _client: Anthropic | null = null;
 function getClient(): Anthropic {
   if (!_client) {
@@ -45,11 +54,15 @@ export async function generateLesson(params: {
   const {
     l1,
     cefrLevel,
-    grammarFocus = [],
-    vocabTopics = [],
-    weaknesses = [],
+    grammarFocus: rawGrammar = [],
+    vocabTopics: rawVocab = [],
+    weaknesses: rawWeaknesses = [],
     exerciseCount = 15,
   } = params;
+
+  const grammarFocus = rawGrammar.map(sanitizePromptInput).filter(Boolean);
+  const vocabTopics = rawVocab.map(sanitizePromptInput).filter(Boolean);
+  const weaknesses = rawWeaknesses.map(sanitizePromptInput).filter(Boolean);
 
   const profile = getProfile(l1);
   const culturalRefs = getCulturalRefs(l1);
@@ -108,7 +121,9 @@ export async function generateSingleExercise(params: {
   topic: string;
   weakness?: string;
 }): Promise<GeneratedExercise> {
-  const { l1, cefrLevel, type, topic, weakness } = params;
+  const { l1, cefrLevel, type, weakness: rawWeakness } = params;
+  const topic = sanitizePromptInput(params.topic);
+  const weakness = rawWeakness ? sanitizePromptInput(rawWeakness) : undefined;
   const profile = getProfile(l1);
   const transfer = profile.transfer;
 
@@ -172,7 +187,7 @@ function buildLessonPrompt(params: {
   weaknesses: string[];
   exerciseCount: number;
   falseFriends: Array<{ word: string; l1Meaning: string; ptMeaning: string }>;
-  grammarGaps: Array<{ concept: string; explanation: string; l1Comparison: string }>;
+  grammarGaps: Array<{ concept: string; explanation: string | Record<string, string>; l1Comparison: string | Record<string, string> }>;
   phoneticDifficulties: Array<{ sound: string | Record<string, string>; ipa: string; description: string | Record<string, string> }>;
   cognates: readonly string[];
   culturalRefs: Array<{ contentPt: string; contentL1: string; explanation: string }>;
@@ -191,7 +206,7 @@ FALSE FRIENDS (use these to create educational traps):
 ${falseFriends.map((ff) => `- "${ff.word}": means "${ff.l1Meaning}" in ${l1Name}, but in PT "${ff.ptMeaning}"`).join("\n")}
 
 GRAMMAR GAPS (focus exercises on these):
-${grammarGaps.map((g) => `- ${g.concept}: ${g.explanation} (vs ${l1Name}: ${g.l1Comparison})`).join("\n")}
+${grammarGaps.map((g) => `- ${g.concept}: ${typeof g.explanation === "string" ? g.explanation : g.explanation["en"] ?? Object.values(g.explanation)[0]} (vs ${l1Name}: ${typeof g.l1Comparison === "string" ? g.l1Comparison : g.l1Comparison["en"] ?? Object.values(g.l1Comparison)[0]})`).join("\n")}
 
 PHONETIC DIFFICULTIES:
 ${phoneticDifficulties.map((p) => `- ${typeof p.sound === "string" ? p.sound : p.sound["en"] ?? Object.values(p.sound)[0]} ${p.ipa}: ${typeof p.description === "string" ? p.description : p.description["en"] ?? Object.values(p.description)[0]}`).join("\n")}
