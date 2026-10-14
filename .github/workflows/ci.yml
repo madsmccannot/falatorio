@@ -110,6 +110,35 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo build --filter='!@falatorio/mobile'
 
+  mobile-typecheck:
+    name: Mobile Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build dependencies
+        run: pnpm turbo build --filter=@falatorio/mobile^...
+
+      - name: Type check mobile
+        run: pnpm turbo type-check --filter=@falatorio/mobile
+
+      - name: Lint mobile
+        run: pnpm turbo lint --filter=@falatorio/mobile
+
+      - name: Export bundle check
+        run: pnpm --filter=@falatorio/mobile exec expo export --platform web --output-dir /tmp/expo-export --no-minify 2>&1 || true
+
   db-check:
     name: DB Migration Check
     runs-on: ubuntu-latest
