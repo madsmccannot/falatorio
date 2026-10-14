@@ -17,6 +17,7 @@ export interface Context {
   db: Database;
   redis: Redis;
   user: UserContext | null;
+  clerkId: string | null;
 }
 
 const DEV_CLERK_ID = "dev_local_user";
@@ -66,6 +67,7 @@ async function getOrCreateDevUser(db: Database, redis: Redis): Promise<UserConte
 export function createContextFactory(db: Database, redis: Redis) {
   return async function createContext({ req }: CreateFastifyContextOptions): Promise<Context> {
     let user: UserContext | null = null;
+    let clerkId: string | null = null;
 
     const authHeader = req.headers.authorization;
     if (authHeader?.startsWith("Bearer ")) {
@@ -76,6 +78,7 @@ export function createContextFactory(db: Database, redis: Redis) {
         });
 
         if (payload.sub) {
+          clerkId = payload.sub;
           const cached = await redis.get(`user:${payload.sub}`);
           if (cached) {
             user = JSON.parse(cached) as UserContext;
@@ -102,9 +105,11 @@ export function createContextFactory(db: Database, redis: Redis) {
     }
 
     if (!user && env.NODE_ENV !== "production") {
-      user = await getOrCreateDevUser(db, redis);
+      const devUser = await getOrCreateDevUser(db, redis);
+      user = devUser;
+      clerkId = clerkId ?? DEV_CLERK_ID;
     }
 
-    return { db, redis, user };
+    return { db, redis, user, clerkId };
   };
 }

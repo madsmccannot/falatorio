@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import { users, adEvents, transactions } from "@falatorio/db/schema";
-import { HEARTS, OURO } from "@falatorio/core";
+import { HEARTS, OURO, ADS } from "@falatorio/core";
 import {
   shouldShowBannerAd,
   shouldShowInterstitialAd,
@@ -63,6 +63,7 @@ export const adsRouter = t.router({
     }),
 
   recordAdView: protectedProcedure
+    .use(rateLimiter(10, 60_000))
     .input(
       z.object({
         adType: z.enum(["banner", "interstitial", "reward"]),
@@ -70,6 +71,26 @@ export const adsRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      if (input.rewardType) {
+        const [user] = await ctx.db
+          .select({ lastAdShownAt: users.lastAdShownAt, tier: users.tier, adConsent: users.adConsent })
+          .from(users)
+          .where(eq(users.id, ctx.user.userId))
+          .limit(1);
+
+        if (!user) throw new TRPCError({ code: "NOT_FOUND" });
+        if (user.tier === "super" || !user.adConsent) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Not eligible for ad rewards" });
+        }
+
+        if (user.lastAdShownAt) {
+          const elapsed = Date.now() - new Date(user.lastAdShownAt).getTime();
+          if (elapsed < ADS.REWARD_COOLDOWN_MS) {
+            throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Reward cooldown active" });
+          }
+        }
+      }
+
       await ctx.db.insert(adEvents).values({
         userId: ctx.user.userId,
         adType: input.adType,
@@ -87,17 +108,12 @@ export const adsRouter = t.router({
         .where(eq(users.id, ctx.user.userId));
 
       if (input.rewardType === "heart") {
-        const [user] = await ctx.db
-          .select({ hearts: users.hearts })
-          .from(users)
-          .where(eq(users.id, ctx.user.userId))
-          .limit(1);
-
-        const currentHearts = user?.hearts ?? 0;
-        const newHearts = Math.min(HEARTS.MAX, currentHearts + HEARTS.REWARD_AD_AMOUNT);
         await ctx.db
           .update(users)
-          .set({ hearts: newHearts, updatedAt: new Date() })
+          .set({
+            hearts: sql`LEAST(${users.hearts} + ${HEARTS.REWARD_AD_AMOUNT}, ${HEARTS.MAX})`,
+            updatedAt: new Date(),
+          })
           .where(eq(users.id, ctx.user.userId));
 
         return { rewarded: true, rewardType: "heart", amount: HEARTS.REWARD_AD_AMOUNT };

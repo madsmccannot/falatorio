@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, spendLock } from "../trpc/middleware.js";
 import { transactions } from "@falatorio/db/schema";
 import {
   computeBalance,
@@ -77,6 +77,7 @@ export const economyRouter = t.router({
     }),
 
   spendOuro: protectedProcedure
+    .use(spendLock)
     .input(
       z.object({
         amount: z.number().int().positive(),

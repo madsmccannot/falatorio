@@ -409,6 +409,11 @@ export const lessonRouter = t.router({
         throw new TRPCError({ code: "FORBIDDEN" });
       }
 
+      const expectedExerciseId = session.exerciseIds[session.currentIndex];
+      if (input.exerciseId !== expectedExerciseId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Unexpected exercise" });
+      }
+
       const [exercise] = await ctx.db
         .select()
         .from(exercises)
@@ -432,12 +437,16 @@ export const lessonRouter = t.router({
       let outOfHearts = false;
 
       if (!result.correct && user.tier === "free" && heartsRemaining !== null) {
-        heartsRemaining = Math.max(0, heartsRemaining - 1);
-        await ctx.db
+        const [updated] = await ctx.db
           .update(users)
-          .set({ hearts: heartsRemaining, updatedAt: new Date() })
-          .where(eq(users.id, ctx.user.userId));
+          .set({
+            hearts: sql`GREATEST(${users.hearts} - 1, 0)`,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, ctx.user.userId))
+          .returning({ hearts: users.hearts });
 
+        heartsRemaining = updated?.hearts ?? 0;
         if (heartsRemaining === 0) outOfHearts = true;
       }
 
@@ -564,7 +573,10 @@ export const lessonRouter = t.router({
       }
 
       const total = session.correctCount + session.incorrectCount;
-      const accuracy = total > 0 ? session.correctCount / total : 0;
+      if (total === 0) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "No answers submitted" });
+      }
+      const accuracy = session.correctCount / total;
       const isPerfect = accuracy === 1;
 
       const dominantLevel = session.cognitiveLevels.length > 0
@@ -608,7 +620,7 @@ export const lessonRouter = t.router({
           await ctx.db
             .update(users)
             .set({
-              hearts: Math.min(5, userData.hearts + heartsEarned),
+              hearts: sql`LEAST(${users.hearts} + ${heartsEarned}, 5)`,
               updatedAt: new Date(),
             })
             .where(eq(users.id, ctx.user.userId));
@@ -618,7 +630,7 @@ export const lessonRouter = t.router({
       await ctx.db
         .update(users)
         .set({
-          totalXp: user.totalXp + finalXp,
+          totalXp: sql`${users.totalXp} + ${finalXp}`,
           lastActivityAt: new Date(),
           updatedAt: new Date(),
         })

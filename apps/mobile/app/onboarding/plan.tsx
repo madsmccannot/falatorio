@@ -59,7 +59,6 @@ export default function PlanScreen() {
           "";
 
         await registerMutation.mutateAsync({
-          clerkId: user.id,
           email,
           name: getString(KEYS.DISPLAY_NAME) ?? user.firstName ?? "User",
           username: getString(KEYS.USERNAME) ?? user.id.slice(0, 20),

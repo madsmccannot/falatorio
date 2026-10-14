@@ -1,17 +1,16 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, clerkTokenProcedure } from "../trpc/middleware.js";
 import { users, transactions } from "@falatorio/db/schema";
 import { L1_CODES, USER_GOALS, OURO } from "@falatorio/core";
 
 const USERNAME_RE = /^[a-z][a-z0-9_]{2,29}$/;
 
 export const authRouter = t.router({
-  register: t.procedure
+  register: clerkTokenProcedure
     .input(
       z.object({
-        clerkId: z.string().min(1),
         email: z.string().email().max(320),
         name: z.string().min(1).max(255),
         username: z.string().min(3).max(30).regex(USERNAME_RE),
@@ -20,10 +19,12 @@ export const authRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const clerkId = ctx.clerkId;
+
       const existing = await ctx.db
         .select({ id: users.id })
         .from(users)
-        .where(eq(users.clerkId, input.clerkId))
+        .where(eq(users.clerkId, clerkId))
         .limit(1);
 
       if (existing.length > 0) {
@@ -31,22 +32,26 @@ export const authRouter = t.router({
       }
 
       const [byEmail] = await ctx.db
-        .select({ id: users.id })
+        .select({ id: users.id, clerkId: users.clerkId })
         .from(users)
         .where(eq(users.email, input.email))
         .limit(1);
 
       if (byEmail) {
+        if (byEmail.clerkId && byEmail.clerkId !== clerkId) {
+          throw new Error("EMAIL_ALREADY_LINKED");
+        }
+
         await ctx.db
           .update(users)
-          .set({ clerkId: input.clerkId, updatedAt: new Date() })
+          .set({ clerkId, updatedAt: new Date() })
           .where(eq(users.id, byEmail.id));
 
         await ctx.redis.set(
-          `user:${input.clerkId}`,
+          `user:${clerkId}`,
           JSON.stringify({
             userId: byEmail.id,
-            clerkId: input.clerkId,
+            clerkId,
             tier: "free",
             l1: input.l1,
           }),
@@ -70,7 +75,7 @@ export const authRouter = t.router({
       const [user] = await ctx.db
         .insert(users)
         .values({
-          clerkId: input.clerkId,
+          clerkId,
           email: input.email,
           name: input.name,
           username: input.username,
@@ -87,10 +92,10 @@ export const authRouter = t.router({
       });
 
       await ctx.redis.set(
-        `user:${input.clerkId}`,
+        `user:${clerkId}`,
         JSON.stringify({
           userId: user!.id,
-          clerkId: input.clerkId,
+          clerkId,
           tier: "free",
           l1: input.l1,
         }),

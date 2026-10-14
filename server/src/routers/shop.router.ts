@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/router.js";
-import { protectedProcedure } from "../trpc/middleware.js";
+import { protectedProcedure, spendLock } from "../trpc/middleware.js";
 import { shopItems, transactions, users, iapReceipts } from "@falatorio/db/schema";
 import { computeBalance, type Transaction } from "@falatorio/core/economy";
 import { HEARTS } from "@falatorio/core";
@@ -28,6 +28,7 @@ export const shopRouter = t.router({
   }),
 
   purchaseWithOuro: protectedProcedure
+    .use(spendLock)
     .input(z.object({ itemId: z.string().max(64) }))
     .mutation(async ({ ctx, input }) => {
       const [item] = await ctx.db

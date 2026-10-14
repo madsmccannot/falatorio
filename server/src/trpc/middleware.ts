@@ -13,6 +13,15 @@ export const authGuard = t.middleware(async ({ ctx, next }) => {
   });
 });
 
+export const clerkIdGuard = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.clerkId) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "Valid Clerk token required" });
+  }
+  return next({ ctx: { ...ctx, clerkId: ctx.clerkId } });
+});
+
+export const clerkTokenProcedure = t.procedure.use(clerkIdGuard);
+
 export const requireSuper = t.middleware(async ({ ctx, next }) => {
   if (!ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -43,6 +52,20 @@ export const rateLimiter = (maxRequests: number, windowMs: number) =>
     }
     return next();
   });
+
+export const spendLock = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.user) return next();
+  const key = `lock:spend:${ctx.user.userId}`;
+  const acquired = await ctx.redis.set(key, "1", "EX", 10, "NX");
+  if (!acquired) {
+    throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Transaction in progress" });
+  }
+  try {
+    return await next();
+  } finally {
+    await ctx.redis.del(key);
+  }
+});
 
 export const protectedProcedure = t.procedure.use(authGuard);
 export const superProcedure = t.procedure.use(authGuard).use(requireSuper);
