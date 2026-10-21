@@ -14,6 +14,8 @@ import {
   skillMastery,
   skillPrerequisites,
   lessons,
+  units,
+  sections,
   lessonSkills,
   lessonCompletions,
   transactions,
@@ -37,24 +39,6 @@ function exerciseToCognitiveLevel(exerciseType: string): CognitiveLevel {
   return EXERCISE_COGNITIVE_MAP[exerciseType as ExerciseType] ?? "recognition";
 }
 
-function highestCognitiveLevel(levels: CognitiveLevel[]): CognitiveLevel {
-  const order: CognitiveLevel[] = [
-    "recognition",
-    "comprehension",
-    "controlled_production",
-    "transformation",
-    "translation",
-    "free_production",
-    "communication",
-  ];
-  let maxIdx = 0;
-  for (const level of levels) {
-    const idx = order.indexOf(level);
-    if (idx > maxIdx) maxIdx = idx;
-  }
-  return order[maxIdx]!;
-}
-
 type SessionType = "lesson" | "review" | "mistakes" | "daily_refresh";
 
 interface LessonSession {
@@ -68,6 +52,9 @@ interface LessonSession {
   startedAt: string;
   cognitiveLevels: CognitiveLevel[];
   sessionType?: SessionType;
+  sessionsRequired: number;
+  sectionSortOrder: number;
+  isUnitFinal: boolean;
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -362,6 +349,46 @@ export const lessonRouter = t.router({
         exerciseToCognitiveLevel(e.type),
       );
 
+      const [lessonRow] = await ctx.db
+        .select({
+          sessionsRequired: lessons.sessionsRequired,
+          sortOrder: lessons.sortOrder,
+          unitId: lessons.unitId,
+        })
+        .from(lessons)
+        .where(eq(lessons.id, input.lessonId))
+        .limit(1);
+
+      let sessionsRequired = lessonRow?.sessionsRequired ?? 3;
+      let sectionSortOrder = 0;
+      let isUnitFinal = false;
+
+      if (lessonRow) {
+        const [unitRow] = await ctx.db
+          .select({ sectionId: units.sectionId, id: units.id })
+          .from(units)
+          .where(eq(units.id, lessonRow.unitId))
+          .limit(1);
+
+        if (unitRow) {
+          const [sectionRow] = await ctx.db
+            .select({ sortOrder: sections.sortOrder })
+            .from(sections)
+            .where(eq(sections.id, unitRow.sectionId))
+            .limit(1);
+          sectionSortOrder = sectionRow?.sortOrder ?? 0;
+
+          const unitLessons = await ctx.db
+            .select({ id: lessons.id, sortOrder: lessons.sortOrder, nodeType: lessons.nodeType })
+            .from(lessons)
+            .where(eq(lessons.unitId, unitRow.id))
+            .orderBy(lessons.sortOrder);
+
+          const lastLesson = unitLessons.filter((l) => l.nodeType === "lesson").at(-1);
+          isUnitFinal = lastLesson?.id === input.lessonId;
+        }
+      }
+
       const sessionId = crypto.randomUUID();
       const session: LessonSession = {
         userId: ctx.user.userId,
@@ -373,6 +400,9 @@ export const lessonRouter = t.router({
         xpEarned: 0,
         startedAt: new Date().toISOString(),
         cognitiveLevels,
+        sessionsRequired,
+        sectionSortOrder,
+        isUnitFinal,
       };
 
       await ctx.redis.set(
@@ -582,10 +612,6 @@ export const lessonRouter = t.router({
       const accuracy = session.correctCount / total;
       const isPerfect = accuracy === 1;
 
-      const dominantLevel = session.cognitiveLevels.length > 0
-        ? highestCognitiveLevel(session.cognitiveLevels)
-        : undefined;
-
       const [user] = await ctx.db
         .select({ streakDays: users.streakDays, totalXp: users.totalXp })
         .from(users)
@@ -594,21 +620,24 @@ export const lessonRouter = t.router({
 
       if (!user) throw new TRPCError({ code: "NOT_FOUND" });
 
+      const practiceType =
+        session.sessionType === "review" ? "hearts" as const
+        : session.sessionType === "mistakes" || session.sessionType === "daily_refresh" ? "review" as const
+        : false as const;
+      const passed = !practiceType || accuracy >= LESSON.PASS_THRESHOLD;
+
       const xpResult = calculateXP({
-        accuracy,
-        streakDays: user.streakDays,
+        sectionSortOrder: session.sectionSortOrder ?? 0,
+        isUnitFinal: session.isUnitFinal ?? false,
+        practiceType,
         isPerfect,
         isFirstOfDay: false,
-        hasXPBoost: false,
-        cognitiveLevel: dominantLevel,
+        boostLevel: 0,
       });
 
-      const isPractice = session.sessionType === "review" || session.sessionType === "mistakes" || session.sessionType === "daily_refresh";
-      const passed = !isPractice || accuracy >= LESSON.PASS_THRESHOLD;
-      const xpMultiplier = isPractice ? PRACTICE.REVIEW_XP_MULTIPLIER : 1;
-      const finalXp = Math.round(xpResult.total * xpMultiplier);
+      const finalXp = xpResult.total;
 
-      const ouroReward = isPractice ? { amount: 0 } : getLessonReward(isPerfect);
+      const ouroReward = practiceType ? { amount: 0 } : getLessonReward(isPerfect);
 
       let heartsEarned = 0;
       if (session.sessionType === "review" && passed) {
@@ -639,7 +668,7 @@ export const lessonRouter = t.router({
         })
         .where(eq(users.id, ctx.user.userId));
 
-      if (passed && !isPractice) {
+      if (passed && !practiceType) {
         const [existing] = await ctx.db
           .select()
           .from(lessonCompletions)
@@ -702,10 +731,8 @@ export const lessonRouter = t.router({
         ouroEarned: ouroReward.amount,
         isPerfect,
         xpBreakdown: xpResult,
-        xpMultiplier,
         heartsEarned,
         sessionType: session.sessionType ?? "lesson",
-        dominantCognitiveLevel: dominantLevel ?? null,
         newAchievements: achievementResult.newlyUnlocked,
       };
     }),
@@ -771,6 +798,9 @@ export const lessonRouter = t.router({
         startedAt: new Date().toISOString(),
         cognitiveLevels,
         sessionType: "review",
+        sessionsRequired: 1,
+        sectionSortOrder: 0,
+        isUnitFinal: false,
       };
 
       await ctx.redis.set(
@@ -872,6 +902,9 @@ export const lessonRouter = t.router({
         startedAt: new Date().toISOString(),
         cognitiveLevels,
         sessionType: "mistakes",
+        sessionsRequired: 1,
+        sectionSortOrder: 0,
+        isUnitFinal: false,
       };
 
       await ctx.redis.set(
@@ -1086,6 +1119,9 @@ export const lessonRouter = t.router({
         startedAt: new Date().toISOString(),
         cognitiveLevels,
         sessionType: "daily_refresh",
+        sessionsRequired: 1,
+        sectionSortOrder: 0,
+        isUnitFinal: false,
       };
 
       await ctx.redis.set(

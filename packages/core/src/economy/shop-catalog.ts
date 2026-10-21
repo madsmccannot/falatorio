@@ -1,5 +1,5 @@
 import type { ShopItemType } from "../constants.js";
-import { OURO, SUPER_PRICING } from "../constants.js";
+import { OURO, SUPER_PRICING, XP } from "../constants.js";
 
 export interface ShopItem {
   id: string;
@@ -62,16 +62,28 @@ export const SHOP_ITEMS: readonly ShopItem[] = [
     sortOrder: 3,
   },
   {
-    id: "xp_boost",
-    name: "XP Boost",
+    id: "xp_boost_double",
+    name: "XP Boost 2x",
     description: "Double XP for 15 minutes",
     type: "consumable",
-    priceOuro: OURO.COST_XP_BOOST,
+    priceOuro: OURO.COST_XP_BOOST_DOUBLE,
     priceEur: null,
     icon: "rocket",
-    effect: { kind: "xp_boost", multiplier: 2, durationMs: 15 * 60 * 1000 },
+    effect: { kind: "xp_boost", multiplier: 2, durationMs: XP.BOOST_DURATION_MS },
     active: true,
     sortOrder: 4,
+  },
+  {
+    id: "xp_boost_triple",
+    name: "XP Boost 3x",
+    description: "Triple XP for 15 minutes",
+    type: "consumable",
+    priceOuro: OURO.COST_XP_BOOST_TRIPLE,
+    priceEur: null,
+    icon: "rocket",
+    effect: { kind: "xp_boost", multiplier: 3, durationMs: XP.BOOST_DURATION_MS },
+    active: true,
+    sortOrder: 5,
   },
   {
     id: "time_extend",
@@ -83,7 +95,7 @@ export const SHOP_ITEMS: readonly ShopItem[] = [
     icon: "timer",
     effect: { kind: "time_extend" },
     active: true,
-    sortOrder: 5,
+    sortOrder: 6,
   },
   {
     id: "ouro_1200",

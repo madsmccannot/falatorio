@@ -124,7 +124,8 @@ export const OURO = {
   COST_STREAK_FREEZE: 50,
   COST_HEART_REFILL: 30,
   COST_CONTINUE_LESSON: 50,
-  COST_XP_BOOST: 100,
+  COST_XP_BOOST_DOUBLE: 100,
+  COST_XP_BOOST_TRIPLE: 200,
   COST_TIME_EXTEND: 450,
   COST_FULL_ENERGY: 120,
 } as const;
@@ -142,15 +143,20 @@ export const SUPER_PRICING = {
 } as const;
 
 export const XP = {
-  BASE_PER_EXERCISE: 10,
+  SESSION_BASE: 20,
+  UNIT_FINAL_BASE: 50,
+  REVIEW_BASE: 10,
+  HEARTS_PRACTICE_BASE: 15,
+  // Section multipliers: index 0 = Section 1, index 1 = Section 2, etc.
+  SECTION_MULTIPLIERS: [1.0, 1.1, 1.25, 1.4, 1.55, 1.7] as const,
   BONUS_PERFECT: 5,
   BONUS_FIRST_OF_DAY: 10,
-  STREAK_MULTIPLIER_WEEK: 1.0,
-  STREAK_MULTIPLIER_MONTH: 1.5,
-  STREAK_MULTIPLIER_BEYOND: 2.0,
-  BOOST_MULTIPLIER: 2,
+  BOOST_DOUBLE: 2,
+  BOOST_TRIPLE: 3,
   BOOST_DURATION_MS: 15 * 60 * 1000,
 } as const;
+
+export type XPBoostLevel = 0 | 2 | 3;
 
 export const LEAGUE = {
   USERS_PER_LEAGUE: 30,

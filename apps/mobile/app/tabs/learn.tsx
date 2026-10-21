@@ -23,7 +23,7 @@ import { useAdReward } from "@/hooks/useAdReward";
 import { BannerAdComponent } from "@/components/ads/BannerAd";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
-import { OURO, HEARTS, LESSON, PRACTICE, calculateXP } from "@falatorio/core";
+import { OURO, HEARTS, calculateXP } from "@falatorio/core";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const NODE_SIZE = 64;
@@ -59,17 +59,16 @@ function darkenColor(hex: string, amount = 0.35): string {
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 }
 
-function getEstimatedXp(_sectionSortOrder: number, _isLastInUnit: boolean, isRepeat: boolean): number {
+function getEstimatedXp(sectionSortOrder: number, isUnitFinal: boolean, isRepeat: boolean): number {
   const result = calculateXP({
-    accuracy: 0.8,
-    streakDays: 0,
+    sectionSortOrder,
+    isUnitFinal,
+    practiceType: isRepeat ? "review" : false,
     isPerfect: false,
     isFirstOfDay: false,
-    hasXPBoost: false,
+    boostLevel: 0,
   });
-  const exerciseCount = LESSON.EXERCISES_PER_LESSON;
-  const perSession = result.total * exerciseCount;
-  return Math.round(isRepeat ? perSession * PRACTICE.REVIEW_XP_MULTIPLIER : perSession);
+  return result.total;
 }
 
 type LessonNode = {

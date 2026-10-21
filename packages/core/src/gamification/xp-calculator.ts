@@ -1,64 +1,55 @@
 import { XP } from "../constants.js";
-import type { CognitiveLevel } from "../constants.js";
+import type { XPBoostLevel } from "../constants.js";
+
+export type PracticeType = "review" | "hearts" | false;
 
 export interface XPInput {
-  accuracy: number;
-  streakDays: number;
+  sectionSortOrder: number;
+  isUnitFinal: boolean;
+  practiceType: PracticeType;
   isPerfect: boolean;
   isFirstOfDay: boolean;
-  hasXPBoost: boolean;
-  cognitiveLevel?: CognitiveLevel;
+  boostLevel: XPBoostLevel;
 }
 
 export interface XPResult {
   base: number;
-  accuracyMultiplier: number;
-  streakMultiplier: number;
-  cognitiveMultiplier: number;
+  sectionMultiplier: number;
   perfectBonus: number;
   firstOfDayBonus: number;
   boostMultiplier: number;
   total: number;
 }
 
-const COGNITIVE_XP_MULTIPLIER: Record<CognitiveLevel, number> = {
-  recognition: 1.0,
-  comprehension: 1.1,
-  controlled_production: 1.2,
-  transformation: 1.3,
-  translation: 1.3,
-  free_production: 1.5,
-  communication: 1.5,
-};
-
-function getStreakMultiplier(streakDays: number): number {
-  if (streakDays >= 30) return XP.STREAK_MULTIPLIER_BEYOND;
-  if (streakDays >= 7) return XP.STREAK_MULTIPLIER_MONTH;
-  return XP.STREAK_MULTIPLIER_WEEK;
+function getSectionMultiplier(sortOrder: number): number {
+  const idx = Math.min(sortOrder, XP.SECTION_MULTIPLIERS.length - 1);
+  return XP.SECTION_MULTIPLIERS[idx]!;
 }
 
 export function calculateXP(input: XPInput): XPResult {
-  const base = XP.BASE_PER_EXERCISE;
-  const accuracyMultiplier = input.accuracy;
-  const streakMultiplier = getStreakMultiplier(input.streakDays);
-  const cognitiveMultiplier = input.cognitiveLevel
-    ? COGNITIVE_XP_MULTIPLIER[input.cognitiveLevel]
-    : 1.0;
+  const sectionMultiplier = getSectionMultiplier(input.sectionSortOrder);
+
+  let base: number;
+  if (input.practiceType === "review") {
+    base = XP.REVIEW_BASE;
+  } else if (input.practiceType === "hearts") {
+    base = XP.HEARTS_PRACTICE_BASE;
+  } else if (input.isUnitFinal) {
+    base = XP.UNIT_FINAL_BASE;
+  } else {
+    base = XP.SESSION_BASE;
+  }
+
+  const scaled = Math.round(base * sectionMultiplier);
   const perfectBonus = input.isPerfect ? XP.BONUS_PERFECT : 0;
   const firstOfDayBonus = input.isFirstOfDay ? XP.BONUS_FIRST_OF_DAY : 0;
-  const boostMultiplier = input.hasXPBoost ? XP.BOOST_MULTIPLIER : 1;
+  const boostMultiplier = input.boostLevel || 1;
 
-  const total = Math.round(
-    (base * accuracyMultiplier * streakMultiplier * cognitiveMultiplier +
-      perfectBonus + firstOfDayBonus) *
-      boostMultiplier,
-  );
+  const total = Math.round((scaled + perfectBonus + firstOfDayBonus) * boostMultiplier);
 
   return {
-    base,
-    accuracyMultiplier,
-    streakMultiplier,
-    cognitiveMultiplier,
+    base: scaled,
+    sectionMultiplier,
     perfectBonus,
     firstOfDayBonus,
     boostMultiplier,

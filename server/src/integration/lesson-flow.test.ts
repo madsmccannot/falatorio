@@ -12,11 +12,12 @@ describe("lesson flow: answer -> score -> XP -> economy", () => {
     expect(result.score).toBeGreaterThanOrEqual(0.9);
 
     const xp = calculateXP({
-      accuracy: 1,
-      streakDays: 0,
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
       isPerfect: true,
       isFirstOfDay: false,
-      hasXPBoost: false,
+      boostLevel: 0,
     });
     expect(xp.total).toBeGreaterThan(0);
   });
@@ -27,58 +28,144 @@ describe("lesson flow: answer -> score -> XP -> economy", () => {
     expect(result.score).toBeLessThan(0.5);
   });
 
-  it("partial accuracy reduces XP", () => {
+  it("perfect bonus increases XP", () => {
     const perfect = calculateXP({
-      accuracy: 1,
-      streakDays: 0,
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
       isPerfect: true,
       isFirstOfDay: false,
-      hasXPBoost: false,
+      boostLevel: 0,
     });
 
-    const partial = calculateXP({
-      accuracy: 0.6,
-      streakDays: 0,
+    const normal = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
       isPerfect: false,
       isFirstOfDay: false,
-      hasXPBoost: false,
+      boostLevel: 0,
     });
 
-    expect(perfect.total).toBeGreaterThan(partial.total);
+    expect(perfect.total).toBeGreaterThan(normal.total);
   });
 
-  it("streak multiplier increases XP", () => {
-    const noStreak = calculateXP({
-      accuracy: 0.8,
-      streakDays: 0,
+  it("later sections give more XP", () => {
+    const early = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
       isPerfect: false,
       isFirstOfDay: false,
-      hasXPBoost: false,
+      boostLevel: 0,
     });
 
-    const withStreak = calculateXP({
-      accuracy: 0.8,
-      streakDays: 7,
+    const late = calculateXP({
+      sectionSortOrder: 3,
+      isUnitFinal: false,
+      practiceType: false,
       isPerfect: false,
       isFirstOfDay: false,
-      hasXPBoost: false,
+      boostLevel: 0,
     });
 
-    expect(withStreak.total).toBeGreaterThanOrEqual(noStreak.total);
+    expect(late.total).toBeGreaterThan(early.total);
   });
 
-  it("review sessions apply XP multiplier", () => {
-    const lessonXp = calculateXP({
-      accuracy: 0.8,
-      streakDays: 0,
+  it("all normal sessions give flat 20 XP base", () => {
+    const xp = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
       isPerfect: false,
       isFirstOfDay: false,
-      hasXPBoost: false,
+      boostLevel: 0,
     });
 
-    const reviewXp = Math.round(lessonXp.total * PRACTICE.REVIEW_XP_MULTIPLIER);
-    expect(reviewXp).toBeLessThanOrEqual(lessonXp.total);
-    expect(PRACTICE.REVIEW_XP_MULTIPLIER).toBeLessThanOrEqual(1);
+    expect(xp.base).toBe(20);
+  });
+
+  it("unit final gives 50 base XP", () => {
+    const unitFinal = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: true,
+      practiceType: false,
+      isPerfect: false,
+      isFirstOfDay: false,
+      boostLevel: 0,
+    });
+
+    expect(unitFinal.base).toBe(50);
+  });
+
+  it("review sessions give 10 XP base", () => {
+    const reviewXp = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: "review",
+      isPerfect: false,
+      isFirstOfDay: false,
+      boostLevel: 0,
+    });
+
+    expect(reviewXp.base).toBe(10);
+  });
+
+  it("hearts practice gives 15 XP base", () => {
+    const heartsXp = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: "hearts",
+      isPerfect: false,
+      isFirstOfDay: false,
+      boostLevel: 0,
+    });
+
+    expect(heartsXp.base).toBe(15);
+  });
+
+  it("double XP boost doubles total", () => {
+    const normal = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
+      isPerfect: false,
+      isFirstOfDay: false,
+      boostLevel: 0,
+    });
+
+    const boosted = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
+      isPerfect: false,
+      isFirstOfDay: false,
+      boostLevel: 2,
+    });
+
+    expect(boosted.total).toBe(normal.total * 2);
+  });
+
+  it("triple XP boost triples total", () => {
+    const normal = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
+      isPerfect: false,
+      isFirstOfDay: false,
+      boostLevel: 0,
+    });
+
+    const boosted = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
+      isPerfect: false,
+      isFirstOfDay: false,
+      boostLevel: 3,
+    });
+
+    expect(boosted.total).toBe(normal.total * 3);
   });
 });
 

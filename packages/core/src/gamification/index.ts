@@ -1,4 +1,4 @@
-export { calculateXP, type XPInput, type XPResult } from "./xp-calculator.js";
+export { calculateXP, type XPInput, type XPResult, type PracticeType } from "./xp-calculator.js";
 export {
   checkStreak,
   recordActivity,
