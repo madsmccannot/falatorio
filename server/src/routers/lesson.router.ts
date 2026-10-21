@@ -20,8 +20,8 @@ import {
   lessonCompletions,
   transactions,
 } from "@falatorio/db/schema";
-import { LESSON, EXERCISE_COGNITIVE_MAP, PRACTICE, DAILY_REFRESH } from "@falatorio/core";
-import { runAdaptiveEngine, type AdaptiveEngineInput } from "@falatorio/core/lesson";
+import { LESSON, EXERCISE_COGNITIVE_MAP, COGNITIVE_LEVELS, PRACTICE, DAILY_REFRESH } from "@falatorio/core";
+import { runAdaptiveEngine, getAllowedCognitiveLevels, type AdaptiveEngineInput } from "@falatorio/core/lesson";
 import { scoreTextAnswer } from "@falatorio/core/scoring";
 import { scoreToRating } from "@falatorio/core/fsrs";
 import { schedule, createNewCard, type FSRSCard } from "@falatorio/core/fsrs";
@@ -71,7 +71,9 @@ function formatExerciseForClient(
   knownWords: Set<string>,
 ) {
   const p = e.prompt as Record<string, unknown> | string;
-  const text = typeof p === "string" ? p : (p["text"] as string ?? "");
+  const text = typeof p === "string"
+    ? p
+    : ((p["sentence"] ?? p["question"] ?? p["text"] ?? p["targetText"] ?? "") as string);
 
   const glossary = typeof p === "object"
     ? (p["glossary"] as Record<string, string[]> | undefined) ?? undefined
@@ -328,6 +330,24 @@ export const lessonRouter = t.router({
         }
       }
 
+      const cogOrder = Object.fromEntries(
+        COGNITIVE_LEVELS.map((lvl, i) => [lvl, i]),
+      ) as Record<string, number>;
+
+      const avgMastery = masteryScores.length > 0
+        ? masteryScores.reduce((sum, m) => sum + m.mastery, 0) / masteryScores.length
+        : 0;
+      const allowedCogLevels = new Set(
+        getAllowedCognitiveLevels((userData?.cefrLevel ?? "A1") as CEFRLevel, avgMastery),
+      );
+
+      const withinLevel = allLessonExercises.filter(
+        (ex) => allowedCogLevels.has(exerciseToCognitiveLevel(ex.type)),
+      );
+      if (withinLevel.length >= LESSON.EXERCISES_PER_LESSON) {
+        allLessonExercises = withinLevel;
+      }
+
       const prioritized: typeof allLessonExercises = [];
       const rest: typeof allLessonExercises = [];
 
@@ -343,7 +363,12 @@ export const lessonRouter = t.router({
       const lessonExercises = [
         ...prioritized,
         ...rest,
-      ].slice(0, LESSON.EXERCISES_PER_LESSON);
+      ].slice(0, LESSON.EXERCISES_PER_LESSON)
+       .sort((a, b) => {
+         const aIdx = cogOrder[exerciseToCognitiveLevel(a.type)] ?? 0;
+         const bIdx = cogOrder[exerciseToCognitiveLevel(b.type)] ?? 0;
+         return aIdx - bIdx;
+       });
 
       const cognitiveLevels = lessonExercises.map((e) =>
         exerciseToCognitiveLevel(e.type),

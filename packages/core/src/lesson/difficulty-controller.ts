@@ -155,6 +155,16 @@ function buildExerciseWeights(
   return weights;
 }
 
+export function getAllowedCognitiveLevels(
+  cefrLevel: CEFRLevel,
+  avgMastery: number,
+): CognitiveLevel[] {
+  let maxIdx = CEFR_MAX_COGNITIVE[cefrLevel];
+  if (avgMastery < 0.4) maxIdx = Math.min(maxIdx, 2);
+  else if (avgMastery < 0.6) maxIdx = Math.min(maxIdx, 3);
+  return COGNITIVE_LADDER.slice(0, maxIdx + 1);
+}
+
 export function selectCognitiveLevel(
   profile: DifficultyProfile,
   rng: () => number = Math.random,

@@ -42,6 +42,7 @@ export {
 } from "./error-engine.js";
 export {
   computeDifficulty,
+  getAllowedCognitiveLevels,
   selectCognitiveLevel,
   type DifficultyProfile,
   type DifficultyInput,

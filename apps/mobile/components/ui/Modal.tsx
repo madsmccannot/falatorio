@@ -74,5 +74,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
     paddingBottom: spacing["5xl"],
     maxHeight: "80%",
+    zIndex: 1,
+    elevation: 1,
   },
 });

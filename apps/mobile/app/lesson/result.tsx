@@ -75,7 +75,7 @@ export default function LessonResultScreen() {
   }, []);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
+    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom, backgroundColor: theme.bg }]}>
       {showCelebration &&
         (celebrationType === "galo" ? (
           <GaloCelebration onFinish={handleCelebrationFinish} />

@@ -13,6 +13,7 @@ import * as Haptics from "expo-haptics";
 import Animated, {
   SlideInRight,
   SlideOutLeft,
+  FadeIn,
 } from "react-native-reanimated";
 import { useFocusEffect } from "expo-router";
 import { useLesson } from "@/hooks/useLesson";
@@ -127,7 +128,7 @@ export default function LessonScreen() {
 
   if (error) {
     return (
-      <View style={[styles.container, styles.centered, { paddingTop: insets.top, backgroundColor: theme.bg }]}>
+      <View style={[styles.container, styles.centered, { paddingTop: insets.top, paddingBottom: insets.bottom, backgroundColor: theme.bg }]}>
         <Text style={[styles.errorTitle, { color: theme.text }]}>{t("lesson.error_title")}</Text>
         <Text style={[styles.errorText, { color: theme.textMuted }]}>{String(error)}</Text>
         <Button
@@ -146,7 +147,7 @@ export default function LessonScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.bg }]}
+      style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom, backgroundColor: theme.bg }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={styles.topBar}>
@@ -168,13 +169,16 @@ export default function LessonScreen() {
       {currentExercise ? (
         <Animated.View
           key={currentExercise.id}
-          entering={SlideInRight.duration(300)}
-          exiting={SlideOutLeft.duration(200)}
+          entering={SlideInRight.springify().damping(20).stiffness(200)}
+          exiting={SlideOutLeft.duration(150)}
           style={styles.exerciseArea}
         >
-          <Text style={[styles.exerciseType, { color: theme.textMuted }]}>
+          <Animated.Text
+            entering={FadeIn.delay(100).duration(200)}
+            style={[styles.exerciseType, { color: theme.textMuted }]}
+          >
             {formatExerciseType(currentExercise.type, t)}
-          </Text>
+          </Animated.Text>
 
           <ExerciseRenderer
             exercise={{
