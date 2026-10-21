@@ -19,6 +19,7 @@ import {
   lessonSkills,
   lessonCompletions,
   transactions,
+  streaks,
 } from "@falatorio/db/schema";
 import { LESSON, EXERCISE_COGNITIVE_MAP, COGNITIVE_LEVELS, PRACTICE, DAILY_REFRESH } from "@falatorio/core";
 import { runAdaptiveEngine, getAllowedCognitiveLevels, type AdaptiveEngineInput } from "@falatorio/core/lesson";
@@ -638,12 +639,35 @@ export const lessonRouter = t.router({
       const isPerfect = accuracy === 1;
 
       const [user] = await ctx.db
-        .select({ streakDays: users.streakDays, totalXp: users.totalXp })
+        .select({
+          streakDays: users.streakDays,
+          totalXp: users.totalXp,
+          xpBoostLevel: users.xpBoostLevel,
+          xpBoostUntil: users.xpBoostUntil,
+        })
         .from(users)
         .where(eq(users.id, ctx.user.userId))
         .limit(1);
 
       if (!user) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Lisbon" });
+      const [todayCompletion] = await ctx.db
+        .select({ lessonId: lessonCompletions.lessonId })
+        .from(lessonCompletions)
+        .where(
+          and(
+            eq(lessonCompletions.userId, ctx.user.userId),
+            sql`${lessonCompletions.lastCompletedAt}::date >= ${todayStr}::date`,
+          ),
+        )
+        .limit(1);
+      const isFirstOfDay = !todayCompletion;
+
+      const now = new Date();
+      const boostLevel = (user.xpBoostUntil && user.xpBoostUntil > now
+        ? (user.xpBoostLevel as 0 | 2 | 3)
+        : 0) || 0;
 
       const practiceType =
         session.sessionType === "review" ? "hearts" as const
@@ -656,8 +680,8 @@ export const lessonRouter = t.router({
         isUnitFinal: session.isUnitFinal ?? false,
         practiceType,
         isPerfect,
-        isFirstOfDay: false,
-        boostLevel: 0,
+        isFirstOfDay,
+        boostLevel,
       });
 
       const finalXp = xpResult.total;
@@ -1235,19 +1259,19 @@ export const lessonRouter = t.router({
           reason: "chest_reward",
         });
       } else if (reward.type === "xp_boost") {
-        await ctx.redis.set(
-          `xpboost:${ctx.user.userId}`,
-          "1",
-          "EX",
-          reward.amount * 60,
-        );
+        await ctx.db
+          .update(users)
+          .set({
+            xpBoostLevel: 2,
+            xpBoostUntil: new Date(Date.now() + reward.amount * 60_000),
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, ctx.user.userId));
       } else if (reward.type === "streak_freeze") {
-        await ctx.redis.set(
-          `streakfreeze:${ctx.user.userId}`,
-          String(reward.amount),
-          "EX",
-          86400,
-        );
+        await ctx.db
+          .update(streaks)
+          .set({ freezeAvailable: true, updatedAt: new Date() })
+          .where(eq(streaks.userId, ctx.user.userId));
       }
 
       const result = { ...reward, alreadyOpened: false };

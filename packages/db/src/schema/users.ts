@@ -42,6 +42,8 @@ export const users = pgTable("users", {
   streakDays: integer("streak_days").notNull().default(0),
   longestStreak: integer("longest_streak").notNull().default(0),
   totalXp: integer("total_xp").notNull().default(0),
+  xpBoostLevel: integer("xp_boost_level").notNull().default(0),
+  xpBoostUntil: timestamp("xp_boost_until", { withTimezone: true }),
   adConsent: boolean("ad_consent").notNull().default(false),
   lastAdShownAt: timestamp("last_ad_shown_at", { withTimezone: true }),
   lastActivityAt: timestamp("last_activity_at", { withTimezone: true }),

@@ -94,7 +94,8 @@ export const gamificationRouter = t.router({
         currentDays: updated.currentDays,
         longestDays: updated.longestDays,
         lastActivityDate: today,
-        freezeUsedToday: false,
+        freezeAvailable: updated.freezeAvailable,
+        freezeUsedToday: updated.freezeUsedToday,
         updatedAt: now,
       })
       .where(eq(streaks.userId, ctx.user.userId));

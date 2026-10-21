@@ -125,12 +125,19 @@ async function applyEffect(
       break;
     case "streak_freeze":
       break;
-    case "xp_boost":
+    case "xp_boost": {
+      const durationMin = (effect["amount"] as number) || 15;
+      const multiplier = (effect["level"] as number) || 2;
       await ctx.db
         .update(users)
-        .set({ updatedAt: new Date() })
+        .set({
+          xpBoostLevel: multiplier,
+          xpBoostUntil: new Date(Date.now() + durationMin * 60_000),
+          updatedAt: new Date(),
+        })
         .where(eq(users.id, ctx.user.userId));
       break;
+    }
     case "super_monthly":
     case "super_yearly": {
       const durationMs =
