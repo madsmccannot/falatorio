@@ -14,7 +14,7 @@ import Animated, {
   SlideInRight,
   SlideOutLeft,
 } from "react-native-reanimated";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "expo-router";
 import { useLesson } from "@/hooks/useLesson";
 import { useHearts } from "@/hooks/useHearts";
 import { ExerciseRenderer } from "@/components/exercises/ExerciseRenderer";
