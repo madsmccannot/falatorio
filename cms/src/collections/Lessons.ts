@@ -1,13 +1,17 @@
 import type { CollectionConfig } from "payload";
+import { CEFR_OPTIONS, NODE_TYPES } from "../constants";
 
 export const Lessons: CollectionConfig = {
   slug: "lessons",
   admin: {
-    defaultColumns: ["unit", "sortOrder", "grammarFocus"],
+    defaultColumns: ["unit", "nodeType", "sortOrder", "sessionsRequired", "cefrLevel"],
     group: "Content",
   },
   access: {
     read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: ({ req }) => req.user?.["role"] === "admin",
   },
   fields: [
     {
@@ -21,6 +25,37 @@ export const Lessons: CollectionConfig = {
       type: "number",
       required: true,
       defaultValue: 0,
+    },
+    {
+      name: "nodeType",
+      type: "select",
+      required: true,
+      defaultValue: "lesson",
+      options: NODE_TYPES,
+      admin: { description: "Pedagogical function of this node" },
+    },
+    {
+      name: "cefrLevel",
+      type: "select",
+      required: true,
+      defaultValue: "A1",
+      options: CEFR_OPTIONS,
+    },
+    {
+      name: "sessionsRequired",
+      type: "number",
+      required: true,
+      defaultValue: 3,
+      min: 0,
+      max: 10,
+      admin: { description: "Number of sessions to complete this node (0 for chests)" },
+    },
+    {
+      name: "skills",
+      type: "relationship",
+      relationTo: "skills",
+      hasMany: true,
+      admin: { description: "Skills targeted by this lesson" },
     },
     {
       name: "grammarFocus",
@@ -37,13 +72,12 @@ export const Lessons: CollectionConfig = {
       admin: { description: 'Target vocabulary: ["obrigado", "bom dia", "como esta"]' },
     },
     {
-      name: "unlockThreshold",
-      type: "number",
-      required: true,
-      defaultValue: 0.8,
-      min: 0,
-      max: 1,
-      admin: { description: "Score needed on previous lesson to unlock (0-1)" },
+      name: "rewardConfig",
+      type: "json",
+      admin: {
+        description: 'For chest nodes: {"type": "ouro", "amount": 50}',
+        condition: (data) => data?.["nodeType"] === "chest",
+      },
     },
   ],
 };

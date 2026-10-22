@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { L1_OPTIONS, CEFR_OPTIONS } from "../constants";
 
 export const L1CulturalContent: CollectionConfig = {
   slug: "l1-cultural-content",
@@ -9,29 +10,16 @@ export const L1CulturalContent: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: ({ req }) => req.user?.["role"] === "admin",
   },
   fields: [
     {
       name: "l1Code",
       type: "select",
       required: true,
-      options: [
-        { label: "English", value: "en" },
-        { label: "Spanish", value: "es" },
-        { label: "French", value: "fr" },
-        { label: "German", value: "de" },
-        { label: "Italian", value: "it" },
-        { label: "Dutch", value: "nl" },
-        { label: "Polish", value: "pl" },
-        { label: "Romanian", value: "ro" },
-        { label: "Ukrainian", value: "uk" },
-        { label: "Russian", value: "ru" },
-        { label: "Arabic", value: "ar" },
-        { label: "Hindi", value: "hi" },
-        { label: "Bengali", value: "bn" },
-        { label: "Urdu", value: "ur" },
-        { label: "Chinese", value: "zh" },
-      ],
+      options: L1_OPTIONS,
     },
     {
       name: "type",
@@ -67,14 +55,7 @@ export const L1CulturalContent: CollectionConfig = {
       type: "select",
       required: true,
       defaultValue: "A1",
-      options: [
-        { label: "A1", value: "A1" },
-        { label: "A2", value: "A2" },
-        { label: "B1", value: "B1" },
-        { label: "B2", value: "B2" },
-        { label: "C1", value: "C1" },
-        { label: "C2", value: "C2" },
-      ],
+      options: CEFR_OPTIONS,
     },
     {
       name: "tags",

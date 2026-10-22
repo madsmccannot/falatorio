@@ -5,11 +5,14 @@ export const ReviewQueue: CollectionConfig = {
   slug: "review-queue",
   admin: {
     useAsTitle: "reason",
-    defaultColumns: ["exercise", "reason", "reviewStatus", "createdAt"],
+    defaultColumns: ["exercise", "reason", "reviewStatus", "assignedTo", "createdAt"],
     group: "QA",
   },
   access: {
     read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: ({ req }) => req.user?.["role"] === "admin",
   },
   hooks: {
     afterChange: [onReject],
@@ -28,8 +31,9 @@ export const ReviewQueue: CollectionConfig = {
       options: [
         { label: "Low quality score", value: "low_score" },
         { label: "User reported", value: "user_reported" },
-        { label: "AI generated — needs review", value: "ai_generated" },
+        { label: "AI generated -- needs review", value: "ai_generated" },
         { label: "Content update", value: "content_update" },
+        { label: "Linguistic error", value: "linguistic_error" },
       ],
     },
     {
@@ -44,6 +48,12 @@ export const ReviewQueue: CollectionConfig = {
         { label: "Needs edit", value: "needs_edit" },
       ],
       admin: { position: "sidebar" },
+    },
+    {
+      name: "assignedTo",
+      type: "relationship",
+      relationTo: "users",
+      admin: { description: "Reviewer assigned to this item" },
     },
     {
       name: "reviewerNotes",

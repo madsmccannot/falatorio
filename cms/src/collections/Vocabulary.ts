@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { CEFR_OPTIONS } from "../constants";
 
 export const Vocabulary: CollectionConfig = {
   slug: "vocabulary",
@@ -9,6 +10,9 @@ export const Vocabulary: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: ({ req }) => req.user?.["role"] === "admin",
   },
   fields: [
     {
@@ -38,14 +42,7 @@ export const Vocabulary: CollectionConfig = {
       type: "select",
       required: true,
       defaultValue: "A1",
-      options: [
-        { label: "A1", value: "A1" },
-        { label: "A2", value: "A2" },
-        { label: "B1", value: "B1" },
-        { label: "B2", value: "B2" },
-        { label: "C1", value: "C1" },
-        { label: "C2", value: "C2" },
-      ],
+      options: CEFR_OPTIONS,
     },
     {
       name: "category",

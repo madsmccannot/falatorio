@@ -13,6 +13,7 @@ import { ReviewQueue } from "./collections/ReviewQueue";
 import { Users } from "./collections/Users";
 import { Skills } from "./collections/Skills";
 import { KnowledgeItems } from "./collections/KnowledgeItems";
+import { PromptTemplates } from "./collections/PromptTemplates";
 
 export default buildConfig({
   serverURL: process.env["PAYLOAD_PUBLIC_SERVER_URL"] ?? "http://localhost:3002",
@@ -42,6 +43,7 @@ export default buildConfig({
     ReviewQueue,
     Skills,
     KnowledgeItems,
+    PromptTemplates,
   ],
   plugins: [
     s3Storage({

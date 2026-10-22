@@ -4,11 +4,14 @@ export const Units: CollectionConfig = {
   slug: "units",
   admin: {
     useAsTitle: "theme",
-    defaultColumns: ["theme", "course", "sortOrder"],
+    defaultColumns: ["theme", "course", "section", "sortOrder"],
     group: "Content",
   },
   access: {
     read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: ({ req }) => req.user?.["role"] === "admin",
   },
   fields: [
     {
@@ -17,6 +20,15 @@ export const Units: CollectionConfig = {
       relationTo: "courses",
       required: true,
       admin: { description: "Parent course" },
+    },
+    {
+      name: "section",
+      type: "number",
+      required: true,
+      defaultValue: 1,
+      min: 1,
+      max: 4,
+      admin: { description: "Section number (1=Basico, 2=Principiante, 3=Intermedio, 4=Avancado)" },
     },
     {
       name: "sortOrder",

@@ -1,31 +1,5 @@
 import type { CollectionConfig } from "payload";
-
-const L1_OPTIONS = [
-  { label: "English", value: "en" },
-  { label: "Spanish", value: "es" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Italian", value: "it" },
-  { label: "Dutch", value: "nl" },
-  { label: "Polish", value: "pl" },
-  { label: "Romanian", value: "ro" },
-  { label: "Ukrainian", value: "uk" },
-  { label: "Russian", value: "ru" },
-  { label: "Arabic", value: "ar" },
-  { label: "Hindi", value: "hi" },
-  { label: "Bengali", value: "bn" },
-  { label: "Urdu", value: "ur" },
-  { label: "Chinese", value: "zh" },
-];
-
-const CEFR_OPTIONS = [
-  { label: "A1", value: "A1" },
-  { label: "A2", value: "A2" },
-  { label: "B1", value: "B1" },
-  { label: "B2", value: "B2" },
-  { label: "C1", value: "C1" },
-  { label: "C2", value: "C2" },
-];
+import { L1_OPTIONS, CEFR_OPTIONS } from "../constants";
 
 export const Courses: CollectionConfig = {
   slug: "courses",
@@ -36,13 +10,16 @@ export const Courses: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: ({ req }) => req.user?.["role"] === "admin",
+    update: () => true,
+    delete: ({ req }) => req.user?.["role"] === "admin",
   },
   fields: [
     {
       name: "internalTitle",
       type: "text",
       required: true,
-      admin: { description: "Internal name for admin reference (e.g., 'EN → PT A1-A2')" },
+      admin: { description: "Internal name for admin reference (e.g., 'EN -> PT A1-A2')" },
     },
     {
       name: "l1Source",

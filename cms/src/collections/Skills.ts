@@ -1,26 +1,5 @@
 import type { CollectionConfig } from "payload";
-
-const SKILL_DOMAINS = [
-  { label: "Phonetics", value: "phonetics" },
-  { label: "Morphology", value: "morphology" },
-  { label: "Tenses & Moods", value: "tenses_moods" },
-  { label: "Determiners", value: "determiners" },
-  { label: "Pronouns", value: "pronouns" },
-  { label: "Prepositions", value: "prepositions" },
-  { label: "Syntax", value: "syntax" },
-  { label: "Lexicon", value: "lexicon" },
-  { label: "Pragmatics", value: "pragmatics" },
-  { label: "Orthography", value: "orthography" },
-];
-
-const CEFR_OPTIONS = [
-  { label: "A1", value: "A1" },
-  { label: "A2", value: "A2" },
-  { label: "B1", value: "B1" },
-  { label: "B2", value: "B2" },
-  { label: "C1", value: "C1" },
-  { label: "C2", value: "C2" },
-];
+import { SKILL_DOMAINS, CEFR_OPTIONS } from "../constants";
 
 export const Skills: CollectionConfig = {
   slug: "skills",
@@ -31,6 +10,9 @@ export const Skills: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: ({ req }) => req.user?.["role"] === "admin",
+    update: () => true,
+    delete: ({ req }) => req.user?.["role"] === "admin",
   },
   fields: [
     {

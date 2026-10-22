@@ -1,13 +1,6 @@
 import type { CollectionConfig } from "payload";
-
-const CEFR_OPTIONS = [
-  { label: "A1", value: "A1" },
-  { label: "A2", value: "A2" },
-  { label: "B1", value: "B1" },
-  { label: "B2", value: "B2" },
-  { label: "C1", value: "C1" },
-  { label: "C2", value: "C2" },
-];
+import { CEFR_OPTIONS } from "../constants";
+import { onApproveKnowledgeItem } from "../hooks/on-approve";
 
 const COGNITIVE_LEVELS = [
   { label: "Recognition", value: "recognition" },
@@ -35,6 +28,12 @@ export const KnowledgeItems: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: ({ req }) => req.user?.["role"] === "admin",
+  },
+  hooks: {
+    afterChange: [onApproveKnowledgeItem],
   },
   versions: {
     drafts: true,
@@ -91,7 +90,7 @@ export const KnowledgeItems: CollectionConfig = {
       name: "l1Notes",
       type: "json",
       admin: {
-        description: 'Per-L1 notes or difficulty data: {"en": "...", "hi": {"difficulty": "high", "reason": "..."}}',
+        description: 'Per-L1 notes: {"en": "...", "hi": {"difficulty": "high", "reason": "..."}}',
       },
     },
     {
@@ -135,18 +134,14 @@ export const KnowledgeItems: CollectionConfig = {
       type: "relationship",
       relationTo: "knowledge-items",
       hasMany: true,
-      admin: {
-        description: "Related KIs (reinforces, same concept family)",
-      },
+      admin: { description: "Related KIs (reinforces, same concept family)" },
     },
     {
       name: "confusableWith",
       type: "relationship",
       relationTo: "knowledge-items",
       hasMany: true,
-      admin: {
-        description: "KIs commonly confused with this one",
-      },
+      admin: { description: "KIs commonly confused with this one" },
     },
     {
       name: "exerciseCount",

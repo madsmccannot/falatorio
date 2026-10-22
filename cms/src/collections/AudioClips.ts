@@ -13,13 +13,21 @@ export const AudioClips: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: ({ req }) => req.user?.["role"] === "admin",
   },
   fields: [
     {
       name: "exercise",
       type: "relationship",
       relationTo: "exercises",
-      required: true,
+    },
+    {
+      name: "vocabulary",
+      type: "relationship",
+      relationTo: "vocabulary",
+      admin: { description: "Associated vocabulary entry (if not an exercise clip)" },
     },
     {
       name: "region",
@@ -31,6 +39,7 @@ export const AudioClips: CollectionConfig = {
         { label: "Algarve", value: "algarve" },
         { label: "Acores", value: "acores" },
         { label: "Madeira", value: "madeira" },
+        { label: "Coimbra", value: "coimbra" },
       ],
     },
     {
@@ -43,6 +52,16 @@ export const AudioClips: CollectionConfig = {
       name: "durationMs",
       type: "number",
       admin: { description: "Clip duration in milliseconds" },
+    },
+    {
+      name: "source",
+      type: "select",
+      defaultValue: "tts",
+      options: [
+        { label: "Azure TTS", value: "tts" },
+        { label: "Native Recording", value: "native" },
+      ],
+      admin: { position: "sidebar" },
     },
   ],
 };

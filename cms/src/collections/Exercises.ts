@@ -1,9 +1,10 @@
 import type { CollectionConfig } from "payload";
 import { onPublish } from "../hooks/on-publish";
+import { onApproveExercise } from "../hooks/on-approve";
 
 const EXERCISE_TYPES = [
-  { label: "Translate L1 → PT", value: "translate_l1_to_pt" },
-  { label: "Translate PT → L1", value: "translate_pt_to_l1" },
+  { label: "Translate L1 -> PT", value: "translate_l1_to_pt" },
+  { label: "Translate PT -> L1", value: "translate_pt_to_l1" },
   { label: "Listen and Type", value: "listen_and_type" },
   { label: "Speak and Score", value: "speak_and_score" },
   { label: "Fill in the Blank", value: "fill_blank" },
@@ -16,14 +17,17 @@ export const Exercises: CollectionConfig = {
   slug: "exercises",
   admin: {
     useAsTitle: "type",
-    defaultColumns: ["type", "lesson", "status", "difficulty"],
+    defaultColumns: ["type", "lesson", "status", "difficulty", "knowledgeItems"],
     group: "Content",
   },
   access: {
     read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: ({ req }) => req.user?.["role"] === "admin",
   },
   hooks: {
-    afterChange: [onPublish],
+    afterChange: [onPublish, onApproveExercise],
   },
   versions: {
     drafts: true,
@@ -42,12 +46,18 @@ export const Exercises: CollectionConfig = {
       options: EXERCISE_TYPES,
     },
     {
+      name: "knowledgeItems",
+      type: "relationship",
+      relationTo: "knowledge-items",
+      hasMany: true,
+      admin: { description: "KnowledgeItems this exercise targets" },
+    },
+    {
       name: "prompt",
       type: "json",
       required: true,
       admin: {
-        description:
-          'Exercise prompt. Structure depends on type. E.g., {"text": "How do you say hello?", "context": "formal"}',
+        description: 'Exercise prompt. Structure depends on type.',
       },
     },
     {
@@ -55,6 +65,16 @@ export const Exercises: CollectionConfig = {
       type: "json",
       required: true,
       admin: { description: 'Array of accepted answers: ["Bom dia", "bom dia"]' },
+    },
+    {
+      name: "glossary",
+      type: "json",
+      admin: { description: 'Word glossary: {"obrigado": ["thank you", "thanks"]}' },
+    },
+    {
+      name: "genderPairs",
+      type: "json",
+      admin: { description: 'Gender info: {"amigo": {"masc": "amigo", "fem": "amiga"}}' },
     },
     {
       name: "audioUrl",
@@ -78,7 +98,7 @@ export const Exercises: CollectionConfig = {
       name: "l1Tip",
       type: "json",
       admin: {
-        description: 'L1-specific hint: {"en": "In PT-EU, we say bom dia until noon", "es": "En PT-EU se dice..."}',
+        description: 'L1-specific hint: {"en": "In PT-EU, we say bom dia until noon"}',
       },
     },
     {
@@ -91,9 +111,7 @@ export const Exercises: CollectionConfig = {
         { label: "Review", value: "review" },
         { label: "Live", value: "live" },
       ],
-      admin: {
-        position: "sidebar",
-      },
+      admin: { position: "sidebar" },
     },
     {
       name: "version",
