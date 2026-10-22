@@ -38,7 +38,7 @@ falatorio/
 | Payments | RevenueCat (subscriptions) |
 | AI | Claude Sonnet 5.5 (conversation tutor), Claude Haiku 5.5 (dynamic content generation), Azure TTS |
 | Speech | On-device speech recognition (expo-speech-recognition), on-device TTS (expo-speech), local scoring (Levenshtein + PT-EU phonetic rules) |
-| Storage | MMKV (device), Cloudflare R2 (audio, media) |
+| Storage | MMKV (device, offline mutation queue), Cloudflare R2 (audio, media) |
 | Deploy | Docker, Railway (server), EAS Build (mobile APK/AAB) |
 | Analytics | PostHog (analytics, A/B testing, feature flags), custom batched event queue |
 | i18n | Custom hook-based system, 16 dictionaries (en, pt, es, fr, hi, ur, ar, bn, de, zh, ru, uk, tr, pl, ko, ja), ~437 keys |
@@ -59,7 +59,7 @@ Mastery is calculated from 3 weighted signals: accuracy (50%), variety (25%), an
 
 KnowledgeItems carry 7 cognitive levels (recognition, comprehension, controlled production, transformation, translation, free production, communication) and declare inter-knowledge relations (related, confusable_with, reinforces) for exercise generation and error prediction.
 
-The taxonomy seed contains 272 Skills and 310 KnowledgeItems across 10 domain groups (phonetics, morphology, tenses_moods, determiners, pronouns, prepositions, syntax, lexicon, pragmatics, orthography).
+The taxonomy seed contains 272 Skills and 310 KnowledgeItems across 13 domain groups (phonetics, morphology, tenses_moods, determiners, pronouns, prepositions, syntax, lexicon, pragmatics, orthography, semantics, discourse, rhetoric).
 
 ### Content Hierarchy
 
@@ -143,7 +143,7 @@ Four practice modes:
 
 ### Pronunciation Animations
 
-14 mouth positions (rest, nasal_ao, nasal_vowel, palatal_lateral, palatal_nasal, uvular_r, alveolar_tap, open_e, closed_e, open_o, closed_o, sibilant_s, sibilant_sh, labiodental_v). `AnimatedMouthDiagram` renders anatomical sagittal cross-section SVGs with a recognizable head profile, bezier-interpolated tongue (5 control points: tip, blade, front, dorsum, back), hard/soft palate, velum with nasal airflow arrows, uvula, upper/lower teeth, and protruding lips. Timer-based animation (setInterval at 28ms) with easeInOut interpolation smoothly transitions between positions. `MouthDiagram` is the static equivalent for non-animated contexts. All anatomy and position labels are i18n-translated (17 keys across 16 languages).
+14 mouth positions (rest, nasal_ao, nasal_vowel, palatal_lateral, palatal_nasal, uvular_r, alveolar_tap, open_e, closed_e, open_o, closed_o, sibilant_s, sibilant_sh, labiodental_v). `AnimatedMouthDiagram` renders anatomical sagittal cross-section SVGs with a recognizable head profile, bezier-interpolated tongue (5 control points: tip, blade, front, dorsum, back), alveolar ridge, hard/soft palate with gradient fills and rugae ridges, velum with nasal airflow arrows, uvula, epiglottis, pharynx, upper/lower teeth with roots, lip vermillion border, and nasal septum. Animation uses `requestAnimationFrame` with settle-overshoot for organic tongue movement, contact point glow (pulsing radial gradient at articulation points), and oral airflow arrows for vowels/fricatives. 5200ms cycle with 800ms transitions. `MouthDiagram` is the static equivalent. Position labels are L1-aware via `useTranslation` (minimal labeling -- only what helps the learner identify what to move).
 
 ### Scoring
 
@@ -167,7 +167,7 @@ Pure business logic, zero I/O dependencies:
 - **Entitlements** -- feature gates, heart system, access checks
 - **Gamification** -- XP calculator, streak logic, league promotion, 54 achievements (31 competence badges tied to mastery evidence, including 10 domain-level and 8 sub-domain badges like Senhor do Conjuntivo, Tempos do Passado, Ser ou Estar?)
 - **Ads** -- ad policy (GDPR, tier, cooldowns)
-- **L1 Profiles** -- 15 language transfer profiles with 30 cognates, 40 false friends, 15 phonetic difficulties (with mouthPosition for animated diagrams), 15 grammar gaps each
+- **L1 Profiles** -- 15 language transfer profiles with 30 cognates, 40 false friends, 15 phonetic difficulties (with mouthPosition for animated diagrams), 15 grammar gaps, 45-49 cultural references each
 
 ### `packages/db` -- 29 tables, 20 enums
 
@@ -191,7 +191,7 @@ Users, courses, sections, units, lessons, exercises, audio clips, user progress,
 
 **Audio:** expo-audio for playback (`useAudioPlayer` + `useAudioPlayerStatus`) and recording (`useAudioRecorder` with `RecordingPresets.HIGH_QUALITY`). Recorded audio is read as base64 via expo-file-system.
 
-**Components:** UI primitives (Button, Card, Modal, Toast), exercise renderers, audio (player, recorder), gamification (XP bar, streak badge, league card, achievement toast, mastery dashboard with CEFR estimate), ads (AdProvider, RewardAd, InterstitialAd, BannerAd with useAdReward/useInterstitialAd hooks), paywall (hearts, mid-lesson, Super upsell), shop (ouro balance, IAP modal), pronunciation (animated mouth diagram SVG, phoneme cards, L1-based guide), tappable text with word tooltips (170+ words, 15 L1s, gender pair display), SVG icon system (react-native-svg).
+**Components:** UI primitives (Button, Card, Modal, Toast), exercise renderers, audio (player, recorder), gamification (XP bar, streak badge, league card, achievement toast, mastery dashboard with CEFR estimate), ads (AdProvider, RewardAd, InterstitialAd, BannerAd with useAdReward/useInterstitialAd hooks), paywall (hearts, mid-lesson, Super upsell), shop (ouro balance, IAP modal), pronunciation (animated mouth diagram SVG, phoneme cards, L1-based guide), tappable text with word tooltips (170+ words, 15 L1s, gender pair display), offline sync (OfflineSyncProvider with MMKV mutation queue, auto connectivity probing, flush-on-reconnect), SVG icon system (react-native-svg).
 
 ### `cms` -- 11 collections, 35 prompt templates
 

@@ -26,7 +26,10 @@ type SkillDomain =
   | "syntax"
   | "lexicon"
   | "pragmatics"
-  | "orthography";
+  | "orthography"
+  | "semantics"
+  | "discourse"
+  | "rhetoric";
 
 type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
@@ -357,54 +360,54 @@ export const SKILLS: SkillSeed[] = [
   // =========================================================================
 
   // A2
-  skill("PT.SEM.TEMPORAL.PAST_PRESENT_FUTURE", "syntax", "A2", "Localização temporal básica", "Basic temporal location"),
-  skill("PT.SEM.ASPECT.PERFECTIVE", "syntax", "A2", "Valor perfetivo", "Perfective aspect", ["PT.TENSES.PRETERITE_PERFECT"]),
+  skill("PT.SEM.TEMPORAL.PAST_PRESENT_FUTURE", "semantics", "A2", "Localização temporal básica", "Basic temporal location"),
+  skill("PT.SEM.ASPECT.PERFECTIVE", "semantics", "A2", "Valor perfetivo", "Perfective aspect", ["PT.TENSES.PRETERITE_PERFECT"]),
 
   // B1
-  skill("PT.SEM.TEMPORAL.ANTERIORITY", "syntax", "B1", "Anterioridade", "Anteriority", ["PT.SEM.TEMPORAL.PAST_PRESENT_FUTURE"]),
-  skill("PT.SEM.TEMPORAL.SIMULTANEITY", "syntax", "B1", "Simultaneidade", "Simultaneity", ["PT.SEM.TEMPORAL.PAST_PRESENT_FUTURE"]),
-  skill("PT.SEM.TEMPORAL.POSTERIORITY", "syntax", "B1", "Posterioridade", "Posteriority", ["PT.SEM.TEMPORAL.PAST_PRESENT_FUTURE"]),
-  skill("PT.SEM.ASPECT.IMPERFECTIVE", "syntax", "B1", "Valor imperfetivo", "Imperfective aspect", ["PT.SEM.ASPECT.PERFECTIVE", "PT.TENSES.IMPERFECT"]),
-  skill("PT.SEM.ASPECT.HABITUAL", "syntax", "B1", "Situação habitual", "Habitual situation", ["PT.SEM.ASPECT.IMPERFECTIVE"]),
-  skill("PT.SEM.ASPECT.GENERIC", "syntax", "B1", "Situação genérica", "Generic situation"),
-  skill("PT.SEM.MODALITY.DEONTIC", "syntax", "B1", "Modalidade deôntica", "Deontic modality", ["PT.TENSES.PRESENT"]),
+  skill("PT.SEM.TEMPORAL.ANTERIORITY", "semantics", "B1", "Anterioridade", "Anteriority", ["PT.SEM.TEMPORAL.PAST_PRESENT_FUTURE"]),
+  skill("PT.SEM.TEMPORAL.SIMULTANEITY", "semantics", "B1", "Simultaneidade", "Simultaneity", ["PT.SEM.TEMPORAL.PAST_PRESENT_FUTURE"]),
+  skill("PT.SEM.TEMPORAL.POSTERIORITY", "semantics", "B1", "Posterioridade", "Posteriority", ["PT.SEM.TEMPORAL.PAST_PRESENT_FUTURE"]),
+  skill("PT.SEM.ASPECT.IMPERFECTIVE", "semantics", "B1", "Valor imperfetivo", "Imperfective aspect", ["PT.SEM.ASPECT.PERFECTIVE", "PT.TENSES.IMPERFECT"]),
+  skill("PT.SEM.ASPECT.HABITUAL", "semantics", "B1", "Situação habitual", "Habitual situation", ["PT.SEM.ASPECT.IMPERFECTIVE"]),
+  skill("PT.SEM.ASPECT.GENERIC", "semantics", "B1", "Situação genérica", "Generic situation"),
+  skill("PT.SEM.MODALITY.DEONTIC", "semantics", "B1", "Modalidade deôntica", "Deontic modality", ["PT.TENSES.PRESENT"]),
 
   // B2
-  skill("PT.SEM.ASPECT.ITERATIVE", "syntax", "B2", "Situação iterativa", "Iterative situation", ["PT.SEM.ASPECT.HABITUAL"]),
-  skill("PT.SEM.MODALITY.EPISTEMIC", "syntax", "B2", "Modalidade epistémica", "Epistemic modality", ["PT.SEM.MODALITY.DEONTIC"]),
-  skill("PT.SEM.MODALITY.APPRECIATIVE", "syntax", "B2", "Modalidade apreciativa", "Appreciative modality"),
-  skill("PT.SEM.TEMPORAL.INTER_EVENT", "syntax", "B2", "Relações temporais entre eventos", "Inter-event temporal relations", ["PT.SEM.TEMPORAL.ANTERIORITY", "PT.SEM.TEMPORAL.POSTERIORITY"]),
+  skill("PT.SEM.ASPECT.ITERATIVE", "semantics", "B2", "Situação iterativa", "Iterative situation", ["PT.SEM.ASPECT.HABITUAL"]),
+  skill("PT.SEM.MODALITY.EPISTEMIC", "semantics", "B2", "Modalidade epistémica", "Epistemic modality", ["PT.SEM.MODALITY.DEONTIC"]),
+  skill("PT.SEM.MODALITY.APPRECIATIVE", "semantics", "B2", "Modalidade apreciativa", "Appreciative modality"),
+  skill("PT.SEM.TEMPORAL.INTER_EVENT", "semantics", "B2", "Relações temporais entre eventos", "Inter-event temporal relations", ["PT.SEM.TEMPORAL.ANTERIORITY", "PT.SEM.TEMPORAL.POSTERIORITY"]),
 
   // =========================================================================
   // PRAGMATICS / DISCOURSE — PT.DISCOURSE.*
   // =========================================================================
 
   // A2
-  skill("PT.DISCOURSE.REGISTER.FORMAL_INFORMAL", "pragmatics", "A2", "Registo formal e informal", "Formal and informal register"),
-  skill("PT.DISCOURSE.POLITENESS", "pragmatics", "A2", "Cortesia e tratamento", "Politeness and forms of address"),
+  skill("PT.DISCOURSE.REGISTER.FORMAL_INFORMAL", "discourse", "A2", "Registo formal e informal", "Formal and informal register"),
+  skill("PT.DISCOURSE.POLITENESS", "discourse", "A2", "Cortesia e tratamento", "Politeness and forms of address"),
 
   // B1
-  skill("PT.DISCOURSE.COHESION.LEXICAL", "pragmatics", "B1", "Coesão lexical", "Lexical cohesion", ["PT.LEX.SYNONYMY_ANTONYMY"]),
-  skill("PT.DISCOURSE.COHESION.GRAMMATICAL", "pragmatics", "B1", "Coesão gramatical", "Grammatical cohesion"),
-  skill("PT.DISCOURSE.COHESION.REFERENTIAL", "pragmatics", "B1", "Coesão referencial", "Referential cohesion", ["PT.PRON.PERSONAL.DIRECT_OBJECT"]),
-  skill("PT.DISCOURSE.COHESION.TEMPORAL", "pragmatics", "B1", "Coesão temporal", "Temporal cohesion", ["PT.SEM.TEMPORAL.PAST_PRESENT_FUTURE"]),
-  skill("PT.DISCOURSE.DEIXIS.PERSONAL", "pragmatics", "B1", "Deixis pessoal", "Personal deixis", ["PT.PRON.PERSONAL.SUBJECT"]),
-  skill("PT.DISCOURSE.DEIXIS.TEMPORAL", "pragmatics", "B1", "Deixis temporal", "Temporal deixis"),
-  skill("PT.DISCOURSE.DEIXIS.SPATIAL", "pragmatics", "B1", "Deixis espacial", "Spatial deixis"),
-  skill("PT.DISCOURSE.CONNECTORS", "pragmatics", "B1", "Conectores discursivos", "Discourse connectors"),
+  skill("PT.DISCOURSE.COHESION.LEXICAL", "discourse", "B1", "Coesão lexical", "Lexical cohesion", ["PT.LEX.SYNONYMY_ANTONYMY"]),
+  skill("PT.DISCOURSE.COHESION.GRAMMATICAL", "discourse", "B1", "Coesão gramatical", "Grammatical cohesion"),
+  skill("PT.DISCOURSE.COHESION.REFERENTIAL", "discourse", "B1", "Coesão referencial", "Referential cohesion", ["PT.PRON.PERSONAL.DIRECT_OBJECT"]),
+  skill("PT.DISCOURSE.COHESION.TEMPORAL", "discourse", "B1", "Coesão temporal", "Temporal cohesion", ["PT.SEM.TEMPORAL.PAST_PRESENT_FUTURE"]),
+  skill("PT.DISCOURSE.DEIXIS.PERSONAL", "discourse", "B1", "Deixis pessoal", "Personal deixis", ["PT.PRON.PERSONAL.SUBJECT"]),
+  skill("PT.DISCOURSE.DEIXIS.TEMPORAL", "discourse", "B1", "Deixis temporal", "Temporal deixis"),
+  skill("PT.DISCOURSE.DEIXIS.SPATIAL", "discourse", "B1", "Deixis espacial", "Spatial deixis"),
+  skill("PT.DISCOURSE.CONNECTORS", "discourse", "B1", "Conectores discursivos", "Discourse connectors"),
 
   // B2
-  skill("PT.DISCOURSE.COHERENCE.LOGICAL", "pragmatics", "B2", "Coerência lógico-conceptual", "Logical-conceptual coherence", ["PT.DISCOURSE.COHESION.GRAMMATICAL"]),
-  skill("PT.DISCOURSE.COHERENCE.PRAGMATIC", "pragmatics", "B2", "Coerência pragmático-funcional", "Pragmatic-functional coherence"),
-  skill("PT.DISCOURSE.SPEECH.DIRECT", "pragmatics", "B2", "Discurso direto", "Direct speech"),
-  skill("PT.DISCOURSE.SPEECH.INDIRECT", "pragmatics", "B2", "Discurso indireto", "Indirect speech", ["PT.DISCOURSE.SPEECH.DIRECT"]),
-  skill("PT.DISCOURSE.SPEECH.FREE_INDIRECT", "pragmatics", "B2", "Discurso indireto livre", "Free indirect speech", ["PT.DISCOURSE.SPEECH.INDIRECT"]),
-  skill("PT.DISCOURSE.TEXT_SEQUENCE.NARRATIVE", "pragmatics", "B2", "Sequência narrativa", "Narrative sequence"),
-  skill("PT.DISCOURSE.TEXT_SEQUENCE.DESCRIPTIVE", "pragmatics", "B2", "Sequência descritiva", "Descriptive sequence"),
-  skill("PT.DISCOURSE.TEXT_SEQUENCE.ARGUMENTATIVE", "pragmatics", "B2", "Sequência argumentativa", "Argumentative sequence"),
-  skill("PT.DISCOURSE.TEXT_SEQUENCE.EXPLICATIVE", "pragmatics", "B2", "Sequência explicativa", "Explicative sequence"),
-  skill("PT.DISCOURSE.TEXT_SEQUENCE.DIALOGAL", "pragmatics", "B2", "Sequência dialogal", "Dialogal sequence"),
-  skill("PT.DISCOURSE.INTERTEXTUALITY", "pragmatics", "B2", "Intertextualidade", "Intertextuality"),
+  skill("PT.DISCOURSE.COHERENCE.LOGICAL", "discourse", "B2", "Coerência lógico-conceptual", "Logical-conceptual coherence", ["PT.DISCOURSE.COHESION.GRAMMATICAL"]),
+  skill("PT.DISCOURSE.COHERENCE.PRAGMATIC", "discourse", "B2", "Coerência pragmático-funcional", "Pragmatic-functional coherence"),
+  skill("PT.DISCOURSE.SPEECH.DIRECT", "discourse", "B2", "Discurso direto", "Direct speech"),
+  skill("PT.DISCOURSE.SPEECH.INDIRECT", "discourse", "B2", "Discurso indireto", "Indirect speech", ["PT.DISCOURSE.SPEECH.DIRECT"]),
+  skill("PT.DISCOURSE.SPEECH.FREE_INDIRECT", "discourse", "B2", "Discurso indireto livre", "Free indirect speech", ["PT.DISCOURSE.SPEECH.INDIRECT"]),
+  skill("PT.DISCOURSE.TEXT_SEQUENCE.NARRATIVE", "discourse", "B2", "Sequência narrativa", "Narrative sequence"),
+  skill("PT.DISCOURSE.TEXT_SEQUENCE.DESCRIPTIVE", "discourse", "B2", "Sequência descritiva", "Descriptive sequence"),
+  skill("PT.DISCOURSE.TEXT_SEQUENCE.ARGUMENTATIVE", "discourse", "B2", "Sequência argumentativa", "Argumentative sequence"),
+  skill("PT.DISCOURSE.TEXT_SEQUENCE.EXPLICATIVE", "discourse", "B2", "Sequência explicativa", "Explicative sequence"),
+  skill("PT.DISCOURSE.TEXT_SEQUENCE.DIALOGAL", "discourse", "B2", "Sequência dialogal", "Dialogal sequence"),
+  skill("PT.DISCOURSE.INTERTEXTUALITY", "discourse", "B2", "Intertextualidade", "Intertextuality"),
 
   // =========================================================================
   // ORTHOGRAPHY — PT.ORTH.*
@@ -440,29 +443,29 @@ export const SKILLS: SkillSeed[] = [
   // =========================================================================
 
   // B1
-  skill("PT.RHETORIC.COMPARISON", "lexicon", "B1", "Comparação", "Comparison"),
-  skill("PT.RHETORIC.ENUMERATION", "lexicon", "B1", "Enumeração", "Enumeration"),
-  skill("PT.RHETORIC.HYPERBOLE", "lexicon", "B1", "Hipérbole", "Hyperbole"),
+  skill("PT.RHETORIC.COMPARISON", "rhetoric", "B1", "Comparação", "Comparison"),
+  skill("PT.RHETORIC.ENUMERATION", "rhetoric", "B1", "Enumeração", "Enumeration"),
+  skill("PT.RHETORIC.HYPERBOLE", "rhetoric", "B1", "Hipérbole", "Hyperbole"),
 
   // B2
-  skill("PT.RHETORIC.METAPHOR", "lexicon", "B2", "Metáfora", "Metaphor", ["PT.RHETORIC.COMPARISON"]),
-  skill("PT.RHETORIC.METONYMY", "lexicon", "B2", "Metonímia", "Metonymy"),
-  skill("PT.RHETORIC.PERSONIFICATION", "lexicon", "B2", "Personificação", "Personification", ["PT.RHETORIC.METAPHOR"]),
-  skill("PT.RHETORIC.IRONY", "lexicon", "B2", "Ironia", "Irony"),
-  skill("PT.RHETORIC.EUPHEMISM", "lexicon", "B2", "Eufemismo", "Euphemism"),
-  skill("PT.RHETORIC.ANTITHESIS", "lexicon", "B2", "Antítese", "Antithesis"),
-  skill("PT.RHETORIC.ANAPHORA", "lexicon", "B2", "Anáfora", "Anaphora"),
-  skill("PT.RHETORIC.APOSTROPHE", "lexicon", "B2", "Apóstrofe", "Apostrophe"),
-  skill("PT.RHETORIC.RHETORICAL_QUESTION", "lexicon", "B2", "Interrogação retórica", "Rhetorical question"),
-  skill("PT.RHETORIC.GRADATION", "lexicon", "B2", "Gradação", "Gradation", ["PT.RHETORIC.ENUMERATION"]),
-  skill("PT.RHETORIC.SYNECDOCHE", "lexicon", "B2", "Sinédoque", "Synecdoche", ["PT.RHETORIC.METONYMY"]),
-  skill("PT.RHETORIC.ALLITERATION", "lexicon", "B2", "Aliteração", "Alliteration"),
-  skill("PT.RHETORIC.ONOMATOPOEIA", "lexicon", "B2", "Onomatopeia", "Onomatopoeia"),
-  skill("PT.RHETORIC.SYNESTHESIA", "lexicon", "B2", "Sinestesia", "Synesthesia"),
-  skill("PT.RHETORIC.ALLEGORY", "lexicon", "B2", "Alegoria", "Allegory", ["PT.RHETORIC.METAPHOR"]),
-  skill("PT.RHETORIC.PERIPHRASIS", "lexicon", "B2", "Perífrase", "Periphrasis"),
-  skill("PT.RHETORIC.PLEONASM", "lexicon", "B2", "Pleonasmo", "Pleonasm"),
-  skill("PT.RHETORIC.ANASTROPHE", "lexicon", "B2", "Anástrofe", "Anastrophe"),
+  skill("PT.RHETORIC.METAPHOR", "rhetoric", "B2", "Metáfora", "Metaphor", ["PT.RHETORIC.COMPARISON"]),
+  skill("PT.RHETORIC.METONYMY", "rhetoric", "B2", "Metonímia", "Metonymy"),
+  skill("PT.RHETORIC.PERSONIFICATION", "rhetoric", "B2", "Personificação", "Personification", ["PT.RHETORIC.METAPHOR"]),
+  skill("PT.RHETORIC.IRONY", "rhetoric", "B2", "Ironia", "Irony"),
+  skill("PT.RHETORIC.EUPHEMISM", "rhetoric", "B2", "Eufemismo", "Euphemism"),
+  skill("PT.RHETORIC.ANTITHESIS", "rhetoric", "B2", "Antítese", "Antithesis"),
+  skill("PT.RHETORIC.ANAPHORA", "rhetoric", "B2", "Anáfora", "Anaphora"),
+  skill("PT.RHETORIC.APOSTROPHE", "rhetoric", "B2", "Apóstrofe", "Apostrophe"),
+  skill("PT.RHETORIC.RHETORICAL_QUESTION", "rhetoric", "B2", "Interrogação retórica", "Rhetorical question"),
+  skill("PT.RHETORIC.GRADATION", "rhetoric", "B2", "Gradação", "Gradation", ["PT.RHETORIC.ENUMERATION"]),
+  skill("PT.RHETORIC.SYNECDOCHE", "rhetoric", "B2", "Sinédoque", "Synecdoche", ["PT.RHETORIC.METONYMY"]),
+  skill("PT.RHETORIC.ALLITERATION", "rhetoric", "B2", "Aliteração", "Alliteration"),
+  skill("PT.RHETORIC.ONOMATOPOEIA", "rhetoric", "B2", "Onomatopeia", "Onomatopoeia"),
+  skill("PT.RHETORIC.SYNESTHESIA", "rhetoric", "B2", "Sinestesia", "Synesthesia"),
+  skill("PT.RHETORIC.ALLEGORY", "rhetoric", "B2", "Alegoria", "Allegory", ["PT.RHETORIC.METAPHOR"]),
+  skill("PT.RHETORIC.PERIPHRASIS", "rhetoric", "B2", "Perífrase", "Periphrasis"),
+  skill("PT.RHETORIC.PLEONASM", "rhetoric", "B2", "Pleonasmo", "Pleonasm"),
+  skill("PT.RHETORIC.ANASTROPHE", "rhetoric", "B2", "Anástrofe", "Anastrophe"),
 
   // =========================================================================
   // VERBS — Additional classes (PT.VERBS.*)
@@ -580,33 +583,33 @@ export const SKILLS: SkillSeed[] = [
   // =========================================================================
 
   // B2
-  skill("PT.RHETORIC.ADJECTIVATION", "lexicon", "B2", "Adjetivação", "Adjectivation", ["PT.ADJ.QUALIFYING"]),
+  skill("PT.RHETORIC.ADJECTIVATION", "rhetoric", "B2", "Adjetivação", "Adjectivation", ["PT.ADJ.QUALIFYING"]),
 
   // =========================================================================
   // DISCOURSE GAPS — COHERENCE subtypes + INTERTEXTUALITY subtypes
   // =========================================================================
 
   // B2
-  skill("PT.DISCOURSE.COHERENCE.RELEVANCE", "pragmatics", "B2", "Coerência: relevância", "Coherence: relevance", ["PT.DISCOURSE.COHERENCE.LOGICAL"]),
-  skill("PT.DISCOURSE.COHERENCE.NON_CONTRADICTION", "pragmatics", "B2", "Coerência: não contradição", "Coherence: non-contradiction", ["PT.DISCOURSE.COHERENCE.LOGICAL"]),
-  skill("PT.DISCOURSE.COHERENCE.NON_REDUNDANCY", "pragmatics", "B2", "Coerência: não redundância", "Coherence: non-redundancy", ["PT.DISCOURSE.COHERENCE.LOGICAL"]),
-  skill("PT.DISCOURSE.INTERTEXTUALITY.CITATION", "pragmatics", "B2", "Citação", "Citation", ["PT.DISCOURSE.INTERTEXTUALITY"]),
-  skill("PT.DISCOURSE.INTERTEXTUALITY.EPIGRAPH", "pragmatics", "B2", "Epígrafe", "Epigraph", ["PT.DISCOURSE.INTERTEXTUALITY"]),
-  skill("PT.DISCOURSE.INTERTEXTUALITY.ALLUSION", "pragmatics", "B2", "Alusão", "Allusion", ["PT.DISCOURSE.INTERTEXTUALITY"]),
-  skill("PT.DISCOURSE.INTERTEXTUALITY.PARAPHRASE", "pragmatics", "B2", "Paráfrase", "Paraphrase", ["PT.DISCOURSE.INTERTEXTUALITY"]),
-  skill("PT.DISCOURSE.INTERTEXTUALITY.PARODY", "pragmatics", "B2", "Paródia", "Parody", ["PT.DISCOURSE.INTERTEXTUALITY"]),
-  skill("PT.DISCOURSE.INTERTEXTUALITY.CREATIVE_IMITATION", "pragmatics", "B2", "Imitação criativa", "Creative imitation", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.COHERENCE.RELEVANCE", "discourse", "B2", "Coerência: relevância", "Coherence: relevance", ["PT.DISCOURSE.COHERENCE.LOGICAL"]),
+  skill("PT.DISCOURSE.COHERENCE.NON_CONTRADICTION", "discourse", "B2", "Coerência: não contradição", "Coherence: non-contradiction", ["PT.DISCOURSE.COHERENCE.LOGICAL"]),
+  skill("PT.DISCOURSE.COHERENCE.NON_REDUNDANCY", "discourse", "B2", "Coerência: não redundância", "Coherence: non-redundancy", ["PT.DISCOURSE.COHERENCE.LOGICAL"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.CITATION", "discourse", "B2", "Citação", "Citation", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.EPIGRAPH", "discourse", "B2", "Epígrafe", "Epigraph", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.ALLUSION", "discourse", "B2", "Alusão", "Allusion", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.PARAPHRASE", "discourse", "B2", "Paráfrase", "Paraphrase", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.PARODY", "discourse", "B2", "Paródia", "Parody", ["PT.DISCOURSE.INTERTEXTUALITY"]),
+  skill("PT.DISCOURSE.INTERTEXTUALITY.CREATIVE_IMITATION", "discourse", "B2", "Imitação criativa", "Creative imitation", ["PT.DISCOURSE.INTERTEXTUALITY"]),
 
   // =========================================================================
   // C1 SKILLS
   // =========================================================================
 
-  skill("PT.RHETORIC.ADVANCED_ANALYSIS", "lexicon", "C1", "Análise avançada de recursos expressivos", "Advanced analysis of expressive resources", ["PT.RHETORIC.METAPHOR", "PT.RHETORIC.METONYMY", "PT.RHETORIC.IRONY"]),
-  skill("PT.DISCOURSE.ARGUMENTATION.ADVANCED", "pragmatics", "C1", "Argumentação avançada", "Advanced argumentation", ["PT.COMM.OPINION_TEXT", "PT.DISCOURSE.COHERENCE.LOGICAL"]),
-  skill("PT.SEM.MODALITY.ADVANCED", "syntax", "C1", "Modalidade avançada", "Advanced modality", ["PT.SEM.MODALITY.EPISTEMIC", "PT.SEM.MODALITY.DEONTIC"]),
+  skill("PT.RHETORIC.ADVANCED_ANALYSIS", "rhetoric", "C1", "Análise avançada de recursos expressivos", "Advanced analysis of expressive resources", ["PT.RHETORIC.METAPHOR", "PT.RHETORIC.METONYMY", "PT.RHETORIC.IRONY"]),
+  skill("PT.DISCOURSE.ARGUMENTATION.ADVANCED", "discourse", "C1", "Argumentação avançada", "Advanced argumentation", ["PT.COMM.OPINION_TEXT", "PT.DISCOURSE.COHERENCE.LOGICAL"]),
+  skill("PT.SEM.MODALITY.ADVANCED", "semantics", "C1", "Modalidade avançada", "Advanced modality", ["PT.SEM.MODALITY.EPISTEMIC", "PT.SEM.MODALITY.DEONTIC"]),
   skill("PT.SYNTAX.SUBORDINATION.ADVANCED", "syntax", "C1", "Subordinação avançada e orações reduzidas", "Advanced subordination and reduced clauses", ["PT.SYNTAX.SUB.CONCESSIVE", "PT.SYNTAX.SUB.CONDITIONAL"]),
   skill("PT.PHON.PROSODY.ADVANCED", "phonetics", "C1", "Prosódia avançada", "Advanced prosody", ["PT.PHON.RHYTHM"]),
-  skill("PT.DISCOURSE.TEXT_TYPES.ADVANCED", "pragmatics", "C1", "Tipologias textuais avançadas", "Advanced text types", ["PT.DISCOURSE.TEXT_SEQUENCE.ARGUMENTATIVE"]),
+  skill("PT.DISCOURSE.TEXT_TYPES.ADVANCED", "discourse", "C1", "Tipologias textuais avançadas", "Advanced text types", ["PT.DISCOURSE.TEXT_SEQUENCE.ARGUMENTATIVE"]),
   skill("PT.LEX.REGISTER.FORMAL", "lexicon", "C1", "Registo formal e literário", "Formal and literary register", ["PT.LEX.REGISTER"]),
   skill("PT.MORPH.WORD_FORMATION.ADVANCED", "morphology", "C1", "Formação de palavras avançada", "Advanced word formation", ["PT.MORPH.DERIVATION.PARASYNTHESIS", "PT.MORPH.COMPOSITION"]),
 
@@ -624,9 +627,9 @@ export const SKILLS: SkillSeed[] = [
   skill("PT.SYNTAX.ELLIPSIS", "syntax", "C1", "Elipse sintática", "Syntactic ellipsis", ["PT.SYNTAX.COORD.COPULATIVE"]),
 
   // --- C1: Discourse ---
-  skill("PT.DISCOURSE.HEDGING", "pragmatics", "C1", "Atenuação e mitigação", "Hedging and mitigation", ["PT.SEM.MODALITY.EPISTEMIC", "PT.DISCOURSE.POLITENESS"]),
-  skill("PT.DISCOURSE.SPEECH_ACTS.INDIRECT", "pragmatics", "C1", "Atos de fala indiretos", "Indirect speech acts", ["PT.DISCOURSE.SPEECH.INDIRECT"]),
-  skill("PT.DISCOURSE.ACADEMIC_WRITING", "pragmatics", "C1", "Escrita académica", "Academic writing", ["PT.COMM.EXPOSITION", "PT.DISCOURSE.COHERENCE.LOGICAL"]),
+  skill("PT.DISCOURSE.HEDGING", "discourse", "C1", "Atenuação e mitigação", "Hedging and mitigation", ["PT.SEM.MODALITY.EPISTEMIC", "PT.DISCOURSE.POLITENESS"]),
+  skill("PT.DISCOURSE.SPEECH_ACTS.INDIRECT", "discourse", "C1", "Atos de fala indiretos", "Indirect speech acts", ["PT.DISCOURSE.SPEECH.INDIRECT"]),
+  skill("PT.DISCOURSE.ACADEMIC_WRITING", "discourse", "C1", "Escrita académica", "Academic writing", ["PT.COMM.EXPOSITION", "PT.DISCOURSE.COHERENCE.LOGICAL"]),
 
   // --- C1: Lexicon ---
   skill("PT.LEX.IDIOMS.ADVANCED", "lexicon", "C1", "Expressões idiomáticas avançadas", "Advanced idiomatic expressions", ["PT.LEX.COLLOCATION"]),
@@ -642,17 +645,17 @@ export const SKILLS: SkillSeed[] = [
   // C2 SKILLS
   // =========================================================================
 
-  skill("PT.DISCOURSE.STYLISTICS", "pragmatics", "C2", "Estilística e efeitos discursivos", "Stylistics and discourse effects", ["PT.RHETORIC.ADVANCED_ANALYSIS", "PT.DISCOURSE.ARGUMENTATION.ADVANCED"]),
-  skill("PT.SEM.PRAGMATIC_INFERENCE", "syntax", "C2", "Inferência pragmática e implicaturas", "Pragmatic inference and implicature", ["PT.SEM.MODALITY.ADVANCED"]),
+  skill("PT.DISCOURSE.STYLISTICS", "discourse", "C2", "Estilística e efeitos discursivos", "Stylistics and discourse effects", ["PT.RHETORIC.ADVANCED_ANALYSIS", "PT.DISCOURSE.ARGUMENTATION.ADVANCED"]),
+  skill("PT.SEM.PRAGMATIC_INFERENCE", "semantics", "C2", "Inferência pragmática e implicaturas", "Pragmatic inference and implicature", ["PT.SEM.MODALITY.ADVANCED"]),
   skill("PT.LEX.ETYMOLOGY", "lexicon", "C2", "Etimologia e evolução lexical", "Etymology and lexical evolution", ["PT.LEX.ARCHAISM_NEOLOGISM", "PT.PHON.HISTORICAL"]),
   skill("PT.SYNTAX.STYLISTIC_VARIATION", "syntax", "C2", "Variação sintática estilística", "Stylistic syntactic variation", ["PT.SYNTAX.SUBORDINATION.ADVANCED"]),
-  skill("PT.DISCOURSE.DIALECTAL_AWARENESS", "pragmatics", "C2", "Variação dialetal lusófona", "Lusophone dialectal variation", ["PT.LEX.REGISTER.FORMAL", "PT.DISCOURSE.TEXT_TYPES.ADVANCED"]),
+  skill("PT.DISCOURSE.DIALECTAL_AWARENESS", "discourse", "C2", "Variação dialetal lusófona", "Lusophone dialectal variation", ["PT.LEX.REGISTER.FORMAL", "PT.DISCOURSE.TEXT_TYPES.ADVANCED"]),
   skill("PT.LEX.HUMOR_WORDPLAY", "lexicon", "C2", "Humor, ironia e jogo de palavras", "Humor, irony and wordplay", ["PT.RHETORIC.IRONY", "PT.LEX.IDIOMS.ADVANCED"]),
-  skill("PT.DISCOURSE.LITERARY_ANALYSIS", "pragmatics", "C2", "Análise literária avançada", "Advanced literary analysis", ["PT.RHETORIC.ADVANCED_ANALYSIS", "PT.DISCOURSE.STYLISTICS"]),
+  skill("PT.DISCOURSE.LITERARY_ANALYSIS", "discourse", "C2", "Análise literária avançada", "Advanced literary analysis", ["PT.RHETORIC.ADVANCED_ANALYSIS", "PT.DISCOURSE.STYLISTICS"]),
   skill("PT.PHON.DIALECTAL_VARIATION", "phonetics", "C2", "Variação fonética dialetal", "Dialectal phonetic variation", ["PT.PHON.PROSODY.ADVANCED", "PT.PHON.HISTORICAL"]),
   skill("PT.SYNTAX.ARCHAIC_FORMS", "syntax", "C2", "Construções sintáticas arcaicas", "Archaic syntactic constructions", ["PT.SYNTAX.STYLISTIC_VARIATION", "PT.TENSES.LITERARY_PLUPERFECT"]),
   skill("PT.LEX.CREATIVE_NEOLOGY", "lexicon", "C2", "Neologia e uso criativo", "Neology and creative usage", ["PT.LEX.ETYMOLOGY", "PT.MORPH.WORD_FORMATION.ADVANCED"]),
-  skill("PT.DISCOURSE.TRANSLATION_CONTRASTIVE", "pragmatics", "C2", "Consciência tradutológica contrastiva", "Contrastive translation awareness", ["PT.DISCOURSE.DIALECTAL_AWARENESS"]),
+  skill("PT.DISCOURSE.TRANSLATION_CONTRASTIVE", "discourse", "C2", "Consciência tradutológica contrastiva", "Contrastive translation awareness", ["PT.DISCOURSE.DIALECTAL_AWARENESS"]),
   skill("PT.ORTH.HISTORICAL_CONVENTIONS", "orthography", "C2", "Convenções ortográficas históricas", "Historical orthographic conventions", ["PT.ORTH.SPELLING_REFORM"]),
 ];
 
