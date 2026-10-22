@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { t } from "../trpc/router.js";
+import { t } from "../trpc/trpc.js";
 import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 
 export const speechRouter = t.router({

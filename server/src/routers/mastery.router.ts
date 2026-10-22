@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { eq, and, sql, desc, count, inArray } from "drizzle-orm";
-import { t } from "../trpc/router.js";
+import { t } from "../trpc/trpc.js";
 import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import { recalculateMasteryForKnowledgeItems } from "../services/mastery-recalculator.service.js";
 import {

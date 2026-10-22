@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { t } from "../trpc/router.js";
+import { t } from "../trpc/trpc.js";
 import { protectedProcedure, clerkTokenProcedure, rateLimiter, ipRateLimiter } from "../trpc/middleware.js";
 import { users, transactions } from "@falatorio/db/schema";
 import { L1_CODES, USER_GOALS, OURO } from "@falatorio/core";

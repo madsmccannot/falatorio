@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { eq, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { t } from "../trpc/router.js";
+import { t } from "../trpc/trpc.js";
 import { protectedProcedure, spendLock, rateLimiter } from "../trpc/middleware.js";
 import { transactions } from "@falatorio/db/schema";
 import { computeBalance, type Transaction } from "@falatorio/core/economy";

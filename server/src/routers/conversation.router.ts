@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { t } from "../trpc/router.js";
+import { t } from "../trpc/trpc.js";
 import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
 import { conversationSessions, skillEvidence, knowledgeItems } from "@falatorio/db/schema";
 import { EXPLAINS } from "@falatorio/core";

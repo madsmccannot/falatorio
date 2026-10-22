@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { eq, and, lte, count } from "drizzle-orm";
-import { t } from "../trpc/router.js";
+import { t } from "../trpc/trpc.js";
 import { protectedProcedure } from "../trpc/middleware.js";
 import {
   userProgress,
