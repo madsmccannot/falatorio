@@ -14,6 +14,7 @@ import { initSentry, identifyUser } from "@/lib/sentry";
 import { initPostHog, identifyPostHogUser } from "@/lib/posthog";
 import { getString, KEYS } from "@/lib/storage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { OfflineSyncProvider } from "@/components/OfflineSyncProvider";
 import { checkRetentionMilestones } from "@/lib/retention-tracker";
 
 SplashScreen.preventAutoHideAsync();
@@ -160,12 +161,14 @@ function AppShell({ children }: { children: React.ReactNode }) {
       <ErrorBoundary>
         <SafeAreaProvider>
           <TRPCWrapper>
-            <AdProvider>
-              <ToastProvider>
-                {children}
-                <StatusBar style="auto" />
-              </ToastProvider>
-            </AdProvider>
+            <OfflineSyncProvider>
+              <AdProvider>
+                <ToastProvider>
+                  {children}
+                  <StatusBar style="auto" />
+                </ToastProvider>
+              </AdProvider>
+            </OfflineSyncProvider>
           </TRPCWrapper>
         </SafeAreaProvider>
       </ErrorBoundary>
