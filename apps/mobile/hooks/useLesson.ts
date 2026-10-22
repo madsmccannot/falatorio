@@ -1,6 +1,13 @@
 import { useState, useCallback, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { trackExerciseAnswer, trackExerciseExplain } from "@/lib/analytics";
+import { useOffline } from "@/components/OfflineSyncProvider";
+
+function isNetworkError(err: unknown): boolean {
+  if (err instanceof TypeError && /network|fetch|abort/i.test(err.message)) return true;
+  if (err instanceof Error && /ECONNREFUSED|ETIMEDOUT|network/i.test(err.message)) return true;
+  return false;
+}
 
 export interface Exercise {
   id: string;
@@ -92,6 +99,7 @@ export function useLesson(lessonId?: string) {
     error: null,
   });
 
+  const { enqueue, markOffline } = useOffline();
   const startMutation = trpc.lesson.startLesson.useMutation();
   const submitMutation = trpc.lesson.submitAnswer.useMutation();
   const completeMutation = trpc.lesson.completeLesson.useMutation();
@@ -176,6 +184,28 @@ export function useLesson(lessonId?: string) {
 
       return result;
     } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue("exerciseResult", {
+          sessionId: state.sessionId,
+          exerciseId: exercise.id,
+          answer,
+        });
+        markOffline();
+        setState((prev) => ({
+          ...prev,
+          phase: "feedback" as const,
+          feedback: {
+            correct: true,
+            userAnswer: answer,
+          },
+          results: [...prev.results, {
+            correct: true,
+            score: 0,
+            feedback: null,
+          }],
+        }));
+        return { correct: true, offlineQueued: true };
+      }
       setState((prev) => ({
         ...prev,
         phase: "answering" as const,
@@ -183,7 +213,7 @@ export function useLesson(lessonId?: string) {
       }));
       return null;
     }
-  }, [state.sessionId, state.exercises, state.currentIndex, submitMutation]);
+  }, [state.sessionId, state.exercises, state.currentIndex, submitMutation, enqueue, markOffline]);
 
   const requestExplanation = useCallback(async () => {
     const exercise = state.exercises[state.currentIndex];
@@ -254,17 +284,26 @@ export function useLesson(lessonId?: string) {
   const completeLesson = useCallback(async () => {
     if (!state.sessionId) return null;
 
-    const result = await completeMutation.mutateAsync({
-      sessionId: state.sessionId,
-    });
+    try {
+      const result = await completeMutation.mutateAsync({
+        sessionId: state.sessionId,
+      });
 
-    await utils.hearts.getState.invalidate();
-    await utils.economy.getBalance.invalidate();
-    await utils.gamification.getStreak.invalidate();
-    await utils.content.getSectionMap.invalidate();
+      await utils.hearts.getState.invalidate();
+      await utils.economy.getBalance.invalidate();
+      await utils.gamification.getStreak.invalidate();
+      await utils.content.getSectionMap.invalidate();
 
-    return result;
-  }, [state.sessionId, completeMutation, utils]);
+      return result;
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue("lessonComplete", { sessionId: state.sessionId });
+        markOffline();
+        return { offlineQueued: true };
+      }
+      throw err;
+    }
+  }, [state.sessionId, completeMutation, utils, enqueue, markOffline]);
 
   const currentExercise = state.exercises[state.currentIndex] ?? null;
   const progress = state.exercises.length > 0

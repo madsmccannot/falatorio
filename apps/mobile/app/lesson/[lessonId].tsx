@@ -116,6 +116,15 @@ export default function LessonScreen() {
       const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000);
       const correctCount = results.filter((r) => r.correct).length;
       const accuracy = totalExercises > 0 ? correctCount / totalExercises : 0;
+
+      if ("offlineQueued" in result) {
+        router.replace({
+          pathname: "/lesson/result",
+          params: { xpEarned: "0", ouroEarned: "0", elapsedSeconds: String(elapsed), offline: "1" },
+        });
+        return;
+      }
+
       trackLessonComplete(lessonId!, elapsed, result.xpEarned, result.ouroEarned, accuracy);
 
       router.replace({
