@@ -28,6 +28,10 @@ import { HeartIcon } from "@/components/icons";
 import { useTranslation } from "@/lib/i18n";
 import { trackLessonStart, trackLessonComplete, trackLessonQuit, trackScreenView } from "@/lib/analytics";
 import { useTheme } from "@/lib/theme";
+import { getString, KEYS } from "@/lib/storage";
+import { getProfile } from "@falatorio/core/l1-profiles";
+import type { MouthPosition } from "@falatorio/core/l1-profiles";
+import type { L1Code } from "@falatorio/core";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 
 export default function LessonScreen() {
@@ -49,6 +53,7 @@ export default function LessonScreen() {
     isSubmitting,
     requestExplanation,
     nextExercise,
+    skipSpeech,
     isComplete,
     isStarting,
     completeLesson,
@@ -61,6 +66,18 @@ export default function LessonScreen() {
 
   const [showQuit, setShowQuit] = React.useState(false);
   const [showOutOfHearts, setShowOutOfHearts] = React.useState(false);
+
+  const pronunciationHint = React.useMemo((): MouthPosition | undefined => {
+    if (currentExercise?.type !== "speak_and_score") return undefined;
+    try {
+      const l1 = getString(KEYS.SELECTED_L1) ?? "en";
+      const profile = getProfile(l1 as L1Code);
+      const diff = profile.transfer.phoneticDifficulties.find((d) => d.mouthPosition);
+      return diff?.mouthPosition;
+    } catch {
+      return undefined;
+    }
+  }, [currentExercise?.type]);
 
   useEffect(() => {
     startLesson();
@@ -192,6 +209,7 @@ export default function LessonScreen() {
               audioUrl: currentExercise.audioUrl ?? undefined,
             }}
             onAnswer={handleAnswer}
+            onSkipSpeech={skipSpeech}
             disabled={phase !== "answering"}
           />
         </Animated.View>
@@ -214,6 +232,8 @@ export default function LessonScreen() {
           explain={explain}
           onContinue={handleContinue}
           onExplain={requestExplanation}
+          exerciseType={currentExercise?.type}
+          pronunciationHint={pronunciationHint}
         />
       )}
 

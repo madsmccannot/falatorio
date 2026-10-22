@@ -80,4 +80,4 @@ export function getAllProfiles(): readonly L1Profile[] {
   return Object.values(PROFILES);
 }
 
-export { type L1Profile, type CulturalRef, type TransferProfile } from "./types.js";
+export { type L1Profile, type CulturalRef, type TransferProfile, type MouthPosition } from "./types.js";

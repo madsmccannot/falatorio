@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import Animated, { SlideInDown, FadeIn } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/Button";
+import { AnimatedMouthDiagram } from "@/components/pronunciation";
+import type { MouthPosition } from "@falatorio/core/l1-profiles";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 
 type PunctuationWarning = {
@@ -25,6 +27,8 @@ type Props = {
   explain: ExplainState;
   onContinue: () => void;
   onExplain: () => void;
+  exerciseType?: string;
+  pronunciationHint?: MouthPosition;
 };
 
 export function FeedbackOverlay({
@@ -35,6 +39,8 @@ export function FeedbackOverlay({
   explain,
   onContinue,
   onExplain,
+  exerciseType,
+  pronunciationHint,
 }: Props) {
   React.useEffect(() => {
     if (correct) {
@@ -70,6 +76,17 @@ export function FeedbackOverlay({
 
       {l1Tip && (
         <Text style={styles.tip}>{l1Tip}</Text>
+      )}
+
+      {!correct && exerciseType === "speak_and_score" && pronunciationHint && (
+        <Animated.View entering={FadeIn.duration(300)} style={styles.mouthBox}>
+          <AnimatedMouthDiagram
+            position={pronunciationHint}
+            size={120}
+            showLabel
+            autoPlay
+          />
+        </Animated.View>
       )}
 
       {explain.loading && (
@@ -161,6 +178,10 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     color: colors.primary[700],
     fontStyle: "italic",
+    marginBottom: spacing.sm,
+  },
+  mouthBox: {
+    alignItems: "center",
     marginBottom: spacing.sm,
   },
   explainBox: {

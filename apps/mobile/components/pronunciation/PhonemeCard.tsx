@@ -100,7 +100,6 @@ export function PhonemeCard({ phoneme, onPress }: PhonemeCardProps) {
                 position={phoneme.mouthPosition}
                 size={160}
                 autoPlay={expanded}
-                t={t as (key: string) => string}
               />
             </View>
           )}
