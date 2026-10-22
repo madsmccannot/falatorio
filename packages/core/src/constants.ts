@@ -166,11 +166,21 @@ export const LEAGUE = {
 
 export const LESSON = {
   EXERCISES_PER_LESSON: 15,
+  EXERCISES_BY_NODE_TYPE: {
+    lesson: 15,
+    application: 12,
+    practice: 10,
+    recap: 8,
+    chest: 0,
+  } as Record<string, number>,
+  SECTION_EXERCISE_BONUS: [0, 2, 3, 5] as readonly number[],
   NEW_RATIO: 0.6,
   REVIEW_RATIO: 0.4,
   CULTURAL_ITEMS_PER_SESSION: 2,
   PASS_THRESHOLD: 0.8,
   REVIEW_ITEMS_MAX: 20,
+  AUDIO_EXERCISE_TYPES: ["listen_and_type", "speak_and_score"] as readonly string[],
+  MAX_SAME_TYPE_CONSECUTIVE: 2,
 } as const;
 
 export const PRACTICE = {

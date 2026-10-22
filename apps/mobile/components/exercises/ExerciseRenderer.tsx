@@ -32,6 +32,7 @@ export type ExerciseData = {
 export type ExerciseProps = {
   exercise: ExerciseData;
   onAnswer: (answer: string) => void;
+  onSkipSpeech?: () => void;
   disabled?: boolean;
 };
 
@@ -50,7 +51,7 @@ const RENDERERS: Record<string, React.ComponentType<ExerciseProps>> = {
   speak_and_score: SpeakAndScore,
 };
 
-export function ExerciseRenderer({ exercise, onAnswer, disabled }: ExerciseProps) {
+export function ExerciseRenderer({ exercise, onAnswer, onSkipSpeech, disabled }: ExerciseProps) {
   const Component = RENDERERS[exercise.type];
 
   if (!Component) {
@@ -59,7 +60,7 @@ export function ExerciseRenderer({ exercise, onAnswer, disabled }: ExerciseProps
 
   return (
     <Suspense fallback={<ActivityIndicator size="large" />}>
-      <Component exercise={exercise} onAnswer={onAnswer} disabled={disabled} />
+      <Component exercise={exercise} onAnswer={onAnswer} onSkipSpeech={onSkipSpeech} disabled={disabled} />
     </Suspense>
   );
 }

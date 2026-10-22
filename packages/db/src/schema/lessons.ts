@@ -9,7 +9,13 @@ import {
 } from "drizzle-orm/pg-core";
 import { units } from "./units.js";
 
-export const nodeTypeEnum = pgEnum("node_type", ["lesson", "chest"]);
+export const nodeTypeEnum = pgEnum("node_type", [
+  "lesson",
+  "chest",
+  "application",
+  "practice",
+  "recap",
+]);
 
 export const lessons = pgTable("lessons", {
   id: uuid("id").primaryKey().defaultRandom(),

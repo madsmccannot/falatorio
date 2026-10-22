@@ -16,6 +16,7 @@ import { Loading } from "@/components/ui/Loading";
 import {
   HeartIcon, StreakIcon, GoldPrisms, BookIcon, ChestIcon,
   StarIcon, BoltIcon, LockIcon, CheckIcon, ChevronRightIcon,
+  StrengthIcon, TrophyIcon,
 } from "@/components/icons";
 import { useTheme } from "@/lib/theme";
 import { useTranslation } from "@/lib/i18n";
@@ -74,7 +75,7 @@ function getEstimatedXp(sectionSortOrder: number, isUnitFinal: boolean, isRepeat
 type LessonNode = {
   id: string;
   sortOrder: number;
-  nodeType: "lesson" | "chest";
+  nodeType: "lesson" | "chest" | "application" | "practice" | "recap";
   sessionsRequired: number;
   rewardConfig: { type: string; amount: number } | null;
   completed: boolean;
@@ -94,7 +95,7 @@ type UnitWithLessons = {
 
 type SelectedLesson = {
   id: string;
-  nodeType: "lesson" | "chest";
+  nodeType: "lesson" | "chest" | "application" | "practice" | "recap";
   unitTitle: string;
   unitColor: string;
   lessonNum: number;
@@ -239,12 +240,19 @@ function LessonPathNode({
     RNAnimated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, speed: 20, bounciness: 8 }).start();
   };
 
+  const iconColor = locked ? "#9CA3AF" : "#FFFFFF";
   const nodeIcon = isChest ? (
     <ChestIcon size={28} />
   ) : isCompleted ? (
-    <CheckIcon size={26} color={locked ? "#9CA3AF" : "#FFFFFF"} />
+    <CheckIcon size={26} color={iconColor} />
+  ) : node.nodeType === "application" ? (
+    <BookIcon size={24} color={iconColor} />
+  ) : node.nodeType === "practice" ? (
+    <StrengthIcon size={24} color={iconColor} />
+  ) : node.nodeType === "recap" ? (
+    <TrophyIcon size={24} color={iconColor} />
   ) : (
-    <StarIcon size={26} color={locked ? "#9CA3AF" : "#FFFFFF"} />
+    <StarIcon size={26} color={iconColor} />
   );
 
   return (
@@ -374,7 +382,7 @@ function UnitGuideModal({
     ? (descMap[l1] ?? descMap["en"] ?? descMap["pt"] ?? null)
     : null;
   const unitColor = getUnitColor(unit.colorIndex);
-  const lessonsCount = unit.lessons.filter((l) => l.nodeType === "lesson").length;
+  const lessonsCount = unit.lessons.filter((l) => l.nodeType !== "chest").length;
   const completed = unit.lessons.filter((l) => l.completed).length;
   const progressPct = lessonsCount > 0 ? (completed / lessonsCount) * 100 : 0;
   const phrases = unit.guidePhrases ?? [];
@@ -1314,7 +1322,7 @@ export default function LearnScreen() {
                     globalNodeIdx++;
 
                     const sectionSort = currentSection?.sortOrder ?? 0;
-                    const isLastLesson = lIdx === unit.lessons.length - 1 && lesson.nodeType === "lesson";
+                    const isLastLesson = lIdx === unit.lessons.length - 1 && lesson.nodeType !== "chest";
 
                     return (
                       <LessonPathNode
@@ -1327,7 +1335,7 @@ export default function LearnScreen() {
                         isSelected={selectedLesson?.id === lesson.id}
                         theme={theme}
                         onPress={() => {
-                          const lessonCount = unit.lessons.filter((l) => l.nodeType === "lesson").length;
+                          const lessonCount = unit.lessons.filter((l) => l.nodeType !== "chest").length;
                           setSelectedLesson({
                             id: lesson.id,
                             nodeType: lesson.nodeType,
@@ -1420,9 +1428,9 @@ export default function LearnScreen() {
                   <Text style={[styles.tooltipSub, { color: theme.textMuted }]}>
                     {selectedLesson?.nodeType === "chest"
                       ? t("learn.chest")
-                      : `${t("learn.lesson")} ${selectedLesson?.lessonNum ?? 1} / ${selectedLesson?.totalLessons ?? 1}`}
+                      : `${selectedLesson?.nodeType === "recap" ? t("learn.recap_label") : selectedLesson?.nodeType === "practice" ? t("learn.practice_label") : selectedLesson?.nodeType === "application" ? t("learn.apply_label") : t("learn.lesson")} ${selectedLesson?.lessonNum ?? 1} / ${selectedLesson?.totalLessons ?? 1}`}
                   </Text>
-                  {selectedLesson && selectedLesson.nodeType === "lesson" && selectedLesson.sessionsRequired > 0 && (
+                  {selectedLesson && selectedLesson.nodeType !== "chest" && selectedLesson.sessionsRequired > 0 && (
                     <View style={styles.tooltipArcsRow}>
                       {Array.from({ length: selectedLesson.sessionsRequired }, (_, i) => (
                         <View
@@ -1461,7 +1469,7 @@ export default function LearnScreen() {
                           ? t("learn.recap").toUpperCase()
                           : t("result.continue").toUpperCase()}
                     </Text>
-                    {selectedLesson?.nodeType === "lesson" && (
+                    {selectedLesson && selectedLesson.nodeType !== "chest" && (
                       <Text style={styles.tooltipBtnXp}>
                         +{getEstimatedXp(selectedLesson.sectionSortOrder, selectedLesson.isLastInUnit, selectedLesson.completed)} XP
                       </Text>

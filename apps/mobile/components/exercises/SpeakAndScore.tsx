@@ -11,13 +11,15 @@ import * as Haptics from "expo-haptics";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { SpeakButton } from "./SpeakButton";
 import { useTheme } from "@/lib/theme";
+import { useTranslation } from "@/lib/i18n";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { TappableText } from "./TappableText";
 import { scoreSpeech, type SpeechScore } from "@/lib/speech-scorer";
 import type { ExerciseProps } from "./ExerciseRenderer";
 
-export function SpeakAndScore({ exercise, onAnswer, disabled }: ExerciseProps) {
+export function SpeakAndScore({ exercise, onAnswer, onSkipSpeech, disabled }: ExerciseProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { isListening, transcript, confidence, startListening, stopListening } = useSpeechRecognition();
   const [finalTranscript, setFinalTranscript] = React.useState<string | null>(null);
   const [scoreResult, setScoreResult] = React.useState<SpeechScore | null>(null);
@@ -142,6 +144,14 @@ export function SpeakAndScore({ exercise, onAnswer, disabled }: ExerciseProps) {
           </View>
         ) : null}
       </View>
+
+      {onSkipSpeech && (
+        <Pressable onPress={onSkipSpeech} style={styles.cantSpeakButton} hitSlop={8}>
+          <Text style={[styles.cantSpeakText, { color: theme.textMuted }]}>
+            {t("lesson.cant_speak_now")}
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -216,5 +226,16 @@ const styles = StyleSheet.create({
   transcriptionText: {
     fontSize: typography.sizes.md,
     lineHeight: 24,
+  },
+  cantSpeakButton: {
+    alignSelf: "center",
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
+  },
+  cantSpeakText: {
+    fontSize: typography.sizes.sm,
+    fontWeight: "500",
+    textDecorationLine: "underline",
   },
 });

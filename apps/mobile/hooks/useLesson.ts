@@ -52,6 +52,32 @@ interface LessonState {
   error: string | null;
 }
 
+function extractTargetText(prompt: unknown): string {
+  if (typeof prompt === "string") {
+    try { const obj = JSON.parse(prompt); return obj.targetText ?? obj.sentence ?? obj.text ?? prompt; }
+    catch { return prompt; }
+  }
+  if (typeof prompt === "object" && prompt !== null) {
+    const p = prompt as Record<string, unknown>;
+    return String(p["targetText"] ?? p["sentence"] ?? p["text"] ?? JSON.stringify(prompt));
+  }
+  return String(prompt);
+}
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j]!, a[i]!];
+  }
+  return a;
+}
+
+function speechToReorder(ex: Exercise): Exercise {
+  const sentence = extractTargetText(ex.prompt);
+  return { ...ex, type: "reorder_words", words: shuffle(sentence.split(/\s+/)), sentence };
+}
+
 export function useLesson(lessonId?: string) {
   const startTimeRef = useRef<number>(Date.now());
 
@@ -98,6 +124,21 @@ export function useLesson(lessonId?: string) {
       return null;
     }
   }, [lessonId, startMutation]);
+
+  const skipSpeech = useCallback(() => {
+    setState((prev) => {
+      const exercises = prev.exercises.map((ex, i) => {
+        if (i < prev.currentIndex || ex.type !== "speak_and_score") return ex;
+        return speechToReorder(ex);
+      });
+      return {
+        ...prev,
+        exercises,
+        feedback: null,
+        explain: { loading: false, explanation: null, remaining: null, error: null },
+      };
+    });
+  }, []);
 
   const submitAnswer = useCallback(async (answer: string) => {
     const exercise = state.exercises[state.currentIndex];
@@ -246,6 +287,7 @@ export function useLesson(lessonId?: string) {
     isSubmitting: state.phase === "submitting",
     requestExplanation,
     nextExercise,
+    skipSpeech,
     isComplete: state.phase === "complete",
     startLesson,
     completeLesson,

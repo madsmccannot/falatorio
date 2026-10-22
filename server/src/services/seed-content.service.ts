@@ -1,4 +1,5 @@
 import type { Database } from "@falatorio/db/client";
+import { eq } from "drizzle-orm";
 import { courses, sections, units, lessons, lessonSkills, skills } from "@falatorio/db/schema";
 
 import { L1_PHASE_1, L1_PHASE_2, type L1Code, type CEFRLevel } from "@falatorio/core";
@@ -26,7 +27,7 @@ export interface SectionDef {
   units: UnitDef[];
 }
 
-const GRAMMAR_TO_SKILLS: Record<string, string[]> = {
+export const GRAMMAR_TO_SKILLS: Record<string, string[]> = {
   "ser present": ["PT.TENSES.PRESENT", "PT.TENSES.SER_ESTAR"],
   "articles": ["PT.DET.ARTICLES.DEFINITE", "PT.DET.ARTICLES.INDEFINITE"],
   "cardinal numbers": ["PT.ADJ.NUMERAL"],
@@ -124,27 +125,64 @@ function getChestPositions(totalSlots: number): number[] {
   return [first, second];
 }
 
-// Sessions per node derived from pedagogical position within the unit.
-// Early nodes (new content) need more repetition; later nodes (application/
-// reinforcement) need less. Recap (last lesson) is always 1. Sections add
-// a scaling factor so advanced content naturally requires more work.
-const SESSION_RANGE: Array<{ min: number; max: number }> = [
-  { min: 2, max: 4 },  // S1 Basico
-  { min: 2, max: 5 },  // S2 Principiante
-  { min: 3, max: 6 },  // S3 Intermedio
-  { min: 3, max: 7 },  // S4 Avancado
-];
+// Sessions per node type. Each type has a base count scaled by section.
+// Section multipliers make advanced content naturally require more work.
+type NodeType = "lesson" | "application" | "practice" | "recap" | "chest";
 
-function computeSessionsRequired(
-  lessonIdx: number,
-  totalLessons: number,
+const SECTION_MULTIPLIER = [1.0, 1.15, 1.3, 1.5];
+
+const NODE_BASE_SESSIONS: Record<NodeType, number> = {
+  lesson: 4,
+  application: 3,
+  practice: 2,
+  recap: 1,
+  chest: 0,
+};
+
+function computeSessionsForNodeType(
+  nodeType: NodeType,
   sectionIdx: number,
 ): number {
-  if (lessonIdx === totalLessons - 1) return 1;
-  const effective = totalLessons - 1;
-  const ratio = effective > 1 ? lessonIdx / (effective - 1) : 0;
-  const cfg = SESSION_RANGE[sectionIdx] ?? SESSION_RANGE[1]!;
-  return Math.round(cfg.max - ratio * (cfg.max - cfg.min));
+  if (nodeType === "chest") return 0;
+  if (nodeType === "recap") return 1;
+  const base = NODE_BASE_SESSIONS[nodeType];
+  const mult = SECTION_MULTIPLIER[sectionIdx] ?? 1.15;
+  return Math.round(base * mult);
+}
+
+// Assign pedagogical node types within a unit's lesson slots.
+// Ramp-up: units 1-3 are lesson-only, units 4-6 introduce application,
+// units 7+ add practice (weak-point reinforcement). Last node = recap always.
+// Recap reviews THAT unit's content (1 session).
+function assignNodeTypes(lessonCount: number, cumulativeUnitIdx: number): NodeType[] {
+  if (lessonCount <= 1) return ["recap"];
+  if (lessonCount === 2) return ["lesson", "recap"];
+
+  const body = lessonCount - 1;
+  const types: NodeType[] = [];
+
+  if (cumulativeUnitIdx < 3) {
+    // Units 1-3: all new content + recap
+    for (let i = 0; i < body; i++) types.push("lesson");
+  } else if (cumulativeUnitIdx < 6) {
+    // Units 4-6: new content + application + recap
+    const contentEnd = Math.ceil(body * 0.6);
+    for (let i = 0; i < body; i++) {
+      types.push(i < contentEnd ? "lesson" : "application");
+    }
+  } else {
+    // Units 7+: new content + application + practice + recap
+    const contentEnd = Math.ceil(body * 0.4);
+    const appEnd = contentEnd + Math.ceil(body * 0.3);
+    for (let i = 0; i < body; i++) {
+      if (i < contentEnd) types.push("lesson");
+      else if (i < appEnd) types.push("application");
+      else types.push("practice");
+    }
+  }
+
+  types.push("recap");
+  return types;
 }
 
 export const COURSE_SECTIONS: SectionDef[] = [
@@ -353,6 +391,16 @@ export async function seedCourseStructure(
 ): Promise<{ courseId: string; sectionCount: number; unitCount: number; lessonCount: number; chestCount: number }> {
   const profile = getProfile(l1);
 
+  const existing = await db
+    .select({ id: courses.id })
+    .from(courses)
+    .where(eq(courses.l1Source, l1))
+    .limit(1);
+  if (existing.length > 0) {
+    console.log(`  Skipping ${l1}: course already exists (${existing[0]!.id})`);
+    return { courseId: existing[0]!.id, sectionCount: 0, unitCount: 0, lessonCount: 0, chestCount: 0 };
+  }
+
   const [course] = await db
     .insert(courses)
     .values({
@@ -437,17 +485,18 @@ export async function seedCourseStructure(
       for (let s = 0; s < totalSlots; s++) {
         if (!chestPositions.has(s)) lessonSlots.push(s);
       }
-      const totalLessonsInUnit = lessonSlots.length;
+      const nodeTypes = assignNodeTypes(lessonSlots.length, unitCount);
 
       for (let slotIdx = 0; slotIdx < totalSlots; slotIdx++) {
         const isChest = chestPositions.has(slotIdx);
         const lessonIdx = isChest ? -1 : lessonSlots.indexOf(slotIdx);
-        const sessions = isChest ? 0 : computeSessionsRequired(lessonIdx, totalLessonsInUnit, sIdx);
+        const nodeType: NodeType = isChest ? "chest" : nodeTypes[lessonIdx] ?? "lesson";
+        const sessions = computeSessionsForNodeType(nodeType, sIdx);
 
         const [lesson] = await db.insert(lessons).values({
           unitId: unit!.id,
           sortOrder: slotIdx,
-          nodeType: isChest ? "chest" : "lesson",
+          nodeType,
           sessionsRequired: sessions,
           grammarFocus: isChest ? [] : unitDef.grammarFocus,
           vocabTarget: isChest ? [] : unitDef.vocabTarget,

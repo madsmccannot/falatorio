@@ -67,18 +67,20 @@ The taxonomy seed contains 272 Skills and 310 KnowledgeItems across 10 domain gr
 Course  (1 per L1 language)
   └── Section  (1-4 numbered + Daily Refresh)
         └── Unit  (variable per section)
-              └── Node  (lesson or chest)
+              └── Node  (lesson | application | practice | recap | chest)
                     └── Exercise  (dynamically generated)
 ```
 
-| Section | CEFR | Units | Slots/Unit | Sessions/Lesson | XP/Lesson | Pattern |
-|---------|------|-------|-----------|-----------------|-----------|---------|
-| S1 Basico | A1-A2 | 10 | 5-6 | 2-4 | 25 | Survival basics |
-| S2 Principiante | A2-B1 | 30 | 6-7 | 2-5 | 25 | Daily life in Portugal |
-| S3 Intermedio | B2-C1 | 40 | 6-8 | 3-6 | 30 | Conversation, work, culture |
-| S4 Avancado | C1-C2 | 50 | 7-9 | 3-7 | 30 | Nuance, register, mastery |
+Node types ramp by position within the course: early units are lesson-only, mid units add application, later units add practice. The last non-chest node in every unit is always a recap (1 session). Chests are reward nodes with 0 sessions and 0 exercises.
 
-Total: 130 units, ~930 slots (lessons + chests). Chest rewards cycle through ouro, XP boosts, streak freezes, and occasional Super days.
+| Section | CEFR | Units | Slots/Unit | Sessions (lesson/app/practice/recap) | XP/Lesson | Pattern |
+|---------|------|-------|-----------|--------------------------------------|-----------|---------|
+| S1 Basico | A1-A2 | 10 | 5-6 | 4 / 3 / 2 / 1 | 25 | Survival basics |
+| S2 Principiante | A2-B1 | 30 | 6-7 | 5 / 3 / 2 / 1 | 25 | Daily life in Portugal |
+| S3 Intermedio | B2-C1 | 40 | 6-8 | 5 / 4 / 3 / 1 | 30 | Conversation, work, culture |
+| S4 Avancado | C1-C2 | 50 | 7-9 | 6 / 5 / 3 / 1 | 30 | Nuance, register, mastery |
+
+Total per course: 130 units, ~930 slots (lessons + chests), across 15 L1 courses (~13,950 nodes total). Chest rewards cycle through ouro, XP boosts, streak freezes, and occasional Super days.
 
 Each lesson requires multiple exercise sessions to fully master. The number of sessions is determined by each node's pedagogical position within the unit, not by section alone: early nodes (new content) require more sessions, later nodes (application/reinforcement) require fewer, and the unit recap (last lesson in each unit) always requires 1 session. `sessionsRequired` is stored per lesson in the database. Progress arcs around each lesson node show how many sessions are completed. Repeating an already-completed lesson awards reduced XP (15).
 
