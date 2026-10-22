@@ -20,6 +20,9 @@ export const skillDomainEnum = pgEnum("skill_domain", [
   "lexicon",
   "pragmatics",
   "orthography",
+  "semantics",
+  "discourse",
+  "rhetoric",
 ]);
 
 export const skills = pgTable("skills", {

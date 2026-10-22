@@ -108,6 +108,9 @@ const DOMAIN_I18N_KEYS: Record<string, string> = {
   lexicon: "reference.domain_lexicon",
   pragmatics: "reference.domain_pragmatics",
   orthography: "reference.domain_orthography",
+  semantics: "reference.domain_semantics",
+  discourse: "reference.domain_discourse",
+  rhetoric: "reference.domain_rhetoric",
 };
 
 function ChevronIcon({ size = 16, color = "#94A3B8", direction = "right" }: { size?: number; color?: string; direction?: "right" | "down" }) {
