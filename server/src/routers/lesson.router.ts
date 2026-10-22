@@ -22,7 +22,7 @@ import {
   streaks,
 } from "@falatorio/db/schema";
 import { LESSON, EXERCISE_COGNITIVE_MAP, COGNITIVE_LEVELS, PRACTICE, DAILY_REFRESH } from "@falatorio/core";
-import { runAdaptiveEngine, getAllowedCognitiveLevels, type AdaptiveEngineInput } from "@falatorio/core/lesson";
+import { runAdaptiveEngine, getAllowedCognitiveLevels, exerciseCountForNode, diversifyExerciseOrder, type AdaptiveEngineInput } from "@falatorio/core/lesson";
 import { scoreTextAnswer } from "@falatorio/core/scoring";
 import { scoreToRating } from "@falatorio/core/fsrs";
 import { schedule, createNewCard, type FSRSCard } from "@falatorio/core/fsrs";
@@ -162,6 +162,34 @@ export const lessonRouter = t.router({
         .from(users)
         .where(eq(users.id, ctx.user.userId))
         .limit(1);
+
+      const [lessonMeta] = await ctx.db
+        .select({ nodeType: lessons.nodeType, unitId: lessons.unitId })
+        .from(lessons)
+        .where(eq(lessons.id, input.lessonId))
+        .limit(1);
+
+      let sectionIdxForCount = 0;
+      if (lessonMeta) {
+        const [unitSec] = await ctx.db
+          .select({ sectionId: units.sectionId })
+          .from(units)
+          .where(eq(units.id, lessonMeta.unitId))
+          .limit(1);
+        if (unitSec) {
+          const [sec] = await ctx.db
+            .select({ sortOrder: sections.sortOrder })
+            .from(sections)
+            .where(eq(sections.id, unitSec.sectionId))
+            .limit(1);
+          sectionIdxForCount = sec?.sortOrder ?? 0;
+        }
+      }
+
+      const exerciseTarget = exerciseCountForNode(
+        lessonMeta?.nodeType ?? "lesson",
+        sectionIdxForCount,
+      );
 
       const allSkills = await ctx.db.select().from(skills);
       const prereqs = await ctx.db.select().from(skillPrerequisites);
@@ -345,31 +373,41 @@ export const lessonRouter = t.router({
       const withinLevel = allLessonExercises.filter(
         (ex) => allowedCogLevels.has(exerciseToCognitiveLevel(ex.type)),
       );
-      if (withinLevel.length >= LESSON.EXERCISES_PER_LESSON) {
+      if (withinLevel.length >= exerciseTarget) {
         allLessonExercises = withinLevel;
       }
 
+      const unlockedSet = new Set(engineOutput.unlockedSkillIds);
+
       const prioritized: typeof allLessonExercises = [];
       const rest: typeof allLessonExercises = [];
+      const locked: typeof allLessonExercises = [];
 
       for (const ex of allLessonExercises) {
         const exSkills = exerciseSkillMap.get(ex.id);
         if (exSkills && [...exSkills].some((sid) => recommendedSkillIds.has(sid))) {
           prioritized.push(ex);
+        } else if (exSkills && [...exSkills].every((sid) => !unlockedSet.has(sid))) {
+          locked.push(ex);
         } else {
           rest.push(ex);
         }
       }
 
-      const lessonExercises = [
-        ...prioritized,
-        ...rest,
-      ].slice(0, LESSON.EXERCISES_PER_LESSON)
-       .sort((a, b) => {
-         const aIdx = cogOrder[exerciseToCognitiveLevel(a.type)] ?? 0;
-         const bIdx = cogOrder[exerciseToCognitiveLevel(b.type)] ?? 0;
-         return aIdx - bIdx;
-       });
+      const available = [...prioritized, ...rest];
+      if (available.length < exerciseTarget) {
+        available.push(...locked.slice(0, exerciseTarget - available.length));
+      }
+
+      const lessonExercises = diversifyExerciseOrder(
+        available
+          .slice(0, exerciseTarget)
+          .sort((a, b) => {
+            const aIdx = cogOrder[exerciseToCognitiveLevel(a.type)] ?? 0;
+            const bIdx = cogOrder[exerciseToCognitiveLevel(b.type)] ?? 0;
+            return aIdx - bIdx;
+          }),
+      );
 
       const cognitiveLevels = lessonExercises.map((e) =>
         exerciseToCognitiveLevel(e.type),
@@ -410,7 +448,7 @@ export const lessonRouter = t.router({
             .where(eq(lessons.unitId, unitRow.id))
             .orderBy(lessons.sortOrder);
 
-          const lastLesson = unitLessons.filter((l) => l.nodeType === "lesson").at(-1);
+          const lastLesson = unitLessons.filter((l) => l.nodeType !== "chest").at(-1);
           isUnitFinal = lastLesson?.id === input.lessonId;
         }
       }
@@ -1219,7 +1257,7 @@ export const lessonRouter = t.router({
         .where(
           and(
             eq(lessons.unitId, node.unitId),
-            eq(lessons.nodeType, "lesson"),
+            sql`${lessons.nodeType} != 'chest'`,
             sql`${lessons.sortOrder} < ${node.sortOrder}`,
           ),
         );

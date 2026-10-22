@@ -53,3 +53,7 @@ export {
   type AdaptiveEngineInput,
   type AdaptiveEngineOutput,
 } from "./adaptive-engine.js";
+export {
+  exerciseCountForNode,
+  diversifyExerciseOrder,
+} from "./exercise-selection.js";
