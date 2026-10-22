@@ -31,15 +31,6 @@ export async function processGenerateExercises(
     throw new Error(`Lesson ${lessonId} not found`);
   }
 
-  const result = await generateLesson({
-    l1: l1Source as L1Code,
-    cefrLevel: cefrLevel as CEFRLevel,
-    grammarFocus,
-    vocabTopics: vocabTarget,
-    weaknesses: weaknesses ?? [],
-    exerciseCount: count,
-  });
-
   const lessonSkillRows = await db
     .select({ skillId: lessonSkills.skillId })
     .from(lessonSkills)
@@ -49,10 +40,36 @@ export async function processGenerateExercises(
 
   const lessonKIs = skillIds.length > 0
     ? await db
-        .select({ id: knowledgeItems.id, skillId: knowledgeItems.skillId })
+        .select({
+          id: knowledgeItems.id,
+          skillId: knowledgeItems.skillId,
+          code: knowledgeItems.code,
+          rule: knowledgeItems.rule,
+          examples: knowledgeItems.examples,
+          commonErrors: knowledgeItems.commonErrors,
+          l1Notes: knowledgeItems.l1Notes,
+        })
         .from(knowledgeItems)
         .where(inArray(knowledgeItems.skillId, skillIds))
     : [];
+
+  const kiContext = lessonKIs.slice(0, 12).map((ki) => ({
+    code: ki.code,
+    rule: ki.rule,
+    examples: (ki.examples ?? []).slice(0, 3),
+    commonErrors: (ki.commonErrors ?? []).slice(0, 2),
+    l1Note: ki.l1Notes?.[l1Source] ?? undefined,
+  }));
+
+  const result = await generateLesson({
+    l1: l1Source as L1Code,
+    cefrLevel: cefrLevel as CEFRLevel,
+    grammarFocus,
+    vocabTopics: vocabTarget,
+    weaknesses: weaknesses ?? [],
+    exerciseCount: count,
+    knowledgeItems: kiContext,
+  });
 
   for (const ex of result.exercises) {
     const [inserted] = await db

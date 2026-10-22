@@ -43,6 +43,14 @@ export interface GeneratedLesson {
   vocabTopics: string[];
 }
 
+export interface KnowledgeItemContext {
+  code: string;
+  rule: string;
+  examples: string[];
+  commonErrors: string[];
+  l1Note?: string | { difficulty: string; reason: string; expectedErrors?: string[] };
+}
+
 export async function generateLesson(params: {
   l1: L1Code;
   cefrLevel: CEFRLevel;
@@ -50,6 +58,7 @@ export async function generateLesson(params: {
   vocabTopics?: string[];
   weaknesses?: string[];
   exerciseCount?: number;
+  knowledgeItems?: KnowledgeItemContext[];
 }): Promise<GeneratedLesson> {
   const {
     l1,
@@ -58,6 +67,7 @@ export async function generateLesson(params: {
     vocabTopics: rawVocab = [],
     weaknesses: rawWeaknesses = [],
     exerciseCount = 15,
+    knowledgeItems: kiItems = [],
   } = params;
 
   const grammarFocus = rawGrammar.map(sanitizePromptInput).filter(Boolean);
@@ -85,6 +95,7 @@ export async function generateLesson(params: {
     phoneticDifficulties: transfer.phoneticDifficulties.slice(0, 6),
     cognates: transfer.cognates.slice(0, 10),
     culturalRefs: cefrCulturalRefs,
+    knowledgeItems: kiItems,
   });
 
   const response = await getClient().messages.create({
@@ -191,11 +202,12 @@ function buildLessonPrompt(params: {
   phoneticDifficulties: Array<{ sound: string | Record<string, string>; ipa: string; description: string | Record<string, string> }>;
   cognates: readonly string[];
   culturalRefs: Array<{ contentPt: string; contentL1: string; explanation: string }>;
+  knowledgeItems?: KnowledgeItemContext[];
 }): string {
   const {
     l1, l1Name, cefrLevel, grammarFocus, vocabTopics, weaknesses,
     exerciseCount, falseFriends, grammarGaps, phoneticDifficulties,
-    cognates, culturalRefs,
+    cognates, culturalRefs, knowledgeItems: kiItems = [],
   } = params;
 
   return `Generate ${exerciseCount} European Portuguese (PT-EU, NOT Brazilian) exercises for a ${cefrLevel} learner whose native language is ${l1Name} (${l1}).
@@ -217,7 +229,18 @@ ${cognates.join(", ")}
 CULTURAL CONTEXT (weave into exercises naturally):
 ${culturalRefs.map((c) => `- ${c.contentPt}: ${c.contentL1}`).join("\n")}
 
-=== EXERCISE PARAMETERS ===
+${kiItems.length > 0 ? `=== KNOWLEDGE ITEMS (target these specifically) ===
+
+${kiItems.map((ki) => {
+  const l1Note = ki.l1Note
+    ? typeof ki.l1Note === "string" ? ki.l1Note : `${ki.l1Note.difficulty}: ${ki.l1Note.reason}`
+    : "";
+  return `[${ki.code}] ${ki.rule}${ki.examples.length > 0 ? `\n  Examples: ${ki.examples.join(" | ")}` : ""}${ki.commonErrors.length > 0 ? `\n  Common errors: ${ki.commonErrors.join("; ")}` : ""}${l1Note ? `\n  ${l1Name} note: ${l1Note}` : ""}`;
+}).join("\n\n")}
+
+Each exercise MUST target at least one knowledge item above. Reference the exact rule and common errors when designing the exercise.
+
+` : ""}=== EXERCISE PARAMETERS ===
 
 ${grammarFocus.length > 0 ? `Grammar focus: ${grammarFocus.join(", ")}` : "Grammar: based on L1 gaps above"}
 ${vocabTopics.length > 0 ? `Vocabulary topics: ${vocabTopics.join(", ")}` : "Vocabulary: general for ${cefrLevel}"}
