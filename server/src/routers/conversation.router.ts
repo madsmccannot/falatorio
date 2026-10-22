@@ -2,13 +2,14 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc/trpc.js";
-import { protectedProcedure, rateLimiter } from "../trpc/middleware.js";
+import { protectedProcedure, rateLimiter, dailyCap } from "../trpc/middleware.js";
 import { conversationSessions, skillEvidence, knowledgeItems } from "@falatorio/db/schema";
-import { EXPLAINS } from "@falatorio/core";
+import { EXPLAINS, AI_BUDGET } from "@falatorio/core";
 import { chatWithTutor, explainGrammarError } from "../services/llm.service.js";
 
 export const conversationRouter = t.router({
   startSession: protectedProcedure
+    .use(dailyCap(AI_BUDGET.CONVERSATION_DAILY_FREE, AI_BUDGET.CONVERSATION_DAILY_SUPER, "conversation"))
     .use(rateLimiter(15, 60_000, "conversation:start"))
     .input(
       z.object({

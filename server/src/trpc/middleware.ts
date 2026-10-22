@@ -86,5 +86,27 @@ export const spendLock = t.middleware(async ({ ctx, next }) => {
   }
 });
 
+export const dailyCap = (freeLimit: number, superLimit: number, scope: string) =>
+  t.middleware(async ({ ctx, next }) => {
+    if (!ctx.user) return next();
+
+    const limit = ctx.user.tier === "super" ? superLimit : freeLimit;
+    if (!Number.isFinite(limit)) return next();
+
+    const today = new Date().toISOString().slice(0, 10);
+    const key = `dailycap:${scope}:${ctx.user.userId}:${today}`;
+    const current = await ctx.redis.incr(key);
+    if (current === 1) {
+      await ctx.redis.expire(key, 86400);
+    }
+    if (current > limit) {
+      throw new TRPCError({
+        code: "TOO_MANY_REQUESTS",
+        message: `Daily ${scope} limit reached (${limit})`,
+      });
+    }
+    return next();
+  });
+
 export const protectedProcedure = t.procedure.use(authGuard);
 export const superProcedure = t.procedure.use(authGuard).use(requireSuper);

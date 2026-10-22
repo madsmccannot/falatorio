@@ -41,7 +41,7 @@ falatorio/
 | Storage | MMKV (device, offline mutation queue), Cloudflare R2 (audio, media) |
 | Deploy | Docker, Railway (server), EAS Build (mobile APK/AAB) |
 | Analytics | PostHog (analytics, A/B testing, feature flags), custom batched event queue |
-| i18n | Custom hook-based system, 16 dictionaries (en, pt, es, fr, hi, ur, ar, bn, de, zh, ru, uk, tr, pl, ko, ja), ~437 keys |
+| i18n | Custom hook-based system, 16 dictionaries (en, pt, es, fr, hi, ur, ar, bn, de, zh, ru, uk, tr, pl, ko, ja), 514 keys |
 
 ## Core Concepts
 
@@ -141,6 +141,14 @@ Four practice modes:
 - **Conversation** -- AI-powered scenario-based chat with pronunciation feedback (8 scenarios gated by CEFR)
 - **Common Mistakes** -- accumulated errors at 0.5x XP (3 sessions/day free, unlimited Super)
 
+### Reference Tab
+
+Three sections, all L1-aware:
+
+- **Portuguese Alphabet** -- shown only for non-Latin L1 users (hi, bn, ur, ar, zh, ru, uk, ko, ja). 7 letter groups (vowels, accented, 4 consonant sets, digraphs) with IPA transcriptions, example words, and interactive quiz exercises (pick the letter that matches a word). Progress tracked per group.
+- **Pronunciation Guide** -- renders the L1-specific phonetic difficulties from the user's L1 profile using `PronunciationGuide` with animated mouth/tongue diagrams.
+- **Grammar Glossary** -- collapsible list of mastered KnowledgeItems grouped by the 13 skill domains. Each entry shows the rule, L1-aware explanation, example sentences, and CEFR level badge. Populated from `mastery.getUserGlossary` (empty until the user completes lessons).
+
 ### Pronunciation Animations
 
 14 mouth positions (rest, nasal_ao, nasal_vowel, palatal_lateral, palatal_nasal, uvular_r, alveolar_tap, open_e, closed_e, open_o, closed_o, sibilant_s, sibilant_sh, labiodental_v). `AnimatedMouthDiagram` renders anatomical sagittal cross-section SVGs with a recognizable head profile, bezier-interpolated tongue (5 control points: tip, blade, front, dorsum, back), alveolar ridge, hard/soft palate with gradient fills and rugae ridges, velum with nasal airflow arrows, uvula, epiglottis, pharynx, upper/lower teeth with roots, lip vermillion border, and nasal septum. Animation uses `requestAnimationFrame` with settle-overshoot for organic tongue movement, contact point glow (pulsing radial gradient at articulation points), and oral airflow arrows for vowels/fricatives. 5200ms cycle with 800ms transitions. `MouthDiagram` is the static equivalent. Position labels are L1-aware via `useTranslation` (minimal labeling -- only what helps the learner identify what to move).
@@ -151,7 +159,7 @@ Text scoring uses Levenshtein distance with PT-EU phonetic normalization. Speech
 
 ### Internationalization
 
-All UI strings translatable via `useTranslation()` hook. 16 dictionaries (15 L1 languages + Portuguese) with ~437 keys each at full parity. English is the source of truth; Portuguese has full coverage with proper diacritics (Acordo Ortografico). All hardcoded UI strings translated to PT-PT. Placement test and section test questions are fully translated in all 15 languages.
+All UI strings translatable via `useTranslation()` hook. 16 dictionaries (15 L1 languages + Portuguese) with 514 keys each at full parity. English is the source of truth; Portuguese has full coverage with proper diacritics (Acordo Ortografico). All hardcoded UI strings translated to PT-PT. Placement test and section test questions are fully translated in all 15 languages.
 
 ## Package Breakdown
 
@@ -185,7 +193,7 @@ Users, courses, sections, units, lessons, exercises, audio clips, user progress,
 
 **Onboarding:** welcome, sign-up/sign-in (email + Google SSO via Clerk), choose profile, language select, GDPR consent, goal, daily goal, level, placement test (10 questions, all 15 L1s), plan.
 
-**Tabs:** learn (winding path with 3D lesson nodes, glow arcs, chest rendering, locked modal, lesson tooltip popup, press animations, section cards, Daily Refresh banner, quest progress, section skip test), practice (FSRS review queue), league (leaderboard with trophy carousel, promotion/demotion zones, L1 flags), shop, profile (blue hero header with gear icon, SUPER badge, overview stats, friend streaks, achievements carousel, mastery dashboard, inline L1/goal pickers), reference.
+**Tabs:** learn (winding path with 3D lesson nodes, glow arcs, chest rendering, locked modal, lesson tooltip popup, press animations, section cards, Daily Refresh banner, quest progress, section skip test), practice (FSRS review queue), league (leaderboard with trophy carousel, promotion/demotion zones, L1 flags), shop, profile (blue hero header with gear icon, SUPER badge, overview stats, friend streaks, achievements carousel, mastery dashboard, inline L1/goal pickers), reference (alphabet guide, pronunciation guide, grammar glossary).
 
 **Lesson flow:** Tapping a lesson node opens a tooltip popup showing unit title, lesson number, session progress dots, and a "CONTINUAR +XP" button. 8 exercise types (translate, fill blank, listen & type, match pairs, pick correct, reorder words, speak & score), feedback overlay, result screen, chest opening (Reanimated shake + reward reveal).
 
@@ -304,7 +312,7 @@ Railway config (`railway.json`) uses the Dockerfile builder with a `/health` hea
 
 ## Security
 
-- **Rate limiting** -- all mutation endpoints are rate-limited per user via Redis with scoped keys (`ratelimit:user:{scope}:{userId}`). Public auth endpoints use IP-based rate limiting (`ratelimit:ip:{scope}:{ip}`) to prevent username enumeration.
+- **Rate limiting** -- all mutation endpoints are rate-limited per user via Redis with scoped keys (`ratelimit:user:{scope}:{userId}`). Public auth endpoints use IP-based rate limiting (`ratelimit:ip:{scope}:{ip}`) to prevent username enumeration. AI-consuming endpoints (conversation, speech) have daily budget caps per tier (free: 20 conversations/30 speech, super: 100/200).
 - **Prompt injection** -- user-supplied text is sanitized before inclusion in LLM prompts (content-generator service).
 - **LIKE injection** -- search queries escape `%`, `_`, and `\` before use in SQL LIKE clauses.
 - **AdMob SSV** -- rewarded ad callbacks are verified via Google's public key before crediting ouro.
@@ -314,8 +322,8 @@ Railway config (`railway.json`) uses the Dockerfile builder with a `/health` hea
 
 ## Testing & CI
 
-- **274 tests** -- 132 core (pure logic) + 142 server (routers, services, integration).
-- **Coverage gates** -- CI enforces minimum thresholds via vitest v8 provider: server (40% statements, 30% branches, 35% functions, 40% lines), core (50/40/45/50%).
+- **Tests** -- core (pure logic) + server (routers, services, integration). Integration tests cover i18n dictionary parity, XP formula invariants, unit path validation, lesson flow, hearts, FSRS scheduling, and economy.
+- **Coverage gates** -- CI enforces minimum thresholds via vitest v8 provider: server (35% statements, 35% branches, 15% functions, 35% lines), core (50/40/45/50%).
 - **Type-checking** -- `tsc --noEmit` runs for both `packages/core` and `server` in CI.
 
 ## Visual Identity

@@ -303,6 +303,103 @@ describe("session security invariants", () => {
   });
 });
 
+describe("XP formula: all multipliers combined", () => {
+  it("first-of-day bonus adds 10 XP before boost", () => {
+    const without = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
+      isPerfect: false,
+      isFirstOfDay: false,
+      boostLevel: 0,
+    });
+    const with_ = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
+      isPerfect: false,
+      isFirstOfDay: true,
+      boostLevel: 0,
+    });
+    expect(with_.firstOfDayBonus).toBe(10);
+    expect(with_.total - without.total).toBe(10);
+  });
+
+  it("first-of-day + perfect stack additively before boost", () => {
+    const both = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
+      isPerfect: true,
+      isFirstOfDay: true,
+      boostLevel: 0,
+    });
+    expect(both.total).toBe(both.base + both.perfectBonus + both.firstOfDayBonus);
+  });
+
+  it("boost multiplies the full sum (base + perfect + firstOfDay)", () => {
+    const unboosted = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
+      isPerfect: true,
+      isFirstOfDay: true,
+      boostLevel: 0,
+    });
+    const boosted = calculateXP({
+      sectionSortOrder: 0,
+      isUnitFinal: false,
+      practiceType: false,
+      isPerfect: true,
+      isFirstOfDay: true,
+      boostLevel: 2,
+    });
+    expect(boosted.total).toBe(unboosted.total * 2);
+  });
+
+  it("max XP scenario: unit-final + S4 + perfect + firstOfDay + triple boost", () => {
+    const max = calculateXP({
+      sectionSortOrder: 3,
+      isUnitFinal: true,
+      practiceType: false,
+      isPerfect: true,
+      isFirstOfDay: true,
+      boostLevel: 3,
+    });
+    const sectionMult = 1.4;
+    const scaledBase = Math.round(50 * sectionMult);
+    const beforeBoost = scaledBase + 5 + 10;
+    expect(max.total).toBe(Math.round(beforeBoost * 3));
+  });
+
+  it("practice types use section multiplier on their own base", () => {
+    const review = calculateXP({
+      sectionSortOrder: 3,
+      isUnitFinal: false,
+      practiceType: "review",
+      isPerfect: false,
+      isFirstOfDay: false,
+      boostLevel: 0,
+    });
+    expect(review.base).toBe(Math.round(10 * 1.4));
+  });
+
+  it("XP result breakdown fields sum to total", () => {
+    const result = calculateXP({
+      sectionSortOrder: 2,
+      isUnitFinal: false,
+      practiceType: false,
+      isPerfect: true,
+      isFirstOfDay: true,
+      boostLevel: 2,
+    });
+    const expected = Math.round(
+      (result.base + result.perfectBonus + result.firstOfDayBonus) * result.boostMultiplier,
+    );
+    expect(result.total).toBe(expected);
+  });
+});
+
 describe("scoring edge cases", () => {
   it("accent-insensitive matching works for PT-EU", () => {
     const result = scoreTextAnswer("cafe", ["café"]);
