@@ -1,13 +1,38 @@
-export function initSentry() {}
+import * as Sentry from "@sentry/react-native";
+import Constants from "expo-constants";
 
-export function identifyUser(_userId: string, _l1?: string) {}
+const DSN = Constants.expoConfig?.extra?.sentryDsn as string | undefined;
 
-export function clearUser() {}
+export function initSentry() {
+  if (!DSN) return;
+  Sentry.init({
+    dsn: DSN,
+    tracesSampleRate: 0.2,
+    environment: __DEV__ ? "development" : "production",
+    enabled: !__DEV__,
+  });
+}
 
-export function captureError(_error: unknown, _context?: Record<string, unknown>) {}
+export function identifyUser(userId: string, l1?: string) {
+  if (!DSN) return;
+  Sentry.setUser({ id: userId, l1 });
+}
+
+export function clearUser() {
+  if (!DSN) return;
+  Sentry.setUser(null);
+}
+
+export function captureError(error: unknown, context?: Record<string, unknown>) {
+  if (!DSN) return;
+  Sentry.captureException(error, { extra: context });
+}
 
 export function addBreadcrumb(
-  _category: string,
-  _message: string,
-  _data?: Record<string, unknown>,
-) {}
+  category: string,
+  message: string,
+  data?: Record<string, unknown>,
+) {
+  if (!DSN) return;
+  Sentry.addBreadcrumb({ category, message, data, level: "info" });
+}

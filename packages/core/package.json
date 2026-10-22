@@ -40,6 +40,10 @@
       "types": "./src/ads/index.ts",
       "default": "./dist/ads/index.js"
     },
+    "./mastery": {
+      "types": "./src/mastery/index.ts",
+      "default": "./dist/mastery/index.js"
+    },
     "./l1-profiles": {
       "types": "./src/l1-profiles/index.ts",
       "default": "./dist/l1-profiles/index.js"

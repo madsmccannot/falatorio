@@ -1,16 +1,24 @@
 import { env } from "../env.js";
 
-const VOICE_NAME = "pt-PT-FernandaNeural";
+const VOICES = ["pt-PT-FernandaNeural", "pt-PT-DuarteNeural", "pt-PT-RaquelNeural"] as const;
+type Voice = (typeof VOICES)[number];
+
+function pickVoice(voice?: Voice): Voice {
+  if (voice) return voice;
+  return VOICES[Math.floor(Math.random() * VOICES.length)]!;
+}
 
 export async function synthesizeSpeech(
   text: string,
   speed: "slow" | "normal" = "normal",
+  voice?: Voice,
 ): Promise<string> {
   const rate = speed === "slow" ? "-30%" : "0%";
+  const selectedVoice = pickVoice(voice);
 
   const ssml = `
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="pt-PT">
-  <voice name="${VOICE_NAME}">
+  <voice name="${selectedVoice}">
     <prosody rate="${rate}">${escapeXml(text)}</prosody>
   </voice>
 </speak>`.trim();

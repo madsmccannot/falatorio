@@ -11,6 +11,9 @@ export const SKILL_DOMAINS = [
   "lexicon",
   "pragmatics",
   "orthography",
+  "semantics",
+  "discourse",
+  "rhetoric",
 ] as const;
 export type SkillDomain = (typeof SKILL_DOMAINS)[number];
 

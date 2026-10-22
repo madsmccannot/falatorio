@@ -23,6 +23,7 @@ import {
 } from "@falatorio/db/schema";
 import { LESSON, EXERCISE_COGNITIVE_MAP, COGNITIVE_LEVELS, PRACTICE, DAILY_REFRESH } from "@falatorio/core";
 import { runAdaptiveEngine, getAllowedCognitiveLevels, exerciseCountForNode, diversifyExerciseOrder, type AdaptiveEngineInput } from "@falatorio/core/lesson";
+import { checkPrerequisitesSatisfied } from "@falatorio/core/mastery";
 import { scoreTextAnswer } from "@falatorio/core/scoring";
 import { scoreToRating } from "@falatorio/core/fsrs";
 import { schedule, createNewCard, type FSRSCard } from "@falatorio/core/fsrs";
@@ -208,6 +209,32 @@ export const lessonRouter = t.router({
         productionScore: m.productionScore,
         lastEvidenceAt: m.lastEvidenceAt,
       }));
+
+      const lessonSkillRows = await ctx.db
+        .select({ skillId: lessonSkills.skillId })
+        .from(lessonSkills)
+        .where(eq(lessonSkills.lessonId, input.lessonId));
+
+      if (lessonSkillRows.length > 0) {
+        const blockers: string[] = [];
+        for (const ls of lessonSkillRows) {
+          const check = checkPrerequisitesSatisfied(ls.skillId, prereqs, masteryScores);
+          if (!check.available) {
+            blockers.push(...check.missing);
+          }
+        }
+        if (blockers.length > 0) {
+          const uniqueBlockers = [...new Set(blockers)];
+          const blockerSkills = allSkills
+            .filter((s) => uniqueBlockers.includes(s.id))
+            .map((s) => s.code);
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "prerequisites_not_met",
+            cause: { missingSkills: blockerSkills },
+          });
+        }
+      }
 
       const fsrsDue = await ctx.db
         .select({ knowledgeItemId: exerciseKnowledge.knowledgeItemId })

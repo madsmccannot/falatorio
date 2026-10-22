@@ -318,6 +318,7 @@ Railway config (`railway.json`) uses the Dockerfile builder with a `/health` hea
 - **AdMob SSV** -- rewarded ad callbacks are verified via Google's public key before crediting ouro.
 - **Atomic economy** -- ouro spend operations use a Redis lock (`spendLock`) to prevent double-spend race conditions.
 - **Chest validation** -- chest rewards require preceding lessons to be completed.
+- **Prerequisite enforcement** -- `startLesson` checks that skill prerequisites are mastered (mastery >= 0.7) before allowing a session. Unmet prerequisites return the blocking skill codes.
 - **Exercise review gate** -- AI-generated exercises must be approved before reaching learners (`status: "review"` -> `"live"`).
 
 ## Testing & CI

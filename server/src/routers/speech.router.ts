@@ -11,11 +11,12 @@ export const speechRouter = t.router({
       z.object({
         text: z.string().min(1).max(500),
         speed: z.enum(["slow", "normal"]).default("normal"),
+        voice: z.enum(["pt-PT-FernandaNeural", "pt-PT-DuarteNeural", "pt-PT-RaquelNeural"]).optional(),
       }),
     )
     .mutation(async ({ input }) => {
       const { synthesizeSpeech } = await import("../services/tts.service.js");
-      const audioUrl = await synthesizeSpeech(input.text, input.speed);
+      const audioUrl = await synthesizeSpeech(input.text, input.speed, input.voice);
       return { audioUrl };
     }),
 });
