@@ -17,6 +17,7 @@ import { qualityRouter } from "../routers/quality.router.js";
 import { pipelineRouter } from "../routers/pipeline.router.js";
 import { analyticsRouter } from "../routers/analytics.router.js";
 import { questsRouter } from "../routers/quests.router.js";
+import { placementRouter } from "../routers/placement.router.js";
 
 export { t } from "./trpc.js";
 
@@ -42,6 +43,7 @@ export const appRouter = t.router({
   pipeline: pipelineRouter,
   analytics: analyticsRouter,
   quests: questsRouter,
+  placement: placementRouter,
 });
 
 export type AppRouter = typeof appRouter;

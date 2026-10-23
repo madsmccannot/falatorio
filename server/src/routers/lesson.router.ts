@@ -10,6 +10,7 @@ import {
   exerciseKnowledge,
   skillEvidence,
   knowledgeItems,
+  knowledgeRelations,
   skills,
   skillMastery,
   skillPrerequisites,
@@ -20,6 +21,7 @@ import {
   lessonCompletions,
   transactions,
   streaks,
+  l1CulturalContent,
 } from "@falatorio/db/schema";
 import { LESSON, EXERCISE_COGNITIVE_MAP, COGNITIVE_LEVELS, PRACTICE, DAILY_REFRESH } from "@falatorio/core";
 import { runAdaptiveEngine, getAllowedCognitiveLevels, exerciseCountForNode, diversifyExerciseOrder, type AdaptiveEngineInput } from "@falatorio/core/lesson";
@@ -413,7 +415,35 @@ export const lessonRouter = t.router({
 
       const unlockedSet = new Set(engineOutput.unlockedSkillIds);
 
+      const errorKIIds = recentErrors.map((e) => e.knowledgeItemId);
+      const confusableKIIds = new Set<string>();
+      if (errorKIIds.length > 0) {
+        const relations = await ctx.db
+          .select({ sourceId: knowledgeRelations.sourceId, targetId: knowledgeRelations.targetId })
+          .from(knowledgeRelations)
+          .where(
+            and(
+              sql`(${knowledgeRelations.sourceId} = ANY(${errorKIIds}) OR ${knowledgeRelations.targetId} = ANY(${errorKIIds}))`,
+              sql`${knowledgeRelations.relationType} IN ('confusable_with', 'reinforces')`,
+            ),
+          );
+        for (const r of relations) {
+          confusableKIIds.add(r.sourceId);
+          confusableKIIds.add(r.targetId);
+        }
+      }
+
+      const confusableExerciseIds = new Set<string>();
+      if (confusableKIIds.size > 0) {
+        const confLinks = await ctx.db
+          .select({ exerciseId: exerciseKnowledge.exerciseId })
+          .from(exerciseKnowledge)
+          .where(inArray(exerciseKnowledge.knowledgeItemId, [...confusableKIIds]));
+        for (const r of confLinks) confusableExerciseIds.add(r.exerciseId);
+      }
+
       const prioritized: typeof allLessonExercises = [];
+      const confusableBoosted: typeof allLessonExercises = [];
       const rest: typeof allLessonExercises = [];
       const locked: typeof allLessonExercises = [];
 
@@ -421,6 +451,8 @@ export const lessonRouter = t.router({
         const exSkills = exerciseSkillMap.get(ex.id);
         if (exSkills && [...exSkills].some((sid) => recommendedSkillIds.has(sid))) {
           prioritized.push(ex);
+        } else if (confusableExerciseIds.has(ex.id)) {
+          confusableBoosted.push(ex);
         } else if (exSkills && [...exSkills].every((sid) => !unlockedSet.has(sid))) {
           locked.push(ex);
         } else {
@@ -428,7 +460,7 @@ export const lessonRouter = t.router({
         }
       }
 
-      const available = [...prioritized, ...rest];
+      const available = [...prioritized, ...confusableBoosted, ...rest];
       if (available.length < exerciseTarget) {
         available.push(...locked.slice(0, exerciseTarget - available.length));
       }
@@ -516,9 +548,23 @@ export const lessonRouter = t.router({
 
       const knownWords = await buildKnownWords(ctx.db, ctx.user.userId);
 
+      const culturalItems = await ctx.db
+        .select({
+          id: l1CulturalContent.id,
+          type: l1CulturalContent.type,
+          contentPt: l1CulturalContent.contentPt,
+          contentL1: l1CulturalContent.contentL1,
+          explanation: l1CulturalContent.explanation,
+        })
+        .from(l1CulturalContent)
+        .where(eq(l1CulturalContent.l1Code, ctx.user.l1 as any))
+        .orderBy(sql`RANDOM()`)
+        .limit(LESSON.CULTURAL_ITEMS_PER_SESSION);
+
       return {
         sessionId,
         exercises: lessonExercises.map((e) => formatExerciseForClient(e, knownWords)),
+        culturalItems,
         hearts: user.hearts,
       };
     }),
