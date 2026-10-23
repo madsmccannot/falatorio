@@ -277,13 +277,18 @@ export const contentRouter = t.router({
     .input(
       z.object({
         limit: z.number().int().min(1).max(20).default(5),
+        type: z.enum(["joke", "expression", "meme", "reference", "slang", "proverb", "regional_expression"]).optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
+      const conditions = [eq(l1CulturalContent.l1Code, ctx.user.l1 as L1Code)];
+      if (input.type) {
+        conditions.push(eq(l1CulturalContent.type, input.type));
+      }
       const rows = await ctx.db
         .select()
         .from(l1CulturalContent)
-        .where(eq(l1CulturalContent.l1Code, ctx.user.l1 as L1Code))
+        .where(and(...conditions))
         .orderBy(sql`RANDOM()`)
         .limit(input.limit);
 

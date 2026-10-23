@@ -42,6 +42,7 @@ function exerciseToCognitiveLevel(exerciseType: string): CognitiveLevel {
 }
 
 type SessionType = "lesson" | "review" | "mistakes" | "daily_refresh";
+type SessionMode = "assessment" | "practice";
 
 interface LessonSession {
   userId: string;
@@ -57,7 +58,13 @@ interface LessonSession {
   sessionsRequired: number;
   sectionSortOrder: number;
   isUnitFinal: boolean;
+  responseTimes: number[];
+  currentStreak: number;
+  maxStreak: number;
+  mode: SessionMode;
 }
+
+type SessionMetrics = import("@falatorio/db/schema").SessionMetrics;
 
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -494,6 +501,10 @@ export const lessonRouter = t.router({
         sessionsRequired,
         sectionSortOrder,
         isUnitFinal,
+        responseTimes: [],
+        currentStreak: 0,
+        maxStreak: 0,
+        mode: "assessment",
       };
 
       await ctx.redis.set(
@@ -519,6 +530,7 @@ export const lessonRouter = t.router({
         sessionId: z.string().uuid(),
         exerciseId: z.string().uuid(),
         answer: z.string().max(2000),
+        responseTimeMs: z.number().int().min(0).max(300_000).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -637,12 +649,15 @@ export const lessonRouter = t.router({
         .where(eq(exerciseKnowledge.exerciseId, input.exerciseId));
 
       if (linkedKIs.length > 0) {
+        const evidenceScore = session.mode === "practice"
+          ? 0.5 + result.score * 0.5
+          : result.score;
         await ctx.db.insert(skillEvidence).values(
           linkedKIs.map((ki) => ({
             userId: ctx.user.userId,
             knowledgeItemId: ki.knowledgeItemId,
             exerciseId: input.exerciseId,
-            score: result.score,
+            score: evidenceScore,
             exerciseType: exercise.type,
           })),
         );
@@ -655,8 +670,19 @@ export const lessonRouter = t.router({
       }
 
       session.currentIndex += 1;
-      if (result.correct) session.correctCount += 1;
-      else session.incorrectCount += 1;
+      if (result.correct) {
+        session.correctCount += 1;
+        session.currentStreak += 1;
+        if (session.currentStreak > session.maxStreak) {
+          session.maxStreak = session.currentStreak;
+        }
+      } else {
+        session.incorrectCount += 1;
+        session.currentStreak = 0;
+      }
+      if (input.responseTimeMs != null) {
+        session.responseTimes.push(input.responseTimeMs);
+      }
 
       await ctx.redis.set(
         `session:${input.sessionId}`,
@@ -702,6 +728,21 @@ export const lessonRouter = t.router({
       }
       const accuracy = session.correctCount / total;
       const isPerfect = accuracy === 1;
+
+      const durationMs = Date.now() - new Date(session.startedAt).getTime();
+      const rt = (session.responseTimes ?? []).slice().sort((a, b) => a - b);
+      const avgResponseMs = rt.length > 0 ? Math.round(rt.reduce((a, b) => a + b, 0) / rt.length) : 0;
+      const medianResponseMs = rt.length > 0
+        ? (rt.length % 2 === 1 ? rt[Math.floor(rt.length / 2)]! : Math.round((rt[Math.floor((rt.length - 1) / 2)]! + rt[Math.ceil((rt.length - 1) / 2)]!) / 2))
+        : 0;
+      const sessionMetrics: SessionMetrics = {
+        durationMs,
+        avgResponseMs,
+        medianResponseMs,
+        maxStreak: session.maxStreak ?? 0,
+        exerciseCount: total,
+        accuracy,
+      };
 
       const [user] = await ctx.db
         .select({
@@ -800,6 +841,7 @@ export const lessonRouter = t.router({
             .set({
               bestAccuracy: Math.max(existing.bestAccuracy, accuracy),
               attempts: existing.attempts + 1,
+              lastSessionMetrics: sessionMetrics,
               lastCompletedAt: new Date(),
             })
             .where(
@@ -814,6 +856,7 @@ export const lessonRouter = t.router({
             lessonId: session.lessonId,
             bestAccuracy: accuracy,
             attempts: 1,
+            lastSessionMetrics: sessionMetrics,
           });
         }
       }
@@ -848,6 +891,7 @@ export const lessonRouter = t.router({
         heartsEarned,
         sessionType: session.sessionType ?? "lesson",
         newAchievements: achievementResult.newlyUnlocked,
+        sessionMetrics,
       };
     }),
 
@@ -915,6 +959,10 @@ export const lessonRouter = t.router({
         sessionsRequired: 1,
         sectionSortOrder: 0,
         isUnitFinal: false,
+        responseTimes: [],
+        currentStreak: 0,
+        maxStreak: 0,
+        mode: "practice",
       };
 
       await ctx.redis.set(
@@ -1019,6 +1067,10 @@ export const lessonRouter = t.router({
         sessionsRequired: 1,
         sectionSortOrder: 0,
         isUnitFinal: false,
+        responseTimes: [],
+        currentStreak: 0,
+        maxStreak: 0,
+        mode: "practice",
       };
 
       await ctx.redis.set(
@@ -1236,6 +1288,10 @@ export const lessonRouter = t.router({
         sessionsRequired: 1,
         sectionSortOrder: 0,
         isUnitFinal: false,
+        responseTimes: [],
+        currentStreak: 0,
+        maxStreak: 0,
+        mode: "practice",
       };
 
       await ctx.redis.set(

@@ -82,9 +82,15 @@ const KEYS = {
   API_URL: "api_url",
   OFFLINE_SYNC_QUEUE: "offline_sync_queue",
   OFFLINE_LESSON_MANIFEST: "offline_lesson_manifest",
+  OFFLINE_PREFETCH_DEPTH: "offline_prefetch_depth",
   DISPLAY_NAME: "display_name",
   USERNAME: "username",
   DAILY_GOAL: "daily_goal",
+} as const;
+
+export const OFFLINE_DEFAULTS = {
+  PREFETCH_DEPTH: 2,
+  MAX_PREFETCH_DEPTH: 5,
 } as const;
 
 export { KEYS };

@@ -23,6 +23,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useAdReward } from "@/hooks/useAdReward";
 import { BannerAdComponent } from "@/components/ads/BannerAd";
 import { useEntitlements } from "@/hooks/useEntitlements";
+import { usePrefetchLessons } from "@/hooks/usePrefetchLessons";
 import { colors, spacing, radii, typography } from "@falatorio/ui/tokens";
 import { OURO, HEARTS, calculateXP } from "@falatorio/core";
 
@@ -986,6 +987,22 @@ export default function LearnScreen() {
     { sectionId: activeSectionId! },
     { enabled: !!activeSectionId && !showSections },
   );
+
+  const prefetchUnits = useMemo(() => {
+    if (!sectionMapQuery.data) return undefined;
+    return sectionMapQuery.data.map((u) => ({
+      unitId: u.id,
+      lessons: u.lessons.map((l) => ({
+        id: l.id,
+        sortOrder: l.sortOrder,
+        nodeType: l.nodeType,
+        grammarFocus: null,
+        completed: l.completed,
+      })),
+    }));
+  }, [sectionMapQuery.data]);
+
+  usePrefetchLessons(prefetchUnits, !!sectionMapQuery.data);
 
   useEffect(() => {
     const handler = BackHandler.addEventListener("hardwareBackPress", () => {

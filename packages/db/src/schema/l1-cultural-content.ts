@@ -9,7 +9,7 @@ import {
 import { l1CodeEnum, cefrEnum } from "./users.js";
 
 export const culturalContentTypeEnum = pgEnum("cultural_content_type", [
-  "joke", "expression", "meme", "reference",
+  "joke", "expression", "meme", "reference", "slang", "proverb", "regional_expression",
 ]);
 
 export const l1CulturalContent = pgTable("l1_cultural_content", {

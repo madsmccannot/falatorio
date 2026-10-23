@@ -47,7 +47,13 @@ export function calculateMastery(
     varietyScore * varietyWeight +
     productionScore * productionWeight;
 
-  const mastery = Math.min(Math.max(rawMastery, 0), 1);
+  const lastEvidenceMs = Date.now() - evidence[evidence.length - 1]!.createdAt.getTime();
+  const daysSinceLastEvidence = lastEvidenceMs / (1000 * 60 * 60 * 24);
+  const decayFactor = daysSinceLastEvidence > 14
+    ? Math.max(1 - (daysSinceLastEvidence - 14) / 120, 0.3)
+    : 1;
+
+  const mastery = Math.min(Math.max(rawMastery * decayFactor, 0), 1);
 
   const repsFactor = Math.min(evidence.length / c.minReps, 1);
   const varietyFactor = Math.min(varietyScore / Math.max(c.minVariety, 0.01), 1);

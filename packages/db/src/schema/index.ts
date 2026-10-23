@@ -24,6 +24,6 @@ export { skillEvidence } from "./skill-evidence.js";
 export { skillMastery } from "./skill-mastery.js";
 export { knowledgeRelations, knowledgeRelationTypeEnum } from "./knowledge-relations.js";
 export { lessonSkills } from "./lesson-skills.js";
-export { lessonCompletions } from "./lesson-completions.js";
+export { lessonCompletions, type SessionMetrics } from "./lesson-completions.js";
 export { userFollows } from "./user-follows.js";
 export { dailyQuests, monthlyQuestProgress, questTypeEnum } from "./daily-quests.js";
