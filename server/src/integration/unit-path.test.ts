@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { exerciseCountForNode } from "@falatorio/core/lesson";
 import { LESSON } from "@falatorio/core";
 
-const NODE_TYPES = ["lesson", "application", "practice", "recap", "chest"] as const;
+const NODE_TYPES = ["lesson", "application", "practice", "recap", "chest", "new_content", "integration"] as const;
 
 describe("unit path: node types and exercise counts", () => {
   it("chest nodes have zero base exercises", () => {

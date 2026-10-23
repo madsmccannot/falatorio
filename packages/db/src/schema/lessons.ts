@@ -15,7 +15,16 @@ export const nodeTypeEnum = pgEnum("node_type", [
   "application",
   "practice",
   "recap",
+  "new_content",
+  "integration",
 ]);
+
+export interface LessonMetadata {
+  learningObjectives?: string[];
+  newConceptCount?: number;
+  vocabularyLoad?: number;
+  grammarComplexity?: "low" | "medium" | "high";
+}
 
 export const lessons = pgTable("lessons", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -27,6 +36,7 @@ export const lessons = pgTable("lessons", {
   vocabTarget: jsonb("vocab_target").notNull().$type<string[]>().default([]),
   rewardConfig: jsonb("reward_config").$type<{ type: "ouro" | "xp_boost" | "super_days" | "streak_freeze"; amount: number }>(),
   unlockThreshold: real("unlock_threshold").notNull().default(0.8),
+  metadata: jsonb("metadata").$type<LessonMetadata>(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

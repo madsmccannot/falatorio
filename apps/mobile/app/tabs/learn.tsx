@@ -75,7 +75,7 @@ function getEstimatedXp(sectionSortOrder: number, isUnitFinal: boolean, isRepeat
 type LessonNode = {
   id: string;
   sortOrder: number;
-  nodeType: "lesson" | "chest" | "application" | "practice" | "recap";
+  nodeType: "lesson" | "chest" | "application" | "practice" | "recap" | "new_content" | "integration";
   sessionsRequired: number;
   rewardConfig: { type: string; amount: number } | null;
   completed: boolean;
@@ -95,7 +95,7 @@ type UnitWithLessons = {
 
 type SelectedLesson = {
   id: string;
-  nodeType: "lesson" | "chest" | "application" | "practice" | "recap";
+  nodeType: "lesson" | "chest" | "application" | "practice" | "recap" | "new_content" | "integration";
   unitTitle: string;
   unitColor: string;
   lessonNum: number;
@@ -245,7 +245,7 @@ function LessonPathNode({
     <ChestIcon size={28} />
   ) : isCompleted ? (
     <CheckIcon size={26} color={iconColor} />
-  ) : node.nodeType === "application" ? (
+  ) : node.nodeType === "application" || node.nodeType === "integration" ? (
     <BookIcon size={24} color={iconColor} />
   ) : node.nodeType === "practice" ? (
     <StrengthIcon size={24} color={iconColor} />

@@ -8,12 +8,14 @@ if (!DATABASE_URL) {
   process.exit(1);
 }
 
-type NodeType = "lesson" | "application" | "practice" | "recap" | "chest";
+type NodeType = "lesson" | "application" | "practice" | "recap" | "chest" | "new_content" | "integration";
 
 const SECTION_MULTIPLIER = [1.0, 1.15, 1.3, 1.5];
 const NODE_BASE_SESSIONS: Record<NodeType, number> = {
   lesson: 4,
+  new_content: 4,
   application: 3,
+  integration: 3,
   practice: 2,
   recap: 1,
   chest: 0,

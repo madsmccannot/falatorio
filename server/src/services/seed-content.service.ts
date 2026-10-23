@@ -127,13 +127,15 @@ function getChestPositions(totalSlots: number): number[] {
 
 // Sessions per node type. Each type has a base count scaled by section.
 // Section multipliers make advanced content naturally require more work.
-type NodeType = "lesson" | "application" | "practice" | "recap" | "chest";
+type NodeType = "lesson" | "application" | "practice" | "recap" | "chest" | "new_content" | "integration";
 
 const SECTION_MULTIPLIER = [1.0, 1.15, 1.3, 1.5];
 
 const NODE_BASE_SESSIONS: Record<NodeType, number> = {
   lesson: 4,
+  new_content: 4,
   application: 3,
+  integration: 3,
   practice: 2,
   recap: 1,
   chest: 0,

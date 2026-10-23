@@ -168,7 +168,9 @@ export const LESSON = {
   EXERCISES_PER_LESSON: 15,
   EXERCISES_BY_NODE_TYPE: {
     lesson: 15,
+    new_content: 15,
     application: 12,
+    integration: 12,
     practice: 10,
     recap: 8,
     chest: 0,
