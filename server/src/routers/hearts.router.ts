@@ -32,8 +32,23 @@ export const heartsRouter = t.router({
       user.tier as Tier,
     );
 
+    const computed = current ?? HEARTS.MAX;
+    if (computed !== user.hearts) {
+      const nextRefill = computed >= HEARTS.MAX ? null : user.heartsRefillAt;
+      await ctx.db
+        .update(users)
+        .set({
+          hearts: computed,
+          heartsRefillAt: nextRefill,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, ctx.user.userId));
+
+      return { hearts: computed, unlimited: false, nextRefillAt: nextRefill };
+    }
+
     return {
-      hearts: current ?? HEARTS.MAX,
+      hearts: computed,
       unlimited: false,
       nextRefillAt: user.heartsRefillAt,
     };

@@ -43,6 +43,7 @@ export default function LessonScreen() {
   const { hearts, unlimited, continueWithOuro } = useHearts();
 
   const {
+    sessionId,
     phase,
     currentExercise,
     currentIndex,
@@ -259,8 +260,9 @@ export default function LessonScreen() {
         <Button
           title={t("lesson.quit")}
           onPress={() => {
+            setShowQuit(false);
             trackLessonQuit(lessonId!, currentIndex, totalExercises);
-            router.back();
+            setTimeout(() => router.back(), 150);
           }}
           variant="danger"
           style={styles.modalButton}
@@ -275,14 +277,23 @@ export default function LessonScreen() {
         <Button
           title={t("lesson.continue_ouro")}
           onPress={async () => {
-            await continueWithOuro(lessonId!);
-            setShowOutOfHearts(false);
+            if (!sessionId) return;
+            try {
+              await continueWithOuro(sessionId);
+              setShowOutOfHearts(false);
+            } catch {
+              setShowOutOfHearts(false);
+              setTimeout(() => router.back(), 150);
+            }
           }}
           style={styles.modalButton}
         />
         <Button
           title={t("lesson.leave")}
-          onPress={() => router.back()}
+          onPress={() => {
+            setShowOutOfHearts(false);
+            setTimeout(() => router.back(), 150);
+          }}
           variant="outline"
           style={styles.modalButton}
         />

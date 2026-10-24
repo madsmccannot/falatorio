@@ -23,7 +23,7 @@ import {
   streaks,
   l1CulturalContent,
 } from "@falatorio/db/schema";
-import { LESSON, EXERCISE_COGNITIVE_MAP, COGNITIVE_LEVELS, PRACTICE, DAILY_REFRESH } from "@falatorio/core";
+import { LESSON, EXERCISE_COGNITIVE_MAP, COGNITIVE_LEVELS, PRACTICE, DAILY_REFRESH, HEARTS } from "@falatorio/core";
 import { runAdaptiveEngine, getAllowedCognitiveLevels, exerciseCountForNode, diversifyExerciseOrder, type AdaptiveEngineInput } from "@falatorio/core/lesson";
 import { checkPrerequisitesSatisfied } from "@falatorio/core/mastery";
 import { scoreTextAnswer } from "@falatorio/core/scoring";
@@ -82,9 +82,18 @@ function formatExerciseForClient(
   knownWords: Set<string>,
 ) {
   const p = e.prompt as Record<string, unknown> | string;
-  const text = typeof p === "string"
-    ? p
-    : ((p["sentence"] ?? p["question"] ?? p["text"] ?? p["targetText"] ?? "") as string);
+  let text: string;
+  if (typeof p === "string") {
+    text = p;
+  } else {
+    text = (p["sentence"] ?? p["question"] ?? p["text"] ?? p["targetText"] ?? "") as string;
+    if (!text) {
+      const firstString = Object.values(p).find(
+        (v) => typeof v === "string" && v.length > 0,
+      );
+      text = typeof firstString === "string" ? firstString : JSON.stringify(p);
+    }
+  }
 
   const glossary = typeof p === "object"
     ? (p["glossary"] as Record<string, string[]> | undefined) ?? undefined
@@ -618,11 +627,23 @@ export const lessonRouter = t.router({
       let outOfHearts = false;
 
       if (!result.correct && user.tier === "free" && heartsRemaining !== null) {
+        const [userRow] = await ctx.db
+          .select({ heartsRefillAt: users.heartsRefillAt })
+          .from(users)
+          .where(eq(users.id, ctx.user.userId))
+          .limit(1);
+
+        const now = new Date();
+        const setRefill = !userRow?.heartsRefillAt;
+
         const [updated] = await ctx.db
           .update(users)
           .set({
             hearts: sql`GREATEST(${users.hearts} - 1, 0)`,
-            updatedAt: new Date(),
+            heartsRefillAt: setRefill
+              ? new Date(now.getTime() + HEARTS.REFILL_INTERVAL_MS)
+              : undefined,
+            updatedAt: now,
           })
           .where(eq(users.id, ctx.user.userId))
           .returning({ hearts: users.hearts });
