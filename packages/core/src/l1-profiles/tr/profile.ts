@@ -246,7 +246,7 @@ export const trProfile: L1Profile = {
       {
         concept: "Tu vs Você vs O Senhor",
         explanation: { en: "Three formality levels for 'you'", tr: "'Sen' icin uc resmiyet duzeyi" },
-        l1Comparison: { en: "Turkish has sen/siz (like tu/vous). PT-EU adds a middle level: 'tu' (intimate, like sen), 'você' (neutral), 'o senhor' (formal, like siz). In Portugal, 'tu' is standard among peers.", tr: "Turkcede sen/siz vardir. PT-EU bir orta duzey ekler: 'tu' (samimi, sen gibi), 'voce' (notr), 'o senhor' (resmi, siz gibi). Portekiz'de akranlar arasinda 'tu' standarttir." },
+        l1Comparison: { en: "Turkish has sen/siz (like tu/vous). PT-EU adds a middle level: 'tu' (intimate, like sen), 'você' (neutral), 'o senhor' (formal, like siz). In Portugal, 'tu' is standard among peers.", tr: "Turkcede sen/siz vardir. PT-EU bir orta duzey ekler: 'tu' (samimi, sen gibi), 'você' (notr), 'o senhor' (resmi, siz gibi). Portekiz'de akranlar arasinda 'tu' standarttir." },
       },
       {
         concept: "Preposition contractions",
