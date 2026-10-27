@@ -570,9 +570,12 @@ export const lessonRouter = t.router({
         .orderBy(sql`RANDOM()`)
         .limit(LESSON.CULTURAL_ITEMS_PER_SESSION);
 
+      const clientExercises = lessonExercises.map((e) => formatExerciseForClient(e, knownWords));
+      console.log("[startLesson] exercises:", JSON.stringify(clientExercises.map((e) => ({ id: e.id, type: e.type, prompt: e.prompt?.slice(0, 80) })), null, 2));
+
       return {
         sessionId,
-        exercises: lessonExercises.map((e) => formatExerciseForClient(e, knownWords)),
+        exercises: clientExercises,
         culturalItems,
         hearts: user.hearts,
       };

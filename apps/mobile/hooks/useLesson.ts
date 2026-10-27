@@ -164,6 +164,10 @@ export function useLesson(lessonId?: string) {
 
       trackExerciseAnswer(exercise.type, result.correct, Date.now() - answerStartMs);
 
+      if (!result.correct) {
+        utils.hearts.getState.invalidate();
+      }
+
       setState((prev) => ({
         ...prev,
         phase: "feedback" as const,
