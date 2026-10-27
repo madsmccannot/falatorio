@@ -33,25 +33,26 @@ export const heartsRouter = t.router({
     );
 
     const computed = current ?? HEARTS.MAX;
-    if (computed !== user.hearts) {
-      const nextRefill = computed >= HEARTS.MAX ? null : user.heartsRefillAt;
+    const now = new Date();
+    let nextRefill = user.heartsRefillAt;
+
+    if (computed !== user.hearts || (computed < HEARTS.MAX && !nextRefill)) {
+      if (computed >= HEARTS.MAX) {
+        nextRefill = null;
+      } else if (!nextRefill) {
+        nextRefill = new Date(now.getTime() + HEARTS.REFILL_INTERVAL_MS);
+      }
       await ctx.db
         .update(users)
         .set({
           hearts: computed,
           heartsRefillAt: nextRefill,
-          updatedAt: new Date(),
+          updatedAt: now,
         })
         .where(eq(users.id, ctx.user.userId));
-
-      return { hearts: computed, unlimited: false, nextRefillAt: nextRefill };
     }
 
-    return {
-      hearts: computed,
-      unlimited: false,
-      nextRefillAt: user.heartsRefillAt,
-    };
+    return { hearts: computed, unlimited: false, nextRefillAt: nextRefill };
   }),
 
   refillWithOuro: protectedProcedure.use(rateLimiter(10, 60_000, "hearts:refill")).use(spendLock).mutation(async ({ ctx }) => {
