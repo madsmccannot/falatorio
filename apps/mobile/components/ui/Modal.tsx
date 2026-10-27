@@ -1,6 +1,5 @@
 import type React from "react";
 import {
-  Modal as RNModal,
   Pressable,
   StyleSheet,
 } from "react-native";
@@ -28,39 +27,40 @@ export function Modal({
   dismissable = true,
 }: ModalProps) {
   const handleClose = onClose ?? onDismiss ?? (() => {});
+
+  if (!visible) return null;
+
   return (
-    <RNModal
-      visible={visible}
-      transparent
-      animationType="none"
-      statusBarTranslucent
-      onRequestClose={dismissable ? handleClose : undefined}
+    <Animated.View
+      entering={FadeIn.duration(200)}
+      exiting={FadeOut.duration(150)}
+      style={styles.overlay}
     >
+      <Pressable
+        style={styles.backdrop}
+        onPress={dismissable ? handleClose : undefined}
+      />
       <Animated.View
-        entering={FadeIn.duration(200)}
-        exiting={FadeOut.duration(150)}
-        style={styles.overlay}
+        entering={SlideInDown.springify().damping(18).stiffness(300)}
+        exiting={SlideOutDown.duration(200)}
+        style={styles.content}
       >
-        <Pressable
-          style={styles.backdrop}
-          onPress={dismissable ? handleClose : undefined}
-        />
-        <Animated.View
-          entering={SlideInDown.springify().damping(18).stiffness(300)}
-          exiting={SlideOutDown.duration(200)}
-          style={styles.content}
-        >
-          {children}
-        </Animated.View>
+        {children}
       </Animated.View>
-    </RNModal>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   overlay: {
-    flex: 1,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: "flex-end",
+    zIndex: 1000,
+    elevation: 1000,
   },
   backdrop: {
     ...StyleSheet.absoluteFill,

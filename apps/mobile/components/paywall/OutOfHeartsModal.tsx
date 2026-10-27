@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -9,6 +10,16 @@ import { HeartIcon } from "@/components/icons";
 import { colors, spacing, typography } from "@falatorio/ui/tokens";
 import { HEARTS } from "@falatorio/core";
 
+function formatCountdown(ms: number): string {
+  if (ms <= 0) return "0:00";
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 type Props = {
   visible: boolean;
   onDismiss: () => void;
@@ -17,10 +28,20 @@ type Props = {
 
 export function OutOfHeartsModal({ visible, onDismiss, context }: Props) {
   const router = useRouter();
-  const { refillWithOuro, nextRefillIn } = useHearts();
+  const { refillWithOuro, nextRefillAt } = useHearts();
   const { balance } = useOuro();
   const refillCost = HEARTS.REFILL_COST;
   const canAfford = balance >= refillCost;
+
+  const [remaining, setRemaining] = useState<number | null>(null);
+  useEffect(() => {
+    if (!nextRefillAt) { setRemaining(null); return; }
+    const target = new Date(nextRefillAt).getTime();
+    const update = () => setRemaining(Math.max(0, target - Date.now()));
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [nextRefillAt]);
 
   return (
     <Modal visible={visible} onDismiss={onDismiss}>
@@ -34,8 +55,8 @@ export function OutOfHeartsModal({ visible, onDismiss, context }: Props) {
           : "Precisas de vidas para começar uma lição."}
       </Text>
 
-      {nextRefillIn && (
-        <Text style={styles.timer}>Próxima vida grátis em {nextRefillIn}</Text>
+      {remaining != null && remaining > 0 && (
+        <Text style={styles.timer}>Próxima vida grátis em {formatCountdown(remaining)}</Text>
       )}
 
       <Button

@@ -756,9 +756,27 @@ function StreakModal({
   );
 }
 
+function useCountdown(targetDate: Date | string | null): number | null {
+  const [remaining, setRemaining] = useState<number | null>(() => {
+    if (!targetDate) return null;
+    return Math.max(0, new Date(targetDate).getTime() - Date.now());
+  });
+
+  useEffect(() => {
+    if (!targetDate) { setRemaining(null); return; }
+    const target = new Date(targetDate).getTime();
+    const update = () => setRemaining(Math.max(0, target - Date.now()));
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [targetDate]);
+
+  return remaining;
+}
+
 function HeartsModal({
   visible, onClose, theme, t, hearts, unlimited,
-  nextRefillIn, balance, onRefill, isRefilling, onPractice,
+  nextRefillAt, balance, onRefill, isRefilling, onPractice,
   canWatchAd, isWatchingAd, onWatchAd,
 }: {
   visible: boolean;
@@ -767,7 +785,7 @@ function HeartsModal({
   t: (key: any) => string;
   hearts: number;
   unlimited: boolean;
-  nextRefillIn: number | null;
+  nextRefillAt: Date | string | null;
   balance: number;
   onRefill: () => void;
   isRefilling: boolean;
@@ -777,6 +795,7 @@ function HeartsModal({
   onWatchAd: () => void;
 }) {
   const heartIcons = Array.from({ length: HEARTS.MAX }, (_, i) => i < hearts);
+  const nextRefillIn = useCountdown(nextRefillAt);
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
@@ -940,7 +959,7 @@ export default function LearnScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const { hearts, unlimited, nextRefillIn, refillWithOuro, isRefilling } = useHearts();
+  const { hearts, unlimited, nextRefillAt, refillWithOuro, isRefilling } = useHearts();
   const { currentDays, longestDays, freezeAvailable, isActive, purchaseFreeze } = useStreak();
   const { balance } = useOuro();
   const { t, l1 } = useTranslation();
@@ -1522,7 +1541,7 @@ export default function LearnScreen() {
         t={t}
         hearts={hearts}
         unlimited={unlimited}
-        nextRefillIn={nextRefillIn}
+        nextRefillAt={nextRefillAt}
         balance={balance}
         onRefill={refillWithOuro}
         isRefilling={isRefilling}

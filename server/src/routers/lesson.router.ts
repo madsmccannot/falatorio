@@ -86,7 +86,7 @@ function formatExerciseForClient(
   if (typeof p === "string") {
     text = p;
   } else {
-    text = (p["sentence"] ?? p["question"] ?? p["text"] ?? p["targetText"] ?? "") as string;
+    text = ((p["sentence"] || p["question"] || p["text"] || p["targetText"]) ?? "") as string;
     if (!text) {
       const firstString = Object.values(p).find(
         (v) => typeof v === "string" && v.length > 0,
@@ -571,7 +571,7 @@ export const lessonRouter = t.router({
         .limit(LESSON.CULTURAL_ITEMS_PER_SESSION);
 
       const clientExercises = lessonExercises.map((e) => formatExerciseForClient(e, knownWords));
-      console.log("[startLesson] exercises:", JSON.stringify(clientExercises.map((e) => ({ id: e.id, type: e.type, prompt: e.prompt?.slice(0, 80) })), null, 2));
+
 
       return {
         sessionId,

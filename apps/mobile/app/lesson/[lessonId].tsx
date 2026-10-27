@@ -262,7 +262,7 @@ export default function LessonScreen() {
           onPress={() => {
             setShowQuit(false);
             trackLessonQuit(lessonId!, currentIndex, totalExercises);
-            setTimeout(() => router.back(), 150);
+            router.back();
           }}
           variant="danger"
           style={styles.modalButton}
@@ -283,7 +283,7 @@ export default function LessonScreen() {
               setShowOutOfHearts(false);
             } catch {
               setShowOutOfHearts(false);
-              setTimeout(() => router.back(), 150);
+              router.back();
             }
           }}
           style={styles.modalButton}
@@ -292,7 +292,7 @@ export default function LessonScreen() {
           title={t("lesson.leave")}
           onPress={() => {
             setShowOutOfHearts(false);
-            setTimeout(() => router.back(), 150);
+            router.back();
           }}
           variant="outline"
           style={styles.modalButton}
