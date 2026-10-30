@@ -200,8 +200,9 @@ async function generateForGap(
 
   let generated = 0;
 
-  for (const exerciseType of typesToGenerate) {
-    const l1 = l1s[Math.floor(Math.random() * l1s.length)]!;
+  for (let typeIdx = 0; typeIdx < typesToGenerate.length; typeIdx++) {
+    const exerciseType = typesToGenerate[typeIdx]!;
+    const l1 = l1s[typeIdx % l1s.length]!;
     const cognitiveLevel = EXERCISE_TO_COGNITIVE[exerciseType] ?? "recognition";
 
     const l1NotesStr = ki.l1Notes
@@ -256,7 +257,6 @@ async function generateForGap(
         }
         if (attempt === 1) {
           console.error(`  [${gap.knowledgeItemCode}] ${exerciseType}: ${msg}`);
-          throw err;
         }
       }
     }
